@@ -720,7 +720,8 @@ class Layout(Case):
 
 class FieldReferences(Case):
     def bind(self, kind, entity, prop):
-        field = {"field": {kind: {"Expression": {"SourceRef": {"Entity": entity}}, "Property": prop}}}
+        field = {"field": {kind: {"Expression": {"SourceRef": {"Entity": entity}}, "Property": prop}},
+                 "queryRef": "%s.%s" % (entity, prop)}
         self.edit_json(CARD, lambda d: d["visual"].update({"query": {"queryState": {"Values": {"projections": [field]}}}}))
 
     def test_field_the_model_has_passes(self):

@@ -20,6 +20,8 @@ Finding codes (errors unless marked warn or note; only errors change the exit co
     F003  a model's 'definition' folder holds no .tmdl file
     J001  a project JSON file is not valid JSON or starts with a byte-order mark; or a .tmdl file is not UTF-8
     J002  a project JSON file does not have the structure Power BI expects
+    J003  a project JSON file does not fit the Microsoft schema its '$schema' line names (scripts/json_schema.py)
+    J004  (note) a project JSON file names a schema version that scripts/schemas holds no copy of: not checked
     S001  '$schema' is missing or is not a Microsoft Fabric schema address
     N001  page name or folder has characters other than letters, digits, underscore, hyphen; or the name is over 50
     N002  visual name or folder: same rule
@@ -85,6 +87,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import formula_scanner as fs  # noqa: E402
+import json_schema  # noqa: E402
 
 NAME_OK = re.compile(r"[A-Za-z0-9_-]+\Z")           # Microsoft Learn: PBIR naming convention
 NAME_MAX = 50                                        # Microsoft schemas: page 2.1.0, visualContainer 2.13.0
@@ -655,13 +658,30 @@ def check_all_json(folder, findings):
     for sub, dirs, files in os.walk(folder):
         dirs[:] = [d for d in dirs if d != ".pbi"]
         for name in sorted(files):
-            if name.lower().endswith((".json", ".pbir", ".pbism")):
+            if name.lower().endswith((".json", ".pbir", ".pbism")) or name == ".platform":
                 path = os.path.join(sub, name)
                 before = len(findings.items)
-                load_json(path, findings)
+                data = load_json(path, findings)
                 if len(findings.items) != before:
                     bad.add(path)
+                elif data is not FAILED:
+                    check_against_schema(data, path, findings)
     return bad
+
+
+def check_against_schema(data, path, findings):
+    """J003: the file does not fit the Microsoft schema its '$schema' line names. J004: no copy of that schema."""
+    try:
+        state, problems = json_schema.check_value(data)
+    except RecursionError:
+        return
+    if state == "failed":
+        findings.add("J003", path, 0, "does not fit Microsoft's schema (%s): %s. Power BI Desktop refuses a file "
+                     "that breaks its schema" % (data.get("$schema", "").split("/json-schemas/")[-1],
+                                                 "; ".join(problems[:3])))
+    elif state == "not shipped":
+        findings.add("J004", path, 0, "not checked against Microsoft's schema: scripts/schemas holds no copy of %s"
+                     % data.get("$schema"), level="note")
 
 
 def check_schema(data, path, findings):
