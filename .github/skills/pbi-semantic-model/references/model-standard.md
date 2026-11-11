@@ -74,6 +74,8 @@ This file covers measures, folders, hiding, calculated objects, summarising, dat
 
 **15. Unused hidden objects.** A hidden column or hidden measure that nothing refers to is listed. Items 5 and 25. Note M201.
 
+Order inside a table file: write measures before columns. Microsoft's skill asks for it (tmdl-guidelines.md), and the TMDL examples on Microsoft Learn show it; Learn also says the order of columns and measures can be anything, so it does not change the model. No check. Source: https://github.com/microsoft/skills-for-fabric/blob/main/plugins/powerbi-authoring/skills/semantic-model-authoring/references/tmdl-guidelines.md ; https://learn.microsoft.com/en-us/analysis-services/tmdl/tmdl-overview
+
 ## D. Off unless the brief turns them on
 
 **16. Excel.** With "Excel check on: yes", the script lists hidden columns that are not a sort key, are not sorted by another column, are in no hierarchy and have no variation (the conditions of Microsoft's best practice rule). Turning `isAvailableInMdx` off on them saves memory, but removes them from Excel PivotTables. Report the list and that risk. Change nothing without the developer's yes. Note M301.
@@ -82,6 +84,7 @@ This file covers measures, folders, hiding, calculated objects, summarising, dat
 
 - Microsoft states that Copilot reads the model's fields, the synonyms in the model's linguistic schema, and only the first 200 characters of a description. So put the key words of a description first. Note M302 lists longer descriptions.
 - Synonyms are part of the model's linguistic setup, which a person edits in Power BI (the Q&A setup, or "Prep data for AI"). Microsoft's skill says an agent must not write their stored form, so do not write them into files. You may hand the developer a list of candidates: the different terms that departments already use for the same field. The developer decides and enters them.
+- Mark the column that names each member of a dimension with `isDefaultLabel`, for example `Store[Store Name]`, so Copilot knows which column labels the table. Note M303 lists dimension tables with no column marked. Item: beyond. Source: Microsoft's skill, https://github.com/microsoft/skills-for-fabric/blob/main/plugins/powerbi-authoring/skills/semantic-model-authoring/references/semantic-model-ai-readiness.md
 
 ## Exceptions
 

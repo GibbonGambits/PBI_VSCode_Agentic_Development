@@ -36,6 +36,7 @@ An empty field means the layout standard: 1280 x 720, margin 24, gap 16, grid 8.
 - Measure table: `_Measures`. Copilot makes it: an imported one-column table, or a calculated table when the model reads its data in Direct Lake or DirectQuery mode. Write here if this model differs, and why:
 - Facts about the data that Copilot was given or read (row counts, distinct values, unique keys, steps that fold), each with its date and where it came from (3, 11, 14, 17, 31):
 - Large tables: row counts, and the decision on incremental refresh or partitions:
+- Prefix for report-level measures (empty means an underscore, `_`):
 - Excel check on (yes or no):
 - Power BI Copilot check on (yes or no):
 - Number formats and date formats (71, 72):

@@ -59,6 +59,7 @@ Finding codes (errors unless marked warn or note; only errors change the exit co
     M201  (note) hidden column or measure that nothing refers to
     M301  (note) hidden columns whose isAvailableInMdx could be turned off (only when the brief turns this on)
     M302  (note) description longer than 200 characters (only when the brief turns this on)
+    M303  (note) dimension table with no column marked isDefaultLabel (only when the brief turns this on)
 
   Layout standard (.github/skills/pbi-report/references/layout-standard.md):
     G001  visual reaches outside the page
@@ -78,6 +79,7 @@ Finding codes (errors unless marked warn or note; only errors change the exit co
     M117  (warn) the one partition of a table is not named after the table
     M118  (warn) visible table, column or hierarchy name: capital, underscores, words run together, technical prefix
     M119  (warn) column and hierarchy of one table share a name
+    M120  (warn) table that shows more than 30 columns
     M401  (warn) Auto date/time is on
     M402  time intelligence is used and no table is marked as a date table
     M403  (warn) date columns, and no table marked as a date table
@@ -93,6 +95,7 @@ Finding codes (errors unless marked warn or note; only errors change the exit co
     M413  (warn) one-side column of a relationship is not marked as the key
     M414  (warn) security roles in a model with inactive relationships
     M415  USERELATIONSHIP towards a table that has a row-level security rule
+    M416  (note) relationship key column that allows blanks (no isNullable: false)
     M417  (warn) a number column for each month: unpivot
     M901  relationship names a table or column the model does not have
     M902  hierarchy level on a column the table does not have
@@ -119,7 +122,12 @@ Finding codes (errors unless marked warn or note; only errors change the exit co
     M514  (warn) EARLIER or EARLIEST: use a variable
     M516  (warn) window function without ORDERBY
     M517  (warn) VALUES compared with one value
+    M518  (warn) DIVIDE by a fixed number: use '/'
+    M519  (warn) ALL as a filter argument of CALCULATE where REMOVEFILTERS is meant
     M520  (warn) formulas that do not follow the DAX style (one finding for each table file)
+    M521  (warn) CALCULATE written directly inside CALCULATE
+    M522  (warn) SUMMARIZE that adds a new column
+    M523  (warn) SUMMARIZECOLUMNS with a filter argument inside a measure
     M908  DAX names a Table[Column] the model does not have
     M909  (warn) DAX calls a function that is not in the DAX function index
 
@@ -129,6 +137,7 @@ Finding codes (errors unless marked warn or note; only errors change the exit co
     P004  (warn) Dataverse query without its options
     P005  (warn) query reads a file from a local drive
     P006  (warn) heavy reshaping in Power Query
+    P007  (warn) loaded table that only feeds other queries
     M601  (warn) row-level security rule uses text or lookup functions
     M602  (warn) row-level security rule on a fact table
     M603  (warn) row-level security rule uses USERNAME
@@ -137,6 +146,7 @@ Finding codes (errors unless marked warn or note; only errors change the exit co
     M606  (warn) object-level security hides a field that a report visual uses
     M607  (warn) row rules and object rules in different roles
     M608  object-level security on a table in the middle of a chain of relationships
+    M609  (warn) relationship that applies the security filter in both directions
     M701  DirectQuery native query with a common table expression or a stored procedure
     M702  (warn) DirectQuery table with transformation steps in Power Query
     M703  (warn) DirectQuery table filtered on the current date in Power Query
@@ -146,6 +156,10 @@ Finding codes (errors unless marked warn or note; only errors change the exit co
     M707  incremental refresh without the parameters RangeStart and RangeEnd, or not of type Date/Time
     M708  (warn) incremental refresh on a native query
     M709  incremental refresh filter that includes both ends of the window
+    M711  (warn) Direct Lake table with a Power Query partition
+    M832  (warn) data source that no partition uses
+    M833  legacy query partition on a structured data source
+    M910  (warn) column of a calculated table whose sourceColumn the formula does not produce
 
   Model objects (.github/skills/pbi-semantic-model/references/model-objects.md):
     M801  user-defined function in a model below compatibility level 1702
@@ -153,6 +167,8 @@ Finding codes (errors unless marked warn or note; only errors change the exit co
     M803  (warn) user-defined function has no '///' description
     M804  (warn) user-defined function parameter has no type
     M805  user-defined function calls itself
+    M806  (warn) user-defined function names an object that a role hides with object-level security
+    M807  (warn) user-defined function or parameter name outside the naming style
     M811  (warn) calculation group with no items
     M812  (warn) calculation item has no '///' description
     M813  (warn) two or more calculation groups without their own precedence
@@ -174,6 +190,13 @@ Finding codes (errors unless marked warn or note; only errors change the exit co
     V009  (warn) colour, font, size, border, shadow or background set on a single visual
     V010  (warn) bookmark that holds a page or visual the report no longer has
     V011  (warn) pages.json and the page folders disagree
+    V012  (warn) report-level measure without the prefix
+    V013  (warn) filter values left on a tooltip page or in a drillthrough filter
+    V014  (warn) visible drillthrough page without a reset button
+    V015  (warn) filter whose Where part uses a source its From part does not declare
+    V016  (warn) visual type that Microsoft is retiring or has deprecated
+    V017  (warn) image or other resource that is not registered or not in the report folder
+    V018  (note) page with no text box for its title
     A001  (warn) visuals without alt text (one finding for each page)
     A002  (warn) visuals that share a tab order number
     A003  (warn) visuals that show a title made up from field names (one finding for each page)
@@ -187,9 +210,12 @@ Finding codes (errors unless marked warn or note; only errors change the exit co
     U005  (note) a measure that returns formatted text: a dynamic format string
     U006  (note) two or more inactive relationships to one table: a role-playing dimension
     U007  (note) a natural drill path and no hierarchy
+    U008  (note) relationship between two DirectQuery tables without Assume referential integrity
     U101  (note) the same slicer on two or more pages, not synced
     U102  (note) three or more page buttons on a page: a page navigator
     U103  (note) stacked visuals switched by bookmarks: a field parameter
+    U104  (note) two or more slicers on a page of a DirectQuery model and no Apply button
+    U105  (note) legacy card or multi-row card: the new card visual
 
     B001  a report file uses a table, column or measure the model in this project does not have; for a report on
           a published model: one that the saved field list, docs/model-fields.md, does not have
@@ -261,7 +287,8 @@ BRIEF_LABELS = {"page_size": "Page size in pixels, width x height",
                 "subjects": "Measure folder subjects",
                 "own_spelling": "Acronyms and words with their own spelling",
                 "excel": "Excel check on",
-                "copilot": "Power BI Copilot check on"}
+                "copilot": "Power BI Copilot check on",
+                "report_prefix": "Prefix for report-level measures"}
 MODEL_EXCEPTIONS = "Exceptions to the model standard"
 LAYOUT_EXCEPTIONS = "Exceptions to the layout standard"
 PREVIEW_AGREED = "Preview features and optional tools"       # section 11 of the brief: one row for each yes
@@ -1099,6 +1126,7 @@ def read_brief(root):
         "own_spelling": set(_brief_list(_brief_value(lines, BRIEF_LABELS["own_spelling"]))),
         "excel": _brief_value(lines, BRIEF_LABELS["excel"]).lower().startswith("yes"),
         "copilot": _brief_value(lines, BRIEF_LABELS["copilot"]).lower().startswith("yes"),
+        "report_prefix": _brief_value(lines, BRIEF_LABELS["report_prefix"]).strip().strip("`").strip(),
         "model_exceptions": {(row[0], row[1]) for row in _brief_rows(lines, MODEL_EXCEPTIONS, 3)},
         "layout_exceptions": {(row[0], row[1], row[2]) for row in _brief_rows(lines, LAYOUT_EXCEPTIONS, 4)},
         "agreed": _agreed(lines),
@@ -1374,7 +1402,7 @@ def check_standards(model_dir, objects, usage, brief, findings):
 
     # ---- rule 5: references in DAX (a text check, not a parser)
     for owner, parsed in code_by_owner:
-        if owner["kind"] not in ("measure", "column", "calculationitem", "tablepermission"):
+        if owner["kind"] not in ("measure", "column", "calculationitem", "tablepermission", "function"):
             continue
         loose = set()
         tied = set()

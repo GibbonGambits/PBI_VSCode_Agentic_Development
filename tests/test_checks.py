@@ -416,7 +416,7 @@ class ListVisuals(ProjectCase):
         self.assertEqual(code, 0)
         lines = [" ".join(line.split()) for line in out.splitlines()]
         self.assertIn("label type x y width height folder", lines)
-        self.assertIn("Overview_Card_TotalSales card 24 24 608 120 Overview_Card_TotalSales", lines)
+        self.assertIn("Overview_Card_TotalSales cardVisual 24 24 608 120 Overview_Card_TotalSales", lines)
         self.assertIn("Overview_Bar_SalesByMonth barChart 24 160 1232 536 4f0c9d2a7b1e8a6c3d5f", lines)   # label from the annotation
         self.assertIn("Overview_Group_Header group 0 0 1280 20 Overview_Group_Header", lines)
 
@@ -1086,7 +1086,7 @@ class MoreStructureCases(ProjectCase):
 class MoreFixerCases(ProjectCase):
     def test_file_is_never_left_half_written(self):
         self.edit_json(CARD, lambda d: d["visual"].pop("visualContainerObjects"))
-        text = self.read(CARD).replace('"visualType": "card"', '"visualType": "card", "note": "half \\ud83d emoji"')
+        text = self.read(CARD).replace('"visualType": "cardVisual"', '"visualType": "cardVisual", "note": "half \\ud83d emoji"')
         self.write(CARD, text)
         code, out = quiet(set_visual_defaults.main, ["set_visual_defaults.py", self.root])
         self.assertEqual(code, 1)

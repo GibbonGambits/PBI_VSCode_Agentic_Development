@@ -5,6 +5,7 @@ table Store
 		dataType: int64
 		isHidden
 		isKey
+		isNullable: false
 		summarizeBy: none
 		sourceColumn: Store Key
 

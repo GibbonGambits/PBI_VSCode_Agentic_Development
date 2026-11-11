@@ -706,5 +706,139 @@ class Suggestions(StarCase):
         self.assertTrue(all(f[4] == "note" for f in items))
 
 
+
+class ClosingTheCoverage(StarCase):
+    """The checks added when the open rows of maintenance/coverage.md were closed."""
+
+    BRIEF_COPILOT = "## 4. Standards to follow\n\n- Power BI Copilot check on (yes or no): yes\n"
+
+    def test_M416_key_that_allows_blanks_is_a_note(self):
+        self.replace(STORE, "\t\tisNullable: false\n", "")
+        self.assertFinds("M416", "note")
+
+    def test_M609_security_filter_in_both_directions_warns(self):
+        self.replace(RELATIONSHIPS, "relationship SalesToStore\n", "relationship SalesToStore\n\tsecurityFilteringBehavior: bothDirections\n")
+        self.assertFinds("M609", "warn")
+
+    def test_M120_table_that_shows_more_than_thirty_columns_warns(self):
+        columns = "".join("\t/// Made-up column %d.\n\tcolumn 'Trait %d'\n\t\tdataType: string\n\t\tsummarizeBy: none\n"
+                          "\t\tsourceColumn: Trait %d\n\n" % (n, n, n) for n in range(31))
+        self.replace(STORE, "\tpartition Store = m", columns + "\tpartition Store = m")
+        self.assertFinds("M120", "warn")
+
+    def test_M303_dimension_without_a_default_label_only_when_the_brief_asks(self):
+        self.assertNot("M303")
+        self.write(os.path.join("docs", "report-brief.md"), self.BRIEF_COPILOT)
+        self.assertFinds("M303", "note")
+        self.replace(STORE, "\tcolumn 'Store Name'\n\t\tdataType: string\n", "\tcolumn 'Store Name'\n\t\tdataType: string\n\t\tisDefaultLabel\n")
+        self.assertNot("M303")
+
+    def test_M518_divide_by_a_fixed_number_warns(self):
+        self.measure("Sales in Thousands", "DIVIDE ( [Total Sales], 1000 )")
+        self.assertFinds("M518", "warn")
+
+    def test_M518_divide_by_a_measure_passes(self):
+        self.measure("Sales Share", "DIVIDE ( [Total Sales], [Total Sales YTD] )")
+        self.assertNot("M518")
+
+    def test_M519_all_as_a_filter_argument_warns_and_removefilters_passes(self):
+        self.measure("Sales All Stores", "CALCULATE ( [Total Sales], ALL ( Store ) )")
+        self.assertFinds("M519", "warn")
+        self.replace(MEASURES, "ALL ( Store )", "REMOVEFILTERS ( Store )")
+        self.assertNot("M519")
+
+    def test_M519_all_inside_filter_passes(self):
+        self.measure("Sales Big Stores", "CALCULATE ( [Total Sales], FILTER ( ALL ( Store[City] ), Store[City] <> \"x\" ) )")
+        self.assertNot("M519")
+
+    def test_M521_calculate_directly_inside_calculate_warns(self):
+        self.measure("Sales Utrecht", 'CALCULATE ( CALCULATE ( [Total Sales], Store[City] = "Utrecht" ), REMOVEFILTERS ( \'Date\' ) )')
+        self.assertFinds("M521", "warn")
+
+    def test_M522_summarize_that_adds_a_column_warns(self):
+        self.measure("Best City Sales", 'MAXX ( SUMMARIZE ( Sales, Store[City], "@Sales", [Total Sales] ), [@Sales] )')
+        self.assertFinds("M522", "warn")
+        self.replace(MEASURES, 'SUMMARIZE ( Sales, Store[City], "@Sales", [Total Sales] )',
+                     'ADDCOLUMNS ( SUMMARIZE ( Sales, Store[City] ), "@Sales", [Total Sales] )')
+        self.assertNot("M522")
+
+    def test_M523_summarizecolumns_with_a_filter_argument_in_a_measure_warns(self):
+        self.measure("Cities With Sales", 'COUNTROWS ( SUMMARIZECOLUMNS ( Store[City], TREATAS ( { "Utrecht" }, Store[City] ) ) )')
+        self.assertFinds("M523", "warn")
+        self.replace(MEASURES, 'SUMMARIZECOLUMNS ( Store[City], TREATAS ( { "Utrecht" }, Store[City] ) )',
+                     'CALCULATETABLE ( SUMMARIZECOLUMNS ( Store[City] ), TREATAS ( { "Utrecht" }, Store[City] ) )')
+        self.assertNot("M523")
+
+    FUNCTION = "/// Sales of one city.\nfunction CitySales = ( city : STRING ) => CALCULATE ( [Total Sales], %s = city )\n"
+
+    def test_M010_reads_functions_too(self):
+        self.write(FUNCTIONS, self.FUNCTION % "[City]")
+        self.assertFinds("M010", "warn")
+        self.write(FUNCTIONS, self.FUNCTION % "Store[City]")
+        self.assertNot("M010")
+
+    def test_M806_function_naming_an_object_a_role_hides_warns(self):
+        self.write(FUNCTIONS, self.FUNCTION % "Store[City]")
+        self.assertNot("M806")
+        self.write(ROLE, "role Readers\n\tmodelPermission: read\n\n\ttablePermission Store\n\n\t\tcolumnPermission City = none\n")
+        self.assertFinds("M806", "warn")
+
+    def test_M807_function_and_parameter_names_outside_the_style_warn(self):
+        self.write(FUNCTIONS, "/// Adds tax.\nfunction add_tax = ( Amount : NUMERIC ) => Amount * 1.21\n")
+        self.assertFinds("M807", "warn")
+        self.write(FUNCTIONS, "/// Adds tax.\nfunction Finance.AddTax = ( amount : NUMERIC ) => amount * 1.21\n")
+        self.assertNot("M807")
+
+    def test_M711_direct_lake_table_with_a_power_query_partition_warns(self):
+        self.replace(SALES, "\t\tmode: import", "\t\tmode: directLake")
+        self.assertFinds("M711", "warn")
+
+    LEGACY = ("\tpartition Store = query\n\t\tmode: import\n\t\tdataSource: Warehouse\n\t\tquery = SELECT * FROM Store\n")
+    SOURCE = "dataSource Warehouse\n\ttype: %s\n\tconnectionDetails = {\"protocol\":\"tds\"}\n"
+
+    def legacy(self, kind):
+        text = self.read(STORE)
+        self.write(STORE, text[:text.index("\tpartition Store = m")] + self.LEGACY)
+        self.write(os.path.join(DEFINITION, "dataSources.tmdl"), self.SOURCE % kind)
+
+    def test_M833_query_partition_on_a_structured_data_source_fails(self):
+        self.legacy("structured")
+        self.assertFinds("M833", False)
+        self.assertNot("M832")
+
+    def test_M832_data_source_that_no_partition_uses_warns(self):
+        self.write(os.path.join(DEFINITION, "dataSources.tmdl"), self.SOURCE % "structured")
+        self.assertFinds("M832", "warn")
+        self.assertNot("M833")
+
+    CITY_TABLE = ("/// Made-up list of cities.\ntable City\n\n\t/// Name of the city.\n\tcolumn 'City Name'\n\t\tdataType: string\n"
+                  "\t\tsummarizeBy: none\n\t\tsourceColumn: [%s]\n\n\tpartition City = calculated\n\t\tmode: import\n"
+                  "\t\tsource = SELECTCOLUMNS ( Store, \"City Name\", Store[City] )\n\n"
+                  "\tannotation CalculatedReason = A made-up calculated table for a test.\n")
+
+    def test_M910_calculated_table_column_the_formula_does_not_produce_warns(self):
+        self.write(os.path.join(TABLES, "City.tmdl"), self.CITY_TABLE % "City Label")
+        self.write(MODEL, self.read(MODEL) + "ref table City\n")
+        self.assertFinds("M910", "warn")
+        self.write(os.path.join(TABLES, "City.tmdl"), self.CITY_TABLE % "City Name")
+        self.assertNot("M910")
+
+    def test_P007_loaded_table_that_only_feeds_another_query_warns(self):
+        self.table("Staging")
+        self.source(SALES, "Staging")
+        self.assertFinds("P007", "warn")
+
+    def test_P007_table_a_relationship_uses_passes(self):
+        self.source(SALES, "Store")
+        self.assertNot("P007")
+
+    def test_U008_directquery_relationship_without_assumed_integrity_is_a_note(self):
+        self.direct_query(SALES)
+        self.direct_query(STORE)
+        self.assertFinds("U008", "note")
+        self.replace(RELATIONSHIPS, "relationship SalesToStore\n", "relationship SalesToStore\n\trelyOnReferentialIntegrity\n")
+        self.assertNot("U008")
+
+
 if __name__ == "__main__":
     unittest.main()

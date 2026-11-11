@@ -70,7 +70,7 @@ class ReportCase(unittest.TestCase):
             listed["pageOrder"].append(name)
             self.write_json(PAGES_JSON, listed)
 
-    def visual(self, page, name, kind="card", fields=(), x=24, y=200, cards=None, objects=None, described=True, **top):
+    def visual(self, page, name, kind="cardVisual", fields=(), x=24, y=200, cards=None, objects=None, described=True, **top):
         """A visual with header icons and tooltips off, and (unless described is False) alt text and a title."""
         self.order += 1
         body = {"visualType": kind, "visualContainerObjects": {"visualHeader": OFF, "visualTooltip": OFF}}
@@ -263,6 +263,135 @@ class Suggestions(ReportCase):
                          "explorationState": {"version": "1.3", "activeSection": "Overview", "sections": {
                              "Overview": {"visualContainers": {"Overview_Line_Returns": {"singleVisual": {"display": {"mode": "hidden"}}}}}}}})
         self.assertFinds("U103", "note")
+
+
+
+class ClosingTheCoverage(ReportCase):
+    """The report checks added when the open rows of maintenance/coverage.md were closed."""
+
+    EXTENSION = {"$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/reportExtension/1.0.0/schema.json",
+                 "name": "extension", "entities": [{"name": "_Measures", "measures": [
+                     {"name": "%s", "dataType": "Double", "expression": "[Total Sales] * 2"}]}]}
+
+    def extension(self, name):
+        data = json.loads(json.dumps(self.EXTENSION).replace("%s", name))
+        self.write_json(os.path.join(DEFINITION, "reportExtensions.json"), data)
+
+    def test_V012_report_level_measure_without_the_prefix_warns(self):
+        self.extension("Double Sales")
+        self.assertFinds("V012", "warn")
+        self.extension("_Double Sales")
+        self.assertNot("V012")
+
+    def test_V012_reads_the_prefix_from_the_brief(self):
+        self.extension("_Double Sales")
+        brief = os.path.join(self.root, "docs", "report-brief.md")
+        os.makedirs(os.path.dirname(brief), exist_ok=True)
+        with open(brief, "a", encoding="utf-8") as fh:
+            fh.write("\n- Prefix for report-level measures (empty means an underscore, `_`): rpt \n")
+        self.assertFinds("V012", "warn")
+        self.extension("rpt Double Sales")
+        self.assertNot("V012")
+
+    FILTER = {"name": "FilterCity", "field": {"Column": {"Expression": {"SourceRef": {"Entity": "Sales"}}, "Property": "Product"}},
+              "type": "Categorical"}
+    WHERE = {"Version": 2, "From": [{"Name": "s", "Entity": "Sales", "Type": 0}],
+             "Where": [{"Condition": {"In": {"Expressions": [{"Column": {"Expression": {"SourceRef": {"Source": "s"}}, "Property": "Product"}}],
+                                             "Values": [[{"Literal": {"Value": "'Bike'"}}]]}}}]}
+
+    def saved(self, **extra):
+        entry = dict(self.FILTER, filter=json.loads(json.dumps(self.WHERE)))
+        entry.update(extra)
+        return {"filters": [entry]}
+
+    def test_V013_values_left_in_a_drillthrough_filter_warn(self):
+        self.page("Detail", type="Drillthrough", visibility="HiddenInViewMode", filterConfig=self.saved(howCreated="Drillthrough"))
+        self.visual("Detail", "Detail_Card_Sales", fields=[SALES])
+        self.button("Detail", "Detail_Button_Back", "Back")
+        self.assertFinds("V013", "warn")
+        self.page("Detail", type="Drillthrough", visibility="HiddenInViewMode",
+                  filterConfig={"filters": [dict(self.FILTER, howCreated="Drillthrough")]})
+        self.assertNot("V013")
+
+    def test_V013_values_left_on_a_tooltip_page_warn(self):
+        self.page("Tip", type="Tooltip", width=320, height=240, visibility="HiddenInViewMode", filterConfig=self.saved())
+        self.assertFinds("V013", "warn")
+
+    def test_V013_a_filter_with_values_on_a_normal_page_passes(self):
+        self.page("Detail", filterConfig=self.saved())
+        self.assertNot("V013")
+
+    def test_V014_visible_drillthrough_page_without_a_reset_button_warns(self):
+        self.page("Detail", type="Drillthrough")
+        self.visual("Detail", "Detail_Card_Sales", fields=[SALES])
+        self.button("Detail", "Detail_Button_Back", "Back")
+        self.assertFinds("V014", "warn")
+        self.page("Detail", type="Drillthrough", visibility="HiddenInViewMode")
+        self.assertNot("V014")
+
+    def test_V015_filter_that_uses_an_undeclared_source_warns(self):
+        broken = self.saved()
+        broken["filters"][0]["filter"]["From"][0]["Name"] = "t"
+        self.page("Detail", filterConfig=broken)
+        self.assertFinds("V015", "warn")
+        self.page("Detail", filterConfig=self.saved())
+        self.assertNot("V015")
+
+    def test_V016_retiring_visual_types_warn_and_the_brief_excuses_one(self):
+        self.visual("Overview", "Overview_Map_Sales", kind="filledMap")
+        self.assertFinds("V016", "warn")
+        brief = os.path.join(self.root, "docs", "report-brief.md")
+        os.makedirs(os.path.dirname(brief), exist_ok=True)
+        with open(brief, "a", encoding="utf-8") as fh:
+            fh.write("\n## 10. Exceptions to the layout standard\n\n| Code | Page | Visual | Reason |\n|---|---|---|---|\n"
+                     "| V016 | Overview | Overview_Map_Sales | Kept until the Azure map is approved. |\n")
+        self.assertNot("V016")
+
+    def test_U105_legacy_cards_are_a_note(self):
+        self.visual("Overview", "Overview_Card_Old", kind="card")
+        self.visual("Overview", "Overview_MultiRowCard_Old", kind="multiRowCard")
+        self.assertFinds("U105", "note")
+
+    IMAGE = {"general": [{"properties": {"imageUrl": {"expr": {"ResourcePackageItem": {
+        "PackageName": "RegisteredResources", "PackageType": 1, "ItemName": "logo.png"}}}}}]}
+
+    def test_V017_image_that_is_not_registered_or_not_on_disk_warns(self):
+        self.visual("Overview", "Overview_Image_Logo", kind="image", objects=self.IMAGE,
+                    cards={"general": [{"properties": {"altText": lit("'Made-up logo'")}}]})
+        self.assertFinds("V017", "warn")
+        report = self.read_json(os.path.join(DEFINITION, "report.json"))
+        package = next(p for p in report["resourcePackages"] if p["type"] == "RegisteredResources")
+        package["items"].append({"name": "logo.png", "path": "logo.png", "type": "Image"})
+        self.write_json(os.path.join(DEFINITION, "report.json"), report)
+        self.assertFinds("V017", "warn")                       # registered, but the file is not there
+        path = os.path.join(self.root, "Sample.Report", "StaticResources", "RegisteredResources", "logo.png")
+        with open(path, "wb") as fh:
+            fh.write(b"made-up")
+        self.assertNot("V017")
+
+    def test_V018_page_without_a_text_box_is_a_note(self):
+        self.page("Detail")
+        self.visual("Detail", "Detail_Card_Sales", fields=[SALES])
+        self.assertFinds("V018", "note")
+        self.visual("Detail", "Detail_Textbox_Title", kind="textbox")
+        self.assertNot("V018")
+
+    def test_U104_slicers_on_a_directquery_model_without_an_apply_button(self):
+        product = field("Sales", "Product", "Column")
+        self.visual("Overview", "Overview_Slicer_Product", kind="slicer", fields=[product])
+        self.visual("Overview", "Overview_Slicer_Returned", kind="slicer", fields=[field("Sales", "Returned", "Column")])
+        self.assertNot("U104")
+        table = os.path.join(self.root, "Sample.SemanticModel", "definition", "tables", "Sales.tmdl")
+        with open(table, encoding="utf-8") as fh:
+            text = fh.read()
+        self.assertIn("\t\tmode: import", text)
+        with open(table, "w", encoding="utf-8", newline="\n") as fh:
+            fh.write(text.replace("\t\tmode: import", "\t\tmode: directQuery", 1))
+        self.assertFinds("U104", "note")
+        report = self.read_json(os.path.join(DEFINITION, "report.json"))
+        report["slowDataSourceSettings"] = {"isSlicerSelectionsButtonEnabled": True}
+        self.write_json(os.path.join(DEFINITION, "report.json"), report)
+        self.assertNot("U104")
 
 
 class Schema(ReportCase):

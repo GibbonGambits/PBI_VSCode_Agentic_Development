@@ -6,12 +6,14 @@ table Date
 	column Date
 		dataType: dateTime
 		isKey
+		isNullable: false
 		formatString: Short Date
 		summarizeBy: none
 		sourceColumn: Date
 
 	column 'Date Key'
 		dataType: int64
+		isNullable: false
 		isHidden
 		summarizeBy: none
 		sourceColumn: Date Key

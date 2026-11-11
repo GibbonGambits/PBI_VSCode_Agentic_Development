@@ -42,6 +42,9 @@ M_RELATIVE_DATES = ("DateTime.LocalNow", "DateTime.FixedLocalNow", "DateTimeZone
 MONTHS = ("jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec")
 PLACE_WORDS = ("country", "continent", "city")
 DAX_NOT_FUNCTIONS = fs.DAX_KEYWORDS | frozenset(("IN", "NOT"))
+MANY_COLUMNS = 30                   # Microsoft's skill (skills-for-fabric): more visible columns hints at a design problem
+CALCULATED_TABLE_MAKERS = ("ROW", "SELECTCOLUMNS", "DATATABLE")
+SUMMARIZECOLUMNS_FILTERS = ("FILTER", "TREATAS", "KEEPFILTERS")
 UDF_NAME = re.compile(r"[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z0-9_]+)*\Z")
 
 _index = None
@@ -159,6 +162,7 @@ def check(context):
     _objects(context, functions, function_names)
     _power_query(context, direct_query)
     _suggestions(context, rels, direct_query, index)
+    _more(context, rels, column_at, permissions, functions, direct_query)
 
 
 # ---------------------------------------------------------------- things that stop a model from loading
@@ -1071,3 +1075,198 @@ def _suggestions(context, rels, direct_query, index):
             add("U007", table["objects"][0], "table '%s' has columns that form a natural drill path and no "
                 "hierarchy; a hierarchy lets readers drill down in one step" % table["name"], level="note",
                 keys=(table["name"],))
+
+
+# ---------------------------------------------------------------- rules added when the coverage file was closed
+
+def _whole_call(parsed, span, *names):
+    """The call that fills one argument completely, when its name is one of names; None otherwise."""
+    stream = parsed["tokens"]
+    if span[1] - span[0] < 3 or stream[span[0]].kind != "word" or stream[span[0]].value.upper() not in names:
+        return None
+    call = next((c for c in parsed["calls"] if c.at == span[0]), None)
+    return call if call is not None and call.close == span[1] - 1 else None
+
+
+def _more(context, rels, column_at, permissions, functions, direct_query):
+    tables, add = context["tables"], context["add"]
+    parsed_by_id = {id(owner): parsed for owner, parsed in context["expressions"]}
+
+    # ---- keys, relationships, wide tables
+    open_keys = {}
+    for r in rels:
+        if r["object"]["props"].get("securityfilteringbehavior", "").lower() == "bothdirections":
+            add("M609", r["object"], "relationship %s applies the security filter in both directions. Microsoft says "
+                "this costs query speed and is needed only when a row-level security rule must travel against the "
+                "relationship: keep it only for that, with the reason in the brief" % r["label"], level="warn",
+                keys=(r["label"],))
+        if r["from_many"] and not r["to_many"] and r["to"] in column_at:
+            table, column = column_at[r["to"]]
+            if column["props"].get("isnullable", "").lower() != "false":
+                open_keys.setdefault(table["name"], (table, []))[1].append(column["name"])
+        if (r["from"][0] in direct_query and r["to"][0] in direct_query
+                and r["object"]["props"].get("relyonreferentialintegrity", "").lower() != "true"):
+            add("U008", r["object"], "relationship %s joins two DirectQuery tables without 'Assume referential "
+                "integrity' (relyOnReferentialIntegrity). When the source guarantees that every key has a match, "
+                "turning it on lets Power BI send faster joins" % r["label"], level="note", keys=(r["label"],))
+    for name, (table, columns) in sorted(open_keys.items()):
+        add("M416", table["objects"][0], "table '%s': key column(s) %s allow blanks. If a blank key must stop the "
+            "refresh instead of loading, set isNullable: false on the column" % (name, ", ".join(sorted(set(columns)))),
+            level="note", keys=(name,))
+    dimensions = {r["to"][0] for r in rels if r["from_many"] and not r["to_many"]}
+    for table in context["own_tables"]:
+        if table["name"] in context["measure_tables"] or table["hidden"]:
+            continue
+        shown = [c for c in table["columns"] if not c["hidden"]]
+        if len(shown) > MANY_COLUMNS:
+            add("M120", table["objects"][0], "table '%s' shows %d columns (more than %d). Hide the columns report "
+                "authors do not need, or split the table: so many columns in one table point to a design problem"
+                % (table["name"], len(shown), MANY_COLUMNS), level="warn", keys=(table["name"],))
+        if (context["brief"].get("copilot") and table["name"] in dimensions and shown
+                and table["props"].get("datacategory", "").lower() != "time"
+                and not any(c["props"].get("isdefaultlabel", "").lower() == "true" for c in table["columns"])):
+            add("M303", table["objects"][0], "dimension table '%s' has no column marked isDefaultLabel. Mark its name "
+                "column, so that Copilot in Power BI knows which column names a row" % table["name"], level="note",
+                keys=(table["name"],))
+
+    # ---- DAX
+    for owner, parsed in context["expressions"]:
+        if owner["kind"] not in ("measure", "column", "calculationitem", "tablepermission", "function", "partition"):
+            continue
+        stream = parsed["tokens"]
+        label = _label(owner)
+        keys = (label,)
+        for call in _calls(parsed, "DIVIDE"):
+            if len(call.args) >= 2 and call.args[1][1] - call.args[1][0] == 1:
+                divisor = stream[call.args[1][0]]
+                if divisor.kind == "number" and float_or_none(divisor.value) not in (None, 0.0):
+                    add("M518", owner, "DAX of %s calls DIVIDE with the fixed number %s as the divisor. Microsoft "
+                        "advises the '/' operator there: a fixed number is never zero or blank, and '/' is faster"
+                        % (label, divisor.value), level="warn", keys=keys)
+                    break
+        cleared = nested = False
+        for call in _calls(parsed, "CALCULATE", "CALCULATETABLE"):
+            if not cleared and any(_whole_call(parsed, span, "ALL") for span in call.args[1:]):
+                cleared = True
+                add("M519", owner, "DAX of %s passes ALL ( ... ) to %s only to remove filters. REMOVEFILTERS does the "
+                    "same and says what is meant; keep ALL for where a table is needed" % (label, call.name),
+                    level="warn", keys=keys)
+            if not nested and call.name == "CALCULATE" and call.args and _whole_call(parsed, call.args[0], "CALCULATE"):
+                nested = True
+                add("M521", owner, "DAX of %s writes CALCULATE directly inside CALCULATE. Give one CALCULATE all the "
+                    "filters, or move the inner part to a variable or a measure of its own" % label, level="warn",
+                    keys=keys)
+        for call in _calls(parsed, "SUMMARIZE"):
+            if any(span[1] - span[0] == 1 and stream[span[0]].kind == fs.TEXT for span in call.args[1:]):
+                add("M522", owner, "DAX of %s adds a new column inside SUMMARIZE. Use SUMMARIZE only to group, and add "
+                    "the column around it with ADDCOLUMNS (or use SUMMARIZECOLUMNS): the result is easier to predict"
+                    % label, level="warn", keys=keys)
+                break
+        if owner["kind"] == "measure":
+            for call in _calls(parsed, "SUMMARIZECOLUMNS"):
+                if any(_whole_call(parsed, span, *SUMMARIZECOLUMNS_FILTERS) for span in call.args):
+                    add("M523", owner, "measure %s gives SUMMARIZECOLUMNS a filter argument. Inside a measure, put the "
+                        "filter in a CALCULATETABLE around SUMMARIZECOLUMNS instead" % label, level="warn", keys=keys)
+                    break
+
+    # ---- user-defined functions
+    hidden_tables, hidden_columns = set(), set()
+    for permission in permissions:
+        if permission["props"].get("metadatapermission", "").lower() == "none":
+            hidden_tables.add(permission["name"].lower())
+        for obj in context["objects"]:
+            if (obj["kind"] == "columnpermission" and obj["parent"] is permission and "none" in (
+                    (obj["expr"] or "").strip().lower(), obj["props"].get("metadatapermission", "").lower())):
+                hidden_columns.add((permission["name"].lower(), obj["name"].lower()))
+    for function in functions:
+        name = function["name"]
+        parsed = parsed_by_id.get(id(function))
+        if parsed is None:
+            continue
+        stream = parsed["tokens"]
+        secret = sorted({"%s[%s]" % (t, n) for t, n, _ in parsed["references"] if t is not None
+                         and (t.lower() in hidden_tables or (t.lower(), n.lower()) in hidden_columns)}
+                        | {"table '%s'" % t.value for t in stream if t.kind in ("word", fs.QUOTED_NAME)
+                           and t.value.lower() in hidden_tables and t.value in tables})
+        if secret:
+            add("M806", function, "function %s names %s, which a role hides with object-level security. Microsoft "
+                "says object-level security does not reach functions: the function's text can show the hidden name. "
+                "Pass the object in as a parameter instead" % (name, ", ".join(secret)), level="warn", keys=(name,))
+        problems = []
+        if "_" in name or any(part[:1].isalpha() and not part[:1].isupper() for part in name.split(".")):
+            problems.append("write each part of the name with a capital first letter and no underscores (AddTax, "
+                            "Finance.AddTax)")
+        if stream and fs.is_symbol(stream[0], "("):
+            closer = fs.match_close(stream, 0)
+            wrong = [stream[span[0]].value for span in fs.split_arguments(stream, 0, closer)
+                     if span[1] > span[0] and stream[span[0]].kind == "word"
+                     and (not stream[span[0]].value[:1].islower() or "_" in stream[span[0]].value)]
+            if wrong:
+                problems.append("start each parameter with a small letter and use no underscores (%s)" % ", ".join(wrong))
+        if problems:
+            add("M807", function, "function %s does not follow the naming style for functions: %s"
+                % (name, "; ".join(problems)), level="warn", keys=(name,))
+
+    # ---- partitions and data sources
+    sources = {o["name"]: o for o in context["objects"] if o["kind"] == "datasource" and o["top"] and not o["translation"]}
+    used_sources = set()
+    feeders = {}
+    for table in context["own_tables"]:
+        modes = table_modes(table)
+        for partition in table["partitions"]:
+            kind = (partition["expr"] or "").split("//")[0].strip().lower()
+            named = (_reference(partition["props"].get("datasource", "")) or ("",))[0]
+            text = " ".join(str(partition["props"].get(key, "")) for key in ("source", "query"))
+            for source_name in sources:
+                if named == source_name or source_name in text:
+                    used_sources.add(source_name)
+            if kind == "m" and "directlake" in modes:
+                add("M711", partition, "table '%s' is in Direct Lake mode but its partition is a Power Query (m) "
+                    "partition. A Direct Lake table reads a Delta table through an entity partition and has no "
+                    "Power Query" % table["name"], level="warn", keys=(table["name"],))
+            if kind == "query" and named in sources and sources[named]["props"].get("type", "").lower() == "structured":
+                add("M833", partition, "partition '%s' of table '%s' is a legacy query partition on the structured "
+                    "data source '%s'. Microsoft's rule says Power BI does not support that pair: use a Power Query "
+                    "(m) partition" % (partition["name"], table["name"], named), keys=(table["name"],))
+            if kind == "m":
+                source = partition["props"].get("source", "")
+                steps = {step["name"] for step in fs.m_steps(source)[0]}
+                for token in fs.tokens(source, fs.M):
+                    if (token.kind in ("word", fs.QUOTED_NAME) and token.value in tables
+                            and token.value != table["name"] and token.value not in steps):
+                        feeders.setdefault(token.value, set()).add(table["name"])
+            if kind == "calculated" and not table.get("field_parameter"):
+                parsed = context["parse"](partition["props"].get("source", ""))
+                calls = parsed["calls"]
+                if calls and calls[0].at == 0 and calls[0].close == len(parsed["tokens"]) - 1 \
+                        and calls[0].name in CALCULATED_TABLE_MAKERS:
+                    made = {t.value.lower() for t in parsed["tokens"] if t.kind in (fs.TEXT, fs.BRACKET_NAME)}
+                    lost = sorted(c["name"] for c in table["columns"] if not c.get("calculated")
+                                  and re.match(r"\[.*\]\Z", c["props"].get("sourcecolumn", "").strip())
+                                  and c["props"]["sourcecolumn"].strip()[1:-1].lower() not in made)
+                    if lost:
+                        add("M910", partition, "calculated table '%s': column(s) %s read a sourceColumn that the "
+                            "table's formula does not produce. Each sourceColumn must be '[Name]' with a name the "
+                            "formula returns, or the column is empty or the table fails to load"
+                            % (table["name"], ", ".join(lost)), level="warn", keys=(table["name"],))
+    for name, source in sorted(sources.items()):
+        if name not in used_sources and not any(name in (o["expr"] or "") for o in context["objects"] if o["kind"] == "expression"):
+            add("M832", source, "data source '%s' is used by no partition; remove it" % name, level="warn", keys=(name,))
+    in_use = {r["from"][0] for r in rels} | {r["to"][0] for r in rels}
+    in_use |= {entity for _, entity, _ in context["usage"]}
+    for owner, parsed in context["expressions"]:
+        home = owner["table"]["name"] if owner.get("table") is not None else None
+        for table_name, _, _ in parsed["references"]:
+            if table_name is not None and table_name != home:
+                in_use.add(table_name)
+        for token in parsed["tokens"]:
+            if token.kind in ("word", fs.QUOTED_NAME) and token.value in tables and token.value != home:
+                in_use.add(token.value)
+    for name, users in sorted(feeders.items()):
+        table = tables[name]
+        if name in in_use or table["measures"] or name in context["measure_tables"] or table["calculated"]:
+            continue
+        add("P007", table["objects"][0], "table '%s' is loaded, but only the queries of %s use it: no relationship, "
+            "formula or visual does. Turn its load off (keep it as a shared query), so that it takes no memory and "
+            "no refresh time" % (name, ", ".join(sorted(users))), level="warn", keys=(name,))
+

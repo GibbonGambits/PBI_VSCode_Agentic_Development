@@ -55,6 +55,13 @@ The three cases in which the work would have stopped to ask did not arise: no so
 32. **Existing tests that changed**, and why: four tests of made-up visuals and measures now meet the new rules (a `queryRef` that Microsoft's schema requires; alt text and a title; a unique tab order number; DAX in the new style); the tests that list every finding of the broken fixture list the new codes; one test that expected a clean result for a relationship to a table that does not exist now expects M901; the test that a report on a published model is not checked now covers the saved field list.
 33. **`maintenance/` is a template folder.** Copilot is told not to read it and not to change it without asking.
 
+## Closing the open rows
+
+34. **Levels of the checks added to close the coverage file.** Fail only for M833 (Microsoft's rule says Power BI does not support a legacy query partition on a structured data source). Notes, because the source words them as a choice or as one option among several: M416 (Is Nullable off on a key), M303 (isDefaultLabel, only with the Copilot check on), V018 (a page title text box: Microsoft's skill puts the title, the main figure or the main chart at the top left), U008, U104, U105. Every other new check warns.
+35. **Report-level measure prefix (V012).** Microsoft Learn asks for a prefix and gives an underscore as its example. The check uses the underscore unless section 4 of the brief gives another prefix. The brief gained that one line.
+36. **The good test project uses the new card visual.** The legacy card now gives the note U105, so the fixture that stands for a correct project was moved to `cardVisual`.
+37. **Variable names.** The DAX standard's own snippets used the `_` prefix that its rule 31 does not adopt. The snippets were renamed; the rule did not change.
+
 ## Could not be verified
 
 - Anything that needs Power BI Desktop: every example, the starter project, the Desktop Bridge script.

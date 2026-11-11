@@ -19,6 +19,13 @@ An exception counts only when section 10 of `docs/report-brief.md` lists the cod
 | V009 | A visual sets its own font, size, colour, bold, italic or underline, writes a colour code, or switches on its own border, shadow or background. A theme colour passes | warn |
 | V010 | A bookmark holds a page or a visual that the report no longer has | warn |
 | V011 | `pages.json` and the page folders disagree: a page listed twice, listed but missing, or not listed; an opening or landing page that does not exist | warn |
+| V012 | A report-level measure's name does not start with the prefix: an underscore, or the prefix the brief gives | warn |
+| V013 | Filter values are saved on a tooltip page or in a drillthrough filter (left over from design time) | warn |
+| V014 | A drillthrough page is visible and has no button with a Bookmark action (a reset) | warn |
+| V015 | A filter's `Where` clause uses a source name that its `From` list does not declare | warn |
+| V016 | A visual type Microsoft is retiring or has deprecated: `map`, `filledMap`, `qnaVisual`, `scriptVisual` (R), `pythonVisual` | warn |
+| V017 | A visual names an image or other resource that `report.json` does not register, or whose file is not in the report folder | warn |
+| V018 | A page that is not a tooltip page has visuals but no text box (no visible page title) | note |
 | A001 | A visual that shows data, or an image, has no alt text (hidden visuals are not checked; an image that is only decoration is listed in the brief) | warn |
 | A004 | Alt text is longer than 250 characters | warn |
 | A002 | Two visuals on one page share a tab order number (members of a group are not compared) | warn |
@@ -26,6 +33,8 @@ An exception counts only when section 10 of `docs/report-brief.md` lists the cod
 | U101 | A slicer on one field is on 2 or more pages and is not synced on all of them (tooltip and drillthrough pages are not counted) | note |
 | U102 | A page has 3 or more buttons that each go to a page | note |
 | U103 | Two data visuals of the same kind sit in the same place, and bookmarks show one at a time | note |
+| U104 | A report on a model with DirectQuery tables has a page with two or more slicers and no Apply button setting | note |
+| U105 | A `multiRowCard` or a legacy `card`: the new card visual replaces them | note |
 
 - In section 10, write Page and Visual as `python scripts/list_visuals.py .` prints them; the script also accepts the visual's `name` or folder.
 - For V010, write the bookmark's name under Page and `-` under Visual.
@@ -89,7 +98,7 @@ An exception counts only when section 10 of `docs/report-brief.md` lists the cod
 21. Screen readers cannot read report page tooltips, and keyboard users cannot reach them. Never put needed information only in a tooltip. Source: https://learn.microsoft.com/en-us/power-bi/create-reports/desktop-accessibility-creating-reports.
 22. A visual points to a tooltip page through `visualContainerObjects.visualTooltip`: `show`, `type` and `section` (the tooltip page's `name`). Source: schema `visualConfiguration` 2.8.0 (`VisualTooltip`). The value of `type` for a report page is not confirmed: copy it from the shipped example or from a visual set up in Desktop.
 - Copilot does: the page files, its hidden state and size, the binding, and the pointer on a visual listed in the brief.
-- Only Desktop shows: whether the tooltip appears and fits. Remove design-time filter values from the tooltip page before publishing (report-page-tooltips guidance).
+- Only Desktop shows: whether the tooltip appears and fits. Remove design-time filter values from the tooltip page before publishing (report-page-tooltips guidance). Code V013 (warn).
 
 ## D. Drillthrough
 
@@ -99,13 +108,14 @@ An exception counts only when section 10 of `docs/report-brief.md` lists the cod
 26. The source page's page filters also pass to the target, as a second kind of drillthrough filter. Readers can edit or clear it; authors cannot lock or hide it. Source: https://learn.microsoft.com/en-us/power-bi/create-reports/power-bi-report-filter-types. Whether `acceptsFilterContext` is the Desktop "Keep all filters" switch is not confirmed: ask the developer to set that switch in Desktop.
 27. Cross-report drillthrough works only in the Power BI service, between reports in the same workspace, with field names and data types that match exactly, and with the setting on in the target report: `settings.useCrossReportDrillthrough` in `report.json` (schema `report` 3.3.0), and `referenceScope` `CrossReport` on the target page. Source: desktop-drillthrough page above.
 28. Header icons are off (owner's rule), so a text box tells readers how to drill through and what the drillthrough page expects. Make the expected context obvious on the page. Source: checklist items 59 and 63; report-drillthrough guidance (instructions in a text box).
-29. Hide drillthrough pages. If one stays visible, add a button with a bookmark that clears its filters. Remove design-time drillthrough values before publishing. Source: report-drillthrough guidance above.
+29. Hide drillthrough pages. If one stays visible, add a button with a bookmark that clears its filters (V014, warn). Remove design-time drillthrough values before publishing (V013, warn). Source: report-drillthrough guidance above.
 - Copilot does: the page type and binding, the back button, and the instruction text box.
 - Only Desktop shows: whether the right-click menu offers the page, and whether visuals show blanks or errors under the drillthrough filter.
 
 ## E. Sync slicers
 
 30. When the same slicer field is on 2 or more pages, sync it unless the pages need their own state. Leave no repeated slicer unsynced without a reason. Source: checklist item 61. Code U101 (note).
+   - In a composite model, a visual takes its fields from one source group where it can: its queries are then faster. When two source groups each hold a copy of a dimension, a hidden slicer on the copy, synced to the visible slicer by the same group name, can replace a relationship between the groups. Hide the copies and describe why they exist. No check: the report files do not mark which source group a field comes from. Source: https://learn.microsoft.com/en-us/power-bi/guidance/composite-model-guidance ; https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-slicers (sync separate slicers).
 31. Sync is stored on each slicer as `visual.syncGroup`: `groupName` (required), `fieldChanges` and `filterChanges` (plain true or false). Every slicer in a group has the same visual type and the same column. Source: schema `visualConfiguration` 2.8.0 (`VisualSyncGroup`, "only applies to slicer visuals"); Microsoft's skill, its file slicers-part-02.md.
 
 ```json
@@ -155,8 +165,20 @@ An exception counts only when section 10 of `docs/report-brief.md` lists the cod
 | Flow through stages | Funnel for stages; waterfall for increases and decreases; decomposition tree for a breakdown |
 
 45. Review a part-to-whole visual with more than 5 categories. A trend uses a true ordered time or category axis. Source: checklist item 54.
+   - Microsoft's skill gives rough limits per chart type, as guidance: a bar chart about 15 to 20 categories with one series; a clustered bar or column chart about 10 categories and 2 or 3 series; a line chart at most 5 lines; a pie or donut at most 5 slices; a scatter chart 3 to 5 colour groups; a treemap 20 to 30 tiles; a table or matrix 5 to 8 visible columns. Past a limit, group the rest as "Other", filter, or split the chart. The checklist's number for part-to-whole (more than 5) stays the review line. No check: it needs the data. Source: Microsoft's skill, its file chart-selection.md.
 46. No unlabeled dual axis. Repeated comparable measures use the same display units unless justified. Avoid 3-D charts and value axes that do not start at zero. Source: checklist item 56; https://learn.microsoft.com/en-us/power-bi/create-reports/desktop-tips-and-tricks-for-creating-reports.
+   - Microsoft's skill lists the same mistakes and a few more; each is guidance.
+   - No three-dimensional effects. No check: Microsoft documents no file property for them.
+   - Bars and columns start at zero. No check yet: Microsoft's skill names the axis start setting only as a sign to look for, and Microsoft Learn documents no file property for it.
+   - A second value axis only when both series share a unit, and then with a title; otherwise use two charts. No check yet, for the same reason.
+   - A pie or donut with more than 5 slices becomes a bar chart sorted by value (rule 45). No check: it needs the data.
+   - No gauge as a KPI: it takes much space for one number and shows no trend. Use a card, or a KPI visual for progress to a goal. No check: whether a gauge serves as a KPI is a judgement.
+   - Sort bars by value, unless the categories have their own order (months, stages). No check: it needs a judgement on the categories.
+   - Source: Microsoft's skill, its file design/anti-patterns.md and chart-selection.md; GitHub's awesome-copilot, https://github.com/github/awesome-copilot/blob/main/instructions/power-bi-report-design-best-practices.instructions.md (axes from zero, bars sorted by value, few categories).
 47. Do not create retired or retiring visuals: the Q&A visual (scheduled for deprecation in December 2026), and the Bing map and filled map (use Azure Maps). Microsoft's skill also says `cardVisual` instead of `multiRowCard`, and `azureMap` instead of `map` and `filledMap`. Source: visualizations overview above; https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-troubleshoot; Microsoft's skill, its file authoring-part-04.md.
+   - By `visualType`: `map` and `filledMap` (deprecated; use `azureMap`), `qnaVisual` (the Q&A visual), `scriptVisual` (the R visual) and `pythonVisual` (both retiring in May 2027). Code V016 (warn). Source: also https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-map-visualizations-overview ; https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-q-and-a ; https://learn.microsoft.com/en-us/power-bi/create-reports/script-visuals-overview.
+   - `multiRowCard` and the legacy `card`: new reports use the new card, `cardVisual`. Old cards are not converted by themselves; replacing one is a change the developer says yes to. Code U105 (note). Source: also https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-card ; Microsoft's skill, its file authoring/card.md.
+   - The shipped examples of `card`, `multiRowCard`, `scriptVisual` and `pythonVisual` (`tests/fixtures/examples/INDEX.md`) exist so that Copilot recognises these types in old reports. Never copy them into a new report.
 48. Custom visuals are outside this template. `visualType` is free text in the schema: copy it from a visual of the same type in the report, or from the shipped example of that type (`tests/fixtures/examples/INDEX.md`). Ask the developer to place one in Desktop only when the index has no example of it.
 - Only Desktop shows: whether the chart reads well with the real data.
 
@@ -164,13 +186,14 @@ An exception counts only when section 10 of `docs/report-brief.md` lists the cod
 
 49. Every data visual has a title that says what it shows: `visualContainerObjects.title` with `show` and `text`; a subtitle is `subTitle`. No placeholder or field-name titles. Source: checklist item 55; schema `visualConfiguration` 2.8.0 (`Title`, `SubTitle`). Code A003.
 50. A title from a measure needs a text measure in the model, not a report-level measure. Source: https://learn.microsoft.com/en-us/power-bi/create-reports/desktop-conditional-format-visual-titles.
-51. Filters sit at three levels, each in `filterConfig`: report (`report.json`), page (`page.json`), visual (`visual.json`). Each filter in `filters[]` has `name`, `field`, `type`, `filter`, `howCreated`, `isHiddenInViewMode`, `isLockedInViewMode`; the order is `filterSortOrder`. Source: schema `filterConfiguration` 1.3.0.
+51. Filters sit at three levels, each in `filterConfig`: report (`report.json`), page (`page.json`), visual (`visual.json`). Each filter in `filters[]` has `name`, `field`, `type`, `filter`, `howCreated`, `isHiddenInViewMode`, `isLockedInViewMode`; the order is `filterSortOrder`. Source: schema `filterConfiguration` 1.3.0. Inside `filter`, a field in a `Where` condition points to the alias that the `From` list declares (`SourceRef` with `Source`), never to the table name (`Entity`); otherwise the filter silently does nothing. Code V015 (warn). Source: Microsoft's skill, its file authoring/filters.md and authoring-part-04.md.
 52. Lock a filter that readers may see but not change; hide a filter that only cleans data. Source: https://learn.microsoft.com/en-us/power-bi/create-reports/power-bi-report-filter.
 53. Interactions are in `page.json` `visualInteractions[]`: `source`, `target`, `type` (`Default`, `DataFilter`, `HighlightFilter`, `NoFilter`). Line charts, scatter charts and maps can be filtered but not highlighted. Switch off any interaction that confuses the page. Source: schema `page` 2.1.0; https://learn.microsoft.com/en-us/power-bi/create-reports/service-reports-visual-interactions; checklist item 60.
 54. Query reduction (checklist item 69):
    - Consider "Apply all slicers" when a page has 2 or more slicers changed together, or one slicer change refreshes 5 or more visuals. Auto page refresh under 30 seconds needs a written reason. Source: checklist item 69.
    - The button action types are `'ApplyAllSlicers'` and `'ClearAllSlicers'`. Source: Microsoft's skill, `button-part-03.md`.
    - Both act on every slicer on the page, not on the Filters pane; hiding the last Apply all button returns slicers to instant apply. Source: https://learn.microsoft.com/en-us/power-bi/create-reports/buttons-apply-all-clear-all-slicers.
+   - On a model with DirectQuery tables, Microsoft advises the query reduction options from the start; code U104 (note) names a page with two or more slicers and no Apply button setting. Source: https://learn.microsoft.com/en-us/power-bi/guidance/directquery-model-guidance.
    - Report-wide query reduction options are in `report.json` `slowDataSourceSettings`: `isSlicerSelectionsButtonEnabled`, `isFilterSelectionsButtonEnabled`, `isCrossHighlightingDisabled`, `isApplyAllButtonEnabled`, `isFieldWellButtonEnabled`. Auto page refresh is page `objects.pageRefresh`. Source: schemas `report` 3.3.0 and `page` 2.1.0.
 - Copilot does: titles, filter cards and interactions in the files.
 - Only Desktop shows: which interactions surprise readers, and how many visuals one slicer refreshes (Performance analyzer).
@@ -199,10 +222,16 @@ Microsoft's report accessibility checklist, restated. Source of rules 55 to 62 u
 ## L. Report-level measures and visual calculations
 
 65. A report-level measure lives in the report, not the model: `definition/reportExtensions.json`, `entities[].measures[]` with `name`, `expression`, `dataType`, `formatString`, `description` and more (schema `reportExtension` 1.0.0). A report on a live connection can add only such measures. Source: https://learn.microsoft.com/en-us/power-bi/developer/projects/projects-report; https://learn.microsoft.com/en-us/power-bi/connect-data/desktop-report-lifecycle-datasets.
-66. Put a measure in the model when other reports would use it, when it drives a title from a measure, or when it needs a dynamic format string; report-level measures support neither of the last two. Give report-level measures a prefix, such as an underscore, so a new model measure cannot clash with them. Source: https://learn.microsoft.com/en-us/power-bi/guidance/report-separate-from-model; desktop-conditional-format-visual-titles page; https://learn.microsoft.com/en-us/power-bi/create-reports/desktop-dynamic-format-strings. Model changes go through the skill pbi-semantic-model.
+66. Put a measure in the model when other reports would use it, when it drives a title from a measure, or when it needs a dynamic format string; report-level measures support neither of the last two. Give report-level measures a prefix, such as an underscore, so a new model measure cannot clash with them. The prefix is an underscore (Microsoft's example), or the one the brief gives in section 4. A report-level measure without it gives V012 (warn). Source: https://learn.microsoft.com/en-us/power-bi/guidance/report-separate-from-model; desktop-conditional-format-visual-titles page; https://learn.microsoft.com/en-us/power-bi/create-reports/desktop-dynamic-format-strings. Model changes go through the skill pbi-semantic-model.
 67. A visual calculation lives on one visual, as a field in its query: `NativeVisualCalculation` with `Language`, `Expression`, `Name`, `DataType` (schema `semanticQuery` 1.4.0). It suits running sums, moving averages, percent of parent and comparisons with the previous item. It cannot be reused on another visual, is left out of data exports, and cannot be pinned or published to web; a field must be on the visual before it is used. Source: https://learn.microsoft.com/en-us/power-bi/transform-model/desktop-visual-calculations-overview.
 68. Release status: Microsoft's visual calculation pages no longer carry a preview label (overview page dated 13 October 2026). Check a feature's page for a preview label before relying on it.
 - Only Desktop shows: whether the result is right.
+
+## M. Resources and page titles
+
+69. An image, or another resource a visual names (`ResourcePackageItem` with its `ItemName`), is a file in `StaticResources/RegisteredResources/` of the report folder, and is registered in `report.json` under `resourcePackages`, in the package of type `RegisteredResources`: an item whose `name` equals the `ItemName` and whose `path` is the file name. Copy the file in first, then register it. Code V017 (warn). Source: Microsoft's skill, its file authoring/image.md and `page-formatting.md`.
+70. Give every page that is not a tooltip page a title: a text box at the top left, in the title band of the layout standard (`layout-standard.md`, beside this file). Readers start there. Microsoft's skill puts the title, the main figure or the main chart in that place, so a title is this template's default and not a rule of Microsoft's: code V018 is a note (a page with visuals and no text box). Source: Microsoft's skill, its file design/layout.md; `layout-standard.md`.
+- Copilot does: copies and registers images, and writes the title text box.
 
 ## Suggesting a better native feature
 
@@ -217,8 +246,9 @@ Microsoft's report accessibility checklist, restated. Source of rules 55 to 62 u
 Read on 11 November 2026. Restated in this template's own words; property names are copied exactly.
 
 - Microsoft Learn: every page named with its full address in the rules above.
+- Microsoft Learn, added for rules 30, 47 and 54: https://learn.microsoft.com/en-us/power-bi/guidance/composite-model-guidance ; https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-slicers ; https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-map-visualizations-overview ; https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-q-and-a ; https://learn.microsoft.com/en-us/power-bi/create-reports/script-visuals-overview ; https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-card ; https://learn.microsoft.com/en-us/power-bi/guidance/directquery-model-guidance
 - Microsoft's report schemas (copies in `scripts/schemas`): `report` 3.3.0, `page` 2.1.0, `pagesMetadata` 1.1.0, `visualContainer` 2.13.0, `visualConfiguration` 2.8.0, `visualContainerMobileState` 2.8.0, `bookmark` 2.1.0, `bookmarksMetadata` 1.0.0, `filterConfiguration` 1.3.0, `formattingObjectDefinitions` 1.5.0, `semanticQuery` 1.4.0, `reportExtension` 1.0.0.
-- microsoft/skills-for-fabric (MIT), skill powerbi-report-cli: its file field-parameters.md, `bookmark.md`, `button-part-02.md`, `button-part-03.md`, `slicers-part-02.md`, `authoring-workflows.md`; its file authoring-part-04.md; its file chart-selection.md, `interactivity.md`, `accessibility.md`. The button action values come from here; the schema does not list them.
+- microsoft/skills-for-fabric (MIT), skill powerbi-report-cli: its file field-parameters.md, `bookmark.md`, `button-part-02.md`, `button-part-03.md`, `slicers-part-02.md`, `authoring-workflows.md`; its file authoring-part-04.md; its file chart-selection.md, `interactivity.md`, `accessibility.md`; its files design/anti-patterns.md, design/layout.md, authoring/filters.md, authoring/image.md, authoring/page-formatting.md, authoring/card.md. The button action values come from here; the schema does not list them.
 - `checklist/checklist.md`, items 20, 51, 53 to 67 and 69.
 - Owner's rules: Header icons and Tooltips off unless section 7 of the brief lists the visual; `mobile.json` and `mobileState.json` never edited; the theme never changed and no styling on a single visual.
 
@@ -227,8 +257,9 @@ Where sources disagree, and what was decided:
 - Microsoft recommends report page tooltips, and header icon text to help readers find drillthrough; Microsoft's skill keeps headers on unless a visual is decoration. The owner's rule keeps header icons and Tooltips off unless the brief lists the visual. The owner's rule stays; exceptions are per visual (section 7), and drill instructions go in text boxes.
 - Visuals per page: the checklist reviews from 13 and asks a reason above 16; Microsoft's skill warns above 12; Microsoft Learn gives no number. The checklist's numbers are used (V006, V007).
 - Colours in conditional formatting: Microsoft's skill writes colour codes as gradient stops and as fixed colours per measure. The owner's rule forbids colour codes on visuals: V009 warns, and a colour code needs a row in section 10.
+- Sync groups: rule 31 (Microsoft's skill) says every slicer in a group uses the same column; Microsoft Learn syncs slicers on two copies of a dimension in a composite model (rule 30). Learn wins for that case.
 - The script is narrower than its sources: A001 looks only at visuals that show data and at images, not at text boxes; V005 counts the hovered field among the 3, while item 65 asks for 3 beyond it, so a page that passes can still fall short; V003's limit (twice 320 x 240) and the "third of the page" in V006 and V007 are this template's own readings of "keep it small" and "dominant large".
 
-Not confirmed from Microsoft: the `visualTooltip` `type` value for a report page tooltip; whether `acceptsFilterContext` is "Keep all filters"; the action value for "Bookmark navigation"; how a synced slicer that is not shown is stored; how "out of the tab order" is stored; marker property names; a statement that visual calculations are generally available.
+Not confirmed from Microsoft: the `visualTooltip` `type` value for a report page tooltip; whether `acceptsFilterContext` is "Keep all filters"; the action value for "Bookmark navigation"; how a synced slicer that is not shown is stored; how "out of the tab order" is stored; marker property names; a statement that visual calculations are generally available; the `visualType` `qnaVisual`, which comes from Microsoft's report tool catalogue (`tests/fixtures/examples/INDEX.md`), not from Learn.
 
 Checklist items: 20, 51, 53-67, 69

@@ -1,12 +1,17 @@
 # Star schema, relationships, dates and names
 
 How the tables of a model built from this template fit together: fact and dimension tables, relationships, the date table, columns with a special job, and the names of tables and columns.
-`python scripts/check_project.py .` checks it; the code after each rule is the finding it gives (M401 to M417, M113 to M119, M901 to M907; M908 and M909 are in the file `dax-standard.md` beside this one).
+`python scripts/check_project.py .` checks it; the code after each rule is the finding it gives (M401 to M417, M113 to M120, M901 to M907; M908 and M909 are in the file `dax-standard.md` beside this one).
 An exception passes only when section 9 of `docs/report-brief.md` lists the code and the object exactly as the check prints it, with a reason: a relationship as `Sales[Store Key] to Store[Store Key]`, a column as `Table[Column]`, a table by its name, and a finding on the whole model as `model`.
 
 ## A. The star schema
 
 **1. Facts and dimensions.** Every table is either a fact table (events or measurements, one row per event, summed by measures) or a dimension table (the things you filter and group by). Never mix both jobs in one table. A fact table holds rows of one grain only, for example one row per order line; a target set per month goes in its own table. When the source is one wide extract, split it into fact and dimension tables in Power Query. The files do not show grain: ask the developer. No check. Checklist item 10. Source: https://learn.microsoft.com/en-us/power-bi/guidance/star-schema ; https://learn.microsoft.com/en-us/power-bi/guidance/relationships-many-to-many (facts at a higher grain)
+
+- Junk dimension: many small attributes with few values each (an order status, an age group) can be merged into one dimension table with one row per combination and a surrogate key. Build it at the source or in Power Query, and merge the key into the fact query so the relationship is one-to-many. It means fewer tables in the Data pane and a smaller model. No check: the files do not show it. Source: https://learn.microsoft.com/en-us/power-bi/guidance/star-schema
+- Degenerate dimension: a fact attribute that readers filter by but that has no table of its own, such as an order number, stays a column of the fact table. This is the one allowed mix of jobs in a table. When several such columns are needed together (order number and order line number), a separate table can be the better design (rule 22). No check. Source: https://learn.microsoft.com/en-us/power-bi/guidance/star-schema ; https://learn.microsoft.com/en-us/power-bi/guidance/relationships-one-to-one
+- One model per subject: build each model around one subject and its central facts, not one model for everything. No check: ask the developer. Source: https://learn.microsoft.com/en-us/power-bi/guidance/powerbi-modeling-guidance-for-power-platform
+- Wide tables: a table with more than about 30 visible columns usually mixes jobs or holds what belongs in other dimensions. Split it into a proper star. Check: M120 (warn; more than 30 visible columns). Source: Microsoft's skill, https://github.com/microsoft/skills-for-fabric/blob/main/plugins/powerbi-authoring/skills/semantic-model-authoring/references/modeling-guidelines.md
 
 **2. No fact-to-fact relationship.** Two fact tables never relate to each other directly. They share dimensions instead: each fact relates one-to-many to the same dimension table, so one slicer filters both. Checklist item 10 allows 0 unless the reason is written down. No check of its own; a many-to-many relationship between two facts also raises M406. Source: checklist item 10; https://learn.microsoft.com/en-us/power-bi/guidance/relationships-many-to-many ; Microsoft's skill, https://github.com/microsoft/skills-for-fabric/blob/main/plugins/powerbi-authoring/skills/semantic-model-authoring/references/modeling-guidelines.md (shared conformed dimension)
 
@@ -43,6 +48,7 @@ Check: U006 (note). Source: https://learn.microsoft.com/en-us/power-bi/guidance/
 - A key made of several values is built in the source, never by joining texts in a calculated column of the model.
 - Do not add surrogate keys to fact tables.
 - Checklist item 14: 0 concatenated relationship keys unless justified, 0 blanks in one-side keys, at most 0.1% blanks in many-side keys. The files do not show data: ask the developer.
+- A key that must never be blank gets `isNullable: false` (Is Nullable off in Power BI Desktop). A refresh that meets a blank in that column then fails, and the model keeps the data of the last good refresh, so the problem is seen instead of showing as a blank item. Microsoft offers it as a choice, so the check is a note. Check: M416 (note; one note per table whose relationship key allows blanks). The shipped examples do not carry it yet; `Store[Store Key]` can show it later. Source: https://learn.microsoft.com/en-us/power-bi/guidance/relationships-many-to-many ; https://learn.microsoft.com/en-us/dax/best-practices/dax-error-functions
 - Check: M110 (warn). Source: https://learn.microsoft.com/en-us/power-bi/guidance/star-schema ; https://learn.microsoft.com/en-us/power-bi/guidance/directquery-model-guidance (no relationship on a concatenated calculated column); Microsoft's skill, modeling-guidelines.md (address in rule 2: no composite keys, no surrogate keys on facts); checklist item 14
 
 ## B. Relationships
@@ -72,9 +78,21 @@ The next seven rules catch files that Power BI refuses to load, or that break a 
 - Checklist item 11: 100% unique one-side keys, 0 avoidable many-to-many relationships.
 - No check of its own; rules 18 to 22 report the other forms. Source: https://learn.microsoft.com/en-us/power-bi/transform-model/desktop-relationships-understand ; Microsoft's skill, modeling-guidelines.md (address in rule 2); checklist item 11
 
-**18. Both directions.** Avoid them: they can slow queries and make filter paths ambiguous. The checklist targets 0; one needs a review, two or more a strong reason. When one measure must filter across a fact (for example to count dimension rows with sales), use CROSSFILTER inside that measure. For a slicer that should show only items with data, use a visual filter on the slicer instead. A bridge table of a many-to-many design needs one both-direction relationship: list it in section 9 with M405 and that reason. Check: M405 (warn; one-to-one and many-to-many relationships are left to rules 19 and 22). Source: https://learn.microsoft.com/en-us/power-bi/guidance/relationships-bidirectional-filtering ; checklist item 12
+**18. Both directions.** Avoid them: they can slow queries and make filter paths ambiguous. The checklist targets 0; one needs a review, two or more a strong reason. When one measure must filter across a fact (for example to count dimension rows with sales), use CROSSFILTER inside that measure. For a slicer that should show only items with data, use a visual filter on the slicer instead. First ask whether a slicer list that changes with the data helps readers at all: it can also confuse them (no check). A bridge table of a many-to-many design needs one both-direction relationship: list it in section 9 with M405 and that reason. Check: M405 (warn; one-to-one and many-to-many relationships are left to rules 19 and 22). Source: https://learn.microsoft.com/en-us/power-bi/guidance/relationships-bidirectional-filtering ; checklist item 12
 
 **19. Many-to-many.** Between two dimensions, use a bridge table with one-to-many relationships to both. A fact at a higher grain (targets per category) may relate many-to-many to its dimension. A fact at a higher date grain stores the first date of its period and relates one-to-many to the date table. Hide the bridge table. The shipped example: `Sales Target[Category] to Product[Category]`. Check: M406 (warn). Source: https://learn.microsoft.com/en-us/power-bi/guidance/relationships-many-to-many ; checklist item 11
+
+- A fact at a higher grain gives a wrong figure below its grain: every product of a category shows the whole category target. Hide its number columns, so that only measures add them up, and let the measure return blank below the grain. Test the levels below with ISFILTERED, or with ISINSCOPE when a hierarchy drives the visual. No check: the files do not show the grain. A measure written for the shipped table `'Sales Target'` (an illustration; it is not in the examples):
+
+```dax
+IF (
+    NOT ISFILTERED ( Product[Subcategory] )
+        && NOT ISFILTERED ( Product[Product Name] ),
+    [Total Target]
+)
+```
+
+- Source of this point: https://learn.microsoft.com/en-us/power-bi/guidance/relationships-many-to-many
 
 **20. Many-to-many filters one way.** A many-to-many relationship filters from the dimension to the fact only. Check: M407 (warn). Source: Microsoft's best practice rule 'Many-to-many relationships should be single-direction', https://github.com/microsoft/Analysis-Services/blob/master/BestPracticeRules/BPARules.json ; https://learn.microsoft.com/en-us/power-bi/guidance/relationships-many-to-many
 
@@ -174,7 +192,7 @@ When "Naming standard" in section 4 of the brief names no other standard, tables
 
 Read on 11 November 2026. Every rule is restated in this template's own words.
 
-- Microsoft Learn, guidance: https://learn.microsoft.com/en-us/power-bi/guidance/star-schema ; https://learn.microsoft.com/en-us/power-bi/guidance/model-date-tables ; https://learn.microsoft.com/en-us/power-bi/guidance/auto-date-time ; https://learn.microsoft.com/en-us/power-bi/guidance/relationships-one-to-one ; https://learn.microsoft.com/en-us/power-bi/guidance/relationships-many-to-many ; https://learn.microsoft.com/en-us/power-bi/guidance/relationships-active-inactive ; https://learn.microsoft.com/en-us/power-bi/guidance/relationships-bidirectional-filtering ; https://learn.microsoft.com/en-us/power-bi/guidance/relationships-troubleshoot ; https://learn.microsoft.com/en-us/power-bi/guidance/directquery-model-guidance ; https://learn.microsoft.com/en-us/power-bi/guidance/power-bi-optimization
+- Microsoft Learn, guidance: https://learn.microsoft.com/en-us/power-bi/guidance/powerbi-modeling-guidance-for-power-platform ; https://learn.microsoft.com/en-us/dax/best-practices/dax-error-functions ; https://learn.microsoft.com/en-us/power-bi/guidance/star-schema ; https://learn.microsoft.com/en-us/power-bi/guidance/model-date-tables ; https://learn.microsoft.com/en-us/power-bi/guidance/auto-date-time ; https://learn.microsoft.com/en-us/power-bi/guidance/relationships-one-to-one ; https://learn.microsoft.com/en-us/power-bi/guidance/relationships-many-to-many ; https://learn.microsoft.com/en-us/power-bi/guidance/relationships-active-inactive ; https://learn.microsoft.com/en-us/power-bi/guidance/relationships-bidirectional-filtering ; https://learn.microsoft.com/en-us/power-bi/guidance/relationships-troubleshoot ; https://learn.microsoft.com/en-us/power-bi/guidance/directquery-model-guidance ; https://learn.microsoft.com/en-us/power-bi/guidance/power-bi-optimization
 - Microsoft Learn, product pages: https://learn.microsoft.com/en-us/power-bi/transform-model/desktop-relationships-understand ; https://learn.microsoft.com/en-us/power-bi/transform-model/desktop-auto-date-time ; https://learn.microsoft.com/en-us/power-bi/transform-model/desktop-date-tables ; https://learn.microsoft.com/en-us/power-bi/transform-model/desktop-time-intelligence ; https://learn.microsoft.com/en-us/power-bi/create-reports/desktop-sort-by-column ; https://learn.microsoft.com/en-us/power-bi/transform-model/desktop-data-categorization ; https://learn.microsoft.com/en-us/power-bi/transform-model/desktop-tmdl-view ; https://learn.microsoft.com/en-us/analysis-services/tabular-models/hierarchies-ssas-tabular ; https://learn.microsoft.com/en-us/analysis-services/tmdl/tmdl-how-to ; https://learn.microsoft.com/en-us/dax/best-practices/dax-column-measure-references
 - Microsoft's best practice rules (MIT), each named by its rule name: https://github.com/microsoft/Analysis-Services/blob/master/BestPracticeRules/BPARules.json
 - Microsoft's skill `semantic-model-authoring` (MIT): https://github.com/microsoft/skills-for-fabric/blob/main/plugins/powerbi-authoring/skills/semantic-model-authoring/references/modeling-guidelines.md ; https://github.com/microsoft/skills-for-fabric/blob/main/plugins/powerbi-authoring/skills/semantic-model-authoring/references/naming-conventions.md ; https://github.com/microsoft/skills-for-fabric/blob/main/plugins/powerbi-authoring/skills/semantic-model-authoring/references/tmdl-guidelines.md (`fromColumn` is the many side)
@@ -199,6 +217,7 @@ Not confirmed from Microsoft:
 - That `dataCategory: Time` plus `isKey` on the date column is what Desktop's "Mark as date table" writes. Microsoft Learn describes the Desktop action; Microsoft's skill and the best practice rules read the two properties.
 - That each case of rules 10 to 14 stops a model from loading. Microsoft documents that TMDL breaking the model's rules is refused, not each case.
 - The prefixes tbl and vw in M118: no source names them.
+- The TMDL spelling `isNullable`: it follows the Tabular Object Model property IsNullable; the Learn pages give only the Desktop label Is Nullable.
 - M906 on descriptions: the best practice rules cover names only.
 
 Checklist items: 7, 10-15, 18, 24, 26, 31, 59

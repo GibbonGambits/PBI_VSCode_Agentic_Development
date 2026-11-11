@@ -42,10 +42,10 @@ More rules:
 | M102, M103, M104 | Items 19 and 25 |
 | M105, M106 | Items 27 and 38 |
 | M107 | Item 29 |
-| M109, M110, M413 | Items 6 and 14 |
+| M109, M110, M413, M416 | Items 6 and 14 |
 | M009 | Item 36 |
 | M112 | Items 71 and 72 |
-| M201, M115 | Items 5 and 25 |
+| M201, M115, M120, P007 | Items 5 and 25 |
 | P005 | Item 2 |
 | P002, P006, M702, M708 | Item 3 |
 | P003 | Item 4 |
@@ -54,7 +54,7 @@ More rules:
 | M405, M407, M408 | Item 12 |
 | M410 | Item 13 |
 | U006 | Item 15 |
-| M513, M701, M703, M704, M705, M706 | Item 16 |
+| M513, M701, M703, M704, M705, M706, M711, U008, U104 | Item 16 |
 | U004 | Item 17 |
 | M401 | Item 18 |
 | M113 | Item 24 |
@@ -65,8 +65,8 @@ More rules:
 | M502 | Item 33 (Fail: the item asks for DIVIDE in every division that is not trivial) |
 | M507, M514 | Item 34 |
 | M508, M509 | Item 35 |
-| M414, M415, M601, M602, M604 | Item 39 |
-| M606, M607, M608 | Item 40 |
+| M414, M415, M601, M602, M604, M609 | Item 39 |
+| M606, M607, M608, M806 | Item 40 |
 | M603, M605 | Item 41 |
 | G001, G002 | Item 49 (Fail: the item asks for 0 overlapping visuals) |
 | G003, G004, G005, G006 | Item 49 (Fail when they name 3 or more visuals on one page, unless the brief justifies it) |
@@ -77,12 +77,12 @@ More rules:
 | A003 | Item 55 |
 | U007 | Item 59 |
 | U101 | Item 61 |
-| V001 | Item 63 (Fail: the item asks for back navigation on every drillthrough page) |
+| V001, V013, V014 | Item 63 (V001 is Fail: the item asks for back navigation on every drillthrough page; V013 on a tooltip page goes to item 65) |
 | M821, M822, U003, U103 | Item 64 |
 | V002, V003, V004, V005 | Item 65 |
 | A001, A002, A004 | Item 66 |
 | V006, V007 | Item 20 (V006 is Fail unless the brief gives the reason) |
-| M001-M004, M010, M108, M111, M116, M117, M301, M302, M501, M503, M504, M506, M510, M511, M512, M516, M517, M520, M707, M709, M801, M802, M804, M805, M831, M841, M901-M909, P004, V011, B001, B002, G008, C001, D003, P001, F002, F003, J001-J004, S001, N001-N005, H001, H002, U001, U002, U005, and any other finding of `check_template.py` | Template rules, not checklist items. List them in the "Template rules" section of the report |
+| M001-M004, M010, M108, M111, M116, M117, M301, M302, M303, M501, M503, M504, M506, M510, M511, M512, M516, M517-M523, M707, M709, M801, M802, M804, M805, M807, M831-M833, M841, M901-M910, P004, V011, V012, V015-V018, B001, B002, G008, C001, D003, P001, F002, F003, J001-J004, S001, N001-N005, H001, H002, U001, U002, U005, U105, and any other finding of `check_template.py` | Template rules, not checklist items. List them in the "Template rules" section of the report |
 
 A warning or a note from the script is evidence, not a verdict: read the item and judge it by its own thresholds. Item 22 is judged by the checklist's thresholds; the two-level measure folders (M003, M004) are a template rule. A finding excused in section 9 or 10 of the brief counts as justified; quote the row.
 

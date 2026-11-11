@@ -34,6 +34,13 @@ SLICER_TYPES = frozenset(("slicer", "advancedSlicerVisual", "listSlicer", "textS
 STYLE_PROPERTIES = frozenset(("fontFamily", "fontSize", "fontColor", "color", "bold", "italic", "underline"))
 STYLE_CARDS = frozenset(("border", "dropShadow", "background"))
 HEX_COLOUR = re.compile(r"#[0-9A-Fa-f]{6}(?:[0-9A-Fa-f]{2})?\b")
+RETIRING_TYPES = {"map": "the Bing map (deprecated: use the Azure map, azureMap)",
+                  "filledMap": "the filled Bing map (deprecated: use the Azure map, azureMap)",
+                  "qnaVisual": "the Q&A visual (deprecated with Q&A)",
+                  "scriptVisual": "the R visual (Microsoft is retiring it)",
+                  "pythonVisual": "the Python visual (Microsoft is retiring it)"}
+OLD_CARD_TYPES = frozenset(("card", "multiRowCard"))
+REPORT_MEASURE_PREFIX = "_"         # Microsoft Learn, "Separate reports from models": its example of a prefix
 LINK_TARGETS = (("Bookmark", "bookmark", "bookmark"), ("PageNavigation", "navigationSection", "page"),
                 ("Drillthrough", "drillthroughSection", "page"))
 
@@ -153,6 +160,12 @@ def check(cp, report_dir, brief, findings):
             findings.add(code, visual["path"] if visual else page["path"], 0, message, level=level)
 
     _page_list(cp, report_dir, pages, findings)
+    _report_level(cp, report_dir, pages, brief, findings)
+    direct_query = _reads_direct_query(cp, report_dir)
+    report = cp.load_object(os.path.join(report_dir, "definition", "report.json")) or {}
+    reduction = report.get("slowDataSourceSettings") if isinstance(report.get("slowDataSourceSettings"), dict) else {}
+    apply_buttons = reduction.get("isSlicerSelectionsButtonEnabled") is True or reduction.get("isApplyAllButtonEnabled") is True
+    registered = _registered(report)
     slicer_fields = {}
     for page in pages:
         title = page["page"].get("displayName") or page["name"]
@@ -202,6 +215,54 @@ def check(cp, report_dir, brief, findings):
             elif count >= DENSITY_REVIEW:
                 add("V007", page, None, "page '%s' has %d visuals that show data%s; the checklist asks for a review "
                     "from %d" % (title, count, twice, DENSITY_REVIEW))
+
+        page_filters = _filters(page["page"])
+        left_over = [f.get("name") or "?" for f in page_filters if isinstance(f.get("filter"), dict)
+                     and (page["kind"] == "Tooltip" or f.get("howCreated") == "Drillthrough")]
+        if left_over:
+            add("V013", page, None, "page '%s' has values saved in its %s filter(s) (%s). They are left over from "
+                "design time and readers would start from them: clear the filter in Power BI Desktop and save"
+                % (title, "tooltip" if page["kind"] == "Tooltip" else "drillthrough", ", ".join(left_over[:5])))
+        if (page["kind"] == "Drillthrough" and not hidden_page
+                and not any(kind == "Bookmark" for _, (kind, _) in actions)):
+            add("V014", page, None, "drillthrough page '%s' is visible and has no reset button (a button whose action "
+                "is a bookmark). Microsoft advises hiding a drillthrough page; a visible one needs a way back to its "
+                "starting state" % title)
+        for owner, visual in [(page["page"], None)] + [(v["data"], v) for v in page["visuals"]]:
+            lost = _lost_sources(owner)
+            if lost:
+                add("V015", page, visual, "a filter of %s uses the source name(s) %s in its Where part, and its From "
+                    "part does not declare them; the filter cannot be read"
+                    % ("'%s'" % shown(visual) if visual else "page '%s'" % title, ", ".join(lost)))
+        old_cards = []
+        for visual, kind in types:
+            if kind in RETIRING_TYPES:
+                add("V016", page, visual, "'%s' is %s. Do not build new ones; plan a replacement for this one, or "
+                    "list the reason in section 10 of the brief" % (shown(visual), RETIRING_TYPES[kind]))
+            elif kind in OLD_CARD_TYPES and not excused("U105", page, visual):
+                old_cards.append(shown(visual))
+            used_items = set()
+            _resources(visual["data"], used_items)
+            lost = sorted(item for item in used_items if item not in registered
+                          or not os.path.isfile(os.path.join(report_dir, "StaticResources", "RegisteredResources",
+                                                             *registered[item].split("/"))))
+            if lost:
+                add("V017", page, visual, "'%s' uses the resource file(s) %s, which report.json does not register or "
+                    "which are not in StaticResources/RegisteredResources; the picture stays empty"
+                    % (shown(visual), ", ".join(lost)))
+        if old_cards:
+            add("U105", page, None, "page '%s' uses the older card visuals (%s). The new card visual (cardVisual) "
+                "replaces the card and the multi-row card and can show several values" % (title, ", ".join(old_cards[:6])),
+                level="note")
+        if (page["kind"] != "Tooltip" and any(isinstance(v["visual"].get("query"), dict) for v in page["visuals"])
+                and not any(kind == "textbox" for _, kind in types)):
+            add("V018", page, None, "page '%s' has no text box, so it has no visible page title. The layout standard "
+                "keeps the top-left of every page for a title text box" % title, level="note")
+        slicers = [v for v, kind in types if kind in SLICER_TYPES]
+        if direct_query and len(slicers) >= 2 and not apply_buttons and page["kind"] is None:
+            add("U104", page, None, "page '%s' has %d slicers on a model with DirectQuery tables, and the report has no "
+                "Apply button for slicers. With an Apply button the source is asked once, after all choices are made "
+                "(Options, Query reduction)" % (title, len(slicers)), level="note")
 
         for visual, (kind, link) in actions:
             for wanted, key, target in LINK_TARGETS:
@@ -364,3 +425,112 @@ def _stacked(cp, report_dir, pages, add):
                         "category, with a slicer" % (first["label"] or first["name"], second["label"] or second["name"]),
                         level="note")
                     return
+
+
+def _filters(owner):
+    config = owner.get("filterConfig") if isinstance(owner, dict) else None
+    filters = config.get("filters") if isinstance(config, dict) else None
+    return [f for f in filters if isinstance(f, dict)] if isinstance(filters, list) else []
+
+
+def _lost_sources(owner):
+    """Source names that the Where part of a filter uses and its From part does not declare."""
+    lost = set()
+    for entry in _filters(owner):
+        body = entry.get("filter")
+        if not isinstance(body, dict) or not isinstance(body.get("From"), list):
+            continue
+        declared = {source.get("Name") for source in body["From"] if isinstance(source, dict)}
+        used = set()
+
+        def walk(node):
+            if isinstance(node, dict):
+                reference = node.get("SourceRef")
+                if isinstance(reference, dict) and isinstance(reference.get("Source"), str):
+                    used.add(reference["Source"])
+                for value in node.values():
+                    walk(value)
+            elif isinstance(node, list):
+                for value in node:
+                    walk(value)
+        walk(body.get("Where"))
+        lost |= used - declared
+    return sorted(lost)
+
+
+def _resources(node, found):
+    """Add the ItemName of every file a JSON value takes from the report's registered resources."""
+    if isinstance(node, dict):
+        item = node.get("ResourcePackageItem")
+        if isinstance(item, dict) and isinstance(item.get("ItemName"), str) \
+                and item.get("PackageName", "RegisteredResources") == "RegisteredResources":
+            found.add(item["ItemName"])
+        for value in node.values():
+            _resources(value, found)
+    elif isinstance(node, list):
+        for value in node:
+            _resources(value, found)
+
+
+def _registered(report):
+    """{item name: path} of the files report.json registers in its RegisteredResources package."""
+    out = {}
+    packages = report.get("resourcePackages") if isinstance(report, dict) else None
+    for package in packages if isinstance(packages, list) else []:
+        if not isinstance(package, dict) or package.get("type") != "RegisteredResources":
+            continue
+        for item in package.get("items") if isinstance(package.get("items"), list) else []:
+            if isinstance(item, dict) and isinstance(item.get("name"), str) and isinstance(item.get("path"), str):
+                out[item["name"]] = item["path"]
+    return out
+
+
+def _reads_direct_query(cp, report_dir):
+    """True when the report's model is in this project and has a table in DirectQuery mode."""
+    model_dir = cp.report_model(report_dir)
+    tables = os.path.join(model_dir, "definition", "tables") if model_dir else None
+    if not tables or not os.path.isdir(tables):
+        return False
+    for name in sorted(os.listdir(tables)):
+        if name.lower().endswith(".tmdl"):
+            try:
+                with open(os.path.join(tables, name), encoding="utf-8-sig") as handle:
+                    if re.search(r"(?mi)^\s*mode:\s*directQuery\s*$", handle.read()):
+                        return True
+            except (OSError, UnicodeDecodeError):
+                continue
+    return False
+
+
+def _report_level(cp, report_dir, pages, brief, findings):
+    """V012: a report-level measure without the prefix. V015 and V017 for report.json itself."""
+    definition = os.path.join(report_dir, "definition")
+    path = os.path.join(definition, "reportExtensions.json")
+    data = cp.load_object(path) if os.path.isfile(path) else None
+    prefix = brief.get("report_prefix") or REPORT_MEASURE_PREFIX
+    bare = []
+    for entity in (data or {}).get("entities", []) if isinstance((data or {}).get("entities"), list) else []:
+        for measure in entity.get("measures", []) if isinstance(entity, dict) and isinstance(entity.get("measures"), list) else []:
+            name = measure.get("name") if isinstance(measure, dict) else None
+            if isinstance(name, str) and not name.startswith(prefix) \
+                    and not cp.layout_excused(brief, "V012", {"-"}, {name}):
+                bare.append(name)
+    if bare:
+        findings.add("V012", path, 0, "report-level measure(s) %s do not start with '%s'. Microsoft advises a prefix on "
+                     "measures a report defines, so that a measure added to the model later can never have the same "
+                     "name. Renaming one changes the visuals that use it" % (", ".join("[%s]" % n for n in bare), prefix),
+                     level="warn")
+    report_path = os.path.join(definition, "report.json")
+    report = cp.load_object(report_path) or {}
+    lost = _lost_sources(report)
+    if lost:
+        findings.add("V015", report_path, 0, "a report-level filter uses the source name(s) %s in its Where part, and "
+                     "its From part does not declare them; the filter cannot be read" % ", ".join(lost), level="warn")
+    missing = sorted(name for name, item_path in _registered(report).items()
+                     if not os.path.isfile(os.path.join(report_dir, "StaticResources", "RegisteredResources",
+                                                        *item_path.split("/"))))
+    if missing:
+        findings.add("V017", report_path, 0, "report.json registers the resource file(s) %s, which are not in "
+                     "StaticResources/RegisteredResources" % ", ".join(missing), level="warn")
+    del pages
+
