@@ -1,0 +1,2 @@
+/// Smallest order amount kept by the Sales query. Made-up value for the tests.
+expression MinimumAmount = 0 meta [IsParameterQuery=true, Type="Number", IsParameterQueryRequired=true]
