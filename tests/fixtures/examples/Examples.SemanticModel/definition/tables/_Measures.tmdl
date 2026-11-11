@@ -135,6 +135,16 @@ table _Measures
 		displayFolder: Customer\Base
 		dataCategory: WebUrl
 
+	/// Example of a label measure for a report in more than one language: the title of the store page in the reader's language, and in English for every language that is not listed.
+	measure 'Sales by Store Label' =
+			SWITCH (
+			    USERCULTURE (),
+			    "nl-NL",
+			    "Verkoop per winkel",
+			    "Sales by Store"
+			)
+		displayFolder: Customer\Base
+
 	column Placeholder
 		dataType: string
 		isHidden

@@ -26,6 +26,10 @@ An exception counts only when section 10 of `docs/report-brief.md` lists the cod
 | V016 | A visual type Microsoft is retiring or has deprecated: `map`, `filledMap`, `qnaVisual`, `scriptVisual` (R), `pythonVisual` | warn |
 | V017 | A visual names an image or other resource that `report.json` does not register, or whose file is not in the report folder | warn |
 | V018 | A page that is not a tooltip page has visuals but no text box (no visible page title) | note |
+| V019 | A report-level measure calls USERCULTURE (the file `multiple-languages.md` in the skill pbi-semantic-model) | warn |
+| V020 | A report on a model with translations holds typed text: text boxes and typed visual titles (one finding for each report) | warn |
+| V021 | A report on a model with translations shows more than one page tab | warn |
+| V022 | The report uses a preview feature that section 11 of the brief does not list: the Gantt visual, a format string on one visual (`visual-features.md`, beside this file) | warn |
 | A001 | A visual that shows data, or an image, has no alt text (hidden visuals are not checked; an image that is only decoration is listed in the brief) | warn |
 | A004 | Alt text is longer than 250 characters | warn |
 | A002 | Two visuals on one page share a tab order number (members of a group are not compared) | warn |

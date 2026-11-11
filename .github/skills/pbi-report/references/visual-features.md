@@ -123,7 +123,7 @@ How to read a block:
     - Stored: `title.text` or `subTitle.text` holds `{"expr": {"Measure": ...}}` (conditional-formatting.md of Microsoft's skill).
     - Copy: `Charts_Features_ClusteredBar_DynamicSubtitle`. Check: A003 counts such a title as written.
 28. **Format string on one visual** (B61). Changes the number format in one visual only. Source: schema `visualConfiguration` 2.8.0 (`RoleProjection.format`).
-    - Stored: `format` on the projection. Status: preview in the release notes; needs the developer's yes. Prefer the model's format string.
+    - Stored: `format` on the projection. Status: preview in the release notes; needs the developer's yes. Prefer the model's format string. Check: V022 (warn) until section 11 of the brief has a row named `format string on a visual`.
     - Copy: `Tables_Features_Table_VisualFormatString`.
 29. **Card visual categories, images and layout** (B94, B88). Several measures and a category in one card visual. Source: https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-card
     - Stored: categories go in the `Rows` role of `cardVisual` (Microsoft's visual catalogue). Images, callout layout and fixed card sizes have no shown form, or are styling: set them in Power BI Desktop.
@@ -162,7 +162,7 @@ How to read a block:
 37. **Power Apps, Power Automate, metrics and Gantt visuals** (A40, A41, A50, A51). Source: https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-powerapp; https://learn.microsoft.com/en-us/power-bi/create-reports/power-bi-automate-visual; https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-scorecard-visual; https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-gantt
     - Limits: the Power Automate visual handles at most 1,000 records and does not work in embedded analytics or publish to web; the Gantt visual takes up to 1,000 rows.
     - Stored: the Gantt visual is `ganttChart` with the roles `Task` (required), `StartDate`, `EndDate`, `Progress`, `Category`, `Columns` (Microsoft's visual catalogue). The other three have no identifier or binding in any Microsoft source: insert them in Power BI Desktop.
-    - Copy: `Charts_Features_Gantt_ProductTasks`. Status: Gantt is preview; needs the developer's yes.
+    - Copy: `Charts_Features_Gantt_ProductTasks`. Status: Gantt is preview; needs the developer's yes. Check: V022 (warn) until section 11 of the brief has a row named `Gantt visual`.
 
 ## I. Report settings
 

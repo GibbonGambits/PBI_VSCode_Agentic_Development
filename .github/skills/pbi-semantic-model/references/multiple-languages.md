@@ -112,7 +112,7 @@ cultureInfo nl-NL
 ## What Copilot does
 
 - Asks nothing in the middle of a task. What it cannot decide goes in the end note.
-- Builds from the shipped examples in `tests/fixtures/examples/INDEX.md`: the field parameter `Sales Metric` (and `Sales Breakdown` for columns) and the culture `nl-NL`.
+- Builds from the shipped examples in `tests/fixtures/examples/INDEX.md`: the field parameter `Sales Metric` (and `Sales Breakdown` for columns), the culture `nl-NL` and the label measure `Sales by Store Label`. A label measure returns text, so it has no format string: list it in section 9 of the brief with M009.
 - Adds a language, a culture file or a label only when the brief names it.
 - Marks for the developer what only Power BI Desktop or the service can do: testing each language in the service, the width of translated labels, publishing, and any bookmark captured in Desktop.
 
