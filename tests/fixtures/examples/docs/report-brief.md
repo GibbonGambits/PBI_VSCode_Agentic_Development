@@ -55,7 +55,7 @@ Brief for the shipped model examples in this folder. The models hold one working
 
 | Page | Visual | What stays on (header, tooltip or both) | Reason |
 |---|---|---|---|
-| | | | |
+| Charts_Bars | Charts_Bars_ClusteredBar_SalesByStore | tooltip | Shipped example of a report page tooltip: hovering a bar shows the page Tooltip_StoreSales |
 
 ## 8. Known limits to tell users about (75)
 
@@ -73,6 +73,7 @@ The model standard is `.github/skills/pbi-semantic-model/references/model-standa
 | M409 | Store Detail[Store Key] to Store[Store Key] | Shipped example of a one-to-one relationship |
 | M408 | model | Shipped examples of a both-direction, a many-to-many and a one-to-one relationship in one small model |
 | M414 | model | Shipped examples of security roles and of an inactive relationship (ship date) in one model |
+| M607 | model | Shipped examples show a role with row rules and a role with object rules side by side; a real model puts both kinds in one role |
 | M009 | [Store Page Link] | Shipped example of the data category WebUrl on a measure: the measure returns text, so it has no format string |
 
 ## 10. Exceptions to the layout standard

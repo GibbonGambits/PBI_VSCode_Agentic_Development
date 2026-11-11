@@ -1,0 +1,35 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/bookmark/2.1.0/schema.json",
+  "displayName": "Show chart",
+  "name": "Bookmark_ShowChart",
+  "options": {
+    "targetVisualNames": [
+      "Bookmarks_ClusteredColumn_SalesByChannel",
+      "Bookmarks_Table_SalesByChannel"
+    ],
+    "suppressData": true,
+    "suppressDisplay": false,
+    "suppressActiveSection": true,
+    "applyOnlyToTargetVisuals": false
+  },
+  "explorationState": {
+    "version": "1.3",
+    "activeSection": "Bookmarks",
+    "sections": {
+      "Bookmarks": {
+        "visualContainers": {
+          "Bookmarks_ClusteredColumn_SalesByChannel": {
+            "singleVisual": {}
+          },
+          "Bookmarks_Table_SalesByChannel": {
+            "singleVisual": {
+              "display": {
+                "mode": "hidden"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

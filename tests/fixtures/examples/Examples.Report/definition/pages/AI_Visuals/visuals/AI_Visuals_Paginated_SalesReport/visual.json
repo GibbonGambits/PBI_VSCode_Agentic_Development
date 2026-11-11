@@ -1,0 +1,69 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
+  "name": "AI_Visuals_Paginated_SalesReport",
+  "position": {
+    "x": 336,
+    "y": 368,
+    "z": 3000,
+    "height": 328,
+    "width": 296,
+    "tabOrder": 3000
+  },
+  "visual": {
+    "visualType": "rdlVisual",
+    "visualContainerObjects": {
+      "visualHeader": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "visualTooltip": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "title": [
+        {
+          "properties": {
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Paginated report'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "general": [
+        {
+          "properties": {
+            "altText": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Paginated report visual. The paginated report to show is chosen in Power BI Desktop'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}
