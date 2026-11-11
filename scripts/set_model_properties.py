@@ -24,6 +24,7 @@ Save in Power BI Desktop before running this. Afterwards reload the project in D
 Needs Python 3.8 or later. Uses the standard library only.
 Exit code: 0 = done, 1 = a change was refused (then no file is written), 2 = wrong usage.
 """
+import collections
 import os
 import re
 import sys
@@ -43,12 +44,15 @@ class Refused(Exception):
     pass
 
 
+Line = collections.namedtuple("Line", "text end")
+
+
 class Files:
     """The .tmdl files of the models under a folder, held in memory so that a dry run changes nothing."""
 
     def __init__(self, root):
-        self.lines = {}
-        self.newline = {}
+        self.lines = {}             # path -> list of Line: the text of a line and its own line ending
+        self.newline = {}           # path -> the ending a new line gets
         self.changed = set()
         self.models = cp.find_models(root)
         for model in self.models:
@@ -58,20 +62,42 @@ class Files:
                     if name.lower().endswith(".tmdl"):
                         path = os.path.join(folder, name)
                         with open(path, "rb") as fh:
-                            text = fh.read().decode("utf-8-sig")
-                        self.newline[path] = "\r\n" if "\r\n" in text else "\n"
-                        self.lines[path] = text.splitlines()
+                            raw = fh.read()
+                        try:
+                            text = raw.decode("utf-8-sig")
+                        except UnicodeDecodeError:
+                            raise Refused("%s is not UTF-8 text; save it as UTF-8 without BOM first" % path)
+                        parts = re.split(r"(\r\n|\n)", text)         # only real line breaks; each line keeps its own
+                        pairs = [Line(parts[i], parts[i + 1] if i + 1 < len(parts) else "") for i in range(0, len(parts), 2)]
+                        if pairs and pairs[-1] == Line("", ""):
+                            pairs.pop()
+                        self.newline[path] = "\r\n" if text.count("\r\n") * 2 > text.count("\n") else "\n"
+                        self.lines[path] = pairs
+
+    def text_lines(self, path):
+        return [line.text for line in self.lines[path]]
+
+    def insert(self, path, index, texts):
+        """Put new lines before position 'index' (0-based). The line before them gets an ending if it had none."""
+        lines = self.lines[path]
+        if 0 < index <= len(lines) and lines[index - 1].end == "":
+            lines[index - 1] = Line(lines[index - 1].text, self.newline[path])
+            lines[index:index] = [Line(t, self.newline[path]) for t in texts[:-1]] + [Line(texts[-1], "")]
+        else:
+            lines[index:index] = [Line(t, self.newline[path]) for t in texts]
+
+    def replace(self, path, index, text):
+        self.lines[path][index] = Line(text, self.lines[path][index].end)
 
     def model(self):
         objects = []
         for path in sorted(self.lines):
-            objects.extend(cp.check_tmdl_lines(path, self.lines[path], cp.Findings()) or [])
+            objects.extend(cp.check_tmdl_lines(path, self.text_lines(path), cp.Findings()) or [])
         return cp.build_model(objects)
 
     def write(self):
         for path in sorted(self.changed):
-            newline = self.newline[path]
-            payload = (newline.join(self.lines[path]) + newline).encode("utf-8")
+            payload = "".join(line.text + line.end for line in self.lines[path]).encode("utf-8")
             temporary = path + ".tmp"
             with open(temporary, "wb") as fh:
                 fh.write(payload)
@@ -106,6 +132,21 @@ def _written(value):
     return value
 
 
+def _indent_unit(lines, obj):
+    """One level of indentation, as this file writes it below this object: a tab, or the spaces it uses."""
+    for line in lines[obj["line"]:]:
+        if line.strip():
+            lead = line[:len(line) - len(line.lstrip(" \t"))]
+            if lead.startswith(obj["indent"]) and len(lead) > len(obj["indent"]) and not obj["has_expr"]:
+                return lead[len(obj["indent"]):]
+            break
+    for line in lines:
+        lead = line[:len(line) - len(line.lstrip(" \t"))]
+        if lead and line.strip():
+            return "\t" if lead[0] == "\t" else lead      # the first indented line of the file is one level deep
+    return "\t"
+
+
 def apply(files, name, prop, value):
     """Change the lines held in 'files'. Returns a text that says what changed, or None when nothing had to."""
     prop = PROPERTIES.get(prop.lower())
@@ -117,16 +158,19 @@ def apply(files, name, prop, value):
     obj = find_object(model, name)
     if obj["kind"] not in KINDS[prop]:
         raise Refused("%s cannot be set on a %s (%s)" % (prop, obj["kind"], name))
-    lines = files.lines[obj["file"]]
-    unit = "\t" if any(line.startswith("\t") for line in lines) or not obj["indent"] else "    "
-    inner = obj["indent"] + unit
+    path = obj["file"]
+    lines = files.text_lines(path)
+    inner = obj["indent"] + _indent_unit(lines, obj)
     key = prop.lower()
     if prop == "isHidden":
         if value.strip().lower() != "true":
             raise Refused("isHidden can only be set to true here; to show an object again, edit the file with the developer")
         if obj["hidden"]:
             return None
-        lines.insert(obj["expr_end"], inner + "isHidden")
+        if "ishidden" in obj["prop_lines"]:                  # written as 'isHidden: false'
+            files.replace(path, obj["prop_lines"]["ishidden"] - 1, inner + "isHidden")
+        else:
+            files.insert(path, obj["expr_end"], [inner + "isHidden"])
         before = "visible"
     elif prop == cp.REASON_ANNOTATION:
         calculated = obj.get("calculated") if obj["kind"] == "column" else model["tables"][obj["name"]]["calculated"]
@@ -139,9 +183,12 @@ def apply(files, name, prop, value):
         if before is not None and before.strip() == value.strip():
             return None
         if prop in obj["annotation_lines"]:
-            lines[obj["annotation_lines"][prop] - 1] = text
+            at = obj["annotation_lines"][prop] - 1
+            if lines[at].split("=", 1)[1].strip() in ("", "```"):
+                raise Refused("the %s annotation of %s runs over several lines; change this one by hand" % (prop, name))
+            files.replace(path, at, text)
         else:
-            lines[obj["last_line"]:obj["last_line"]] = ["", text]
+            files.insert(path, obj["last_line"], ["", text])
     else:
         if prop == "summarizeBy" and value.strip().lower() != "none":
             raise Refused("summarizeBy can only be set to none here")
@@ -153,9 +200,9 @@ def apply(files, name, prop, value):
             return None
         text = "%s%s: %s" % (inner, prop, _written(value))
         if key in obj["prop_lines"]:
-            lines[obj["prop_lines"][key] - 1] = text
+            files.replace(path, obj["prop_lines"][key] - 1, text)
         else:
-            lines.insert(obj["expr_end"], text)
+            files.insert(path, obj["expr_end"], [text])
     after = find_object(files.model(), name)             # read the result back before it counts
     seen = (("true" if after["hidden"] else None) if prop == "isHidden"
             else after["annotations"].get(prop) if prop == cp.REASON_ANNOTATION else after["props"].get(key))
@@ -175,8 +222,12 @@ def main(argv):
     try:
         while len(args) > 1:
             if args[-2] == "--set":
-                target, value = args[-1].split("=", 1)
-                name, prop = target.rsplit(".", 1)
+                known = re.match(r"(.+?)\.(%s)=(.*)\Z" % "|".join(PROPERTIES.values()), args[-1], re.S | re.I)
+                if known:
+                    name, prop, value = known.groups()
+                else:
+                    target, value = args[-1].split("=", 1)
+                    name, prop = target.rsplit(".", 1)
                 changes.insert(0, (name.strip(), prop.strip(), value))
             elif args[-2] == "--only":
                 only.append(args[-1].strip())
@@ -192,10 +243,19 @@ def main(argv):
         print(__doc__)
         return 2
     root = os.path.abspath(args[0])
-    files = Files(root)
+    try:
+        files = Files(root)
+    except Refused as exc:
+        print("refused  %s" % exc)
+        print("Nothing was written.")
+        return 1
     if not files.models:
         print("No *.SemanticModel folder with TMDL files found under %s." % args[0])
         return 2
+    if len(files.models) > 1:
+        print("refused  more than one model under %s; give the folder that holds one project" % args[0])
+        print("Nothing was written.")
+        return 1
     if codes:
         findings, _, _ = cp.run(root)
         for code, name, prop, value in findings.fixes:

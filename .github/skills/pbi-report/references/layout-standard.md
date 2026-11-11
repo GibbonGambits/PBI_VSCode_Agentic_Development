@@ -17,7 +17,7 @@ A value in the brief always wins. The theme sets no page size and no spacing.
 | 1 to 3 slicers | In the title band, at its right end, each 160 x 56, one gap apart | Each 232 x 64 |
 | 4 or more slicers | One column at the left, 208 wide | 312 wide |
 
-- An existing report keeps its own page size. Write it in section 2 of the brief. For a size other than these two, the brief must also give the margin and the gap; if it does not, ask.
+- An existing report keeps its own page size. Write it in section 2 of the brief. For a size other than these two, the brief must also give the margin and the gap; if it does not, ask (the script says so with G004).
 - Every x, y, width and height is a multiple of the grid step.
 - Left, top and right margins equal the margin. The bottom margin is at least the margin: a page need not be full.
 - Slicers sit in the same place on every page (item 61).
@@ -34,10 +34,10 @@ A value in the brief always wins. The theme sets no page size and no spacing.
 | G005 | Visuals of the same kind in one row have different heights | warn |
 | G006 | The gap between neighbours differs from the gap | warn |
 | G007 | The page size differs from the brief or the default | warn |
-| G008 | A rotated visual: its position is not checked | note |
+| G008 | Not checked: a rotated visual, or the visuals inside a group | note |
 
 - A "data visual" is a visual with fields. Shapes, images, text boxes and buttons have none, so a background shape behind a chart is not an overlap.
-- Not an overlap either: a visual marked hidden, a visual that a bookmark hides, and a group against its own members.
+- Not an overlap either: a visual marked hidden; two visuals of which a bookmark shows one without the other (layered on purpose); and a group against its own members. Two stacked visuals that are always shown or hidden together do overlap.
 - A visual inside a group is compared only with the other members of that group, because it is not known where a member's position counts from. So when a page has groups, a clean G002 does not prove item 49's "0 overlapping visuals": the developer looks at that page.
 - Checklist item 49 asks for 0 overlapping visuals, and for a review when 3 or more visuals on a page are off the grid or badly aligned.
 - An exception counts only when section 10 of the brief lists the code, the page and the visual with a reason. A full-page background shape is listed with `G004`.
@@ -58,7 +58,7 @@ A value in the brief always wins. The theme sets no page size and no spacing.
 
 1. Run `python scripts/list_visuals.py . --page <page>` and `python scripts/check_project.py .`.
 2. Work out each new x, y, width and height by arithmetic from the numbers above. Show the developer the sums and the old and new values, and wait for a yes.
-3. Apply with `python scripts/set_positions.py . --dry-run --move "<page>/<visual>=<x>,<y>,<width>,<height>"`, then without `--dry-run`. `--snap` only rounds existing numbers to the grid. The script changes the four numbers and nothing else, and refuses groups, members, rotated visuals and anything that would leave the page.
+3. Apply with `python scripts/set_positions.py . --dry-run --move "<page>/<visual>=<x>,<y>,<width>,<height>"`, then without `--dry-run`. `--snap` only moves each edge of a visual to the nearest grid line, so visuals that touch still touch. A target that fits more than one visual is refused: name the page and the visual by their folders. The script changes the four numbers and nothing else, and refuses groups, members, rotated visuals and anything that would leave the page.
 4. Run the check again.
 5. Name the pages that changed and ask the developer to reload the project in Power BI Desktop and look at each one. The script prints the list. Never say a page looks right from the files alone.
 

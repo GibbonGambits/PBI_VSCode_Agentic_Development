@@ -66,7 +66,7 @@ Finding codes (errors unless marked warn or note; only errors change the exit co
     G005  (warn) visuals of the same kind in one row have different heights
     G006  (warn) gap between neighbours differs from the gap
     G007  (warn) page size differs from the brief or the standard
-    G008  (note) rotated visual, not checked
+    G008  (note) position not checked: a rotated visual, or visuals inside a group
 
     B001  a report file uses a table, column or measure the model in this project does not have
 
@@ -94,7 +94,7 @@ SCHEMA_PREFIX = "https://developer.microsoft.com/json-schemas/fabric/"
 REVIEW_STATUSES = ("Pass", "Fail", "Not applicable")
 
 # The model standard: .github/skills/pbi-semantic-model/references/model-standard.md
-MEASURE_TABLE = "_Measures"                          # Microsoft Learn, "Organize your measures"
+MEASURE_TABLE = "_Measures"                          # the table: Microsoft Learn, "Organize your measures"; the name: the owner's
 FOLDER_SUBJECTS = ("Reliability", "Energy and Gas", "Customer", "Safety", "Finance", "Workforce",
                    "IT and Security", "Work Management")             # the eight business definition areas
 FOLDER_TYPES = ("Base", "Time Intelligence", "Comparisons", "Ratios", "Counts")
@@ -186,6 +186,13 @@ def safe_output():
 
 
 # ---------------------------------------------------------------- TMDL
+
+def split_lines(text):
+    """Lines of a file, split only at real line breaks. (str.splitlines also splits at characters such as
+    U+2028, which can sit inside a text value and are not line breaks to Power BI.)"""
+    lines = re.split(r"\r\n|\n|\r", text)
+    return lines[:-1] if lines and lines[-1] == "" else lines
+
 
 def _width(line):
     return len(line) - len(line.lstrip(" \t"))
@@ -309,7 +316,7 @@ def check_tmdl_file(path, findings):
     try:
         if b"\x00" in raw:
             raise UnicodeDecodeError("utf-8", raw, 0, 1, "the file looks like UTF-16")
-        lines = raw.decode("utf-8-sig").splitlines()
+        lines = split_lines(raw.decode("utf-8-sig"))
     except UnicodeDecodeError:
         findings.add("J001", path, 0, "file is not UTF-8 text, so it cannot be checked; save it as UTF-8 without BOM")
         return
@@ -656,7 +663,9 @@ def is_label(label, page_name, page_display):
 
 
 def _walk(root):
-    """os.walk that skips Git folders and the template's own test data."""
+    """os.walk that skips Git folders, the template's own test data and the untouched copy made by improve.py."""
+    if BEFORE_COPY in os.path.abspath(root).split(os.sep):
+        return
     for folder, dirs, files in os.walk(root):
         dirs[:] = [d for d in dirs if not d.startswith(".git") and d not in ("node_modules", BEFORE_COPY)
                    and not (d == "fixtures" and os.path.basename(folder) == "tests")]
@@ -824,10 +833,10 @@ def check_page(page_folder, page_path, bad, findings):
         if is_visual == is_group:
             findings.add("J002", visual_path, 0, "visual.json needs exactly one of 'visual' or 'visualGroup', as an object")
         position = data.get("position")
-        if not isinstance(position, dict) or not all(
-                isinstance(position.get(k), (int, float)) and not isinstance(position.get(k), bool)
-                for k in ("x", "y", "width", "height")):
-            findings.add("J002", visual_path, 0, "'position' must be an object with numeric x, y, width and height")
+        if not isinstance(position, dict) or not all(_is_number(position.get(k)) for k in ("x", "y", "width", "height")) \
+                or position["width"] < 0 or position["height"] < 0:
+            findings.add("J002", visual_path, 0, "'position' must be an object with numeric x, y, width and height "
+                         "(finite numbers; width and height not below 0)")
         if "annotations" in data and not isinstance(data["annotations"], list):
             findings.add("J002", visual_path, 0, "'annotations' must be a list of { \"name\", \"value\" } entries")
         name = data.get("name")
@@ -897,7 +906,7 @@ def check_report(report_dir, findings, brief=None):
             check_page(page_folder, page_path, bad, findings)
             if page_path not in bad:
                 check_layout(report_dir, page_folder_name, page_folder, page_path, hidden_by_bookmark, brief, findings)
-        except (AttributeError, TypeError, KeyError, ValueError) as exc:
+        except (AttributeError, TypeError, KeyError, ValueError, OverflowError) as exc:
             findings.add("J002", page_path, 0, "a file of this page has an unexpected structure (%s)" % exc)
 
 
@@ -924,7 +933,7 @@ def _brief_value(lines, label):
     """Text after 'label ...:' on the first list line that holds the label; '' when there is none."""
     for line in lines:
         text = line.strip()
-        if text.startswith("-") and label.lower() in text.lower():
+        if text.startswith(("-", "*")) and label.lower() in text.lower():
             rest = text[text.lower().index(label.lower()) + len(label):]
             if ":" in rest:
                 return rest.split(":", 1)[1].strip().strip("`").strip()
@@ -948,7 +957,7 @@ def _brief_rows(lines, heading, cells):
             continue
         parts = [c.replace("\\|", "|").strip().strip("`").strip()
                  for c in re.split(r"(?<!\\)\|", text.strip("|"))]
-        if len(parts) == cells and CODE_RE.match(parts[0]) and re.search(r"[^\W_]", parts[-1]):
+        if len(parts) == cells and CODE_RE.match(parts[0]) and not _no_evidence(parts[-1]):
             rows.append(parts)
     return rows
 
@@ -966,7 +975,8 @@ def read_brief(root):
                 lines = fh.read().splitlines()
         except (OSError, UnicodeDecodeError):
             lines = []
-    numbers = {key: [int(n) for n in re.findall(r"\d+", _brief_value(lines, BRIEF_LABELS[key]))]
+    numbers = {key: [int(n) for n in re.findall(r"\d+", re.sub(r"\b(\d{1,2}),(\d{3})\b", r"\1\2",
+                                                                _brief_value(lines, BRIEF_LABELS[key])))]
                for key in ("page_size", "margin", "gap", "grid")}
     size = tuple(numbers["page_size"][:2]) if len(numbers["page_size"]) >= 2 else None
     subjects = _brief_list(_brief_value(lines, BRIEF_LABELS["subjects"]))
@@ -1092,6 +1102,8 @@ def _name_problems(name, brief):
     if (len(spelled) >= 2 and all(w.isupper() for w in spelled)
             and any(len(w) > 4 and w not in own for w in spelled)):
         errors.append("it is all in capitals")
+    elif any(w.isupper() and len(w) >= 6 and w not in own for w in spelled):
+        errors.append("it has a word of six or more letters in capitals (list a real acronym in the brief)")
     for index, word in enumerate(words):
         bare = word.strip("()")
         if bare in own or word in own or not bare[:1].isalpha():
@@ -1137,15 +1149,18 @@ def check_standards(model_dir, objects, usage, brief, findings):
     tables = model["tables"]
     if not tables:
         return model
+    automatic = {name for name in tables if name.startswith(AUTO_DATE_PREFIXES)}     # made by Auto date/time: item 18
+    own_tables = [t for t in tables.values() if t["name"] not in automatic]
     measure_tables = {MEASURE_TABLE} | {name for name in tables if model_excused(brief, "M001", name)}
-    all_measures = [(t, m) for t in tables.values() for m in t["measures"]]
-    all_columns = [(t, c) for t in tables.values() for c in t["columns"]]
+    all_measures = [(t, m) for t in own_tables for m in t["measures"]]
+    all_columns = [(t, c) for t in own_tables for c in t["columns"]]
     column_names = {}
     for table, column in all_columns:
         column_names.setdefault(column["name"].lower(), "%s[%s]" % (table["name"], column["name"]))
     measure_names = {m["name"].lower() for _, m in all_measures}
-    code_by_owner = [(owner, _dax_code(text)) for owner, text in model["expressions"]]
-    used_fields = {(entity, prop) for _, entity, prop in usage}
+    code_by_owner = [(owner, _dax_code(text)) for owner, text in model["expressions"]
+                     if owner["table"] is None or owner["table"]["name"] not in automatic]
+    used_fields = {(entity, prop) for _, entity, prop in usage if isinstance(prop, str)}
 
     def add(code, obj, message, level="error", keys=()):
         if not model_excused(brief, code, *keys):
@@ -1163,11 +1178,12 @@ def check_standards(model_dir, objects, usage, brief, findings):
                 "the brief lists). In an existing model the developer moves it in Power BI Desktop (Home table)"
                 % (key, table["name"], MEASURE_TABLE), keys=(key, table["name"]))
         folder = measure["props"].get("displayfolder", "")
-        levels = [part.strip() for part in folder.split("\\")]
+        levels = folder.split("\\")
         if not folder:
             add("M003", measure, "measure %s has no display folder; give it one as Subject\\Type" % key, keys=(key,))
-        elif ";" in folder or len(levels) != 2 or not all(levels):
+        elif ";" in folder or len(levels) != 2 or not all(levels) or any(part != part.strip() for part in levels):
             hint = " Levels are separated by a backslash, not a forward slash." if "/" in folder else ""
+            hint += " A level has no space before or after it." if any(part != part.strip() for part in levels) else ""
             add("M003", measure, "measure %s has display folder '%s'; it needs one folder with exactly two levels, "
                 "Subject\\Type.%s" % (key, folder, hint), keys=(key,))
         else:
@@ -1249,7 +1265,7 @@ def check_standards(model_dir, objects, usage, brief, findings):
     sort_keys = {}
     for relationship in model["relationships"]:
         ends = [_split_reference(relationship["props"].get(k, "")) for k in ("fromcolumn", "tocolumn")]
-        if None in ends:
+        if None in ends or ends[0][0] in automatic or ends[1][0] in automatic:
             continue
         relationship_ends.append((relationship, ends[0], ends[1]))
         if relationship["props"].get("fromcardinality", "many").lower() == "many":
@@ -1259,8 +1275,9 @@ def check_standards(model_dir, objects, usage, brief, findings):
         target = _unquote(column["props"].get("sortbycolumn", ""))
         if target:
             sort_keys[(table["name"], target)] = column["name"]
-    hierarchy_columns = {(t["name"], level) for t in tables.values() for h in t["hierarchies"]
+    hierarchy_columns = {(t["name"], level) for t in own_tables for h in t["hierarchies"]
                          for level in h.get("levels", [])}
+    with_variation = {id(o["parent"]) for o in objects if o["kind"] == "variation" and o["parent"] is not None}
     totalled = {}
     for owner, code in code_by_owner:
         if owner["kind"] != "measure":
@@ -1277,17 +1294,20 @@ def check_standards(model_dir, objects, usage, brief, findings):
         kind = props.get("datatype", "").lower()
         visible = not _is_hidden(table, column)
         in_measure_table = table["name"] in measure_tables
+        in_use = place in hierarchy_columns or place in used_fields
+        advice = ("a hierarchy or a report visual uses it, so it stays visible: record its use in the brief" if in_use
+                  else "hide it, or record its use in the brief")
         if visible and place in foreign:
-            if add("M102", column, "column %s is the many side of a relationship (a foreign key) and is visible; hide it, "
-                   "or record its use in the brief" % key, level="warn", keys=(key,)):
+            if add("M102", column, "column %s is the many side of a relationship (a foreign key) and is visible; %s"
+                   % (key, advice), level="warn", keys=(key,)) and not in_use:
                 findings.fixes.append(("M102", key, "isHidden", "true"))
         elif visible and place in sort_keys:
-            if add("M102", column, "column %s only sorts column '%s' and is visible; hide it, or record its use in the brief"
-                   % (key, sort_keys[place]), level="warn", keys=(key,)):
+            if add("M102", column, "column %s only sorts column '%s' and is visible; %s"
+                   % (key, sort_keys[place], advice), level="warn", keys=(key,)) and not in_use:
                 findings.fixes.append(("M102", key, "isHidden", "true"))
         if visible and kind in NUMERIC_TYPES and place in totalled:
-            if add("M103", column, "numeric column %s is visible, and measure [%s] already totals it; hide the column, "
-                   "or record its use in the brief" % (key, totalled[place]), level="warn", keys=(key,)):
+            if add("M103", column, "numeric column %s is visible, and measure [%s] already totals it; %s"
+                   % (key, totalled[place], advice), level="warn", keys=(key,)) and not in_use:
                 findings.fixes.append(("M103", key, "isHidden", "true"))
         if column["hidden"] and not table["hidden"] and not in_measure_table:
             needed = []
@@ -1296,13 +1316,15 @@ def check_standards(model_dir, objects, usage, brief, findings):
             if place in used_fields:
                 needed.append("a report visual")
             if needed:
-                add("M104", column, "hidden column %s is used by %s; check that it still works for report users"
+                add("M104", column, "hidden column %s is used by %s. It still works, but report authors can no longer "
+                    "pick it; the standard keeps such a column visible unless the brief says why not"
                     % (key, " and ".join(needed)), level="warn", keys=(key,))
         if column.get("calculated"):
             calculated_columns.append((table, column))
             if not re.search(r"[^\W_]", column["annotations"].get(REASON_ANNOTATION, "")):
-                add("M105", column, "calculated column %s has no '%s' annotation saying why it is calculated in the "
-                    "model and cannot come from the source" % (key, REASON_ANNOTATION), keys=(key,))
+                add("M105", column, "calculated column %s has no '%s' annotation. Ask the developer what makes a DAX "
+                    "calculation necessary here and what stops Power Query or the source from supplying the value"
+                    % (key, REASON_ANNOTATION), keys=(key,))
             if re.search(r"(?i)\bRELATED\s*\(", _dax_code(column["expr"] or "")):
                 add("M106", column, "calculated column %s uses RELATED; consider bringing the value in at the source"
                     % key, level="warn", keys=(key,))
@@ -1325,7 +1347,7 @@ def check_standards(model_dir, objects, usage, brief, findings):
             add("M112", column, "visible %s column %s has no format string"
                 % ("date" if kind == "datetime" else "numeric", key), level="warn", keys=(key,))
 
-    for table in tables.values():
+    for table in own_tables:
         if table["name"] in measure_tables or table["hidden"]:
             continue
         shown = [c for c in table["columns"] if not c["hidden"]]
@@ -1336,12 +1358,12 @@ def check_standards(model_dir, objects, usage, brief, findings):
             add("M101", table["objects"][0], "table '%s' shows %d fields; group its columns in the folders %s. "
                 "Not in one of them: %s" % (table["name"], fields, ", ".join(COLUMN_FOLDERS), ", ".join(loose[:12])
                                            + (" ..." if len(loose) > 12 else "")), level="warn", keys=(table["name"],))
-    for table in tables.values():
-        if table["calculated"] and not table["name"].startswith(AUTO_DATE_PREFIXES):
+    for table in own_tables:
+        if table["calculated"]:
             if not re.search(r"[^\W_]", table["annotations"].get(REASON_ANNOTATION, "")):
-                add("M105", table["objects"][0], "calculated table '%s' has no '%s' annotation saying why it is "
-                    "calculated in the model and cannot come from the source" % (table["name"], REASON_ANNOTATION),
-                    keys=(table["name"],))
+                add("M105", table["objects"][0], "calculated table '%s' has no '%s' annotation. Ask the developer what "
+                    "makes a DAX calculation necessary here and what stops Power Query or the source from supplying "
+                    "the table" % (table["name"], REASON_ANNOTATION), keys=(table["name"],))
     if len(calculated_columns) > CALCULATED_COLUMN_LIMIT:
         table, column = calculated_columns[0]
         add("M106", column, "the model has %d calculated columns (more than %d): review whether they can come from "
@@ -1385,11 +1407,11 @@ def check_standards(model_dir, objects, usage, brief, findings):
 
     # ---- D. only when the brief turns them on
     if brief["excel"]:
-        for table in tables.values():
+        for table in own_tables:
             if table["name"] in measure_tables:
                 continue
             found = [c["name"] for c in table["columns"]
-                     if _is_hidden(table, c) and (table["name"], c["name"]) not in sort_keys
+                     if _is_hidden(table, c) and id(c) not in with_variation and (table["name"], c["name"]) not in sort_keys
                      and not c["props"].get("sortbycolumn") and (table["name"], c["name"]) not in hierarchy_columns
                      and c["props"].get("isavailableinmdx", "true").lower() != "false"]
             if found:
@@ -1398,7 +1420,8 @@ def check_standards(model_dir, objects, usage, brief, findings):
                     % (table["name"], ", ".join(found)), level="note", keys=(table["name"],))
     if brief["copilot"]:
         for obj in objects:
-            if (not obj["translation"] and obj["kind"] in DESCRIBED_KINDS
+            home = obj if obj["kind"] == "table" else obj["table"]
+            if (not obj["translation"] and obj["kind"] in DESCRIBED_KINDS and (home is None or home["name"] not in automatic)
                     and len(obj["description"]) > COPILOT_DESCRIPTION_LIMIT):
                 findings.add("M302", obj["file"], obj["line"],
                              "%s '%s': its description has %d characters; Copilot in Power BI reads the first %d, so "
@@ -1419,20 +1442,47 @@ def report_model(report_dir):
     return os.path.normpath(os.path.join(report_dir, path)) if isinstance(path, str) else None
 
 
-def _field_references(node, found):
+def _source_table(expression, aliases):
+    """The table a {"SourceRef": ...} names: directly ("Entity"), or by an alias of the nearest "From" list ("Source")."""
+    source = expression.get("SourceRef") if isinstance(expression, dict) else None
+    if not isinstance(source, dict):
+        return None
+    if isinstance(source.get("Entity"), str):
+        return source["Entity"]
+    return aliases.get(source.get("Source")) if isinstance(source.get("Source"), str) else None
+
+
+def _field_references(node, found, aliases=None):
+    """Adds (table, field) pairs to 'found'. field is None for a table named on its own, and ('hierarchy', name)
+    for a hierarchy."""
+    aliases = aliases or {}
     if isinstance(node, dict):
+        listed = node.get("From")
+        if isinstance(listed, list):
+            aliases = dict(aliases)
+            for entry in listed:
+                if isinstance(entry, dict) and isinstance(entry.get("Name"), str) and isinstance(entry.get("Entity"), str):
+                    aliases[entry["Name"]] = entry["Entity"]
+                    found.append((entry["Entity"], None))
         for kind in ("Column", "Measure"):
             value = node.get(kind)
             if isinstance(value, dict) and isinstance(value.get("Property"), str):
-                source = value.get("Expression")
-                source = source.get("SourceRef") if isinstance(source, dict) else None
-                if isinstance(source, dict) and isinstance(source.get("Entity"), str):
-                    found.append((source["Entity"], value["Property"]))
+                table = _source_table(value.get("Expression"), aliases)
+                if table is not None:
+                    found.append((table, value["Property"]))
+        value = node.get("Hierarchy")
+        if isinstance(value, dict) and isinstance(value.get("Hierarchy"), str):
+            table = _source_table(value.get("Expression"), aliases)
+            if table is not None:
+                found.append((table, ("hierarchy", value["Hierarchy"])))
+        source = node.get("SourceRef")
+        if isinstance(source, dict) and isinstance(source.get("Entity"), str):
+            found.append((source["Entity"], None))
         for value in node.values():
-            _field_references(value, found)
+            _field_references(value, found, aliases)
     elif isinstance(node, list):
         for value in node:
-            _field_references(value, found)
+            _field_references(value, found, aliases)
 
 
 def report_fields(report_dir):
@@ -1474,12 +1524,15 @@ def check_bindings(report_dir, model, usage, brief, findings):
     tables = model["tables"]
     missing = {}
     for path, entity, prop in usage:
-        if (entity, prop) in own or model_excused(brief, "B001", "%s[%s]" % (entity, prop)):
+        if (entity, prop) in own or (isinstance(prop, str) and model_excused(brief, "B001", "%s[%s]" % (entity, prop))):
             continue
         table = tables.get(entity)
         if table is None:
             missing.setdefault(path, set()).add("table '%s'" % entity)
-        elif prop not in {o["name"] for o in table["columns"] + table["measures"]}:
+        elif isinstance(prop, tuple):
+            if prop[1] not in {h["name"] for h in table["hierarchies"]}:
+                missing.setdefault(path, set()).add("hierarchy '%s' of table '%s'" % (prop[1], entity))
+        elif prop is not None and prop not in {o["name"] for o in table["columns"] + table["measures"]}:
             missing.setdefault(path, set()).add("%s[%s]" % (entity, prop))
     for path in sorted(missing):
         findings.add("B001", path, 0, "this file uses field(s) the model does not have: %s. A rename or a move of a "
@@ -1489,7 +1542,13 @@ def check_bindings(report_dir, model, usage, brief, findings):
 # ---------------------------------------------------------------- layout standard
 
 def _is_number(value):
-    return isinstance(value, (int, float)) and not isinstance(value, bool)
+    """A real, finite number of a size a page can have."""
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        return False
+    try:
+        return abs(float(value)) < 1e9
+    except OverflowError:
+        return False
 
 
 def _text(value):
@@ -1497,7 +1556,7 @@ def _text(value):
 
 
 def bookmark_hidden(report_dir):
-    """{page name: (visual names, group names)} that at least one bookmark hides."""
+    """{page name: [(visual names, group names) that one bookmark hides, ...]}: one entry for each bookmark."""
     out = {}
     folder = os.path.join(report_dir, "definition", "bookmarks")
     if not os.path.isdir(folder):
@@ -1519,7 +1578,8 @@ def bookmark_hidden(report_dir):
         for page, section in sections.items() if isinstance(sections, dict) else []:
             if not isinstance(section, dict):
                 continue
-            visuals, hidden_groups = out.setdefault(page, (set(), set()))
+            visuals, hidden_groups = set(), set()
+            out.setdefault(page, []).append((visuals, hidden_groups))
             containers = section.get("visualContainers")
             for visual, saved in containers.items() if isinstance(containers, dict) else []:
                 try:
@@ -1562,19 +1622,39 @@ def _keys(visual):
 def check_layout(report_dir, page_folder_name, page_folder, page_path, hidden_by_bookmark, brief, findings):
     """The layout standard (codes G...) for one page."""
     page = load_object(page_path)
-    if page is None or not _is_number(page.get("width")) or not _is_number(page.get("height")):
+    if page is None:
+        return
+    if not _is_number(page.get("width")) or not _is_number(page.get("height")) or page["width"] <= 0 or page["height"] <= 0:
+        if page.get("displayOption") != "DeprecatedDynamic":
+            findings.add("G007", page_path, 0, "page has no usable width and height, so its layout cannot be checked",
+                         level="warn")
         return
     width, height = page["width"], page["height"]
     page_keys = {k for k in (page_folder_name, _text(page.get("name")), _text(page.get("displayName"))) if k}
     visuals = page_layout(page_folder)
     by_name = {v["name"]: v for v in visuals}
-    hidden_visuals, hidden_groups = hidden_by_bookmark.get(_text(page.get("name")) or page_folder_name, (set(), set()))
+    for visual in visuals:
+        if visual["parent"] and not (visual["parent"] in by_name and by_name[visual["parent"]]["group"]):
+            visual["parent"] = None            # names a group that is not on the page: treat it as a visual of the page
+    states = hidden_by_bookmark.get(_text(page.get("name")) or page_folder_name, [])
 
-    def is_hidden(visual, depth=0):
-        if visual["hidden"] or visual["name"] in hidden_visuals or (visual["group"] and visual["name"] in hidden_groups):
+    def hidden_in(visual, state, depth=0):
+        """Hidden by default (state None), or hidden when one bookmark (a pair of name sets) is applied."""
+        if state is None:
+            own = visual["hidden"]
+        else:
+            own = visual["name"] in state[0] or (visual["group"] and visual["name"] in state[1])
+        if own:
             return True
         parent = by_name.get(visual["parent"]) if visual["parent"] else None
-        return parent is not None and depth < 20 and is_hidden(parent, depth + 1)
+        return parent is not None and depth < 20 and hidden_in(parent, state, depth + 1)
+
+    def is_hidden(visual):
+        return hidden_in(visual, None) or any(hidden_in(visual, state) for state in states)
+
+    def shown_together(first, second):
+        """False when the two are layered on purpose: a bookmark shows one of them without the other."""
+        return not any(hidden_in(first, state) != hidden_in(second, state) for state in states)
 
     def excused(code, *some):
         keys = set()
@@ -1598,10 +1678,16 @@ def check_layout(report_dir, page_folder_name, page_folder, page_path, hidden_by
             findings.add("G001", visual["path"], 0, "visual '%s' (x %g, y %g, width %g, height %g) reaches outside the "
                          "page (%g x %g)" % (_shown(visual), visual["x"], visual["y"], visual["w"], visual["h"], width, height))
 
-    plotted = [v for v in visuals if v["data"] and not v["rotated"] and not is_hidden(v)]
+    members = [_shown(v) for v in visuals if v["parent"]]
+    if members:
+        findings.add("G008", page_path, 0, "visuals inside a group are compared only with the other members of their "
+                     "group, and not with the page: %s. Look at this page in Power BI Desktop"
+                     % (", ".join(members[:8]) + (" ..." if len(members) > 8 else "")), level="note")
+
+    plotted = [v for v in visuals if v["data"] and not v["rotated"] and not hidden_in(v, None)]
     for index, first in enumerate(plotted):
         for second in plotted[index + 1:]:
-            if first["parent"] != second["parent"]:
+            if first["parent"] != second["parent"] or not shown_together(first, second):
                 continue            # a member's position may count from its group: compare like with like only
             across = min(right(first), right(second)) - max(first["x"], second["x"])
             down = min(bottom(first), bottom(second)) - max(first["y"], second["y"])
@@ -1627,6 +1713,9 @@ def check_layout(report_dir, page_folder_name, page_folder, page_path, hidden_by
                          "height %g)" % (_shown(visual), ", ".join(off), grid, visual["x"], visual["y"], visual["w"], visual["h"]),
                          level="warn")
     edge = [v for v in placed if not excused("G004", v)]
+    if margin is None or gap is None:
+        findings.add("G004", page_path, 0, "the layout standard has no margin and gap for a page %g wide; write both "
+                     "in the brief, so that margins and gaps can be checked" % width, level="warn")
     if edge and margin is not None:
         sides = (("left", min(v["x"] for v in edge)), ("top", min(v["y"] for v in edge)),
                  ("right", width - max(right(v) for v in edge)))
@@ -1741,6 +1830,9 @@ def run(root):
     for report in reports:
         check_report(report, findings, brief)
         target = report_model(report)
+        if target is not None and not os.path.isdir(target):
+            findings.add("B001", os.path.join(report, "definition.pbir"), 0,
+                         "the report points to a model folder that does not exist: %s" % os.path.basename(target))
         if target in parsed:
             usage.setdefault(target, []).append((report, report_fields(report)))
     for model in models:
@@ -1750,7 +1842,7 @@ def run(root):
             built = check_standards(model, parsed[os.path.normpath(model)], every, brief, findings)
             for report, fields in used:
                 check_bindings(report, built, fields, brief, findings)
-        except (AttributeError, TypeError, KeyError, ValueError, RecursionError) as exc:
+        except (AttributeError, TypeError, KeyError, ValueError, RecursionError, OverflowError) as exc:
             findings.add("J002", os.path.join(model, "definition"), 0,
                          "the model has a structure the standard checks cannot read (%s)" % exc)
     return findings, models, reports

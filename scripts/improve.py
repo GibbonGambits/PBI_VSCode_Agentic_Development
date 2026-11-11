@@ -3,7 +3,8 @@
 
 Usage (run from the repository root; <folder> is '.' when left out):
     python scripts/improve.py next [<folder>]        say which step the flow is at, and what to run
-    python scripts/improve.py start [<folder>]       stop unless everything is committed; make a new branch;
+    python scripts/improve.py start [<folder>]       stop unless everything is committed, a branch is checked
+                                                     out and no earlier flow left its files; make a new branch;
                                                      copy the project, unchanged, to _before/
     python scripts/improve.py snapshot [<folder>]    keep the first review as docs/checklist-review-before.md
     python scripts/improve.py plan [<folder>]        write docs/fix-plan.md from the review and the project check
@@ -43,6 +44,7 @@ BRANCH_PREFIX = "improve/"
 PATH_LIMIT = 260                                     # Microsoft Learn, "Power BI Desktop projects", limitations
 COMMITS = {"Mechanical": "Improve: mechanical fixes", "Layout": "Improve: layout fixes"}
 KINDS = ("Mechanical", "Layout", "Needs a person")
+ANSWER = re.compile(r"(?i)(yes|no)(,?\s+[0-9]{4}-[0-9]{2}-[0-9]{2})?\Z")      # 'yes', 'no', 'yes, 2026-11-11'
 PLAN_HEADER = ["Id", "Kind", "Item or code", "Object", "What will change", "Files", "What could break", "Approved"]
 
 # code -> (kind, what will change, what could break). A code that is not here needs a person.
@@ -172,8 +174,9 @@ def read_plan(path):
             for column in ("Item or code", "What will change", "Files", "What could break"):
                 if not re.search(r"[^\W_]", row[column]) or row[column].startswith("<"):
                     problems.append("%s: '%s' is empty" % (where, column))
-            if row["Approved"] and not re.match(r"(?i)(yes|no)\b", row["Approved"]):
-                problems.append("%s: Approved must be empty, or start with yes or no" % where)
+            if row["Approved"] and not ANSWER.match(row["Approved"]):
+                problems.append("%s: Approved must be empty, or exactly yes or no, with or without the date "
+                                "(for example 'yes, 2026-11-11'); a doubt is a no" % where)
             rows.append(row)
     if not inside:
         problems.append("no table with the header | %s |" % " | ".join(PLAN_HEADER))
@@ -181,7 +184,14 @@ def read_plan(path):
 
 
 def approved(rows, kind):
-    return [r for r in rows if r["Kind"] == kind and r["Approved"].lower().startswith("yes")]
+    return [r for r in rows if r["Kind"] == kind and ANSWER.match(r["Approved"]) and r["Approved"].lower().startswith("yes")]
+
+
+def review_problems(path):
+    """Error lines of an unfinished review table; [] when it has all 79 rows with a status and evidence."""
+    findings = cp.Findings()
+    cp.check_review(path, findings)
+    return ["%s  %s" % (f[0], f[3]) for f in findings.errors()]
 
 
 # ---------------------------------------------------------------- commands
@@ -191,7 +201,7 @@ def start(root):
     if code != 0:
         print("Stopped: %s is not a Git repository, so the original cannot be kept on a branch." % root)
         return 1
-    code, out = git(root, "status", "--porcelain")
+    code, out = git(root, "status", "--porcelain", "--untracked-files=all")
     if code != 0 or out:
         print("Stopped: not everything is committed. Commit these first, then run this again:")
         print(out)
@@ -201,7 +211,21 @@ def start(root):
         print("Stopped: no .pbip file, .Report or .SemanticModel folder directly under %s." % root)
         return 1
     _, old_branch = git(root, "rev-parse", "--abbrev-ref", "HEAD")
-    _, commit = git(root, "rev-parse", "HEAD")
+    code, commit = git(root, "rev-parse", "HEAD")
+    if code != 0 or old_branch == "HEAD":
+        print("Stopped: no branch is checked out (or there is no commit yet), so no branch would keep the original. "
+              "Check out a branch first.")
+        return 1
+    if old_branch.startswith(BRANCH_PREFIX):
+        print("Stopped: this is already a flow branch (%s). Finish that flow (python scripts/improve.py next), "
+              "or go back to your own branch before starting a new one." % old_branch)
+        return 1
+    left = [name.replace(os.sep, "/") for name in (PLAN, REVIEW_BEFORE, cp.BEFORE_COPY) if os.path.exists(os.path.join(root, name))]
+    if left:
+        print("Stopped: an earlier flow left %s. They would be taken for this flow's plan and 'before'. "
+              "Remove them (Git keeps the committed ones in its history), commit, then run this again."
+              % ", ".join(left))
+        return 1
     name = BRANCH_PREFIX + datetime.date.today().isoformat()
     number = 1
     while git(root, "rev-parse", "--verify", "--quiet", "refs/heads/" + name)[0] == 0:
@@ -221,20 +245,22 @@ def start(root):
     if git(root, "check-ignore", "-q", cp.BEFORE_COPY + "/x")[0] != 0:
         print("No second copy: Git does not ignore %s/, and a committed copy would repeat each logicalId. "
               "Add '%s/' to .gitignore if you want the copy. The branch is the safeguard." % (cp.BEFORE_COPY, cp.BEFORE_COPY))
-    elif os.path.exists(target):
-        print("No second copy: %s/ is already there. Remove it yourself if you want a new one. The branch is the safeguard."
-              % cp.BEFORE_COPY)
     elif longest >= PATH_LIMIT:
         print("No second copy: a path in it would be %d characters long (the limit is %d). The branch is the safeguard."
               % (longest, PATH_LIMIT))
     else:
-        os.mkdir(target)
-        for part in parts:
-            source = os.path.join(root, part)
-            if os.path.isdir(source):
-                shutil.copytree(source, os.path.join(target, part))
-            else:
-                shutil.copy2(source, os.path.join(target, part))
+        try:
+            os.mkdir(target)
+            for part in parts:
+                source = os.path.join(root, part)
+                if os.path.isdir(source):
+                    shutil.copytree(source, os.path.join(target, part), symlinks=True)
+                else:
+                    shutil.copy2(source, os.path.join(target, part))
+        except (OSError, shutil.Error) as exc:
+            shutil.rmtree(target, ignore_errors=True)            # never leave half a copy that looks like 'before'
+            print("No second copy: copying failed (%s). The branch is the safeguard." % str(exc)[:300])
+            return 0
         print("Second copy: %s/ holds the project as it was (%s). Open its .pbip file to see 'before'. "
               "Git ignores the folder and the checks skip it. Do not edit it." % (cp.BEFORE_COPY, ", ".join(parts)))
     return 0
@@ -245,9 +271,7 @@ def snapshot(root):
     if not os.path.isfile(source):
         print("Stopped: %s does not exist yet. Evaluate first (skill pbi-checklist-review)." % REVIEW.replace(os.sep, "/"))
         return 1
-    findings = cp.Findings()
-    cp.check_review(source, findings)
-    if findings.errors():
+    if review_problems(source):
         print("Stopped: the review is not finished. Run: python scripts/check_project.py --review docs/checklist-review.md")
         return 1
     if os.path.isfile(target):
@@ -267,6 +291,9 @@ def plan(root):
     review = read_review(os.path.join(root, REVIEW))
     if review is None:
         print("Stopped: %s does not exist yet. Evaluate first (skill pbi-checklist-review)." % REVIEW.replace(os.sep, "/"))
+        return 1
+    if review_problems(os.path.join(root, REVIEW)):
+        print("Stopped: the review is not finished. Run: python scripts/check_project.py --review docs/checklist-review.md")
         return 1
     findings, _, _ = cp.run(root)
     rows, notes = [], []
@@ -323,7 +350,7 @@ def changed_pages(root):
     code, base = git(root, "config", "--get", "improve.base")
     if code != 0 or not base:
         return None
-    code, out = git(root, "diff", "--name-only", base, "HEAD")
+    code, out = git(root, "diff", "--name-only", "--relative", base, "HEAD")        # paths as seen from <folder>
     if code != 0:
         return None
     pages = []
@@ -343,6 +370,11 @@ def compare(root):
     if before is None or after is None:
         print("Stopped: both %s and %s are needed." % (REVIEW_BEFORE.replace(os.sep, "/"), REVIEW.replace(os.sep, "/")))
         return 1
+    for name in (REVIEW_BEFORE, REVIEW):
+        if review_problems(os.path.join(root, name)):
+            print("Stopped: %s is not a finished review, so its counts would be wrong. Run: "
+                  "python scripts/check_project.py --review %s" % (name.replace(os.sep, "/"), name.replace(os.sep, "/")))
+            return 1
     print("            Pass  Fail  Not applicable")
     print("Before      %4d  %4d  %4d" % counts(before))
     print("After       %4d  %4d  %4d" % counts(after))
@@ -391,10 +423,12 @@ def next_step(root):
     rows, problems = read_plan(os.path.join(root, PLAN))
     if problems:
         return say(25, "Finish the fix plan (%d problem(s)): python scripts/improve.py check-plan" % len(problems))
-    answered = [r for r in rows if r["Approved"]]
-    if not answered:
+    waiting = [r for r in rows if r["Kind"] in COMMITS and not r["Approved"]]
+    if waiting:
         return say(26, "Stop. Show the developer docs/fix-plan.md. They approve all of it, one kind, or single rows. "
-                       "Write yes or no with the date in 'Approved'. Change nothing before that.")
+                       "Then write yes or no with the date in 'Approved' of every Mechanical and Layout row: a row "
+                       "they did not approve gets no. %d row(s) still have no answer. Change nothing before that."
+                       % len(waiting))
     for kind in ("Mechanical", "Layout"):
         if approved(rows, kind) and not _has_commit(root, COMMITS[kind]):
             return say(27, "Apply the approved %s rows only. Run python scripts/check_project.py . and fix what it reports. "
@@ -406,7 +440,7 @@ def next_step(root):
     if exists[REVIEW]:
         with open(os.path.join(root, REVIEW), "rb") as one, open(os.path.join(root, REVIEW_BEFORE), "rb") as two:
             same = one.read() == two.read()
-    if after is None or (same and with_fixes):
+    if after is None or (same and with_fixes) or review_problems(os.path.join(root, REVIEW)):
         return say(28, "Evaluate again with the skill pbi-checklist-review (confirm that docs/checklist-review.md may be replaced; "
                        "the first review is kept as docs/checklist-review-before.md).")
     return say("28 and 29", "Show the result: python scripts/improve.py compare. Then tell the developer which pages to "

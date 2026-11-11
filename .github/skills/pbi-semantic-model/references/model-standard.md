@@ -20,11 +20,11 @@ One fixed standard for every model built from this template, so that models look
 - Subject comes from "Measure folder subjects" in the brief. If that field is empty the list is: Reliability, Energy and Gas, Customer, Safety, Finance, Workforce, IT and Security, Work Management (the eight business definition areas of this template).
 - Type is one of: Base, Time Intelligence, Comparisons, Ratios, Counts.
 - Both lists are the owner's. No public source prescribes them.
-- The levels are separated by one backslash, written plainly: `displayFolder: Finance\Base`. A forward slash does not make a second level.
+- The levels are separated by one backslash, written plainly, with no space on either side of it: `displayFolder: Finance\Base`. A forward slash does not make a second level.
 
 **3. Names.** Items 7 and 28.
 
-- Business words with spaces. No snake_case, CamelCase or ALL_CAPS, and no space at either end. Check: M007 (fail). The script catches an underscore, two words run together, and a name of two or more words all in capitals where one has five letters or more. One word in capitals is read as an acronym. A word with its own spelling, such as kWh, passes when the brief lists it.
+- Business words with spaces. No snake_case, CamelCase or ALL_CAPS, and no space at either end. Check: M007 (fail). The script catches an underscore, two words run together, a name of two or more words all in capitals where one has five letters or more, and any word of six or more letters in capitals. A shorter word in capitals is read as an acronym. A word with its own spelling, such as kWh, or a long acronym, passes when the brief lists it.
 - No abbreviation a report author would not know. No script can judge this; the review does (item 7).
 - Title Case, with acronyms in capitals.
 - Order: base name, then period, then comparison, then unit: `Total Sales`, `Total Sales YTD`, `Total Sales vs Budget`, `Total Sales vs PY (%)`.
@@ -50,7 +50,7 @@ One fixed standard for every model built from this template, so that models look
 - Otherwise these are hidden: identifier columns, the many-side column of a relationship, a column that exists only to sort another one, and system columns.
 - A number column is hidden once a measure adds it up, counts it or averages it; authors use the measure.
 - A table that only bridges two tables, or only feeds formulas, is hidden. `_Measures` is never hidden.
-- A column that a hierarchy level or a report visual uses stays visible. This last point is the owner's rule. Microsoft states that a hidden column still works in the model and in queries; hiding only takes it out of the field list, so authors can no longer pick it.
+- A column that a hierarchy level or a report visual uses stays visible, and no script proposes to hide it. This last point is the owner's rule. Microsoft states that a hidden column still works in the model and in queries; hiding only takes it out of the field list, so authors can no longer pick it.
 
 **8. Calculated columns and calculated tables.** They get no special name. Each carries an annotation with one line of justification: `annotation CalculatedReason = <one line>`. The line states what makes a DAX calculation necessary here, and what stops the value being delivered by Power Query or the source system. The words are the developer's: ask for them. If the developer has no such reason, say that Microsoft's guidance is to push the logic upstream, and leave the finding open. More than five calculated columns in a model, or one that uses RELATED, is reported for review. The tables that Power BI makes for Auto date/time (`LocalDateTable_...`, `DateTableTemplate_...`) are left out; item 18 deals with them. Items 27 and 38. Checks: M105 (fail), M106 (warn).
 

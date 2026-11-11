@@ -14,14 +14,14 @@ It reads the files and Git, and prints the step you are on and what to run. If i
 
 ## Steps
 
-1. **Safety first.** Ask the developer to save in Power BI Desktop and to commit everything. Then run `python scripts/improve.py start`. It stops if anything is not committed. It makes a new branch, so the original stays untouched on the old one, and copies the project unchanged into `_before/`, so the developer can open before and after side by side. If it says it made no copy, tell the developer why; the branch is then the safeguard. Never edit, check or commit `_before/`.
+1. **Safety first.** Ask the developer to save in Power BI Desktop and to commit everything. Then run `python scripts/improve.py start`. It stops if anything is not committed, if no branch is checked out, or if an earlier flow left its plan, its first review or `_before/` behind; then tell the developer what it said and wait. It makes a new branch, so the original stays untouched on the old one, and copies the project unchanged into `_before/`, so the developer can open before and after side by side. If it says it made no copy, tell the developer why; the branch is then the safeguard. Never edit, check or commit `_before/`.
 2. **Evaluate.** Use the skill `pbi-checklist-review` from start to finish. It writes `docs/checklist-review.md`. Then run `python scripts/improve.py snapshot` to keep that review as the "before".
 3. **Write the fix plan.** Run `python scripts/improve.py plan`. It writes `docs/fix-plan.md` with one row for every finding and every failed item, sorted into three kinds:
    - **Mechanical**: descriptions, format strings, display folders, hiding, header icons and tooltips.
    - **Layout**: positions and sizes, by the numbers in `.github/skills/pbi-report/references/layout-standard.md`.
    - **Needs a person**: access, user testing, export tests, performance runs; renames and moves; data types; summarisation; and anything a file cannot settle.
    Then finish the plan yourself. Give every `?` row a kind. Fill in every `<...>` cell: what will change, which files, what could break. Never move a row out of "Needs a person" to make the plan look better. Run `python scripts/improve.py check-plan` until it reports no problem.
-4. **Stop.** Show the developer the plan. They approve all of it, one kind, or single rows. Write `yes` or `no` and the date in the Approved column of each row they answered. Change no report or model file before this.
+4. **Stop.** Show the developer the plan. They approve all of it, one kind, or single rows. Then write `yes` or `no`, with the date, in the Approved column of every Mechanical and Layout row: a row they did not clearly approve gets `no`. Only a plain yes counts; "yes, but", "probably" or silence is a no. Change no report or model file before this.
 5. **Apply the approved Mechanical rows**, and only those, with the skills `pbi-semantic-model` and `pbi-report` and these scripts:
    - `python scripts/set_visual_defaults.py .` for header icons, tooltips and labels;
    - `python scripts/set_model_properties.py . --set "<object>.<property>=<value>"` for folders, formats, hiding and the reason line of a calculated object. Values come from the brief or the developer, never from you.

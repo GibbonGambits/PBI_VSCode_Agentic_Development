@@ -162,7 +162,7 @@ class BadProject(Case):
               "G001", "G002", "B001", "H001", "H002", "N003", "D001")
     WARNINGS = ("M008", "M010", "M101", "M102", "M103", "M104", "M106", "M108", "M110", "M111", "M112",
                 "G003", "G004", "G005", "G006", "G007")
-    NOTES = ("M201", "M301", "M302")
+    NOTES = ("M201", "M301", "M302", "G008")
 
     def test_every_breach_is_caught(self):
         items = self.found()
@@ -277,8 +277,12 @@ class BadProject(Case):
         code, out = quiet(smp.main, args)
         self.assertEqual(code, 0, out)
         left = self.codes()
-        for code in ("H001", "H002", "N003", "M003", "M004", "M009", "M101", "M102", "M103", "M112"):
+        for code in ("H001", "H002", "N003", "M003", "M004", "M009", "M101", "M102", "M112"):
             self.assertNotIn(code, left)
+        self.assertEqual(len(self.messages("M103")), 1)   # Orders[Cost] is hidden now; Orders[Amount] is not:
+        self.assertIn("Orders[Amount]", self.messages("M103")[0])            # a visual uses it, so no script hides it
+        self.assertIn("a report visual uses it, so it stays visible", self.messages("M103")[0])
+        self.assertNotIn("column Amount\n\t\tisHidden", self.read(os.path.join(BAD_TABLES, "Orders.tmdl")))
         for code in ("M001", "M002", "M005", "M006", "M007", "M105", "M107", "M109", "B001", "D001"):
             self.assertIn(code, left)                    # these need a person: no script repairs them
 
@@ -948,8 +952,9 @@ def review_text(fails=(), not_applicable=()):
     return REVIEW_HEAD + "".join(rows)
 
 
-@unittest.skipUnless(shutil.which("git"), "Git is not installed")
-class Flow(Case):
+class FlowCase(Case):
+    """A made-up project inside a new Git repository."""
+
     def git(self, *args):
         done = subprocess.run(("git", "-C", self.root) + args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         self.assertEqual(done.returncode, 0, done.stdout.decode("utf-8", "replace"))
@@ -971,6 +976,10 @@ class Flow(Case):
 
     def step(self):
         return quiet(improve.next_step, self.root)[1]
+
+
+@unittest.skipUnless(shutil.which("git"), "Git is not installed")
+class Flow(FlowCase):
 
     def test_start_stops_when_something_is_not_committed(self):
         self.write("note.txt", "not committed\n")
@@ -995,14 +1004,81 @@ class Flow(Case):
         self.assertEqual(json.loads(self.read(os.path.join("_before", "Sample.Report", "definition.pbir")))
                          ["datasetReference"]["byPath"]["path"], "../Sample.SemanticModel")
 
-    def test_start_twice_makes_a_second_branch_and_keeps_the_first_copy(self):
+    def test_start_is_refused_while_a_flow_is_running_or_left_its_files(self):
         quiet(improve.start, self.root)
-        self.write(os.path.join("_before", "marker.txt"), "first copy\n")
+        first = self.git("rev-parse", "--abbrev-ref", "HEAD")
+        code, out = quiet(improve.start, self.root)                           # on the flow branch itself
+        self.assertEqual(code, 1)
+        self.assertIn("already a flow branch", out)
+        self.git("checkout", "-q", "work")
+        code, out = quiet(improve.start, self.root)                           # back on the old branch: _before/ is still there
+        self.assertEqual(code, 1)
+        self.assertIn("an earlier flow left _before", out)
+        shutil.rmtree(self.path("_before"))
+        self.write(os.path.join("docs", "fix-plan.md"), "old plan\n")
+        self.commit("An old plan")
         code, out = quiet(improve.start, self.root)
-        self.assertEqual(code, 0, out)
-        self.assertTrue(self.git("rev-parse", "--abbrev-ref", "HEAD").endswith("-2"))
-        self.assertIn("No second copy", out)
-        self.assertTrue(os.path.isfile(self.path(os.path.join("_before", "marker.txt"))))
+        self.assertEqual(code, 1)
+        self.assertIn("docs/fix-plan.md", out)
+        self.assertEqual(self.git("rev-parse", "--abbrev-ref", "HEAD"), "work")
+        self.assertEqual(self.git("branch", "--list", "improve/*").split(), [first])
+
+    def test_start_is_refused_without_a_branch(self):
+        self.git("checkout", "-q", "--detach")
+        code, out = quiet(improve.start, self.root)
+        self.assertEqual(code, 1)
+        self.assertIn("no branch is checked out", out)
+
+    def test_failed_copy_leaves_no_half_copy(self):
+        saved = shutil.copytree
+
+        def broken(source, target, **options):
+            os.makedirs(target)
+            raise shutil.Error("made-up failure")
+        shutil.copytree = broken
+        try:
+            code, out = quiet(improve.start, self.root)
+        finally:
+            shutil.copytree = saved
+        self.assertEqual(code, 0)
+        self.assertIn("No second copy: copying failed", out)
+        self.assertFalse(os.path.exists(self.path("_before")))
+
+    def test_only_a_plain_yes_is_an_approval(self):
+        quiet(improve.start, self.root)
+        self.replace(CARD, '"width": 608', '"width": 610')
+        self.commit("As found")
+        self.write(os.path.join("docs", "checklist-review.md"), review_text(fails=(76,)))
+        quiet(improve.snapshot, self.root)
+        quiet(improve.plan, self.root)
+        plan = os.path.join("docs", "fix-plan.md")
+        text = self.read(plan).replace("<what will change>", "a").replace("<files>", "b").replace("<what could break>", "c")
+        rows = [line for line in text.splitlines() if line.startswith("| F") and "| Layout |" in line]
+        self.assertEqual(len(rows), 1)
+        for answer in ("yes?", "yes/no", "yes or no", "Yes - not sure, ask Anna", "yes, but only after the backup", "n/a", "ok"):
+            self.write(plan, text.replace(rows[0], rows[0][:-3] + " %s |" % answer))
+            self.assertEqual(quiet(improve.check_plan, self.root)[0], 1, answer)
+            self.assertIn("Step 25. Finish the fix plan", self.step(), answer)
+        for answer in ("yes", "YES", "yes, 2026-11-11", "Yes 2026-11-11"):
+            self.write(plan, text.replace(rows[0], rows[0][:-3] + " %s |" % answer))
+            self.assertEqual(quiet(improve.check_plan, self.root)[0], 0, answer)
+            self.assertIn("Apply the approved Layout rows only", self.step(), answer)
+
+    def test_the_stop_holds_until_every_fix_row_has_an_answer(self):
+        quiet(improve.start, self.root)
+        self.replace(CARD, '"width": 608', '"width": 610')
+        self.replace(SALES, "\t/// Sales channel of the order line: Web or Store.\n", "")
+        self.commit("As found")
+        self.write(os.path.join("docs", "checklist-review.md"), review_text(fails=(76,)))
+        quiet(improve.snapshot, self.root)
+        quiet(improve.plan, self.root)
+        plan = os.path.join("docs", "fix-plan.md")
+        text = self.read(plan).replace("<what will change>", "a").replace("<files>", "b").replace("<what could break>", "c")
+        layout = [line for line in text.splitlines() if line.startswith("| F") and "| Layout |" in line][0]
+        self.write(plan, text.replace(layout, layout[:-3] + " no |"))
+        step = self.step()
+        self.assertIn("Step 26. Stop.", step)                                 # one 'no' does not end the stop
+        self.assertIn("1 row(s) still have no answer", step)
 
     def test_no_copy_when_git_would_not_ignore_it(self):
         self.write(".gitignore", "__pycache__/\n")
@@ -1118,6 +1194,314 @@ class Flow(Case):
         self.assertEqual(quiet(improve.main, ["improve.py", "publish"])[0], 2)
         self.assertEqual(quiet(improve.main, ["improve.py", "next", self.root])[0], 0)
         self.assertEqual(quiet(improve.main, ["improve.py", "compare", self.root])[0], 1)
+
+
+# ---------------------------------------------------------------- found by the adversarial review
+
+AUTO_DATE = ("table LocalDateTable_0a1b\n\tisHidden\n\n\tcolumn Date\n\t\tdataType: dateTime\n\t\tisHidden\n"
+             "\t\tsummarizeBy: none\n\t\tsourceColumn: [Date]\n\n"
+             "\tcolumn Year = YEAR([Date])\n\t\tdataType: int64\n\t\tisHidden\n\t\tsummarizeBy: none\n\n"
+             "\tcolumn MonthNo = MONTH([Date])\n\t\tdataType: int64\n\t\tisHidden\n\t\tsummarizeBy: none\n\n"
+             "\tcolumn Month = FORMAT([Date], \"MMMM\")\n\t\tdataType: string\n\t\tisHidden\n\t\tsummarizeBy: none\n\n"
+             "\tcolumn QuarterNo = INT(([MonthNo] + 2) / 3)\n\t\tdataType: int64\n\t\tisHidden\n\t\tsummarizeBy: none\n\n"
+             "\tcolumn Quarter = \"Qtr \" & [QuarterNo]\n\t\tdataType: string\n\t\tisHidden\n\t\tsummarizeBy: none\n\n"
+             "\tcolumn Day = DAY([Date])\n\t\tdataType: int64\n\t\tisHidden\n\t\tsummarizeBy: none\n\n"
+             "\tpartition LocalDateTable_0a1b = calculated\n\t\tmode: import\n"
+             "\t\tsource = Calendar(Date(2026,1,1), Date(2026,12,31))\n")
+
+
+class ReviewedEdgeCases(Case):
+    def test_auto_date_tables_are_left_out_of_the_model_standard(self):
+        self.write(os.path.join(TABLES, "LocalDateTable_0a1b.tmdl"), AUTO_DATE)
+        self.add_measure("\t/// Day of the order.\n\tcolumn 'Order Date'\n\t\tdataType: dateTime\n\t\tformatString: Short Date\n"
+                         "\t\tsummarizeBy: none\n\t\tsourceColumn: OrderDate\n", SALES)
+        self.write(RELATIONSHIPS, "relationship r1\n\tjoinOnDateBehavior: datePartOnly\n\tfromColumn: Sales.'Order Date'\n"
+                                  "\ttoColumn: LocalDateTable_0a1b.Date\n")
+        self.assertEqual(self.codes(), ["I001"])                   # no M105, M106, M010, M102, M110 or M201 for Power BI's own table
+        findings, _, _ = cp.run(self.root)
+        self.assertEqual(findings.fixes, [])                       # and no proposal to hide the user's date column
+
+    def test_odd_characters_inside_a_text_value_do_not_hide_later_objects(self):
+        self.replace(MEASURES, '"http://example.com/help"', '"http://example.com/help \x0c\x85"')
+        self.replace(MEASURES, "\t\tformatString: 0.0%\n", "")
+        self.assertEqual(self.codes(False), ["M009"])
+        self.replace(SALES, "/// One row per order line.", "/// One row per order line.")
+        self.replace(SALES, "\t\tdataType: decimal\n\t\tisHidden\n", "\t\tdataType: decimal\n")
+        self.assertEqual(sorted(self.codes(False)), ["M009", "M107"])
+
+    def test_setter_keeps_every_other_byte(self):
+        with open(self.path(MEASURES), "rb") as fh:
+            raw = fh.read()
+        odd = raw.replace(b'"http://example.com/help"', '"help \x0c\x85"'.encode("utf-8"))
+        odd = odd.replace(b"\tmeasure 'Total Sales'", b"\r\n\tmeasure 'Total Sales'", 1).rstrip(b"\n")   # one CRLF; no final newline
+        with open(self.path(MEASURES), "wb") as fh:
+            fh.write(odd)
+        code, out = quiet(smp.main, ["set_model_properties.py", self.root, "--set", "[Total Sales].formatString=#,0.00"])
+        self.assertEqual(code, 0, out)
+        with open(self.path(MEASURES), "rb") as fh:
+            after = fh.read()
+        self.assertEqual(after, odd.replace(b"formatString: #,0\n\t\tdisplayFolder: Finance", b"formatString: #,0.00\n\t\tdisplayFolder: Finance"))
+
+    def test_new_last_line_of_a_file_without_final_newline(self):
+        text = ("/// One row per day.\ntable Calendar\n\n\t/// The day.\n\tcolumn Date\n\t\tdataType: dateTime\n"
+                "\t\tformatString: Short Date\n\t\tsummarizeBy: none\n\t\tsourceColumn: [Date]\n\n"
+                "\tpartition Calendar = calculated\n\t\tmode: import\n\t\tsource = CALENDAR(DATE(2026,1,1), DATE(2026,12,31))")
+        self.write(os.path.join(TABLES, "Calendar.tmdl"), text)
+        self.assertEqual(quiet(smp.main, ["set_model_properties.py", self.root, "--set", "Calendar.CalculatedReason=No calendar at the source."])[0], 0)
+        self.assertEqual(self.read(os.path.join(TABLES, "Calendar.tmdl")),
+                         text + "\n\n\tannotation CalculatedReason = No calendar at the source.")
+        self.assertEqual(self.codes(False), [])
+
+    def test_setter_special_cases(self):
+        self.replace(SALES, "\tcolumn Channel\n\t\tdataType: string\n", "\tcolumn Channel\n\t\tisHidden: false\n\t\tdataType: string\n")
+        self.assertEqual(quiet(smp.main, ["set_model_properties.py", self.root, "--set", "Sales[Channel].isHidden=true"])[0], 0)
+        self.assertIn("\tcolumn Channel\n\t\tisHidden\n\t\tdataType: string\n", self.read(SALES))
+        self.assertEqual(self.read(SALES).count("isHidden"), 3)
+
+    def test_setter_follows_a_file_indented_with_spaces(self):
+        self.write(SALES, self.read(SALES).replace("\t", "    "))
+        self.assertEqual(quiet(smp.main, ["set_model_properties.py", self.root, "--set", "Sales[Channel].displayFolder=Attributes",
+                                          "--set", "Sales.isHidden=true"])[0], 0)
+        text = self.read(SALES)
+        self.assertNotIn("\t", text)
+        self.assertIn("    column Channel\n        displayFolder: Attributes\n", text)
+        self.assertIn("table Sales\n    isHidden\n", text)
+
+    def test_setter_refuses_what_it_cannot_do_safely(self):
+        self.add_measure("\t/// Amount with a flat tax.\n\tcolumn 'Amount With Tax' = Sales[Amount] * 1.1\n"
+                         "\t\tdataType: decimal\n\t\tformatString: #,0.00\n\t\tsummarizeBy: none\n\n"
+                         "\t\tannotation CalculatedReason =\n\t\t\t\tfirst line\n\t\t\t\tsecond line\n", SALES)
+        before = self.read(SALES)
+        code, out = quiet(smp.main, ["set_model_properties.py", self.root, "--set", "Sales[Amount With Tax].CalculatedReason=New reason."])
+        self.assertEqual(code, 1)
+        self.assertIn("runs over several lines", out)
+        self.assertEqual(self.read(SALES), before)
+        shutil.copytree(self.path("Sample.SemanticModel"), self.path("Copy.SemanticModel"))
+        code, out = quiet(smp.main, ["set_model_properties.py", self.root, "--set", "Sales.isHidden=true"])
+        self.assertEqual(code, 1)
+        self.assertIn("more than one model", out)
+        shutil.rmtree(self.path("Copy.SemanticModel"))
+        with open(self.path(os.path.join(TABLES, "Old.tmdl")), "wb") as fh:
+            fh.write("table Caf\xe9\n".encode("cp1252"))
+        code, out = quiet(smp.main, ["set_model_properties.py", self.root, "--set", "Sales.isHidden=true"])
+        self.assertEqual(code, 1)
+        self.assertIn("not UTF-8", out)
+        self.assertEqual(self.read(SALES), before)
+
+    def test_object_name_with_an_equals_sign_can_be_named(self):
+        self.add_measure("\t/// Share of web orders.\n\tmeasure 'Share (Channel = Web)' = 1\n\t\tformatString: 0%\n"
+                         "\t\tdisplayFolder: Customer\\Base\n")
+        code, out = quiet(smp.main, ["set_model_properties.py", self.root, "--set", "[Share (Channel = Web)].displayFolder=Customer\\Ratios"])
+        self.assertEqual(code, 0, out)
+        self.assertIn("displayFolder: Customer\\Ratios", self.read(MEASURES))
+
+    def test_the_untouched_copy_is_never_edited_even_when_named(self):
+        shutil.copytree(self.path("Sample.Report"), self.path(os.path.join("_before", "Sample.Report")))
+        shutil.copytree(self.path("Sample.SemanticModel"), self.path(os.path.join("_before", "Sample.SemanticModel")))
+        copy = self.path("_before")
+        self.edit_json(os.path.join("_before", CARD), lambda d: (d["visual"].pop("visualContainerObjects"), d["position"].update({"x": 26})))
+        before = self.read(os.path.join("_before", CARD)) + self.read(os.path.join("_before", SALES))
+        for target in (copy, os.path.join(copy, "Sample.Report"), os.path.join(copy, "Sample.SemanticModel")):
+            self.assertEqual(quiet(svd.main, ["set_visual_defaults.py", target])[0], 2)
+            self.assertEqual(quiet(sp.main, ["set_positions.py", target, "--snap"])[0], 2)
+            self.assertEqual(quiet(smp.main, ["set_model_properties.py", target, "--set", "Sales.isHidden=true"])[0], 2)
+            self.assertEqual(quiet(cp.main, ["check_project.py", target])[0], 2)
+        self.assertEqual(self.read(os.path.join("_before", CARD)) + self.read(os.path.join("_before", SALES)), before)
+
+    def test_huge_numbers_do_not_crash(self):
+        for change in (lambda d: d["position"].update({"x": 10 ** 400}), lambda d: d["position"].update({"width": float("inf")})):
+            self.setUp()
+            data = json.loads(self.read(CARD))
+            change(data)
+            self.write(CARD, json.dumps(data).replace("Infinity", "1e400"))
+            self.assertIn("J002", self.codes(False))
+            self.assertEqual(quiet(sp.main, ["set_positions.py", self.root, "--snap"])[0], 0)
+            self.tearDown()
+        self.setUp()
+        self.replace(os.path.join(PAGE, "page.json"), '"width": 1280', '"width": 1e400')
+        self.assertEqual(self.codes("warn"), ["G007"])               # said, not skipped in silence
+        self.assertEqual(quiet(sp.main, ["set_positions.py", self.root, "--snap"])[0], 0)
+        code, out = quiet(sp.main, ["set_positions.py", self.root, "--move", "Overview/Overview_Card_TotalSales=24,24,304,120"])
+        self.assertEqual(code, 1)
+        self.assertIn("no width and height", out)
+
+    def test_negative_size_and_page_without_size_are_reported(self):
+        self.edit_json(CARD, lambda d: d["position"].update({"width": -5}))
+        self.assertIn("J002", self.codes(False))
+        self.edit_json(os.path.join(PAGE, "page.json"), lambda d: d.update({"width": "1280"}))
+        self.assertIn("G007", self.codes("warn"))
+
+    def test_page_of_unknown_size_asks_for_margin_and_gap(self):
+        self.edit_json(os.path.join(PAGE, "page.json"), lambda d: d.update({"width": 1600, "height": 900}))
+        self.brief(size="1600 x 900")
+        self.assertEqual(self.codes("warn"), ["G004"])
+        self.assertIn("write both in the brief", self.messages("G004")[0])
+
+    def test_brief_numbers_with_thousands_separators_and_star_bullets(self):
+        self.brief(size="1,920 x 1,080", margin="32", gap="24")
+        self.write(BRIEF, self.read(BRIEF).replace("- Page size", "* Page size"))
+        brief = cp.read_brief(self.root)
+        self.assertEqual((brief["page_size"], brief["margin"], brief["gap"]), ((1920, 1080), 32, 24))
+        self.brief(size="1280,720")
+        self.assertEqual(cp.read_brief(self.root)["page_size"], (1280, 720))
+
+    def test_exception_with_a_placeholder_reason_does_not_count(self):
+        self.replace(SALES, "\t\tdataType: decimal\n\t\tisHidden\n", "\t\tdataType: decimal\n")
+        for reason in ("TODO", "tbd", "n/a", "TODO(owner): ask finance"):
+            self.brief(model="| M107 | Sales[Amount] | %s |" % reason)
+            self.assertFails("M107")
+        self.brief(model="| M107 | Sales[Amount] | Analysts total it in ad hoc tables |")
+        self.assertNot("M107")
+
+    def test_more_name_and_folder_breaches(self):
+        self.replace(MEASURES, "measure 'Total Sales' =", "measure REVENUE =")
+        self.assertEqual(self.codes(False), ["M007"])
+        self.brief(own="REVENUE")
+        self.assertEqual(self.codes(False), [])
+        self.replace(MEASURES, "\t\tdisplayFolder: Finance\\Base\n", "\t\tdisplayFolder: Finance \\ Base\n")
+        self.assertEqual(self.codes(False), ["M003"])
+        self.assertIn("no space before or after", self.messages("M003")[0])
+
+    def test_excel_candidates_leave_out_columns_with_a_variation(self):
+        self.brief(excel="yes")
+        self.assertIn("OrderId, Amount", self.messages("M301")[0])
+        self.replace(SALES, "\t\tsourceColumn: OrderId\n", "\t\tsourceColumn: OrderId\n\n\t\tvariation Variation\n"
+                     "\t\t\tisDefault\n\t\t\trelationship: r1\n\t\t\tdefaultHierarchy: Other.'A Hierarchy'\n")
+        self.assertNotIn("OrderId", self.messages("M301")[0])
+
+
+class ReviewedLayoutCases(Case):
+    FIELDS = {"queryState": {"Values": {"projections": []}}}
+
+    def stacked(self):
+        """The card and the bar chart, both with fields, the chart moved onto the card."""
+        self.edit_json(CARD, lambda d: d["visual"].update({"query": self.FIELDS}))
+        self.edit_json(BAR, lambda d: (d["visual"].update({"query": self.FIELDS}), d["position"].update({"y": 100})))
+
+    def bookmark(self, name, *hidden):
+        containers = {visual: {"singleVisual": {"display": {"mode": "hidden"}}} for visual in hidden}
+        self.write(os.path.join("Sample.Report", "definition", "bookmarks", name + ".bookmark.json"),
+                   json.dumps({"name": name, "explorationState": {"sections": {"Overview": {"visualContainers": containers}}}}))
+
+    def test_bookmark_that_hides_both_does_not_excuse_the_overlap(self):
+        self.stacked()
+        self.bookmark("HideBoth", "Overview_Card_TotalSales", "4f0c9d2a7b1e8a6c3d5f")
+        self.assertFails("G002")
+        self.bookmark("ShowCard", "4f0c9d2a7b1e8a6c3d5f")             # a bookmark that shows one without the other
+        self.assertNot("G002")
+
+    def test_member_of_a_group_that_is_not_there_counts_as_a_visual_of_the_page(self):
+        self.edit_json(BAR, lambda d: (d.update({"parentGroupName": "nope"}), d["position"].update({"width": 5000})))
+        self.assertFails("G001")
+
+    def test_group_members_are_named_in_a_note(self):
+        self.edit_json(BAR, lambda d: d.update({"parentGroupName": "Overview_Group_Header"}))
+        self.assertIn("Overview_Bar_SalesByMonth", " ".join(self.messages("G008")))
+        self.assertEqual(self.codes(False), [])
+
+    def test_snap_keeps_touching_visuals_touching(self):
+        self.edit_json(CARD, lambda d: (d["visual"].update({"query": self.FIELDS}), d["position"].update({"x": 30, "width": 109})))
+        self.edit_json(BAR, lambda d: (d["visual"].update({"query": self.FIELDS}), d["position"].update({"x": 139, "y": 24, "width": 109, "height": 120})))
+        self.assertNot("G002")
+        self.assertEqual(quiet(sp.main, ["set_positions.py", self.root, "--snap"])[0], 0)
+        card, bar = json.loads(self.read(CARD))["position"], json.loads(self.read(BAR))["position"]
+        self.assertEqual(card["x"] + card["width"], bar["x"])
+        self.assertNot("G002")
+        self.assertNot("G003")
+
+    def test_move_with_a_number_that_is_not_one_is_wrong_usage(self):
+        before = self.read(CARD) + self.read(BAR)
+        for bad in ("nan,24,608,120", "inf,24,608,120", "1e400,24,608,120"):
+            code, _ = quiet(sp.main, ["set_positions.py", self.root, "--move", "Overview/Overview_Card_TotalSales=24,24,304,120",
+                                      "--move", "Overview/4f0c9d2a7b1e8a6c3d5f=" + bad])
+            self.assertEqual(code, 2)
+        self.assertEqual(self.read(CARD) + self.read(BAR), before)
+
+    def test_nothing_is_written_when_one_file_cannot_be_read_safely(self):
+        self.replace(BAR, '"name": "4f0c9d2a7b1e8a6c3d5f",', '"name": "4f0c9d2a7b1e8a6c3d5f", "name": "4f0c9d2a7b1e8a6c3d5f",')
+        self.edit_json(CARD, lambda d: d["position"].update({"x": 26}))
+        before = self.read(CARD)
+        code, out = quiet(sp.main, ["set_positions.py", self.root, "--move", "Overview/Overview_Card_TotalSales=24,24,304,120",
+                                    "--move", "Overview/4f0c9d2a7b1e8a6c3d5f=24,160,1232,528"])
+        self.assertEqual(code, 1, out)
+        self.assertIn("cannot be read safely", out)
+        self.assertEqual(self.read(CARD), before)
+
+    def test_move_that_fits_two_visuals_is_refused(self):
+        other = os.path.join("Sample.Report", "definition", "pages", "Second")
+        shutil.copytree(self.path(PAGE), self.path(other))
+        self.edit_json(os.path.join(other, "page.json"), lambda d: d.update({"name": "Second"}))     # same tab name, "Overview"
+        before = self.read(CARD)
+        code, out = quiet(sp.main, ["set_positions.py", self.root, "--move", "Overview/Overview_Card_TotalSales=24,24,304,120"])
+        self.assertEqual(code, 1)
+        self.assertIn("fits 2 visuals", out)
+        self.assertEqual(self.read(CARD), before)
+        code, out = quiet(sp.main, ["set_positions.py", self.root, "--move", "Second/Overview_Card_TotalSales=24,24,304,120"])
+        self.assertEqual(code, 0, out)
+        self.assertEqual(self.read(CARD), before)
+
+
+class ReviewedFieldCases(Case):
+    def query(self, node):
+        self.edit_json(CARD, lambda d: d["visual"].update({"query": {"queryState": {"Values": {"projections": [node]}}}}))
+
+    def test_hierarchy_level(self):
+        level = {"field": {"HierarchyLevel": {"Expression": {"Hierarchy": {"Expression": {"SourceRef": {"Entity": "%s"}},
+                                                                             "Hierarchy": "Calendar"}}, "Level": "Year"}}}
+        self.query(json.loads(json.dumps(level) % "Nowhere"))
+        self.assertIn("table 'Nowhere'", self.messages("B001")[0])
+        self.query(json.loads(json.dumps(level) % "Sales"))
+        self.assertIn("hierarchy 'Calendar' of table 'Sales'", self.messages("B001")[0])
+
+    def test_alias_form_is_resolved(self):
+        def filtered(entity, prop):
+            return {"filter": {"From": [{"Name": "s", "Entity": entity, "Type": 0}],
+                               "Where": [{"Condition": {"Column": {"Expression": {"SourceRef": {"Source": "s"}}, "Property": prop}}}]}}
+        self.edit_json(CARD, lambda d: d.update({"filterConfig": {"filters": [filtered("Sales", "Channel")]}}))
+        self.assertNot("B001")
+        self.edit_json(CARD, lambda d: d.update({"filterConfig": {"filters": [filtered("Sales", "Region")]}}))
+        self.assertIn("Sales[Region]", self.messages("B001")[0])
+        self.edit_json(CARD, lambda d: d.update({"filterConfig": {"filters": [filtered("Gone", "Region")]}}))
+        self.assertIn("table 'Gone'", self.messages("B001")[0])
+
+    def test_report_that_points_to_a_missing_model_folder_fails(self):
+        self.edit_json(os.path.join("Sample.Report", "definition.pbir"),
+                       lambda d: d["datasetReference"]["byPath"].update({"path": "../Renamed.SemanticModel"}))
+        self.assertIn("Renamed.SemanticModel", self.messages("B001")[0])
+
+
+@unittest.skipUnless(shutil.which("git"), "Git is not installed")
+class ReviewedFlowCases(FlowCase):
+    def test_compare_refuses_a_review_that_is_not_finished(self):
+        quiet(improve.start, self.root)
+        self.write(os.path.join("docs", "checklist-review.md"), review_text(fails=(76,)))
+        quiet(improve.snapshot, self.root)
+        self.write(os.path.join("docs", "checklist-review.md"), review_text().replace("| 5 | Pass |", "| 5 | **Pass** |"))
+        code, out = quiet(improve.compare, self.root)
+        self.assertEqual(code, 1)
+        self.assertIn("not a finished review", out)
+        self.assertEqual(quiet(improve.plan, self.root)[0], 1)
+
+    def test_pages_are_named_by_tab_when_the_project_sits_in_a_subfolder(self):
+        inner = os.path.join(self.root, "report")
+        os.mkdir(inner)
+        for name in ("Sample.pbip", "Sample.Report", "Sample.SemanticModel"):
+            shutil.move(self.path(name), os.path.join(inner, name))
+        with open(os.path.join(inner, PAGE, "page.json"), encoding="utf-8") as fh:
+            page = json.load(fh)
+        page["displayName"] = "Sales overview"
+        with open(os.path.join(inner, PAGE, "page.json"), "w", encoding="utf-8") as fh:
+            json.dump(page, fh)
+        self.commit("Project in a subfolder")
+        self.assertEqual(quiet(improve.start, inner)[0], 0)
+        self.assertTrue(os.path.isdir(os.path.join(inner, "_before", "Sample.Report")))
+        self.assertEqual(self.git("status", "--porcelain"), "")
+        with open(os.path.join(inner, CARD), encoding="utf-8") as fh:
+            text = fh.read()
+        with open(os.path.join(inner, CARD), "w", encoding="utf-8") as fh:
+            fh.write(text.replace('"width": 608', '"width": 600'))
+        self.commit(improve.COMMITS["Layout"])
+        self.assertEqual(improve.changed_pages(inner), ["Sales overview"])
 
 
 # ---------------------------------------------------------------- the template keeps its promises
