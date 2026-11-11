@@ -23,7 +23,8 @@ Updated at every commit, so that a stop loses nothing.
 | T10 Security | Compared with the repository, rewritten, rendered |
 | T09 Storage modes | Compared with the repository, rewritten, rendered |
 | T13 User-defined functions in DAX | Compared with the repository, rewritten, rendered |
-| The other five topics | Not yet done |
+| T11 Calculation groups and field parameters | Compared with the repository, rewritten, rendered |
+| The other four topics | Not yet done |
 | Duplicates across topics | Not yet done |
 | Index, tests, README, notices, evals | Index started; the rest not yet done |
 | Two read-only reviews | Not yet done |

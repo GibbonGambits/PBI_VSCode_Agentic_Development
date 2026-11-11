@@ -15,10 +15,10 @@ The library started from 2,318 notes drawn from public SQLBI articles. Notes wer
 | 1. Outdated | 35 |
 | 2. Conflicts with the checklist | 19 |
 | 3. The repository already says it | 81 |
-| 4. Not adopted: a higher source says otherwise | 21 |
+| 4. Not adopted: a higher source says otherwise | 30 |
 | 5. Duplicate in another topic | 0 |
-| Kept in the library | 1346 |
-| Not yet decided | 816 |
+| Kept in the library | 1416 |
+| Not yet decided | 737 |
 
 | Note | Group | Covered by |
 |---|---|---|
@@ -161,6 +161,15 @@ The library started from 2,318 notes drawn from public SQLBI articles. Notes wer
 | T11-A268-2 | 2 | `checklist/checklist.md`, item 12 |
 | T11-A332-1 | 3 | `.github/skills/pbi-semantic-model/references/model-objects.md`, section B, rule 6 |
 | T11-A340-4 | 3 | `.github/skills/pbi-semantic-model/references/model-objects.md`, section B, rule 6 |
+| T12-A298-4 | 4 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, rule 19 |
+| T12-A301-2 | 4 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, rule 19 |
+| T12-A301-3 | 4 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, rule 19 |
+| T12-A301-4 | 4 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, rule 19 |
+| T12-A301-6 | 4 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, rule 19 |
+| T12-A302-3 | 4 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, rule 19 |
+| T12-A302-4 | 4 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, rule 19 |
+| T12-A302-5 | 4 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, rule 19 |
+| T12-A357-3 | 4 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, rule 19 |
 | T13-A344-3 | 3 | `.github/skills/pbi-semantic-model/references/model-objects.md`, section A, rule 5 |
 | T14-A015-1 | 1 | - |
 | T14-A015-3 | 2 | `checklist/checklist.md`, item 14 |
