@@ -868,6 +868,13 @@ def _objects(context, functions, function_names):
         if len(set(orders)) < len(orders) or "" in orders:
             add("M813", groups[0]["calculation_group"], "the model has %d calculation groups; give each its own "
                 "precedence number, so that the order they apply in is fixed" % len(groups), level="warn", keys=("model",))
+    if groups:
+        detailed = [o for o in context["objects"] if not o["translation"]
+                    and ("detailrowsdefinition" in o["props"] or "defaultdetailrowsdefinition" in o["props"])]
+        if detailed:
+            add("M815", detailed[0], "the model has a calculation group and detail rows expressions (%s). Microsoft "
+                "lists detail rows expressions as not supported in a model with a calculation group: keep one of the two"
+                % ", ".join("'%s'" % o["name"] for o in detailed[:4]), level="warn", keys=("model",))
     model_object = context["model_object"]
     if groups and model_object is not None and model_object["props"].get("discourageimplicitmeasures", "").lower() != "true":
         add("M814", model_object, "the model has a calculation group but discourageImplicitMeasures is not set. "

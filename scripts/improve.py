@@ -188,6 +188,8 @@ PERSON = {
     "V020": "Decide: label measures for the report's text, or one language (a row in section 10 of the brief)",
     "V021": "Decide: hide the pages and add navigation buttons, or one language (a row in section 10 of the brief)",
     "V022": "The developer says yes or no to the preview feature; a yes gets its row in section 11 of the brief",
+    "M815": "Decide: the calculation group or the detail rows expressions",
+    "V023": "Decide whether other reports may drill through to this report; then the setting is switched on",
     "M601": "Simplify the security rule; the role must be tested again",
     "M602": "Move the security rule to a dimension table; the role must be tested again",
     "M603": "Replace USERNAME with USERPRINCIPALNAME; the role must be tested again",

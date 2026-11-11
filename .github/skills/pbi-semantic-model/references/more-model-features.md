@@ -112,8 +112,8 @@ A preview feature is used only after the developer's yes, recorded in section 11
 
 **14. Detail rows and calculation groups.**
 - Microsoft states that detail rows expressions do not work in a model with a calculation group.
-- The shipped `Examples.SemanticModel` holds both (`# Order Lines` and 'Time Calculation') only to show each form. A real model picks one: ask the developer which.
-- No check yet. Source: https://learn.microsoft.com/en-us/analysis-services/tabular-models/calculation-groups ("Limitations")
+- The shipped `Examples.SemanticModel` holds both (`# Order Lines` and 'Time Calculation') only to show each form. A real model keeps one of the two; which one is the developer's decision.
+- Check: M815 (warn). Source: https://learn.microsoft.com/en-us/analysis-services/tabular-models/calculation-groups ("Limitations")
 
 ## C. Model-wide switches
 

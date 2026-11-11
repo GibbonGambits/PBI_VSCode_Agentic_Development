@@ -92,7 +92,8 @@ How to read a block:
 21. **Web addresses and pictures in tables** (B48, B49). Source: https://learn.microsoft.com/en-us/power-bi/create-reports/power-bi-images-tables; https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-onelake-files
     - Limits: picture addresses must open without sign-in, except OneDrive embed codes and OneLake files; OneLake pictures need read access and fail in publish to web; a moved or renamed file breaks its address.
     - Stored: the link or picture comes from the column's data category in the model (WebUrl, ImageUrl), not from the report. `values.urlIcon` shows a link as an icon (conditional-formatting-part-06.md of Microsoft's skill).
-    - Copy: `Tables_Features_Table_WebUrl`. No example has a picture column: the shipped model has no ImageUrl column. The model side is in the skill pbi-semantic-model.
+    - Copy: `Tables_Features_Table_WebUrl` for a link. For a picture: the column `Product[Product Image]` of the shipped model carries `dataCategory: ImageUrl`; put it in a table like any column. The model side is in the skill pbi-semantic-model.
+    - A picture from a measure in an image visual: `objects.image` with `sourceType` `'imageData'` and the measure in `sourceField`, and no `query` (Microsoft's skill, its file authoring/image.md). The measure or column needs `dataCategory: ImageUrl`, or the picture stays empty. Copy: `Elements_Image_FromMeasure` on page folder `Elements`, with the measure [Selected Product Image].
 
 ## E. Charts
 
@@ -114,7 +115,7 @@ How to read a block:
     - Copy: `Charts_Features_Line_SeriesLabels`.
 26. **High-density sampling** (B67, B68). Better sampling for line and scatter charts with many points. Source: https://learn.microsoft.com/en-us/power-bi/create-reports/desktop-high-density-sampling; https://learn.microsoft.com/en-us/power-bi/create-reports/desktop-high-density-scatter-charts
     - Limits: tooltips may show only at sampled points; above 60 series, series are dropped in alphabetical order; not for text values.
-    - Stored: `query.options` with `allowBinnedLineSample` or `allowOverlappingPointsSample` (schema `visualConfiguration` 2.8.0). No shipped example: set it in Power BI Desktop, or add the switch to a copy of a line chart.
+    - Stored: `query.options` with `allowBinnedLineSample` or `allowOverlappingPointsSample` (schema `visualConfiguration` 2.8.0). Copy: `Charts_Lines_Line_SalesByMonth` and `Charts_Lines_Scatter_StoreSalesAndLines` on page folder `Charts_Lines`.
 
 ## F. Titles, number formats, cards and visual calculations
 
@@ -148,7 +149,7 @@ How to read a block:
 34. **Cross-report drillthrough** (B10). Lets readers drill from another report into this one. Source: https://learn.microsoft.com/en-us/power-bi/create-reports/desktop-drillthrough
     - Limits: Power BI service only; both reports in the same workspace; field names and data types must match.
     - Stored: on the target page `pageBinding.referenceScope` `CrossReport` (schema `page` 2.1.0), and in the target's `report.json` `settings.useCrossReportDrillthrough` true (schema `report` 3.3.0).
-    - Copy: page folder `Drillthrough_CrossReport`. Rule 27 of `report-standard.md`, beside this file, applies. Check: V001 asks for its back button; V013 reports filter values left in it.
+    - Copy: page folder `Drillthrough_CrossReport`. Rule 27 of `report-standard.md`, beside this file, applies. Check: V001 asks for its back button; V013 reports filter values left in it; V023 (warn) reports such a page in a report whose `report.json` does not switch the setting on.
 35. **Automatic page refresh** (B72). For DirectQuery pages that watch fast-changing data. Source: https://learn.microsoft.com/en-us/power-bi/create-reports/desktop-automatic-page-refresh
     - Limits: not for import models; the capacity admin sets a minimum interval and can turn it off; outside a Premium workspace the fixed interval is 30 minutes. This template asks a written reason below 30 seconds (rule 54 of `report-standard.md`, beside this file).
     - Stored: `page.json` `objects.pageRefresh` (schema `page` 2.1.0 lists `show`, `refreshType`, `duration`, `checkEvery`, `measure`, untyped). The values are not given: set it in Power BI Desktop.

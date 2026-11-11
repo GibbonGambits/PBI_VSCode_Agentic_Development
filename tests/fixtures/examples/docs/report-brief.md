@@ -72,11 +72,13 @@ The model standard is `.github/skills/pbi-semantic-model/references/model-standa
 | M110 | Sales Target[Category] to Product[Category] | Shipped example of a many-to-many relationship, which joins on a text column (category) |
 | M409 | Store Detail[Store Key] to Store[Store Key] | Shipped example of a one-to-one relationship |
 | M408 | model | Shipped examples of a both-direction, a many-to-many and a one-to-one relationship in one small model |
+| M815 | model | Shipped examples of a calculation group and of a detail rows expression in one model; a real model keeps one of the two |
 | M414 | model | Shipped examples of security roles and of an inactive relationship (ship date) in one model |
 | M607 | model | Shipped examples show a role with row rules and a role with object rules side by side; a real model puts both kinds in one role |
 | M411 | Region Choice | Shipped example of the table of values for a dynamic M query parameter; it only feeds the parameter, so it has no relationship |
 | M009 | [Store Page Link] | Shipped example of the data category WebUrl on a measure: the measure returns text, so it has no format string |
 | M009 | [Sales by Store Label] | Shipped example of a label measure for a report in more than one language: the measure returns text, so it has no format string |
+| M009 | [Selected Product Image] | Shipped example of the data category ImageUrl on a measure: the measure returns text, so it has no format string |
 
 ## 10. Exceptions to the layout standard
 

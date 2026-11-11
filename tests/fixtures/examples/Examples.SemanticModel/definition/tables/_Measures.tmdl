@@ -145,6 +145,11 @@ table _Measures
 			)
 		displayFolder: Customer\Base
 
+	/// Example of the data category ImageUrl on a measure: the picture address of the product when one product is shown. An image visual can show it.
+	measure 'Selected Product Image' = SELECTEDVALUE ( Product[Product Image] )
+		displayFolder: Customer\Base
+		dataCategory: ImageUrl
+
 	column Placeholder
 		dataType: string
 		isHidden

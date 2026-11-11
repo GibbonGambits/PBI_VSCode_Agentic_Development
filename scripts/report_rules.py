@@ -258,6 +258,20 @@ def check(cp, report_dir, brief, findings):
                 and not any(kind == "textbox" for _, kind in types)):
             add("V018", page, None, "page '%s' has no text box, so it has no visible page title. The layout standard "
                 "keeps the top-left of every page for a title text box" % title, level="note")
+        binding = page["page"].get("pageBinding") if isinstance(page["page"].get("pageBinding"), dict) else {}
+        settings = report.get("settings") if isinstance(report.get("settings"), dict) else {}
+        if binding.get("referenceScope") == "CrossReport" and settings.get("useCrossReportDrillthrough") is not True:
+            add("V023", page, None, "page '%s' is a target for cross-report drillthrough, but report.json does not "
+                "switch the feature on (settings.useCrossReportDrillthrough). Other reports cannot reach the page "
+                "until it is on" % title)
+        if direct_query:
+            costly = sorted({shown(v) for v in page["visuals"] for f in _filters(v["data"])
+                             if f.get("type") in ("TopN", "VisualTopN")
+                             or (isinstance(f.get("field"), dict) and "Measure" in f["field"] and isinstance(f.get("filter"), dict))})
+            if costly:
+                add("U106", page, None, "page '%s', on a model with DirectQuery tables: %s use a Top N filter or a filter "
+                    "on a measure. Each sends extra queries to the source; keep them only where readers need them"
+                    % (title, ", ".join(costly[:6])), level="note")
         slicers = [v for v, kind in types if kind in SLICER_TYPES]
         if direct_query and len(slicers) >= 2 and not apply_buttons and page["kind"] is None:
             add("U104", page, None, "page '%s' has %d slicers on a model with DirectQuery tables, and the report has no "

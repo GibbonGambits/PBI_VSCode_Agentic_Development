@@ -1,16 +1,18 @@
-/// Example of a dimension table with data categories (City, WebUrl), column display folders, an annotation and an extended property. One row per store. Made-up data.
+/// Example of a dimension table with a key that allows no blanks (isNullable: false), a default label (isDefaultLabel), data categories (City, WebUrl), column display folders, an annotation and an extended property. One row per store. Made-up data.
 table Store
 
 	column 'Store Key'
 		dataType: int64
 		isHidden
 		isKey
+		isNullable: false
 		summarizeBy: none
 		sourceColumn: Store Key
 
 	/// Name of the store.
 	column 'Store Name'
 		dataType: string
+		isDefaultLabel
 		displayFolder: Attributes
 		summarizeBy: none
 		sourceColumn: Store Name

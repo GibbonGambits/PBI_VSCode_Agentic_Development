@@ -904,5 +904,18 @@ class ClosingTheCoverage(StarCase):
         self.assertNot("M525")
 
 
+    def test_M815_detail_rows_in_a_model_with_a_calculation_group_warns(self):
+        self.replace(MEASURES, "\tcolumn Placeholder", "\t/// Made-up measure with detail rows.\n\tmeasure 'Sales With Rows' = SUM ( Sales[Amount] )\n"
+                     "\t\tformatString: #,0.00\n\t\tdisplayFolder: Finance\\Base\n\n\t\tdetailRowsDefinition = SELECTCOLUMNS ( Sales, \"Amount\", Sales[Amount] )\n\n"
+                     "\tcolumn Placeholder")
+        self.assertNot("M815")
+        self.write(os.path.join(TABLES, "Time Calculation.tmdl"),
+                   "/// Switches a measure between periods.\ntable 'Time Calculation'\n\n\tcalculationGroup\n\t\tprecedence: 10\n\n"
+                   "\t\t/// The measure as it is.\n\t\tcalculationItem Current = SELECTEDMEASURE ()\n\n"
+                   "\t/// The period to show.\n\tcolumn Period\n\t\tdataType: string\n\t\tsummarizeBy: none\n\t\tsourceColumn: Name\n")
+        self.write(MODEL, self.read(MODEL) + "ref table 'Time Calculation'\n")
+        self.assertFinds("M815", "warn")
+
+
 if __name__ == "__main__":
     unittest.main()

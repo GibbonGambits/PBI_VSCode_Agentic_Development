@@ -63,6 +63,9 @@
             }
           ]
         }
+      },
+      "options": {
+        "allowBinnedLineSample": true
       }
     },
     "visualContainerObjects": {

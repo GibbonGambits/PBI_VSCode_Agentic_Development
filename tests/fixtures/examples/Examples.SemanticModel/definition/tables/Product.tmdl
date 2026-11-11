@@ -40,6 +40,13 @@ table Product
 		summarizeBy: none
 		sourceColumn: Barcode
 
+	/// Example of the data category ImageUrl: the made-up web address of a picture of the product. A table, matrix, slicer or card shows the picture.
+	column 'Product Image'
+		dataType: string
+		dataCategory: ImageUrl
+		summarizeBy: none
+		sourceColumn: Product Image
+
 	/// Example of a hierarchy: category, subcategory, product.
 	hierarchy 'Product Hierarchy'
 
@@ -58,10 +65,10 @@ table Product
 				let
 				    // Build a small made-up list of products.
 				    Source = #table(
-				        type table [#"Product Key" = Int64.Type, #"Product Name" = text, Category = text, Subcategory = text, #"Unit Cost" = Currency.Type, Barcode = text],
+				        type table [#"Product Key" = Int64.Type, #"Product Name" = text, Category = text, Subcategory = text, #"Unit Cost" = Currency.Type, Barcode = text, #"Product Image" = text],
 				        {
-				            {1, "Garden Chair", "Garden", "Furniture", 35.00, "2000000000015"},
-				            {2, "Watering Can", "Garden", "Tools", 6.50, "2000000000022"}
+				            {1, "Garden Chair", "Garden", "Furniture", 35.00, "2000000000015", "https://example.com/pictures/garden-chair.png"},
+				            {2, "Watering Can", "Garden", "Tools", 6.50, "2000000000022", "https://example.com/pictures/watering-can.png"}
 				        }
 				    )
 				in

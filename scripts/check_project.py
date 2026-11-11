@@ -175,6 +175,7 @@ Finding codes (errors unless marked warn or note; only errors change the exit co
     M812  (warn) calculation item has no '///' description
     M813  (warn) two or more calculation groups without their own precedence
     M814  (warn) calculation group in a model without discourageImplicitMeasures
+    M815  (warn) detail rows expressions in a model with a calculation group
     M821  field parameter names a field the model does not have
     M822  (warn) field parameter not wired the way Power BI Desktop writes it
     M831  (warn) perspective with no objects
@@ -205,6 +206,7 @@ Finding codes (errors unless marked warn or note; only errors change the exit co
     V021  (warn) more than one page tab in a report on a model with translations
     V022  (warn) the report uses a preview feature that section 11 of the brief does not list (Gantt visual,
           format string on a visual)
+    V023  (warn) cross-report drillthrough page in a report that does not switch the feature on
     A001  (warn) visuals without alt text (one finding for each page)
     A002  (warn) visuals that share a tab order number
     A003  (warn) visuals that show a title made up from field names (one finding for each page)
@@ -224,6 +226,7 @@ Finding codes (errors unless marked warn or note; only errors change the exit co
     U103  (note) stacked visuals switched by bookmarks: a field parameter
     U104  (note) two or more slicers on a page of a DirectQuery model and no Apply button
     U105  (note) legacy card or multi-row card: the new card visual
+    U106  (note) Top N filter or filter on a measure, on a model with DirectQuery tables
 
     B001  a report file uses a table, column or measure the model in this project does not have; for a report on
           a published model: one that the saved field list, docs/model-fields.md, does not have

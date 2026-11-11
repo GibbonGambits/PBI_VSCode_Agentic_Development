@@ -54,12 +54,12 @@ More rules:
 | M405, M407, M408 | Item 12 |
 | M410 | Item 13 |
 | U006 | Item 15 |
-| M513, M701, M703, M704, M705, M706, M711, U008, U104 | Item 16 |
+| M513, M701, M703, M704, M705, M706, M711, U008, U104, U106 | Item 16 |
 | U004 | Item 17 |
 | M401 | Item 18 |
 | M113 | Item 24 |
 | M114 | Item 26 |
-| M811, M813, M814 | Item 30 |
+| M811, M813, M814, M815 | Item 30 |
 | M402, M403, M404 | Item 31 |
 | M505 | Item 32 |
 | M502 | Item 33 (Fail: the item asks for DIVIDE in every division that is not trivial) |
@@ -77,7 +77,7 @@ More rules:
 | A003 | Item 55 |
 | U007 | Item 59 |
 | U101 | Item 61 |
-| V001, V013, V014 | Item 63 (V001 is Fail: the item asks for back navigation on every drillthrough page; V013 on a tooltip page goes to item 65) |
+| V001, V013, V014, V023 | Item 63 (V001 is Fail: the item asks for back navigation on every drillthrough page; V013 on a tooltip page goes to item 65) |
 | M821, M822, U003, U103 | Item 64 |
 | V002, V003, V004, V005 | Item 65 |
 | A001, A002, A004 | Item 66 |

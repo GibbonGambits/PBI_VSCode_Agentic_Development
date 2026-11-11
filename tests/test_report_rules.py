@@ -438,6 +438,30 @@ class ClosingTheCoverage(ReportCase):
         self.assertFinds("V022", "warn")
 
 
+    def test_V023_cross_report_page_without_the_report_setting_warns(self):
+        self.page("Detail", type="Drillthrough", visibility="HiddenInViewMode",
+                  pageBinding={"name": "CrossStore", "type": "Drillthrough", "referenceScope": "CrossReport"})
+        self.visual("Detail", "Detail_Card_Sales", fields=[SALES])
+        self.button("Detail", "Detail_Button_Back", "Back")
+        self.assertFinds("V023", "warn")
+        report = self.read_json(os.path.join(DEFINITION, "report.json"))
+        report.setdefault("settings", {})["useCrossReportDrillthrough"] = True
+        self.write_json(os.path.join(DEFINITION, "report.json"), report)
+        self.assertNot("V023")
+
+    def test_U106_top_n_filter_on_a_directquery_model_is_a_note(self):
+        top = {"filters": [{"name": "TopProducts", "type": "TopN",
+                            "field": {"Column": {"Expression": {"SourceRef": {"Entity": "Sales"}}, "Property": "Product"}}}]}
+        self.visual("Overview", "Overview_Bar_TopProducts", kind="clusteredBarChart", fields=[SALES], filterConfig=top)
+        self.assertNot("U106")
+        table = os.path.join(self.root, "Sample.SemanticModel", "definition", "tables", "Sales.tmdl")
+        with open(table, encoding="utf-8") as fh:
+            text = fh.read()
+        with open(table, "w", encoding="utf-8", newline="\n") as fh:
+            fh.write(text.replace("\t\tmode: import", "\t\tmode: directQuery", 1))
+        self.assertFinds("U106", "note")
+
+
 class Schema(ReportCase):
     def test_J003_property_that_is_not_in_microsofts_schema_fails(self):
         path = os.path.join(PAGES, "Overview", "page.json")

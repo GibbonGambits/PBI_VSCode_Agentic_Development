@@ -30,6 +30,7 @@ An exception counts only when section 10 of `docs/report-brief.md` lists the cod
 | V020 | A report on a model with translations holds typed text: text boxes and typed visual titles (one finding for each report) | warn |
 | V021 | A report on a model with translations shows more than one page tab | warn |
 | V022 | The report uses a preview feature that section 11 of the brief does not list: the Gantt visual, a format string on one visual (`visual-features.md`, beside this file) | warn |
+| V023 | A cross-report drillthrough page in a report whose `report.json` does not have `settings.useCrossReportDrillthrough` on | warn |
 | A001 | A visual that shows data, or an image, has no alt text (hidden visuals are not checked; an image that is only decoration is listed in the brief) | warn |
 | A004 | Alt text is longer than 250 characters | warn |
 | A002 | Two visuals on one page share a tab order number (members of a group are not compared) | warn |
@@ -39,6 +40,7 @@ An exception counts only when section 10 of `docs/report-brief.md` lists the cod
 | U103 | Two data visuals of the same kind sit in the same place, and bookmarks show one at a time | note |
 | U104 | A report on a model with DirectQuery tables has a page with two or more slicers and no Apply button setting | note |
 | U105 | A `multiRowCard` or a legacy `card`: the new card visual replaces them | note |
+| U106 | A Top N filter or a filter on a measure, on a visual of a report whose model has DirectQuery tables (`storage-and-security.md` in the skill pbi-semantic-model, rule 24) | note |
 
 - In section 10, write Page and Visual as `python scripts/list_visuals.py .` prints them; the script also accepts the visual's `name` or folder.
 - For V010, write the bookmark's name under Page and `-` under Visual.
@@ -173,8 +175,8 @@ An exception counts only when section 10 of `docs/report-brief.md` lists the cod
 46. No unlabeled dual axis. Repeated comparable measures use the same display units unless justified. Avoid 3-D charts and value axes that do not start at zero. Source: checklist item 56; https://learn.microsoft.com/en-us/power-bi/create-reports/desktop-tips-and-tricks-for-creating-reports.
    - Microsoft's skill lists the same mistakes and a few more; each is guidance.
    - No three-dimensional effects. No check: Microsoft documents no file property for them.
-   - Bars and columns start at zero. No check yet: Microsoft's skill names the axis start setting only as a sign to look for, and Microsoft Learn documents no file property for it.
-   - A second value axis only when both series share a unit, and then with a title; otherwise use two charts. No check yet, for the same reason.
+   - Bars and columns start at zero. No check: Microsoft's visual catalogue names the property (`valueAxis.start`), but no Microsoft source shows how its value is written, so the files do not show a breach for certain.
+   - A second value axis only when both series share a unit, and then with a title; otherwise use two charts. No check, for the same reason.
    - A pie or donut with more than 5 slices becomes a bar chart sorted by value (rule 45). No check: it needs the data.
    - No gauge as a KPI: it takes much space for one number and shows no trend. Use a card, or a KPI visual for progress to a goal. No check: whether a gauge serves as a KPI is a judgement.
    - Sort bars by value, unless the categories have their own order (months, stages). No check: it needs a judgement on the categories.

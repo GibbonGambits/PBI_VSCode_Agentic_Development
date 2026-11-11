@@ -67,6 +67,9 @@
             }
           ]
         }
+      },
+      "options": {
+        "allowOverlappingPointsSample": true
       }
     },
     "visualContainerObjects": {
