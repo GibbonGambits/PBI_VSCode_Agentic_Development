@@ -14,11 +14,11 @@ The library started from 2,318 notes drawn from public SQLBI articles. Notes wer
 |---|---:|
 | 1. Outdated | 35 |
 | 2. Conflicts with the checklist | 19 |
-| 3. The repository already says it | 81 |
-| 4. Not adopted: a higher source says otherwise | 18 |
+| 3. The repository already says it | 95 |
+| 4. Not adopted: a higher source says otherwise | 20 |
 | 5. Duplicate in another topic | 0 |
-| Kept in the library | 1428 |
-| Not yet decided | 737 |
+| Kept in the library | 1923 |
+| Not yet decided | 226 |
 
 | Note | Group | Covered by |
 |---|---|---|
@@ -161,17 +161,33 @@ The library started from 2,318 notes drawn from public SQLBI articles. Notes wer
 | T13-A344-3 | 3 | `.github/skills/pbi-semantic-model/references/model-objects.md`, section A, rule 5 |
 | T14-A015-1 | 1 | - |
 | T14-A015-3 | 2 | `checklist/checklist.md`, item 14 |
+| T14-A015-5 | 3 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rule 19 |
+| T14-A019-5 | 4 | `.github/skills/pbi-semantic-model/references/model-standard.md`, rule 7 |
+| T14-A149-4 | 3 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rule 31 |
 | T14-A149-6 | 1 | - |
 | T14-A052-3 | 1 | - |
+| T14-A066-3 | 3 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, rule 32 |
 | T14-A086-5 | 1 | - |
+| T14-A088-1 | 3 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rule 7 |
+| T14-A088-7 | 3 | `.github/skills/pbi-semantic-model/references/model-standard.md`, rule 7 |
 | T14-A136-2 | 1 | - |
+| T14-A183-7 | 3 | `.github/skills/pbi-checklist-review/references/native-features.md`, The list, Model: row "Calculation groups" |
 | T14-A323-10 | 2 | `checklist/checklist.md`, item 35 |
 | T14-A326-7 | 2 | `checklist/checklist.md`, item 38 |
 | T15-A166-2 | 2 | `checklist/checklist.md`, item 14 |
 | T15-A166-5 | 2 | `checklist/checklist.md`, item 12 |
+| T15-A166-6 | 3 | `.github/skills/pbi-semantic-model/references/model-standard.md`, rule 7 |
 | T15-A189-2 | 1 | - |
 | T15-A231-4 | 1 | - |
+| T15-A276-2 | 3 | `.github/skills/pbi-semantic-model/references/model-objects.md`, section D, Dynamic format string |
+| T15-A317-13 | 4 | `.github/skills/pbi-semantic-model/references/model-standard.md`, rule 1 |
+| T15-A317-4 | 3 | `.github/skills/pbi-report/references/report-standard.md`, rule 44 (checklist item 54) |
 | T15-A351-3 | 1 | - |
+| T16-A081-1 | 3 | `.github/skills/pbi-semantic-model/references/model-objects.md`, section D, "Translations and cultures" |
+| T16-A123-10 | 3 | `checklist/checklist.md`, Item 68 |
+| T16-A123-6 | 3 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, rule 6 (M505) |
 | T16-A205-1 | 1 | - |
 | T16-A221-10 | 1 | - |
 | T16-A221-7 | 1 | - |
+| T16-A343-1 | 3 | `.github/skills/pbi-checklist-review/references/native-features.md`, section "Tooling Copilot can use", row "Power BI Project format" (F001) |
+| T16-A366-1 | 3 | `.github/skills/pbi-semantic-model/SKILL.md`, section "What the files cannot tell", third point (whether the model loads and the numbers are right) |
