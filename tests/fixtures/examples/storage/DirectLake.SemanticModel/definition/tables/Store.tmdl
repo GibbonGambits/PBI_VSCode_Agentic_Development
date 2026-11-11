@@ -1,0 +1,23 @@
+/// Example of a Direct Lake table: one row per store. Made-up source.
+table Store
+
+	column 'Store Key'
+		dataType: int64
+		isHidden
+		isKey
+		summarizeBy: none
+		sourceColumn: store_key
+
+	/// Name of the store.
+	column 'Store Name'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: store_name
+
+	partition Store = entity
+		mode: directLake
+		source
+			entityName: store
+			schemaName: dbo
+			expressionSource: 'DirectLake - Shop'
+

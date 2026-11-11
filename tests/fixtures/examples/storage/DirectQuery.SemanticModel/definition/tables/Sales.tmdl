@@ -1,0 +1,33 @@
+/// Example of a DirectQuery fact table: one row per order line, read from the source at query time. Made-up source.
+table Sales
+
+	column 'Date Key'
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: Date Key
+
+	column 'Store Key'
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: Store Key
+
+	column Amount
+		dataType: decimal
+		isHidden
+		formatString: #,0.00
+		summarizeBy: none
+		sourceColumn: Amount
+
+	partition Sales = m
+		mode: directQuery
+		source =
+				let
+				    // Connect to the made-up shop database.
+				    Source = Sql.Database("sql.example.com", "Shop"),
+				    // Pick the order line view.
+				    Data = Source{[Schema="dbo",Item="Sales"]}[Data]
+				in
+				    Data
+

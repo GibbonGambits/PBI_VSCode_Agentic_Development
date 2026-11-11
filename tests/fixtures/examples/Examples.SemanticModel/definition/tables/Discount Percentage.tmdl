@@ -1,0 +1,16 @@
+/// Example of a numeric range (what-if) parameter: discounts from 0 to 50 percent in steps of 5.
+table 'Discount Percentage'
+
+	/// The discount a reader picks.
+	column 'Discount Percentage'
+		dataType: decimal
+		formatString: 0%
+		summarizeBy: none
+		sourceColumn: [Value]
+
+	partition 'Discount Percentage' = calculated
+		mode: import
+		source = GENERATESERIES ( CURRENCY ( 0 ), CURRENCY ( 0.5 ), CURRENCY ( 0.05 ) )
+
+	annotation CalculatedReason = Shipped example of a numeric range parameter; Power BI Desktop makes it as a calculated table with GENERATESERIES.
+

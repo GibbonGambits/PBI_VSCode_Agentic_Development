@@ -1,0 +1,30 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/reportExtension/1.0.0/schema.json",
+  "name": "extension",
+  "entities": [
+    {
+      "name": "_Measures",
+      "measures": [
+        {
+          "name": "_Sales per Order Line",
+          "dataType": "Double",
+          "expression": "DIVIDE ( [Total Sales], [# Order Lines] )",
+          "formatString": "#,0.00",
+          "description": "Example of a report-level measure: total sales divided by the number of order lines.",
+          "references": {
+            "measures": [
+              {
+                "entity": "_Measures",
+                "name": "Total Sales"
+              },
+              {
+                "entity": "_Measures",
+                "name": "# Order Lines"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

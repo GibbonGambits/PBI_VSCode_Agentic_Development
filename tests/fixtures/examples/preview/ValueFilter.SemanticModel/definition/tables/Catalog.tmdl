@@ -1,0 +1,39 @@
+/// Example of a table for value filter behavior (preview): which product was sold in which colour in which year. Made-up data.
+table Catalog
+
+	/// Name of the product.
+	column Product
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Product
+
+	/// Colour the product was sold in.
+	column Colour
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Colour
+
+	/// Year the product was sold in that colour.
+	column Year
+		dataType: int64
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: Year
+
+	partition Catalog = m
+		mode: import
+		source =
+				let
+				    // Build a small made-up catalog: product, colour, year.
+				    Source = #table(
+				        type table [Product = text, Colour = text, Year = Int64.Type],
+				        {
+				            {"Garden Chair", "Blue", 2023},
+				            {"Garden Chair", "Red", 2023},
+				            {"Garden Chair", "Blue", 2024},
+				            {"Watering Can", "Red", 2023}
+				        }
+				    )
+				in
+				    Source
+

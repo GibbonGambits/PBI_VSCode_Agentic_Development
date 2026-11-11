@@ -1,0 +1,20 @@
+# Status
+
+Updated at every commit, so that a stop loses nothing.
+
+| Step | State |
+|---|---|
+| 1. Formula scanner (Part F) | Done: `scripts/formula_scanner.py`, 25 hard formulas in `tests/test_scanner.py` |
+| 2. Sources record and routine (Part G) | Done: `sources.md`, `scripts/refresh_sources.py` |
+| 3. Standards and checks (Part A) | Done: seven standard files, `scripts/model_rules.py`, `scripts/report_rules.py`, a test for each code. `coverage.md` lists every row |
+| 4. Feature inventory (Part B) | Done: `feature-inventory.md` |
+| 5. Copilot builds it itself (Part C) | Done: shipped examples and index, `scaffold.py`, `find_references.py`, `list_todos.py`, `desktop_bridge.py`, the data-facts guidance, the saved field list |
+| 6. Look-ups (Part D) | Done: skill `pbi-lookup`, `scripts/lookup.py` |
+| 7. DAX function index (Part E) | Done: 464 functions |
+| 8. Flow tables, review skill, one chat per task, lessons guard (Part F) | Done |
+| 9. README, notices, evals, template check | Done |
+| 10. Two read-only reviews, fixes, pull request | Done: both reviews ran to the end and their findings are fixed; the pull request is open |
+
+## Where to pick up
+
+Nothing is open. `coverage.md` and `feature-inventory.md` list no soft, missing or uncovered row. The next work is the owner's: open the examples and a scaffolded project once in Power BI Desktop (the README lists what to look at), and run the test prompts in `evals/`.

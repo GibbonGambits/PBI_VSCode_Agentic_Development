@@ -1,0 +1,32 @@
+/// One row per store. Made-up data.
+table Store
+
+	column 'Store Key'
+		dataType: int64
+		isHidden
+		isKey
+		isNullable: false
+		summarizeBy: none
+		sourceColumn: Store Key
+
+	/// Name of the store.
+	column 'Store Name'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Store Name
+
+	/// City the store is in.
+	column City
+		dataType: string
+		dataCategory: City
+		summarizeBy: none
+		sourceColumn: City
+
+	partition Store = m
+		mode: import
+		source =
+				let
+				    // Build a small made-up list of stores.
+				    Source = #table(type table [#"Store Key" = Int64.Type, #"Store Name" = text, City = text], {{1, "North", "Utrecht"}})
+				in
+				    Source

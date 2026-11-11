@@ -1,0 +1,44 @@
+/// Example of a table with two partitions: recent order lines imported, older order lines read in DirectQuery mode; a data coverage definition says the DirectQuery partition holds the years 2022 and 2023 only. One row per order line. Made-up source.
+table 'Sales History'
+
+	column 'Date Key'
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: Date Key
+
+	column Amount
+		dataType: decimal
+		isHidden
+		formatString: #,0.00
+		summarizeBy: none
+		sourceColumn: Amount
+
+	partition 'Sales History Recent' = m
+		mode: import
+		source =
+				let
+				    // Connect to the made-up shop database.
+				    Source = Sql.Database("sql.example.com", "Shop"),
+				    // Pick the order line view.
+				    Data = Source{[Schema="dbo",Item="Sales"]}[Data],
+				    // Keep the order lines from 2024 on: this partition is imported.
+				    #"Filtered Rows" = Table.SelectRows(Data, each [Date Key] >= 20240101)
+				in
+				    #"Filtered Rows"
+
+	partition 'Sales History Older' = m
+		mode: directQuery
+		source =
+				let
+				    // Connect to the made-up shop database.
+				    Source = Sql.Database("sql.example.com", "Shop"),
+				    // Pick the order line view.
+				    Data = Source{[Schema="dbo",Item="Sales"]}[Data],
+				    // Keep the order lines before 2024: this partition is read at query time.
+				    #"Filtered Rows" = Table.SelectRows(Data, each [Date Key] < 20240101)
+				in
+				    #"Filtered Rows"
+
+		dataCoverageDefinition = RELATED ( 'Date'[Year] ) IN { 2022, 2023 }
+

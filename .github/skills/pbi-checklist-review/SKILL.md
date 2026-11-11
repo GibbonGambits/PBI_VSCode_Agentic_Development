@@ -12,9 +12,9 @@ A review reports. It never fixes. Change files only after the developer has read
 2. Read `docs/report-brief.md`, the model files and the report files. If the brief is empty or missing, carry on; ask for the facts in step 5 and mark what stays unknown as Fail with "Evidence missing".
 3. Copy `references/review-template.md` to `docs/checklist-review.md`. If that file already exists, ask the developer to commit it or to confirm it can be replaced.
 4. Go through `checklist/checklist.md` from item 1 to item 79, in order, reading each item in full. Fill one row per item.
-5. Before finishing, ask the developer, in one message, for the facts the files cannot show (see "Evidence only people can give"). Use their answers as evidence, with the date.
+5. Before finishing, get the facts the files cannot show (see "Evidence only people can give"). Facts about the data: read them yourself where the developer has set up Microsoft's modeling server (the file data-facts.md of the skill `pbi-semantic-model`); for the rest, ask the developer in one message. Use the answers as evidence, with the date. Where the Desktop Bridge is agreed, look at the pages yourself for what only the screen shows (the file desktop-bridge.md of the skill `pbi-report`).
 6. Run `python scripts/check_project.py --review docs/checklist-review.md` and fix the table until it passes.
-7. Report: the script findings, the 79 rows, and a short list of the Fail items with what would close each gap.
+7. Report: the script findings, the 79 rows, a short list of the Fail items with what would close each gap, the open `TODO(owner)` questions (`python scripts/list_todos.py .`), and the suggestions.
 
 ## The three statuses
 
@@ -35,25 +35,60 @@ More rules:
 
 | Finding | Where it goes |
 |---|---|
-| D001, D002, I001 | Item 23 |
+| D001, D002, I001, M803, M812 | Item 23 |
 | T001, and T105 from `check_template.py` | Item 50 |
-| M005, M006, M007, M008 | Items 7 and 28 |
+| M005, M006, M007, M008, M118, M119 | Items 7 and 28 |
 | M101 | Item 22 |
 | M102, M103, M104 | Items 19 and 25 |
 | M105, M106 | Items 27 and 38 |
 | M107 | Item 29 |
-| M109, M110 | Item 6 |
+| M109, M110, M413, M416 | Items 6 and 14 |
 | M009 | Item 36 |
 | M112 | Items 71 and 72 |
-| M201 | Items 5 and 25 |
+| M201, M115, M120, P007 | Items 5 and 25 |
+| P005 | Item 2 |
+| P002, P006, M702, M708 | Item 3 |
+| P003 | Item 4 |
+| M411, M412, M417 | Item 10 |
+| M406, M409 | Item 11 |
+| M405, M407, M408 | Item 12 |
+| M410 | Item 13 |
+| U006 | Item 15 |
+| M513, M701, M703, M704, M705, M706, M711, U008, U104, U106 | Item 16 |
+| U004 | Item 17 |
+| M401 | Item 18 |
+| M113 | Item 24 |
+| M114 | Item 26 |
+| M811, M812, M813, M814, M815 | Item 30 (M812 also counts for item 23) |
+| M402, M403, M404 | Item 31 |
+| M505 | Item 32 |
+| M502 | Item 33 (Fail: the item asks for DIVIDE in every division that is not trivial) |
+| M507, M514 | Item 34 |
+| M508, M509 | Item 35 |
+| M414, M415, M601, M602, M604, M609 | Item 39 |
+| M606, M607, M608, M806 | Item 40 |
+| M603, M605 | Item 41 |
 | G001, G002 | Item 49 (Fail: the item asks for 0 overlapping visuals) |
 | G003, G004, G005, G006 | Item 49 (Fail when they name 3 or more visuals on one page, unless the brief justifies it) |
+| V009 | Items 50, 70 and 74 |
+| V008, U102 | Item 51 |
 | G007 | Item 52 |
-| M001-M004, M010, M108, M111, M301, M302, B001, G008, C001, D003, P001, F002, F003, J001, J002, S001, N001-N005, H001, H002, and any other finding of `check_template.py` | Template rules, not checklist items. List them in the "Template rules" section of the report |
+| V010 | Item 53 |
+| A003 | Item 55 |
+| U007 | Item 59 |
+| U101 | Item 61 |
+| V001, V013, V014, V023 | Item 63 (V001 is Fail: the item asks for back navigation on every drillthrough page; V013 on a tooltip page goes to item 65) |
+| M821, M822, U003, U103 | Item 64 |
+| V002, V003, V004, V005 | Item 65 |
+| A001, A002, A004 | Item 66 |
+| V006, V007 | Item 20 (V006 is Fail unless the brief gives the reason) |
+| M001-M004, M010, M108, M111, M116, M117, M301, M302, M303, M501, M503, M504, M506, M510, M511, M512, M516, M517-M525, M707, M709, M801, M802, M804, M805, M807, M831-M833, M841, M901-M910, P004, V011, V012, V015-V022, B001, B002, G008, C001, D003, P001, F002, F003, J001-J004, S001, N001-N005, H001, H002, U001, U002, U005, U105, and any other finding of `check_template.py` | Template rules, not checklist items. List them in the "Template rules" section of the report |
 
 A warning or a note from the script is evidence, not a verdict: read the item and judge it by its own thresholds. Item 22 is judged by the checklist's thresholds; the two-level measure folders (M003, M004) are a template rule. A finding excused in section 9 or 10 of the brief counts as justified; quote the row.
 
-Some rules have no script. Judge them from the files and the brief: hierarchies for natural drill paths (item 59); the decision on incremental refresh or partitions for large tables (section 4 of the brief; ask for row counts; report it under "Template rules"); abbreviations in names (item 7); and overlaps on a page that has groups, which the script compares only inside each group (item 49: ask the developer to look).
+Notes whose codes start with U are suggestions: a native feature may do a job better. List them in their own section, "Suggestions", with the feature, what it would replace and its release status (`references/native-features.md`). A suggestion never makes an item Fail, and nothing is built from one without the developer's yes.
+
+Some rules have no script. Judge them from the files and the brief: hierarchies for natural drill paths beyond the three column pairs that note U007 knows (item 59); the decision on incremental refresh or partitions for large tables (section 4 of the brief; ask for row counts; report it under "Template rules"); abbreviations in names (item 7); and overlaps on a page that has groups, which the script compares only inside each group (item 49: ask the developer to look).
 
 ## Evidence only people can give
 
@@ -63,4 +98,4 @@ These items cannot be judged from project files alone. Ask; do not guess.
 - In the Power BI service or from the team: security roles tested (39-41), sensitivity labels and endorsement (42), permissions (43), lineage (44), refresh and alerting (45), user testing (76), export tests (77), audience access (78), decommission plan (79).
 
 Checklist items: 1-79
-Review-only items: 39-45, 68, 76, 78, 79
+Review-only items: 42-45, 68, 76, 78, 79

@@ -1,0 +1,76 @@
+/// Example of a dimension table with a category and subcategory hierarchy. One row per product. Made-up data.
+table Product
+
+	column 'Product Key'
+		dataType: int64
+		isHidden
+		isKey
+		summarizeBy: none
+		sourceColumn: Product Key
+
+	/// Name of the product.
+	column 'Product Name'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Product Name
+
+	/// Product category.
+	column Category
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Category
+
+	/// Product subcategory, within a category.
+	column Subcategory
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Subcategory
+
+	/// Cost price of one unit. Hidden from the role No Product Cost by object-level security.
+	column 'Unit Cost'
+		dataType: decimal
+		formatString: #,0.00
+		summarizeBy: none
+		sourceColumn: Unit Cost
+
+	/// Example of the data category Barcode: the made-up barcode on the product, which the Power BI mobile app can scan to filter a report.
+	column Barcode
+		dataType: string
+		dataCategory: Barcode
+		summarizeBy: none
+		sourceColumn: Barcode
+
+	/// Example of the data category ImageUrl: the made-up web address of a picture of the product. A table, matrix, slicer or card shows the picture.
+	column 'Product Image'
+		dataType: string
+		dataCategory: ImageUrl
+		summarizeBy: none
+		sourceColumn: Product Image
+
+	/// Example of a hierarchy: category, subcategory, product.
+	hierarchy 'Product Hierarchy'
+
+		level Category
+			column: Category
+
+		level Subcategory
+			column: Subcategory
+
+		level Product
+			column: 'Product Name'
+
+	partition Product = m
+		mode: import
+		source =
+				let
+				    // Build a small made-up list of products.
+				    Source = #table(
+				        type table [#"Product Key" = Int64.Type, #"Product Name" = text, Category = text, Subcategory = text, #"Unit Cost" = Currency.Type, Barcode = text, #"Product Image" = text],
+				        {
+				            {1, "Garden Chair", "Garden", "Furniture", 35.00, "2000000000015", "https://example.com/pictures/garden-chair.png"},
+				            {2, "Watering Can", "Garden", "Tools", 6.50, "2000000000022", "https://example.com/pictures/watering-can.png"}
+				        }
+				    )
+				in
+				    Source
+

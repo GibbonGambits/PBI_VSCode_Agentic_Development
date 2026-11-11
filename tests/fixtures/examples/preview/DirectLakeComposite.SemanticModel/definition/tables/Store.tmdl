@@ -1,0 +1,42 @@
+/// Example of a Direct Lake on OneLake table with a user-context calculated column (preview): one row per store. Made-up source.
+table Store
+
+	column 'Store Key'
+		dataType: int64
+		isHidden
+		isKey
+		summarizeBy: none
+		sourceColumn: store_key
+
+	/// Name of the store, in English.
+	column 'Store Name'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: store_name
+
+	column 'Store Name Dutch'
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: store_name_nl
+
+	/// Example of a user-context calculated column (preview): the store name in Dutch for a reader whose language is Dutch, else in English.
+	column 'Store Name Local' =
+			IF (
+			    USERCULTURE () = "nl-NL",
+			    Store[Store Name Dutch],
+			    Store[Store Name]
+			)
+		dataType: string
+		summarizeBy: none
+		expressionContext: userContext
+
+		annotation CalculatedReason = Shipped example of a user-context calculated column: the value depends on the reader's language, so it cannot be made at the source.
+
+	partition Store = entity
+		mode: directLake
+		source
+			entityName: store
+			schemaName: dbo
+			expressionSource: 'DirectLake - Shop'
+

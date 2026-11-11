@@ -1,0 +1,75 @@
+/// Example of a date table that holds a calendar for calendar-based time intelligence (preview). One row per calendar day. Made-up data.
+table Date
+	dataCategory: Time
+
+	/// The calendar day.
+	column Date
+		dataType: dateTime
+		isKey
+		formatString: Short Date
+		summarizeBy: none
+		sourceColumn: Date
+
+	column 'Date Key'
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: Date Key
+
+	/// Calendar year.
+	column Year
+		dataType: int64
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: Year
+
+	column 'Year Month Number'
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: Year Month Number
+
+	/// Month and year, such as Jan 2024.
+	column Month
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Month
+		sortByColumn: 'Year Month Number'
+
+	/// Weekday or Weekend.
+	column 'Day Type'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Day Type
+
+	partition Date = m
+		mode: import
+		source =
+				let
+				    // Build a small made-up calendar.
+				    Source = #table(
+				        type table [Date = date, #"Date Key" = Int64.Type, Year = Int64.Type, #"Year Month Number" = Int64.Type, Month = text, #"Day Type" = text],
+				        {
+				            {#date(2024, 1, 5), 20240105, 2024, 202401, "Jan 2024", "Weekday"},
+				            {#date(2024, 1, 6), 20240106, 2024, 202401, "Jan 2024", "Weekend"}
+				        }
+				    )
+				in
+				    Source
+
+	/// Example of a calendar (preview): year, month and date, with Day Type as a time-related column.
+	calendar 'Shop Calendar'
+
+		calendarColumnGroup = year
+			primaryColumn: Year
+
+		calendarColumnGroup = month
+			primaryColumn: 'Year Month Number'
+			associatedColumn: Month
+
+		calendarColumnGroup = date
+			primaryColumn: Date
+
+		calendarColumnGroup
+			column: 'Day Type'
+

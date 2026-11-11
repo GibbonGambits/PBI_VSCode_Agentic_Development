@@ -20,6 +20,8 @@ Finding codes (errors unless marked warn or note; only errors change the exit co
     F003  a model's 'definition' folder holds no .tmdl file
     J001  a project JSON file is not valid JSON or starts with a byte-order mark; or a .tmdl file is not UTF-8
     J002  a project JSON file does not have the structure Power BI expects
+    J003  a project JSON file does not fit the Microsoft schema its '$schema' line names (scripts/json_schema.py)
+    J004  (note) a project JSON file names a schema version that scripts/schemas holds no copy of: not checked
     S001  '$schema' is missing or is not a Microsoft Fabric schema address
     N001  page name or folder has characters other than letters, digits, underscore, hyphen; or the name is over 50
     N002  visual name or folder: same rule
@@ -57,6 +59,7 @@ Finding codes (errors unless marked warn or note; only errors change the exit co
     M201  (note) hidden column or measure that nothing refers to
     M301  (note) hidden columns whose isAvailableInMdx could be turned off (only when the brief turns this on)
     M302  (note) description longer than 200 characters (only when the brief turns this on)
+    M303  (note) dimension table with no column marked isDefaultLabel (only when the brief turns this on)
 
   Layout standard (.github/skills/pbi-report/references/layout-standard.md):
     G001  visual reaches outside the page
@@ -68,20 +71,189 @@ Finding codes (errors unless marked warn or note; only errors change the exit co
     G007  (warn) page size differs from the brief or the standard
     G008  (note) position not checked: a rotated visual, or visuals inside a group
 
-    B001  a report file uses a table, column or measure the model in this project does not have
+  Relationships, dates and names (.github/skills/pbi-semantic-model/references/relationships-and-dates.md):
+    M113  (warn) text column that looks like a month name has no sort column
+    M114  (warn) column that looks like a place has no data category
+    M115  (warn) column repeated in the related table
+    M116  (warn) flag column shown as a number
+    M117  (warn) the one partition of a table is not named after the table
+    M118  (warn) visible table, column or hierarchy name: capital, underscores, words run together, technical prefix
+    M119  (warn) column and hierarchy of one table share a name
+    M120  (warn) table that shows more than 30 columns
+    M401  (warn) Auto date/time is on
+    M402  time intelligence is used and no table is marked as a date table
+    M403  (warn) date columns, and no table marked as a date table
+    M404  (warn) table that looks like a date table is not marked as one
+    M405  (warn) relationship filters in both directions
+    M406  (warn) many-to-many relationship
+    M407  (warn) many-to-many relationship that filters in both directions
+    M408  (warn) more than 30% of the relationships are both-direction or many-to-many
+    M409  (warn) one-to-one relationship
+    M410  (warn) inactive relationship that no formula turns on
+    M411  (warn) table with no relationship
+    M412  (warn) snowflake: a table is the many side of one relationship and the one side of another
+    M413  (warn) one-side column of a relationship is not marked as the key
+    M414  (warn) security roles in a model with inactive relationships
+    M415  USERELATIONSHIP towards a table that has a row-level security rule
+    M416  (note) relationship key column that allows blanks (no isNullable: false)
+    M417  (warn) a number column for each month: unpivot
+    M901  relationship names a table or column the model does not have
+    M902  hierarchy level on a column the table does not have
+    M903  sort column the table does not have
+    M904  data column without sourceColumn
+    M905  measure, calculated column or calculation item with an empty expression
+    M906  control character, other than white space, in a name or a description
+    M907  isAvailableInMdx off on a column used for sorting or in a hierarchy
+
+  DAX (.github/skills/pbi-semantic-model/references/dax-standard.md):
+    M501  (warn) IFERROR or ISERROR
+    M502  division with '/' by something that is not a fixed number: use DIVIDE
+    M503  (warn) COUNT or COUNTA of a column where COUNTROWS says what is meant
+    M504  (warn) HASONEVALUE with VALUES: use SELECTEDVALUE
+    M505  (warn) FILTER over a whole table as a filter argument of CALCULATE
+    M506  (warn) a blank turned into a value
+    M507  (warn) the same expression written twice: use a variable
+    M508  (warn) two measures with the same formula
+    M509  (warn) a measure that only repeats another measure
+    M510  (warn) INTERSECT where TREATAS is meant
+    M511  (warn) a number plus or minus a ratio (1 - x / y)
+    M512  (warn) EVALUATEANDLOG left in a formula
+    M513  (warn) time intelligence in a model with DirectQuery tables
+    M514  (warn) EARLIER or EARLIEST: use a variable
+    M516  (warn) window function without ORDERBY
+    M517  (warn) VALUES compared with one value
+    M518  (warn) DIVIDE by a fixed number: use '/'
+    M519  (warn) ALL as a filter argument of CALCULATE where REMOVEFILTERS is meant
+    M520  (warn) formulas that do not follow the DAX style (one finding for each table file)
+    M521  (warn) CALCULATE written directly inside CALCULATE
+    M522  (warn) SUMMARIZE that adds a new column
+    M523  (note) SUMMARIZECOLUMNS with a filter argument inside a measure
+    M524  (warn) USERCULTURE in an imported calculated column or calculated table
+    M525  (warn) SWITCH over USERCULTURE with no default value, or naming a culture that has no culture file
+    M908  DAX names a Table[Column] the model does not have
+    M909  (warn) DAX calls a function that is not in the DAX function index
+
+  Power Query, storage modes and security (.github/skills/pbi-semantic-model/references/storage-and-security.md):
+    P002  (warn) native query built by joining text
+    P003  (warn) one shared query feeds two or more tables
+    P004  (warn) Dataverse query without its options
+    P005  (warn) query reads a file from a local drive
+    P006  (warn) heavy reshaping in Power Query
+    P007  (warn) loaded table that only feeds other queries
+    M601  (warn) row-level security rule uses text or lookup functions
+    M602  (warn) row-level security rule on a fact table
+    M603  (warn) row-level security rule uses USERNAME
+    M604  (warn) row-level security rule next to a many-to-many relationship
+    M605  (warn) user-based rule that ends in TRUE for everyone else
+    M606  (warn) object-level security hides a field that a report visual uses
+    M607  (warn) row rules and object rules in different roles
+    M608  object-level security on a table in the middle of a chain of relationships
+    M609  (warn) relationship that applies the security filter in both directions
+    M701  DirectQuery native query with a common table expression or a stored procedure
+    M702  (warn) DirectQuery table with transformation steps in Power Query
+    M703  (warn) DirectQuery table filtered on the current date in Power Query
+    M704  (warn) calculated column of a DirectQuery table used in a relationship
+    M705  calculated column of a DirectQuery table that uses CALCULATE or an iterator
+    M706  (warn) imported dimension of a DirectQuery fact: consider Dual
+    M707  incremental refresh without the parameters RangeStart and RangeEnd, or not of type Date/Time
+    M708  (warn) incremental refresh on a native query
+    M709  incremental refresh filter that includes both ends of the window
+    M711  (warn) Direct Lake table with a Power Query partition
+    M832  (warn) data source that no partition uses
+    M833  legacy query partition on a structured data source
+    M910  (warn) column of a calculated table whose sourceColumn the formula does not produce
+
+  Model objects (.github/skills/pbi-semantic-model/references/model-objects.md):
+    M801  user-defined function in a model below compatibility level 1702
+    M802  user-defined function name breaks Microsoft's naming rules
+    M803  (warn) user-defined function has no '///' description
+    M804  (warn) user-defined function parameter has no type
+    M805  user-defined function calls itself
+    M806  (warn) user-defined function names an object that a role hides with object-level security
+    M807  (warn) user-defined function or parameter name outside the naming style
+    M811  (warn) calculation group with no items
+    M812  (warn) calculation item has no '///' description
+    M813  (warn) two or more calculation groups without their own precedence
+    M814  (warn) calculation group in a model without discourageImplicitMeasures
+    M815  (warn) detail rows expressions in a model with a calculation group
+    M821  field parameter names a field the model does not have
+    M822  (warn) field parameter not wired the way Power BI Desktop writes it
+    M831  (warn) perspective with no objects
+    M841  (warn) the model uses a preview feature that section 11 of the brief does not list (calendars, value
+          filter behavior, user-context calculated columns, calculated tables over Direct Lake data)
+
+  Report standard (.github/skills/pbi-report/references/report-standard.md):
+    V001  drillthrough page without a back button
+    V002  (warn) tooltip page that is not hidden
+    V003  (warn) tooltip page much larger than the built-in tooltip size
+    V004  (warn) slicer or button on a tooltip page
+    V005  (warn) tooltip page with fewer than three fields
+    V006  more than 16 visuals that show data on one page
+    V007  (warn) 13 to 16 visuals that show data on one page
+    V008  (warn) button whose action goes to a page or bookmark the report does not have
+    V009  (warn) colour, font, size, border, shadow or background set on a single visual
+    V010  (warn) bookmark that holds a page or visual the report no longer has
+    V011  (warn) pages.json and the page folders disagree
+    V012  (warn) report-level measure without the prefix
+    V013  (warn) filter values left on a tooltip page or in a drillthrough filter
+    V014  (warn) visible drillthrough page without a reset button
+    V015  (warn) filter whose Where part uses a source its From part does not declare
+    V016  (warn) visual type that Microsoft is retiring or has deprecated
+    V017  (warn) image or other resource that is not registered or not in the report folder
+    V018  (note) page with no text box for its title
+    V019  (warn) report-level measure that calls USERCULTURE
+    V020  (warn) typed text in a report on a model with translations (one finding for each report)
+    V021  (warn) more than one page tab in a report on a model with translations
+    V022  (warn) the report uses a preview feature that section 11 of the brief does not list (Gantt visual,
+          format string on a visual)
+    V023  (warn) cross-report drillthrough page in a report that does not switch the feature on
+    A001  (warn) visuals without alt text (one finding for each page)
+    A002  (warn) visuals that share a tab order number
+    A003  (warn) visuals that show a title made up from field names (one finding for each page)
+    A004  (warn) alt text longer than 250 characters
+
+  Suggestions: a native feature may do this better (.github/skills/pbi-checklist-review/references/native-features.md):
+    U001  (note) three or more measures of one formula pattern: a user-defined function
+    U002  (note) many time variants of measures: a calculation group
+    U003  (note) a measure that switches between measures: a field parameter
+    U004  (note) DirectQuery tables and no aggregation table
+    U005  (note) a measure that returns formatted text: a dynamic format string
+    U006  (note) two or more inactive relationships to one table: a role-playing dimension
+    U007  (note) a natural drill path and no hierarchy
+    U008  (note) relationship between two DirectQuery tables without Assume referential integrity
+    U101  (note) the same slicer on two or more pages, not synced
+    U102  (note) three or more page buttons on a page: a page navigator
+    U103  (note) stacked visuals switched by bookmarks: a field parameter
+    U104  (note) two or more slicers on a page of a DirectQuery model and no Apply button
+    U105  (note) legacy card or multi-row card: the new card visual
+    U106  (note) Top N filter or filter on a measure, on a model with DirectQuery tables
+
+    B001  a report file uses a table, column or measure the model in this project does not have; for a report on
+          a published model: one that the saved field list, docs/model-fields.md, does not have
+    B002  (note) a report on a published model has no saved field list, so its fields are not checked
 
 The M, G and B checks read their numbers, lists and exceptions from docs/report-brief.md under <folder>.
 An exception counts only when its row there names the same code and object and gives a reason.
-The DAX checks (M010, M103, M201) read text; they are not a DAX parser.
+Formulas are read once, in six states, by scripts/formula_scanner.py (separate rules for DAX and Power Query).
+It is a scanner, not a parser: it knows names, text, comments and brackets, not what a formula means.
+Levels of the checks added in round 3: fail when Microsoft says it breaks something or gives wrong numbers, or
+the checklist gives a hard number, and the files show it for certain; warn for every other rule; note (U) for a
+suggestion. The checks are in scripts/model_rules.py and scripts/report_rules.py.
 
 A visual may keep Header icons or Tooltips on only with a HeaderTooltipException annotation whose value
 names what stays on and why: "header: <reason>", "tooltip: <reason>" or "both: <reason>".
-The Power Query step check reads the outer 'let' of each query; it is a plain text check, not a parser.
+The Power Query step check reads the outer 'let' of each query with the same scanner.
 """
 import json
 import os
 import re
 import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import formula_scanner as fs  # noqa: E402
+import json_schema  # noqa: E402
+import model_rules  # noqa: E402
+import report_rules  # noqa: E402
 
 NAME_OK = re.compile(r"[A-Za-z0-9_-]+\Z")           # Microsoft Learn: PBIR naming convention
 NAME_MAX = 50                                        # Microsoft schemas: page 2.1.0, visualContainer 2.13.0
@@ -126,23 +298,31 @@ BRIEF_LABELS = {"page_size": "Page size in pixels, width x height",
                 "subjects": "Measure folder subjects",
                 "own_spelling": "Acronyms and words with their own spelling",
                 "excel": "Excel check on",
-                "copilot": "Power BI Copilot check on"}
+                "copilot": "Power BI Copilot check on",
+                "report_prefix": "Prefix for report-level measures"}
 MODEL_EXCEPTIONS = "Exceptions to the model standard"
 LAYOUT_EXCEPTIONS = "Exceptions to the layout standard"
+PREVIEW_AGREED = "Preview features and optional tools"       # section 11 of the brief: one row for each yes
+FIELD_LIST = os.path.join("docs", "model-fields.md")  # the saved field list of a published model (skill pbi-report)
 BEFORE_COPY = "_before"                              # the untouched copy made by scripts/improve.py
 ITEM_COUNT = 79
 FAILED = object()                                    # returned by load_json when a file cannot be parsed
 
 DESCRIBED_KINDS = ("table", "column", "measure")
-STEP_RE = re.compile(r'^(#"(?:[^"]|"")+"|[^\W\d][\w.]*)\s*=(?![=>])')
+DESCRIBED_PROPERTIES = ("multipleoremptyselectionexpression", "noselectionexpression", "datacoveragedefinition")
 DECL_RE = re.compile(r"^([A-Za-z]+)\s+('(?:[^']|'')*'|[^\s=:]+)\s*(.*)$")
 PROP_EQ_RE = re.compile(r"^([A-Za-z_]\w*)\s*=\s*(.*)$")
 PROP_COLON_RE = re.compile(r"^([A-Za-z_]\w*)\s*:")
 OBJECT_KEYWORDS = frozenset((
     "table", "column", "measure", "expression", "partition", "hierarchy", "level",
-    "calculationgroup", "calculationitem", "function", "role", "tablepermission",
-    "relationship", "perspective", "culture", "cultureinfo", "datasource", "model", "database",
-    "annotation", "extendedproperty", "querygroup", "variation", "kpi"))
+    "calculationgroup", "calculationitem", "function", "role", "tablepermission", "columnpermission",
+    "relationship", "perspective", "perspectivetable", "perspectivecolumn", "perspectivemeasure",
+    "perspectivehierarchy", "culture", "cultureinfo", "datasource", "model", "database",
+    "annotation", "extendedproperty", "querygroup", "variation", "kpi", "calendar"))
+# Objects written as one bare word, with their properties below (the spelling Microsoft's TMDL serializer writes).
+NAMELESS_OBJECTS = frozenset(("calculationgroup", "kpi", "refreshpolicy", "alternateof", "relatedcolumndetails",
+                              "translations"))
+M_PROPERTIES = frozenset(("sourceexpression", "pollingexpression"))    # Power Query held by a refresh policy
 VALUE_ONLY = frozenset(("annotation", "extendedproperty"))       # 'name = value' lines, not real objects
 PLAIN_VALUE_KEYS = frozenset(("changedproperty",))               # 'key = value' where the value is not an expression
 FREE_TEXT_KEYS = frozenset(("sourcecolumn", "formatstring", "displayfolder", "sortbycolumn",
@@ -151,6 +331,14 @@ HIDING_FLAGS = frozenset(("ishidden", "ishidden:true", "isprivate", "isprivate:t
 BARE_FLAG_RE = re.compile(r"[A-Za-z_]\w*\Z")
 QUOTED = re.compile(r"'(?:[^']|'')*'|\"(?:[^\"]|\"\")*\"")
 EMPTY_EVIDENCE = frozenset(("todo", "tbd", "na", "n/a", "none", "nbsp", "br", "x", "evidence"))
+
+
+def code_levels():
+    """{code: 'fail', 'warn' or 'note'} for every finding code, read from the list at the top of this file."""
+    levels = {}
+    for code, mark in re.findall(r"^ {4}([A-Z][0-9]{3})  (\(warn\)|\(note\))?", __doc__, re.M):
+        levels[code] = mark.strip("()") or "fail"
+    return levels
 
 
 class Findings:
@@ -217,93 +405,24 @@ def _has_comment(text):
     return re.search(r"(?<![:/])//(?!/)", QUOTED.sub("''", text)) is not None
 
 
-def _m_code(text):
-    """A line of Power Query with text values and a trailing '//' comment removed."""
-    text = re.sub(r'#?"(?:[^"]|"")*"', '""', text)
-    return text.split("//")[0]
-
-
 def check_m_steps(block, path, owner, findings):
     """block: list of (line_number, text) of one Power Query expression.
 
-    Finds the first 'let', then looks at every step of that 'let' (lines that start a 'name = ...'
-    outside any bracket) and reports a step with no comment line directly above it.
+    The formula scanner finds the steps of the query's outer 'let'. A step with no comment line directly
+    above it is reported.
     """
-    start = None
-    in_block_comment = False
-    for idx, (n, t) in enumerate(block):
-        s = t.strip()
-        if in_block_comment:
-            in_block_comment = "*/" not in s
-            continue
-        if s.startswith("/*") and "*/" not in s:
-            in_block_comment = True
-            continue
-        code = _m_code(re.sub(r"/\*.*?\*/", " ", s)).strip()
-        if not code:
-            continue
-        m = re.search(r"(?:^|[\s)>])let(?:\s+(.*))?$", code)
-        if m:
-            start = idx
-            break
-    if start is None:
+    steps, found = fs.m_steps("\n".join(text for _, text in block))
+    if not found:
         return
-
-    depth = 0
-    nested = []           # bracket depth at which each inner 'let' opened
-    in_block_comment = False
-    previous_is_comment = False
-    first = True
-    for n, t in block[start:]:
-        s = t.strip()
-        if first:
-            first = False
-            code = _m_code(s)
-            m = re.search(r"(?:^|[\s)>])let(?:\s+(.*))?$", code.strip())
-            rest = (m.group(1) or "").strip() if m else ""
-            if rest and STEP_RE.match(rest):
-                findings.add("P001", path, n,
-                             "Power Query step %s in %s starts on the 'let' line; put it on its own line with a '//' description above"
-                             % (STEP_RE.match(rest).group(1), owner))
-            for ch in rest:
-                depth += ch in "([{"
-                depth -= ch in ")]}"
-            continue
-        if not s:
-            previous_is_comment = False       # the description must sit directly above its step
-            continue
-        if in_block_comment:
-            if "*/" in s:
-                in_block_comment = False
-                previous_is_comment = s.endswith("*/")
-            continue
-        if s.startswith("/*") and "*/" not in s:
-            in_block_comment = True
-            continue
-        if s.startswith("//"):
-            previous_is_comment = bool(s[2:].strip())
-            continue
-        if s.startswith("/*") and s.endswith("*/"):
-            previous_is_comment = bool(s[2:-2].strip())
-            continue
-        code = _m_code(s).strip()
-        if code == "in" or code.startswith("in "):
-            if nested and nested[-1] == depth:
-                nested.pop()
-            elif depth == 0 and not nested:
-                break
-        elif depth == 0 and not nested:
-            m = STEP_RE.match(s.lstrip(", "))
-            if m and not previous_is_comment:
-                findings.add("P001", path, n,
-                             "Power Query step %s in %s has no '//' description line directly above it" % (m.group(1), owner))
-        for ch in code:
-            depth += ch in "([{"
-            depth -= ch in ")]}"
-        depth = max(depth, 0)
-        if re.search(r"(?:^|[\s=(,>])let$", code):
-            nested.append(depth)
-        previous_is_comment = False
+    for step in steps:
+        number = block[min(step["line"], len(block)) - 1][0]
+        if step["on_let_line"]:
+            findings.add("P001", path, number,
+                         "Power Query step %s in %s starts on the 'let' line; put it on its own line with a '//' description above"
+                         % (step["name"], owner))
+        elif not step["described"]:
+            findings.add("P001", path, number,
+                         "Power Query step %s in %s has no '//' description line directly above it" % (step["name"], owner))
 
 
 def check_tmdl_file(path, findings):
@@ -412,6 +531,10 @@ def check_tmdl_lines(path, lines, findings):
         decl = DECL_RE.match(stripped)
         keyword = decl.group(1).lower() if decl else ""
         is_object = bool(decl) and keyword in OBJECT_KEYWORDS
+        nameless = stripped.lower() in NAMELESS_OBJECTS
+        if nameless:
+            keyword = stripped.lower()
+            is_object = True
         opens_block = False
         fenced = False
         is_m = False
@@ -419,8 +542,8 @@ def check_tmdl_lines(path, lines, findings):
         steps_deeper = 1      # tab levels between this line and the first line of its expression
 
         if is_object:
-            raw_name = decl.group(2)
-            rest = decl.group(3).strip()
+            raw_name = "" if nameless else decl.group(2)
+            rest = "" if nameless else decl.group(3).strip()
             if not raw_name.startswith("'") and "//" in raw_name:
                 comment(number)                       # a comment glued to the name: 'column A// note'
                 raw_name = raw_name.split("//")[0]
@@ -444,10 +567,15 @@ def check_tmdl_lines(path, lines, findings):
             if keyword in VALUE_ONLY:
                 if had_pending:
                     findings.add("D003", path, pending_line, "'///' description is not directly above an object")
+                if keyword == "annotation" and parent is None:
+                    # model.tmdl writes the model's own annotations at the left margin, below the model's properties
+                    parent = next((o for o in objects if o["kind"] == "model" and o["top"] and not o["translation"]), None)
                 if keyword == "annotation" and parent is not None:
                     parent["annotations"][name] = tail or ""
                     parent["annotation_lines"][name] = number
                     target = ("annotation", parent, name)
+                elif keyword == "extendedproperty" and parent is not None:
+                    parent.setdefault("extended", {})[name] = tail or ""
             else:
                 if keyword == "cultureinfo":
                     translations = True
@@ -473,7 +601,9 @@ def check_tmdl_lines(path, lines, findings):
         else:
             prop = PROP_EQ_RE.match(stripped)
             colon = PROP_COLON_RE.match(stripped)
-            if had_pending and (prop or colon or stripped.replace(" ", "").lower() in HIDING_FLAGS):
+            if had_pending and prop and prop.group(1).lower() in DESCRIBED_PROPERTIES:
+                pass                                  # child objects that Microsoft's serializer writes with a description
+            elif had_pending and (prop or colon or stripped.replace(" ", "").lower() in HIDING_FLAGS):
                 findings.add("D003", path, pending_line, "'///' description is not directly above an object")
             if prop:
                 key = prop.group(1).lower()
@@ -489,7 +619,7 @@ def check_tmdl_lines(path, lines, findings):
                     fenced = True
                 elif key in PLAIN_VALUE_KEYS and _has_comment(" " + tail):
                     comment(number)
-                is_m = key == "source" and partition_is_m
+                is_m = (key == "source" and partition_is_m) or key in M_PROPERTIES
                 if is_m and re.match(r"let\b", tail):
                     findings.add("P001", path, number,
                                  "this query is written on one line; put 'let' and each step on its own line with a '//' description above each step")
@@ -722,13 +852,30 @@ def check_all_json(folder, findings):
     for sub, dirs, files in os.walk(folder):
         dirs[:] = [d for d in dirs if d != ".pbi"]
         for name in sorted(files):
-            if name.lower().endswith((".json", ".pbir", ".pbism")):
+            if name.lower().endswith((".json", ".pbir", ".pbism")) or name == ".platform":
                 path = os.path.join(sub, name)
                 before = len(findings.items)
-                load_json(path, findings)
+                data = load_json(path, findings)
                 if len(findings.items) != before:
                     bad.add(path)
+                elif data is not FAILED:
+                    check_against_schema(data, path, findings)
     return bad
+
+
+def check_against_schema(data, path, findings):
+    """J003: the file does not fit the Microsoft schema its '$schema' line names. J004: no copy of that schema."""
+    try:
+        state, problems = json_schema.check_value(data)
+    except RecursionError:
+        return
+    if state == "failed":
+        findings.add("J003", path, 0, "does not fit Microsoft's schema (%s): %s. Power BI Desktop refuses a file "
+                     "that breaks its schema" % (data.get("$schema", "").split("/json-schemas/")[-1],
+                                                 "; ".join(problems[:3])))
+    elif state == "not shipped":
+        findings.add("J004", path, 0, "not checked against Microsoft's schema: scripts/schemas holds no copy of %s"
+                     % data.get("$schema"), level="note")
 
 
 def check_schema(data, path, findings):
@@ -908,6 +1055,10 @@ def check_report(report_dir, findings, brief=None):
                 check_layout(report_dir, page_folder_name, page_folder, page_path, hidden_by_bookmark, brief, findings)
         except (AttributeError, TypeError, KeyError, ValueError, OverflowError) as exc:
             findings.add("J002", page_path, 0, "a file of this page has an unexpected structure (%s)" % exc)
+    try:
+        report_rules.check(sys.modules[__name__], report_dir, brief, findings)
+    except (AttributeError, TypeError, KeyError, ValueError, OverflowError, RecursionError) as exc:
+        findings.add("J002", report_path, 0, "the report has a structure the report checks cannot read (%s)" % exc)
 
 
 def check_model(model_dir, findings):
@@ -989,9 +1140,28 @@ def read_brief(root):
         "own_spelling": set(_brief_list(_brief_value(lines, BRIEF_LABELS["own_spelling"]))),
         "excel": _brief_value(lines, BRIEF_LABELS["excel"]).lower().startswith("yes"),
         "copilot": _brief_value(lines, BRIEF_LABELS["copilot"]).lower().startswith("yes"),
+        "report_prefix": _brief_value(lines, BRIEF_LABELS["report_prefix"]).strip().strip("`").strip(),
         "model_exceptions": {(row[0], row[1]) for row in _brief_rows(lines, MODEL_EXCEPTIONS, 3)},
         "layout_exceptions": {(row[0], row[1], row[2]) for row in _brief_rows(lines, LAYOUT_EXCEPTIONS, 4)},
+        "agreed": _agreed(lines),
     }
+
+
+def _agreed(lines):
+    """Lower-case names of the preview features and optional tools that section 11 of the brief lists with a name."""
+    names = []
+    inside = False
+    for line in lines:
+        text = line.strip()
+        if text.startswith("#"):
+            inside = PREVIEW_AGREED.lower() in text.lower()
+            continue
+        if inside and text.startswith("|"):
+            cells = [c.strip().strip("`").strip() for c in text.strip("|").split("|")]
+            if len(cells) >= 3 and cells[0] and not set(cells[0]) <= set("-: ") and cells[0].lower() != "feature or tool" \
+                    and not _no_evidence(cells[1]):
+                names.append(cells[0].lower())
+    return names
 
 
 def model_excused(brief, code, *keys):
@@ -1011,19 +1181,15 @@ def page_numbers(brief, width):
 
 # ---------------------------------------------------------------- model standard
 
-def _dax_code(text):
-    """DAX with text values and comments removed, so a name inside them is not read as a reference."""
-    text = re.sub(r'"(?:[^"]|"")*"', '""', text or "")
-    text = re.sub(r"/\*.*?\*/", " ", text, flags=re.S)
-    return re.sub(r"(//|--)[^\n]*", " ", text)
+def _dax(text):
+    """One DAX expression, read once by the formula scanner: its tokens, its [Name] references and its calls."""
+    stream = fs.tokens(text or "", fs.DAX)
+    return {"tokens": stream, "references": fs.dax_references(stream), "calls": fs.calls(stream)}
 
 
-def _dax_text_only(text):
-    """DAX with comments removed and text values kept: used to see that a measure is one text value and no more."""
-    kept = []
-    for part in re.split(r'("(?:[^"]|"")*")', text):
-        kept.append(part if part.startswith('"') else re.sub(r"(//|--)[^\n]*", " ", re.sub(r"/\*.*?\*/", " ", part, flags=re.S)))
-    return "".join(kept)
+def _only_text(stream):
+    """True when a DAX expression is one text value and nothing else."""
+    return len(stream) == 1 and stream[0].kind == fs.TEXT
 
 
 def _split_reference(text):
@@ -1044,10 +1210,12 @@ def build_model(objects):
         if kind == "table" and obj["top"]:
             table = tables.setdefault(obj["name"], {"name": obj["name"], "objects": [], "columns": [], "measures": [],
                                                     "hierarchies": [], "partitions": [], "hidden": False,
-                                                    "annotations": {}})
+                                                    "annotations": {}, "props": {}, "calculation_group": None,
+                                                    "refresh_policy": None})
             table["objects"].append(obj)
             table["hidden"] = table["hidden"] or obj["hidden"]
             table["annotations"].update(obj["annotations"])
+            table["props"].update(obj["props"])
     for obj in objects:
         if obj["translation"]:
             continue
@@ -1067,9 +1235,15 @@ def build_model(objects):
                 obj["levels"] = []
             elif kind == "partition":
                 table["partitions"].append(obj)
+            elif kind == "calculationgroup":
+                table["calculation_group"] = obj
+            elif kind == "refreshpolicy":
+                table["refresh_policy"] = obj
         elif kind == "level" and obj["parent"] is not None and obj["parent"]["kind"] == "hierarchy":
             obj["parent"].setdefault("levels", []).append(_unquote(obj["props"].get("column", "")))
-        if obj["has_expr"] and kind in ("measure", "column", "tablepermission", "calculationitem"):
+        elif kind == "alternateof" and obj["parent"] is not None and obj["parent"]["kind"] == "column":
+            obj["parent"]["alternate_of"] = obj
+        if obj["has_expr"] and kind in ("measure", "column", "tablepermission", "calculationitem", "function"):
             expressions.append((obj, obj["expr"] or ""))
         if kind == "partition" and (obj["expr"] or "").split("//")[0].strip().lower() == "calculated":
             expressions.append((obj, obj["props"].get("source", "")))
@@ -1079,6 +1253,13 @@ def build_model(objects):
     for table in tables.values():
         table["calculated"] = any((p["expr"] or "").split("//")[0].strip().lower() == "calculated"
                                   for p in table["partitions"])
+        # A field parameter: Power BI marks its fields column with the extended property ParameterMetadata.
+        table["field_parameter"] = any("parametermetadata" in {k.lower() for k in c.get("extended", {})}
+                                       for c in table["columns"])
+        # A numeric range ("what-if") parameter: a calculated table made with GENERATESERIES.
+        table["parameter_table"] = table["calculated"] and any(
+            call.name == "GENERATESERIES" for p in table["partitions"]
+            for call in fs.calls(fs.tokens(p["props"].get("source", ""), fs.DAX)))
     return {"tables": tables, "relationships": relationships, "expressions": expressions}
 
 
@@ -1158,8 +1339,9 @@ def check_standards(model_dir, objects, usage, brief, findings):
     for table, column in all_columns:
         column_names.setdefault(column["name"].lower(), "%s[%s]" % (table["name"], column["name"]))
     measure_names = {m["name"].lower() for _, m in all_measures}
-    code_by_owner = [(owner, _dax_code(text)) for owner, text in model["expressions"]
+    code_by_owner = [(owner, _dax(text)) for owner, text in model["expressions"]
                      if owner["table"] is None or owner["table"]["name"] not in automatic]
+    parsed_by_id = {id(owner): parsed for owner, parsed in code_by_owner}
     used_fields = {(entity, prop) for _, entity, prop in usage if isinstance(prop, str)}
 
     def add(code, obj, message, level="error", keys=()):
@@ -1175,7 +1357,8 @@ def check_standards(model_dir, objects, usage, brief, findings):
         key = "[%s]" % name
         if table["name"] not in measure_tables:
             add("M001", measure, "measure %s lives in table '%s'; every measure lives in '%s' (or in a measure table "
-                "the brief lists). In an existing model the developer moves it in Power BI Desktop (Home table)"
+                "the brief lists). A new measure is written there. Moving an existing one needs the developer's yes; after it, "
+                "Copilot moves it and proves every reference (model standard, 'Existing models')"
                 % (key, table["name"], MEASURE_TABLE), keys=(key, table["name"]))
         folder = measure["props"].get("displayfolder", "")
         levels = folder.split("\\")
@@ -1210,7 +1393,8 @@ def check_standards(model_dir, objects, usage, brief, findings):
             warnings.append("its name points to the folder type '%s', not '%s'" % (expected, levels[1]))
         if warnings:
             add("M008", measure, "measure name %s: %s" % (key, "; ".join(warnings)), level="warn", keys=(key,))
-        only_text = re.match(r'\s*"(?:[^"]|"")*"\s*\Z', _dax_text_only(measure["expr"] or ""))
+        only_text = _only_text(parsed_by_id[id(measure)]["tokens"] if id(measure) in parsed_by_id
+                               else fs.tokens(measure["expr"] or "", fs.DAX))
         if (not _is_hidden(table, measure) and not measure["props"].get("formatstring")
                 and "formatstringdefinition" not in measure["props"] and not only_text):
             add("M009", measure, "visible measure %s has no format string" % key, keys=(key,))
@@ -1231,21 +1415,16 @@ def check_standards(model_dir, objects, usage, brief, findings):
             add("M002", first, "measure table '%s': %s" % (name, "; ".join(problems)), keys=(name,))
 
     # ---- rule 5: references in DAX (a text check, not a parser)
-    for owner, code in code_by_owner:
-        if owner["kind"] not in ("measure", "column"):
+    for owner, parsed in code_by_owner:
+        if owner["kind"] not in ("measure", "column", "calculationitem", "tablepermission", "function"):
             continue
         loose = set()
-        for match in re.finditer(r"(?<![\w'\]])\s*\[([^\]]+)\]", code):
-            before = code[:match.start()].rstrip()
-            if before[-1:] in ("'",) or re.search(r"\w\Z", before):
-                continue
-            name = match.group(1)
-            if name.lower() in column_names and name.lower() not in measure_names:
-                loose.add("[%s]" % name)
         tied = set()
-        for match in re.finditer(r"(?:'((?:[^']|'')+)'|([A-Za-z_]\w*))\s*\[([^\]]+)\]", code):
-            table_name = (match.group(1) or match.group(2)).replace("''", "'")
-            name = match.group(3)
+        for table_name, name, _ in parsed["references"]:
+            if table_name is None:
+                if name.lower() in column_names and name.lower() not in measure_names:
+                    loose.add("[%s]" % name)
+                continue
             table = tables.get(table_name)
             if (name.lower() in measure_names and table is not None
                     and name.lower() not in {c["name"].lower() for c in table["columns"]}):
@@ -1256,7 +1435,7 @@ def check_standards(model_dir, objects, usage, brief, findings):
                 parts.append("write the column with its table: %s" % ", ".join(sorted(loose)))
             if tied:
                 parts.append("write the measure without its table: %s" % ", ".join(sorted(tied)))
-            label = "[%s]" % owner["name"] if owner["kind"] == "measure" else "%s[%s]" % (owner["table"]["name"], owner["name"])
+            label = model_rules._label(owner)
             add("M010", owner, "DAX of %s: %s" % (label, "; ".join(parts)), level="warn", keys=(label,))
 
     # ---- B. columns and tables
@@ -1279,12 +1458,16 @@ def check_standards(model_dir, objects, usage, brief, findings):
                          for level in h.get("levels", [])}
     with_variation = {id(o["parent"]) for o in objects if o["kind"] == "variation" and o["parent"] is not None}
     totalled = {}
-    for owner, code in code_by_owner:
+    for owner, parsed in code_by_owner:
         if owner["kind"] != "measure":
             continue
-        for match in re.finditer(r"(?i)\b(%s)\s*\(\s*(?:'((?:[^']|'')+)'|([A-Za-z_]\w*))\s*\[([^\]]+)\]\s*\)"
-                                 % "|".join(TOTAL_FUNCTIONS), code):
-            totalled.setdefault(((match.group(2) or match.group(3)).replace("''", "'"), match.group(4)), owner["name"])
+        stream = parsed["tokens"]
+        for call in parsed["calls"]:
+            if call.name not in TOTAL_FUNCTIONS or len(call.args) != 1 or call.args[0][1] - call.args[0][0] != 2:
+                continue
+            first, second = stream[call.args[0][0]], stream[call.args[0][0] + 1]
+            if first.kind in ("word", fs.QUOTED_NAME) and second.kind == fs.BRACKET_NAME:
+                totalled.setdefault((first.value, second.value), owner["name"])
 
     calculated_columns = []
     for table, column in all_columns:
@@ -1325,7 +1508,7 @@ def check_standards(model_dir, objects, usage, brief, findings):
                 add("M105", column, "calculated column %s has no '%s' annotation. Ask the developer what makes a DAX "
                     "calculation necessary here and what stops Power Query or the source from supplying the value"
                     % (key, REASON_ANNOTATION), keys=(key,))
-            if re.search(r"(?i)\bRELATED\s*\(", _dax_code(column["expr"] or "")):
+            if any(call.name == "RELATED" for call in _dax(column["expr"] or "")["calls"]):
                 add("M106", column, "calculated column %s uses RELATED; consider bringing the value in at the source"
                     % key, level="warn", keys=(key,))
         if visible and kind in NUMERIC_TYPES and props.get("summarizeby", "").lower() != "none":
@@ -1384,23 +1567,25 @@ def check_standards(model_dir, objects, usage, brief, findings):
                 % (label, " and ".join(sorted({k for k in kinds if k}))), level="warn", keys=(label,))
 
     # ---- C. assess only
-    everything = "\n".join(code for _, code in code_by_owner)
+    named = {}                          # lower-case [name] -> the owners whose DAX holds it
+    for owner, parsed in code_by_owner:
+        for _, name, _ in parsed["references"]:
+            named.setdefault(name.lower(), []).append(owner)
     for table, column in all_columns:
         place = (table["name"], column["name"])
         if not _is_hidden(table, column) or table["name"] in measure_tables:
             continue
         if (place in foreign or place in sort_keys or place in hierarchy_columns or place in used_fields
                 or any(place in (start, end) for _, start, end in relationship_ends)
-                or column["props"].get("sortbycolumn") or "[%s]" % column["name"].lower() in everything.lower()):
+                or column["props"].get("sortbycolumn") or column["name"].lower() in named):
             continue
         add("M201", column, "hidden column %s[%s]: nothing in the model or the report refers to it"
             % place, level="note", keys=("%s[%s]" % place,))
     for table, measure in all_measures:
         if not _is_hidden(table, measure):
             continue
-        marker = "[%s]" % measure["name"].lower()
-        others = "\n".join(code for owner, code in code_by_owner if owner is not measure).lower()
-        if marker in others or any(prop == measure["name"] for _, _, prop in usage):
+        if (any(owner is not measure for owner in named.get(measure["name"].lower(), []))
+                or any(prop == measure["name"] for _, _, prop in usage)):
             continue
         add("M201", measure, "hidden measure [%s]: nothing in the model or the report refers to it" % measure["name"],
             level="note", keys=("[%s]" % measure["name"],))
@@ -1427,6 +1612,20 @@ def check_standards(model_dir, objects, usage, brief, findings):
                              "%s '%s': its description has %d characters; Copilot in Power BI reads the first %d, so "
                              "put the key words first" % (obj["kind"], obj["name"], len(obj["description"]),
                                                           COPILOT_DESCRIPTION_LIMIT), level="note")
+
+    # ---- the rules added in round 3 (scripts/model_rules.py)
+    model_object = next((o for o in objects if o["kind"] == "model" and o["top"] and not o["translation"]), None)
+    database = next((o for o in objects if o["kind"] == "database" and o["top"]), None)
+    level = (database or {}).get("props", {}).get("compatibilitylevel", "") if database else ""
+    model_rules.check({
+        "model": model, "tables": tables, "own_tables": own_tables, "automatic": automatic,
+        "auto_prefixes": AUTO_DATE_PREFIXES, "measure_tables": measure_tables, "all_measures": all_measures,
+        "all_columns": all_columns, "expressions": code_by_owner, "objects": objects, "brief": brief,
+        "usage": usage, "add": add, "parse": _dax, "model_object": model_object, "findings": findings,
+        "excused": lambda code, *keys: model_excused(brief, code, *keys),
+        "model_anchor": model_object or (own_tables[0]["objects"][0] if own_tables else None),
+        "compatibility_level": int(level) if level.isdigit() else None,
+        "table_names_upper": {name.upper() for name in tables}})
     return model
 
 
@@ -1516,6 +1715,30 @@ def report_measures(report_dir):
                 if isinstance(measure, dict):
                     out.add((entity.get("name"), measure.get("name")))
     return out
+
+
+def read_field_list(root):
+    """The saved field list of a published model as a model the binding check can read, or None when there is none.
+
+    docs/model-fields.md holds one table: | Table | Field | Kind |, with Kind column, measure or hierarchy.
+    """
+    path = os.path.join(root, FIELD_LIST)
+    try:
+        with open(path, encoding="utf-8-sig") as fh:
+            lines = fh.read().splitlines()
+    except (OSError, UnicodeDecodeError):
+        return None
+    tables = {}
+    for line in lines:
+        text = line.strip()
+        if not text.startswith("|"):
+            continue
+        cells = [c.replace("\\|", "|").strip().strip("`").strip() for c in re.split(r"(?<!\\)\|", text.strip("|"))]
+        if len(cells) < 3 or cells[2].lower() not in ("column", "measure", "hierarchy") or not cells[0] or not cells[1]:
+            continue
+        table = tables.setdefault(cells[0], {"name": cells[0], "columns": [], "measures": [], "hierarchies": []})
+        table[{"column": "columns", "measure": "measures", "hierarchy": "hierarchies"}[cells[2].lower()]].append({"name": cells[1]})
+    return {"tables": tables} if tables else None
 
 
 def check_bindings(report_dir, model, usage, brief, findings):
@@ -1835,6 +2058,14 @@ def run(root):
                          "the report points to a model folder that does not exist: %s" % os.path.basename(target))
         if target in parsed:
             usage.setdefault(target, []).append((report, report_fields(report)))
+        elif target is None:
+            listed = read_field_list(root)
+            if listed is None:
+                findings.add("B002", os.path.join(report, "definition.pbir"), 0, "this report reads a published model and "
+                             "%s does not exist, so its fields are not checked. Save the field list there (skill pbi-report)"
+                             % FIELD_LIST.replace(os.sep, "/"), level="note")
+            else:
+                check_bindings(report, listed, report_fields(report), brief, findings)
     for model in models:
         used = usage.get(os.path.normpath(model), [])
         every = [field for _, fields in used for field in fields]

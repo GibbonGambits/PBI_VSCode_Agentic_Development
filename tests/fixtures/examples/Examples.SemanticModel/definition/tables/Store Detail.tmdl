@@ -1,0 +1,26 @@
+/// Example of a table in a one-to-one relationship with Store. One row per store. Made-up data.
+table 'Store Detail'
+
+	column 'Store Key'
+		dataType: int64
+		isHidden
+		isKey
+		summarizeBy: none
+		sourceColumn: Store Key
+
+	/// Sales floor of the store, in square metres.
+	column 'Floor Area'
+		dataType: int64
+		formatString: #,0
+		summarizeBy: none
+		sourceColumn: Floor Area
+
+	partition 'Store Detail' = m
+		mode: import
+		source =
+				let
+				    // Build a small made-up list of store floor areas.
+				    Source = #table(type table [#"Store Key" = Int64.Type, #"Floor Area" = Int64.Type], {{1, 450}, {2, 300}})
+				in
+				    Source
+

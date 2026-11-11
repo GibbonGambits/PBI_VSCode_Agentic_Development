@@ -4,7 +4,7 @@ Sources: Microsoft's report theme schema (version 2.159); Microsoft Learn pages 
 
 ## The theme
 
-`theme/theme.json` is the owner's theme. It must stay exactly as it is. The developer applies it in Power BI Desktop (Design ribbon > Import theme).
+`theme/theme.json` is the owner's theme. It must stay exactly as it is. The developer applies it once in Power BI Desktop (Design ribbon > Import theme). Microsoft Learn supports changing a file under `RegisteredResources` only for a resource that Desktop itself registered, so Copilot does not register the theme by writing files; `python scripts/scaffold.py project <Name> --register-theme` does it the way Microsoft's own report skill does, and only after the developer's yes.
 
 It sets: 32 data colours; background, foreground and table accent colours; the three colours for colour-scale conditional formatting (maximum green, minimum red, null grey); four text classes (label 10 pt, title 11 pt, callout 28 pt, header); filter pane text sizes; and, for every visual type, Header icons off and Tooltips off.
 

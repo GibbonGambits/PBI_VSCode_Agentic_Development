@@ -416,7 +416,7 @@ class ListVisuals(ProjectCase):
         self.assertEqual(code, 0)
         lines = [" ".join(line.split()) for line in out.splitlines()]
         self.assertIn("label type x y width height folder", lines)
-        self.assertIn("Overview_Card_TotalSales card 24 24 608 120 Overview_Card_TotalSales", lines)
+        self.assertIn("Overview_Card_TotalSales cardVisual 24 24 608 120 Overview_Card_TotalSales", lines)
         self.assertIn("Overview_Bar_SalesByMonth barChart 24 160 1232 536 4f0c9d2a7b1e8a6c3d5f", lines)   # label from the annotation
         self.assertIn("Overview_Group_Header group 0 0 1280 20 Overview_Group_Header", lines)
 
@@ -972,7 +972,7 @@ class MoreTmdlEdgeCases(ProjectCase):
         self.write(os.path.join(base, "relationships.tmdl"),
                    "relationship r1\n\tfromColumn: 'Sales // archive'.'Order = Date'\n\ttoColumn: Sales.OrderId\n")
         self.write(os.path.join(base, "model.tmdl"), "model Model\n\tculture: en-US\n\nref table 'Sales // archive'\nref table Sales\n")
-        self.assertClean()
+        self.assertEqual(self.codes(), ["M901"])     # no C001; the made-up table is not in the model, which M901 reports
 
     def test_expression_whose_first_line_is_indented_deeper_is_kept_whole(self):
         self.replace(SALES, "\tannotation SampleSource",
@@ -1086,7 +1086,7 @@ class MoreStructureCases(ProjectCase):
 class MoreFixerCases(ProjectCase):
     def test_file_is_never_left_half_written(self):
         self.edit_json(CARD, lambda d: d["visual"].pop("visualContainerObjects"))
-        text = self.read(CARD).replace('"visualType": "card"', '"visualType": "card", "note": "half \\ud83d emoji"')
+        text = self.read(CARD).replace('"visualType": "cardVisual"', '"visualType": "cardVisual", "note": "half \\ud83d emoji"')
         self.write(CARD, text)
         code, out = quiet(set_visual_defaults.main, ["set_visual_defaults.py", self.root])
         self.assertEqual(code, 1)
@@ -1304,6 +1304,14 @@ class LessonsFile(LessonsCase):
         self.assertEqual(row["Mistake"], "Put the measure in the Calendar table")
         self.assertEqual(row["Fix went to"], "report")
         self.assertEqual(self.codes(), [])
+
+    def test_a_warning_or_a_note_of_the_check_does_not_start_the_loop(self):
+        for key in ("M520", "A001", "U001"):                # two warnings and a suggestion
+            with self.assertRaises(ValueError, msg=key):
+                self.add(key=key, trigger="check")
+        self.assertEqual(self.rows(), [])
+        self.assertEqual(self.add(key="M502", trigger="check"), (1, 0))      # a failed check is recorded
+        self.assertEqual(self.add(key="M520", trigger="developer"), (2, 0))  # the developer may still point one out
 
     def test_lessons_are_numbered_in_order_and_earlier_rows_are_untouched(self):
         self.add()

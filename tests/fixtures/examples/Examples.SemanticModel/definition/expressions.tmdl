@@ -1,0 +1,27 @@
+/// Example of the RangeStart parameter of incremental refresh: start of the refresh window.
+expression RangeStart = #datetime(2024, 1, 1, 0, 0, 0) meta [IsParameterQuery=true, Type="DateTime", IsParameterQueryRequired=true]
+	queryGroup: Parameters
+
+/// Example of the RangeEnd parameter of incremental refresh: end of the refresh window.
+expression RangeEnd = #datetime(2025, 1, 1, 0, 0, 0) meta [IsParameterQuery=true, Type="DateTime", IsParameterQueryRequired=true]
+	queryGroup: Parameters
+
+/// Example of a text parameter: the region whose stores the Store table loads.
+expression 'Store Region' = "North" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	queryGroup: Parameters
+
+/// Example of a shared staging query: made-up order lines, not loaded as a table of its own; the Sales table reads it.
+expression 'Sales Source' =
+		let
+		    // Build a small made-up list of order lines.
+		    Source = #table(
+		        type table [#"Date Key" = Int64.Type, #"Ship Date Key" = Int64.Type, #"Store Key" = Int64.Type, #"Product Key" = Int64.Type, #"Channel Key" = Int64.Type, #"Order Date" = datetime, Quantity = Int64.Type, Amount = Currency.Type],
+		        {
+		            {20240105, 20240108, 1, 1, 1, #datetime(2024, 1, 5, 0, 0, 0), 2, 120.50},
+		            {20240212, 20240214, 2, 2, 2, #datetime(2024, 2, 12, 0, 0, 0), 1, 80.00}
+		        }
+		    )
+		in
+		    Source
+	queryGroup: Staging
+

@@ -1,0 +1,32 @@
+/// Holds every measure of the model.
+table _Measures
+
+	/// Sum of the order line amounts.
+	measure 'Total Sales' = SUM ( Sales[Amount] )
+		formatString: #,0.00
+		displayFolder: Finance\Base
+
+	/// Example of calendar-based time intelligence (preview): total sales from the start of the year, by the calendar Shop Calendar.
+	measure 'Total Sales YTD' =
+			TOTALYTD (
+			    [Total Sales],
+			    'Shop Calendar'
+			)
+		formatString: #,0.00
+		displayFolder: Finance\Time Intelligence
+
+	column Placeholder
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: Placeholder
+
+	partition _Measures = m
+		mode: import
+		source =
+				let
+				    // An empty one-column table: it only holds the measures.
+				    Source = #table(type table [Placeholder = text], {})
+				in
+				    Source
+

@@ -1,0 +1,8 @@
+/// Example of object-level security on a column: the column Unit Cost is hidden from this role.
+role 'No Product Cost'
+	modelPermission: read
+
+	tablePermission Product
+
+		columnPermission 'Unit Cost' = none
+

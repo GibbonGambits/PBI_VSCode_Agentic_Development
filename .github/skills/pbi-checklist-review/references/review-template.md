@@ -93,3 +93,11 @@ Statuses: Pass, Fail, Not applicable. Every row needs evidence. Rules: skill `pb
 ## Gaps to close
 
 <each Fail item, with what would close it>
+
+## Suggestions
+
+<notes whose codes start with U: the native feature, what it would replace here, its release status. Nothing is built from a suggestion without the developer's yes>
+
+## Open questions
+
+<each `TODO(owner)` question that `python scripts/list_todos.py .` prints>

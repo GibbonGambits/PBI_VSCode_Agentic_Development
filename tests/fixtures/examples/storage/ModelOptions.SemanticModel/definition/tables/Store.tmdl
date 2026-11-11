@@ -1,0 +1,31 @@
+/// Example of a table in a model that shows model-wide switches: one row per store. Made-up data.
+table Store
+
+	column 'Store Key'
+		dataType: int64
+		isHidden
+		isKey
+		summarizeBy: none
+		sourceColumn: Store Key
+
+	/// Name of the store.
+	column 'Store Name'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Store Name
+
+	partition Store = m
+		mode: import
+		source =
+				let
+				    // Build a small made-up list of stores.
+				    Source = #table(
+				        type table [#"Store Key" = Int64.Type, #"Store Name" = text],
+				        {
+				            {1, "Harbour Shop"},
+				            {2, "Market Shop"}
+				        }
+				    )
+				in
+				    Source
+

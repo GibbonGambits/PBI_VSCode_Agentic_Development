@@ -34,7 +34,7 @@ The file is docs/lessons.md. It holds one table row per lesson:
 
 What a lesson may reach: every template file, which includes the model standard, the layout standard, their
 checks in check_project.py, the fix scripts and the skill pbi-improve. A failed check of those standards
-(a code that starts with M, G or B) is a trigger like any other failed check. Copilot asks first and a
+(a code that starts with M, P, G, B, V or A) is a trigger like any other failed check. Copilot asks first and a
 person approves by pull request. The checklist and the theme stay outside: X002 refuses them.
 
 The check cannot see a lesson that was deleted from the end of the table or reworded; the pull request
@@ -54,7 +54,7 @@ LESSONS = "docs/lessons.md"
 HEADER = ["No", "Date", "Trigger", "Key", "Mistake", "Correction", "Fix went to", "Approved in"]
 TRIGGERS = ("developer", "check")
 KEY_OK = re.compile(r"(?:[A-Z][0-9]{3}|[a-z0-9]+(?:-[a-z0-9]+)*)\Z")
-TEMPLATE_AREAS = (".github/", "scripts/", "tests/", "evals/")
+TEMPLATE_AREAS = (".github/", "scripts/", "tests/", "evals/", "maintenance/")
 TEMPLATE_FILES = ("README.md", "LICENSE", "THIRD_PARTY_NOTICES.md", ".gitignore", ".gitattributes")
 NEVER = ("checklist", "theme")
 REPEAT_AT = 2
@@ -216,6 +216,10 @@ def add(path, trigger, key, mistake, correction, fix="report", approved="-", tod
 
     Raises ValueError, and writes nothing, when the file or the new row is not valid.
     """
+    level = cp.code_levels().get(key)
+    if trigger == "check" and level in ("warn", "note"):
+        raise ValueError("%s is a %s of the project check. Only a failed check starts the loop: a warning or a note "
+                         "(a suggestion) is not a mistake to record" % (key, "warning" if level == "warn" else "note"))
     with open(path, "rb") as fh:
         raw = fh.read()
     text = raw.decode("utf-8-sig")

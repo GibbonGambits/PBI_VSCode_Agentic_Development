@@ -1,0 +1,16 @@
+relationship 'Sales to Date'
+	fromColumn: Sales.'Date Key'
+	toColumn: Date.'Date Key'
+
+relationship 'Sales to Store'
+	fromColumn: Sales.'Store Key'
+	toColumn: Store.'Store Key'
+
+relationship 'Sales Aggregate to Date'
+	fromColumn: 'Sales Aggregate'.'Date Key'
+	toColumn: Date.'Date Key'
+
+relationship 'Sales Aggregate to Store'
+	fromColumn: 'Sales Aggregate'.'Store Key'
+	toColumn: Store.'Store Key'
+

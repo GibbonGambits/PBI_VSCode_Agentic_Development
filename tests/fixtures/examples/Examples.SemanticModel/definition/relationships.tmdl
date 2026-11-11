@@ -1,0 +1,33 @@
+relationship 'Sales order date to Date'
+	fromColumn: Sales.'Date Key'
+	toColumn: Date.'Date Key'
+
+relationship 'Sales ship date to Date (inactive)'
+	isActive: false
+	fromColumn: Sales.'Ship Date Key'
+	toColumn: Date.'Date Key'
+
+relationship 'Sales to Store'
+	fromColumn: Sales.'Store Key'
+	toColumn: Store.'Store Key'
+
+relationship 'Sales to Product (both directions)'
+	crossFilteringBehavior: bothDirections
+	fromColumn: Sales.'Product Key'
+	toColumn: Product.'Product Key'
+
+relationship 'Sales to Sales Channel'
+	fromColumn: Sales.'Channel Key'
+	toColumn: 'Sales Channel'.'Channel Key'
+
+relationship 'Sales Target to Product (many-to-many)'
+	toCardinality: many
+	fromColumn: 'Sales Target'.Category
+	toColumn: Product.Category
+
+relationship 'Store Detail to Store (one-to-one)'
+	crossFilteringBehavior: bothDirections
+	fromCardinality: one
+	fromColumn: 'Store Detail'.'Store Key'
+	toColumn: Store.'Store Key'
+

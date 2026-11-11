@@ -1,0 +1,22 @@
+/// Example of a perspective: the date table, the store names, the product hierarchy and three measures.
+perspective 'Sales Overview'
+
+	perspectiveTable _Measures
+
+		perspectiveMeasure 'Total Sales'
+
+		perspectiveMeasure '# Order Lines'
+
+		perspectiveMeasure 'Average Line Amount'
+
+	perspectiveTable Date
+		includeAll
+
+	perspectiveTable Store
+
+		perspectiveColumn 'Store Name'
+
+	perspectiveTable Product
+
+		perspectiveHierarchy 'Product Hierarchy'
+

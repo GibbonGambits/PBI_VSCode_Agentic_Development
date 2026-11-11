@@ -1,0 +1,39 @@
+/// Example of a field parameter over three measures: lets a reader pick the measure a visual shows.
+table 'Sales Metric'
+
+	/// The measure a reader picks.
+	column 'Sales Metric'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: [Value1]
+		sortByColumn: 'Sales Metric Order'
+
+		relatedColumnDetails
+			groupByColumn: 'Sales Metric Fields'
+
+	column 'Sales Metric Fields'
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: [Value2]
+		sortByColumn: 'Sales Metric Order'
+
+		extendedProperty ParameterMetadata = {"version":3,"kind":2}
+
+	column 'Sales Metric Order'
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: [Value3]
+
+	partition 'Sales Metric' = calculated
+		mode: import
+		source =
+				{
+				    ("Total Sales", NAMEOF('_Measures'[Total Sales]), 0),
+				    ("# Order Lines", NAMEOF('_Measures'[# Order Lines]), 1),
+				    ("Average Line Amount", NAMEOF('_Measures'[Average Line Amount]), 2)
+				}
+
+	annotation CalculatedReason = Shipped example of a field parameter over measures; Power BI Desktop makes a field parameter as a calculated table.
+

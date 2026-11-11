@@ -1,0 +1,6 @@
+/// Example of a fixed row-level security rule: sees the stores in Northport only.
+role 'Northport Stores'
+	modelPermission: read
+
+	tablePermission Store = Store[City] = "Northport"
+

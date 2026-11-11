@@ -1,0 +1,51 @@
+/// Example of an imported aggregation table: sales by day and store, answers summary queries for the DirectQuery table Sales.
+table 'Sales Aggregate'
+	isHidden
+
+	column 'Date Key'
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: Date Key
+
+		alternateOf
+			baseColumn: Sales.'Date Key'
+
+	column 'Store Key'
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: Store Key
+
+		alternateOf
+			baseColumn: Sales.'Store Key'
+
+	column Amount
+		dataType: decimal
+		formatString: #,0.00
+		summarizeBy: none
+		sourceColumn: Amount
+
+		alternateOf
+			summarization: sum
+			baseColumn: Sales.Amount
+
+	column 'Order Lines'
+		dataType: int64
+		formatString: #,0
+		summarizeBy: none
+		sourceColumn: Order Lines
+
+		alternateOf
+			summarization: count
+			baseTable: Sales
+
+	partition 'Sales Aggregate' = m
+		mode: import
+		source =
+				let
+				    // Connect to the made-up shop database.
+				    Source = Sql.Database("sql.example.com", "Shop"),
+				    // Pick the aggregated sales view.
+				    Data = Source{[Schema="dbo",Item="SalesByDayAndStore"]}[Data]
+				in
+				    Data
+

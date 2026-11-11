@@ -1,0 +1,26 @@
+/// Example of a calculated table over a Direct Lake on OneLake table (preview): one row per day with sales.
+table 'Daily Sales'
+
+	column 'Date Key'
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: Sales[Date Key]
+
+	column 'Daily Amount'
+		dataType: decimal
+		isHidden
+		formatString: #,0.00
+		summarizeBy: none
+		sourceColumn: [Daily Amount]
+
+	partition 'Daily Sales' = calculated
+		mode: import
+		source =
+				SUMMARIZECOLUMNS (
+				    Sales[Date Key],
+				    "Daily Amount", SUM ( Sales[Amount] )
+				)
+
+	annotation CalculatedReason = Shipped example of a calculated table over Direct Lake data (preview); in a real model this summary is made in the lakehouse.
+

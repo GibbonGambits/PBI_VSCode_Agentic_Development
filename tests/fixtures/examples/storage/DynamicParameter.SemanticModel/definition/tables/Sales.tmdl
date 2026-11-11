@@ -1,0 +1,29 @@
+/// Example of a DirectQuery fact table filtered by a dynamic M query parameter: one row per order line of the picked region. Made-up source.
+table Sales
+
+	column 'Date Key'
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: Date Key
+
+	column Amount
+		dataType: decimal
+		isHidden
+		formatString: #,0.00
+		summarizeBy: none
+		sourceColumn: Amount
+
+	partition Sales = m
+		mode: directQuery
+		source =
+				let
+				    // Connect to the made-up shop database.
+				    Source = Sql.Database("sql.example.com", "Shop"),
+				    // Pick the order line view.
+				    Data = Source{[Schema="dbo",Item="Sales"]}[Data],
+				    // Keep the order lines of the region that RegionParameter holds; a filter step folds to the source.
+				    #"Filtered Rows" = Table.SelectRows(Data, each [Region] = RegionParameter)
+				in
+				    #"Filtered Rows"
+

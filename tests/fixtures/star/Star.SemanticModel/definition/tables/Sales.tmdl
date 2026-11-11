@@ -1,0 +1,30 @@
+/// One row per order line. Made-up data.
+table Sales
+
+	column 'Date Key'
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: Date Key
+
+	column 'Store Key'
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: Store Key
+
+	column Amount
+		dataType: decimal
+		isHidden
+		formatString: #,0.00
+		summarizeBy: none
+		sourceColumn: Amount
+
+	partition Sales = m
+		mode: import
+		source =
+				let
+				    // Build a small made-up list of order lines.
+				    Source = #table(type table [#"Date Key" = Int64.Type, #"Store Key" = Int64.Type, Amount = Currency.Type], {{20240101, 1, 120.5}})
+				in
+				    Source

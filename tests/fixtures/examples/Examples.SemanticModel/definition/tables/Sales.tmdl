@@ -1,0 +1,93 @@
+/// Example of a fact table with hidden keys, a calculated column and an incremental refresh policy. One row per order line. Made-up data.
+table Sales
+
+	refreshPolicy
+		policyType: basic
+		rollingWindowGranularity: year
+		rollingWindowPeriods: 3
+		incrementalGranularity: day
+		incrementalPeriods: 10
+		sourceExpression =
+			let
+			    // Start from the shared staging query of order lines.
+			    Source = #"Sales Source",
+			    // Keep the order lines inside the refresh window that RangeStart and RangeEnd set.
+			    #"Filtered Rows" = Table.SelectRows(Source, each [Order Date] >= RangeStart and [Order Date] < RangeEnd)
+			in
+			    #"Filtered Rows"
+
+	column 'Date Key'
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: Date Key
+
+	column 'Ship Date Key'
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: Ship Date Key
+
+	column 'Store Key'
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: Store Key
+
+	column 'Product Key'
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: Product Key
+
+	column 'Channel Key'
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: Channel Key
+
+	column 'Order Date'
+		dataType: dateTime
+		isHidden
+		formatString: Short Date
+		summarizeBy: none
+		sourceColumn: Order Date
+
+	column Quantity
+		dataType: int64
+		isHidden
+		formatString: #,0
+		isAvailableInMdx: false
+		summarizeBy: none
+		sourceColumn: Quantity
+
+	column Amount
+		dataType: decimal
+		isHidden
+		formatString: #,0.00
+		summarizeBy: none
+		sourceColumn: Amount
+
+	/// Example of a calculated column: Large for an order line of 100 or more, else Small.
+	column 'Order Size' =
+			IF (
+			    Sales[Amount] >= 100,
+			    "Large",
+			    "Small"
+			)
+		dataType: string
+		summarizeBy: none
+
+		annotation CalculatedReason = Shipped example of a calculated column: a one-line band on the amount, kept in the model to show the form.
+
+	partition Sales = m
+		mode: import
+		source =
+				let
+				    // Start from the shared staging query of order lines.
+				    Source = #"Sales Source",
+				    // Keep the order lines inside the refresh window that RangeStart and RangeEnd set.
+				    #"Filtered Rows" = Table.SelectRows(Source, each [Order Date] >= RangeStart and [Order Date] < RangeEnd)
+				in
+				    #"Filtered Rows"
+

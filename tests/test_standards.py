@@ -158,11 +158,12 @@ class GoodProject(Case):
 
 class BadProject(Case):
     FIXTURE = "bad"
-    ERRORS = ("M001", "M002", "M003", "M004", "M005", "M006", "M007", "M009", "M105", "M107", "M109",
-              "G001", "G002", "B001", "H001", "H002", "N003", "D001")
-    WARNINGS = ("M008", "M010", "M101", "M102", "M103", "M104", "M106", "M108", "M110", "M111", "M112",
-                "G003", "G004", "G005", "G006", "G007")
-    NOTES = ("M201", "M301", "M302", "G008")
+    ERRORS = ("B001", "D001", "G001", "G002", "H001", "H002", "M001", "M002", "M003", "M004", "M005", "M006",
+              "M007", "M009", "M105", "M107", "M109", "M402", "N003")
+    WARNINGS = ("A001", "A002", "A003", "G003", "G004", "G005", "G006", "G007", "M008", "M010", "M101", "M102",
+                "M103", "M104", "M106", "M108", "M110", "M111", "M112", "M114", "M118", "M404", "M411", "M413",
+                "M508", "M520", "V002", "V005")
+    NOTES = ("G008", "M201", "M301", "M302", "M303", "M416", "U103", "U105", "V018")
 
     def test_every_breach_is_caught(self):
         items = self.found()
@@ -333,12 +334,12 @@ class BadProject(Case):
 
 class MeasureHome(Case):
     def test_measure_outside_the_measure_table_fails(self):
-        self.add_measure("\t/// Units.\n\tmeasure 'Total Units' = COUNTROWS(Sales)\n\t\tformatString: #,0\n"
+        self.add_measure("\t/// Units.\n\tmeasure 'Total Units' = COUNTROWS ( Sales )\n\t\tformatString: #,0\n"
                          "\t\tdisplayFolder: Finance\\Base\n", SALES)
         self.assertEqual(self.codes(False), ["M001"])
 
     def test_second_measure_table_passes_when_the_brief_lists_it(self):
-        self.add_measure("\t/// Units.\n\tmeasure 'Total Units' = COUNTROWS(Sales)\n\t\tformatString: #,0\n"
+        self.add_measure("\t/// Units.\n\tmeasure 'Total Units' = COUNTROWS ( Sales )\n\t\tformatString: #,0\n"
                          "\t\tdisplayFolder: Finance\\Base\n", SALES)
         self.brief(model="| M001 | Sales | Finance keeps its measures apart |")
         codes = self.codes(False)
@@ -415,7 +416,7 @@ class MeasureFolders(Case):
 
 class MeasureNames(Case):
     def named(self, name, folder="Finance\\Base"):
-        self.add_measure("\t/// Made-up measure.\n\tmeasure %s = COUNTROWS(Sales)\n\t\tformatString: #,0\n"
+        self.add_measure("\t/// Made-up measure.\n\tmeasure %s = COUNTROWS ( Sales )\n\t\tformatString: #,0\n"
                          "\t\tdisplayFolder: %s\n" % ("'%s'" % name.replace("'", "''"), folder))
         items = self.found()
         return [f[0] for f in items if f[4] is False], " ".join(f[3] for f in items if f[0] == "M008")
@@ -490,7 +491,7 @@ class MeasureNames(Case):
 
 class DaxReferences(Case):
     def test_unqualified_column_warns(self):
-        self.replace(MEASURES, "SUM(Sales[Amount])", "SUM([Amount])")
+        self.replace(MEASURES, "SUM ( Sales[Amount] )", "SUM ( [Amount] )")
         self.assertWarns("M010")
         self.assertIn("[Amount]", self.messages("M010")[0])
 
@@ -577,13 +578,13 @@ class ColumnsAndTables(Case):
         column = ("\t/// When the order was placed.\n\tcolumn 'Ordered At'\n\t\tdataType: dateTime\n%s"
                   "\t\tsummarizeBy: none\n\t\tsourceColumn: OrderedAt\n")
         self.add_measure(column % "\t\tformatString: General Date\n", SALES)
-        self.assertEqual(self.codes("warn"), ["M111"])
+        self.assertEqual(self.codes("warn"), ["M111", "M403"])     # M403: a date column, and no date table
         self.replace(SALES, "\t\tformatString: General Date\n", "\t\tformatString: Short Date\n")
-        self.assertEqual(self.codes("warn"), [])
+        self.assertEqual(self.codes("warn"), ["M403"])
         self.replace(SALES, "\t\tformatString: Short Date\n", "\t\tformatString: dd/MM/yyyy hh:mm\n")
-        self.assertEqual(self.codes("warn"), ["M111"])
+        self.assertEqual(self.codes("warn"), ["M111", "M403"])
         self.replace(SALES, "\t\tformatString: dd/MM/yyyy hh:mm\n", "")
-        self.assertEqual(sorted(self.codes("warn")), ["M111", "M112"])
+        self.assertEqual(sorted(self.codes("warn")), ["M111", "M112", "M403"])
 
     def test_visible_number_without_format_warns(self):
         self.add_measure("\t/// Number of items on the line.\n\tcolumn Items\n\t\tdataType: int64\n"
@@ -630,7 +631,7 @@ class ColumnsAndTables(Case):
         self.assertNot("M101")
 
     def test_hidden_column_nothing_uses_is_a_note(self):
-        self.replace(MEASURES, "DISTINCTCOUNT(Sales[OrderId])", "COUNTROWS(Sales)")
+        self.replace(MEASURES, "DISTINCTCOUNT ( Sales[OrderId] )", "COUNTROWS ( Sales )")
         self.assertEqual(sorted(self.codes("note")), ["I001", "M201"])
         self.assertEqual(self.codes(False), [])
 
@@ -692,7 +693,7 @@ class Layout(Case):
     def test_same_kind_in_one_row_with_other_height_warns(self):
         shutil.copytree(os.path.dirname(self.path(CARD)), self.path(os.path.join(PAGE, "visuals", "Overview_Card_Second")))
         second = os.path.join(PAGE, "visuals", "Overview_Card_Second", "visual.json")
-        self.edit_json(second, lambda d: d.update({"name": "Overview_Card_Second"}))
+        self.edit_json(second, lambda d: (d.update({"name": "Overview_Card_Second"}), d["position"].update({"tabOrder": 5})))
         self.move(second, x=648, height=104)
         self.assertEqual(sorted(set(self.codes("warn"))), ["G005", "G006"])
         self.move(second, height=120)
@@ -720,8 +721,12 @@ class Layout(Case):
 
 class FieldReferences(Case):
     def bind(self, kind, entity, prop):
-        field = {"field": {kind: {"Expression": {"SourceRef": {"Entity": entity}}, "Property": prop}}}
-        self.edit_json(CARD, lambda d: d["visual"].update({"query": {"queryState": {"Values": {"projections": [field]}}}}))
+        field = {"field": {kind: {"Expression": {"SourceRef": {"Entity": entity}}, "Property": prop}},
+                 "queryRef": "%s.%s" % (entity, prop)}
+        text = {"expr": {"Literal": {"Value": "'Made-up card for a test'"}}}
+        self.edit_json(CARD, lambda d: (d["visual"].update({"query": {"queryState": {"Values": {"projections": [field]}}}}),
+                                        d["visual"]["visualContainerObjects"].update(
+                                            {"general": [{"properties": {"altText": text}}], "title": [{"properties": {"text": text}}]})))
 
     def test_field_the_model_has_passes(self):
         self.bind("Measure", "_Measures", "Total Sales")
@@ -742,11 +747,17 @@ class FieldReferences(Case):
                    json.dumps({"name": "extension", "entities": [{"name": "Sales", "measures": [{"name": "Report Only"}]}]}))
         self.assertNot("B001")
 
-    def test_report_on_a_published_model_is_not_checked(self):
+    def test_report_on_a_published_model_is_checked_against_the_saved_field_list(self):
         self.bind("Measure", "Elsewhere", "Anything")
         self.edit_json(os.path.join("Sample.Report", "definition.pbir"),
                        lambda d: d.update({"datasetReference": {"byConnection": {"connectionString": "semanticmodelid=x"}}}))
+        self.assertNot("B001")                                    # no saved field list: nothing to check against
+        self.assertEqual([f[4] for f in self.found() if f[0] == "B002"], ["note"])
+        self.write(os.path.join("docs", "model-fields.md"), "| Table | Field | Kind |\n|---|---|---|\n| Elsewhere | Other | measure |\n")
+        self.assertIn("Elsewhere[Anything]", self.messages("B001")[0])
+        self.write(os.path.join("docs", "model-fields.md"), "| Table | Field | Kind |\n|---|---|---|\n| Elsewhere | Anything | measure |\n")
         self.assertNot("B001")
+        self.assertNot("B002")
 
     def test_hidden_column_used_by_a_visual_warns(self):
         self.bind("Column", "Sales", "Amount")
@@ -779,13 +790,13 @@ class SetModelProperties(Case):
 
     def test_existing_value_is_replaced_in_place(self):
         self.assertEqual(self.run_set("[Total Sales].formatString=#,0.00")[0], 0)
-        self.assertIn("SUM(Sales[Amount]) // one-line DAX comment is allowed here\n\t\tformatString: #,0.00\n"
+        self.assertIn("SUM ( Sales[Amount] ) // one-line DAX comment is allowed here\n\t\tformatString: #,0.00\n"
                       "\t\tdisplayFolder: Finance\\Base\n", self.read(MEASURES))
 
     def test_property_goes_after_a_multi_line_expression(self):
         self.replace(MEASURES, "\t\tformatString: 0.0%\n", "")
         self.assertEqual(self.run_set("[Return Rate].formatString=0.0%")[0], 0)
-        self.assertIn("\t\t\t\tCOUNTROWS(Sales)\n\t\t\t)\n\t\tformatString: 0.0%\n", self.read(MEASURES))
+        self.assertIn("\t\t\t    COUNTROWS ( Sales )\n\t\t\t)\n\t\tformatString: 0.0%\n", self.read(MEASURES))
         self.assertEqual(self.codes(), ["I001"])
 
     def test_same_value_is_no_change(self):
@@ -1217,7 +1228,8 @@ class ReviewedEdgeCases(Case):
                          "\t\tsummarizeBy: none\n\t\tsourceColumn: OrderDate\n", SALES)
         self.write(RELATIONSHIPS, "relationship r1\n\tjoinOnDateBehavior: datePartOnly\n\tfromColumn: Sales.'Order Date'\n"
                                   "\ttoColumn: LocalDateTable_0a1b.Date\n")
-        self.assertEqual(self.codes(), ["I001"])                   # no M105, M106, M010, M102, M110 or M201 for Power BI's own table
+        # no M105, M106, M010, M102, M110 or M201 for Power BI's own table; M401 says Auto date/time is on
+        self.assertEqual(self.codes(), ["I001", "M401", "M403"])
         findings, _, _ = cp.run(self.root)
         self.assertEqual(findings.fixes, [])                       # and no proposal to hide the user's date column
 
@@ -1550,19 +1562,63 @@ class TemplateFiles(unittest.TestCase):
             ct.errors[:] = saved_errors
             shutil.rmtree(tmp, ignore_errors=True)
 
-    def test_every_new_code_is_listed_in_the_script_help_and_sorted_by_the_flow(self):
+    def all_codes(self):
+        """{code: levels} for every finding the project check can give, read from the three check files."""
+        import re
+        found = {}
+        for name, default in (("check_project.py", "fail"), ("model_rules.py", "fail"), ("report_rules.py", "warn")):
+            with open(os.path.join(REPO, "scripts", name), encoding="utf-8") as fh:
+                source = fh.read()
+            for match in re.finditer(r'add\("([A-Z][0-9]{3})"', source):
+                following = re.search(r'\badd\("[A-Z][0-9]{3}"', source[match.end():])
+                call = source[match.end():match.end() + (following.start() if following else 900)][:900]
+                level = ("note" if 'level="note"' in call or "info=True" in call else "warn" if 'level="warn"' in call
+                         else "fail" if 'level="error"' in call else default)
+                found.setdefault(match.group(1), set()).add(level)
+        return found
+
+    def test_every_code_is_listed_in_the_script_help_with_its_level(self):
+        import re
         with open(os.path.join(REPO, "scripts", "check_project.py"), encoding="utf-8") as fh:
             source = fh.read()
-        import re
-        used = set(re.findall(r'add\("([MGB][0-9]{3})"', source))
-        listed = set(re.findall(r"^    ([MGB][0-9]{3})  ", source, re.M))
-        self.assertEqual(used, listed)
-        sorted_codes = set(improve.MECHANICAL) | set(improve.LAYOUT) | set(improve.PERSON)
-        errors_and_warnings = {c for c in used if c not in ("M201", "M301", "M302", "G008")}
-        self.assertEqual(errors_and_warnings - sorted_codes, set())
-        for never in ("M001", "M005", "M006", "M007", "M107", "M108", "B001"):
-            self.assertNotIn(never, improve.MECHANICAL)                       # renames, moves, types, summarisation
+        listed = dict(re.findall(r"^ {4}([A-Z][0-9]{3})  (\(warn\)|\(note\))?", source, re.M))
+        codes = {c: levels for c, levels in self.all_codes().items() if c[0] not in "R"}
+        self.assertEqual(sorted(set(codes) - set(listed)), [])
+        for code in ("M402", "M502", "M901", "V001", "V006"):                # the new failures
+            self.assertEqual((codes[code], listed[code]), ({"fail"}, ""), code)
+        for code, levels in codes.items():
+            if code[0] in "UVAP" or code[:2] in ("M4", "M5", "M6", "M7", "M8", "M9") or code in (
+                    "M113", "M114", "M115", "M116", "M117", "M118", "M119"):
+                if levels == {"warn"}:
+                    self.assertEqual(listed[code], "(warn)", code)
+                elif levels == {"note"}:
+                    self.assertEqual(listed[code], "(note)", code)
+                elif levels == {"fail"}:
+                    self.assertEqual(listed[code], "", code)
 
+    def test_every_error_and_warning_is_sorted_by_the_improve_flow(self):
+        sorted_codes = set(improve.MECHANICAL) | set(improve.LAYOUT) | set(improve.PERSON)
+        errors_and_warnings = {c for c, levels in self.all_codes().items()
+                               if levels - {"note"} and c[0] in "MGBPVA"}
+        self.assertEqual(sorted(errors_and_warnings - sorted_codes), [])
+        for never in ("M001", "M005", "M006", "M007", "M107", "M108", "B001", "M118", "M119", "M502", "M802"):
+            self.assertNotIn(never, improve.MECHANICAL)                       # renames, moves, types, summarisation, numbers
+
+    def test_every_code_is_named_in_the_checklist_review_skill(self):
+        import re
+        with open(os.path.join(REPO, ".github", "skills", "pbi-checklist-review", "SKILL.md"), encoding="utf-8") as fh:
+            text = fh.read()
+        named = set(re.findall(r"\b([A-Z][0-9]{3})\b", text))
+        for first, last in re.findall(r"\b([A-Z][0-9]{3})-([A-Z][0-9]{3})\b", text):
+            named |= {"%s%03d" % (first[0], n) for n in range(int(first[1:]), int(last[1:]) + 1)}
+        missing = sorted(c for c in self.all_codes() if c not in named and c[0] not in "RF" and c != "F001")
+        self.assertEqual(missing, [])
+
+    def test_suggestions_are_always_notes_and_never_start_the_lessons_loop(self):
+        codes = self.all_codes()
+        for code, levels in codes.items():
+            if code.startswith("U"):
+                self.assertEqual(levels, {"note"}, code)
 
 if __name__ == "__main__":
     unittest.main()

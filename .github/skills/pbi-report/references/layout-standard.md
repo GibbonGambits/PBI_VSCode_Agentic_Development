@@ -1,6 +1,6 @@
 # The layout standard
 
-Copilot cannot see a page. It changes positions blind. So layout is set by numbers that `python scripts/check_project.py .` can check. The "Layout" rules in the skill still apply; this file adds the numbers.
+Copilot cannot see a page from the files. So layout is set by numbers that `python scripts/check_project.py .` can check; where the developer has agreed to the Desktop Bridge, Copilot also takes a picture of the page afterwards (`desktop-bridge.md`, beside this file). The "Layout" rules in the skill still apply; this file adds the numbers.
 
 A value in the brief always wins. The theme sets no page size and no spacing.
 
@@ -46,12 +46,12 @@ A value in the brief always wins. The theme sets no page size and no spacing.
 
 | Thing | What is known | What to do |
 |---|---|---|
-| Groups | A member names its group. Microsoft's schema does not say whether a member's x and y count from the page or from the group | Never move or resize a group or a visual inside one. Tell the developer; they do it in Power BI Desktop |
+| Groups | A member names its group. Microsoft's schema does not say whether a member's x and y count from the page or from the group | Never move or resize a group or a visual inside one. List it for the developer under "needs a person" |
 | Bookmarks | Microsoft's bookmark schema holds no position or size. A bookmark does store which visuals are hidden | No bookmark file changes. Do not un-stack visuals that a bookmark shows one at a time |
 | Phone layout | Each visual's phone position is its own `mobile.json`. `mobileState.json` must not be edited outside Desktop | Leave both alone. Ask the developer to look at the phone layout |
 | Tooltip pages | Own small canvas | Never re-lay them out |
 | Drillthrough pages | A normal canvas; nothing in the schema ties its back button or filters to positions | Same rules as other pages |
-| Tab order and stacking order | Microsoft asks that tab order follows the reading order | Do not change `tabOrder` or `z`. Ask the developer to check the tab order after visuals move |
+| Tab order and stacking order | Microsoft asks that tab order follows the reading order | A move leaves `tabOrder` and `z` alone, and so does `scripts/set_positions.py`. When a move changed the reading order, say so at the end of the task: the tab order numbers change only after the developer's yes (rule 56 of `report-standard.md`, beside this file) |
 | Rotated visuals | Their real bounds are not known from the numbers | Leave alone and say so |
 
 ## How to change positions
@@ -60,7 +60,7 @@ A value in the brief always wins. The theme sets no page size and no spacing.
 2. Work out each new x, y, width and height by arithmetic from the numbers above. Show the developer the sums and the old and new values, and wait for a yes.
 3. Apply with `python scripts/set_positions.py . --dry-run --move "<page>/<visual>=<x>,<y>,<width>,<height>"`, then without `--dry-run`. `--snap` only moves each edge of a visual to the nearest grid line, so visuals that touch still touch. A target that fits more than one visual is refused: name the page and the visual by their folders. The script changes the four numbers and nothing else, and refuses groups, members, rotated visuals and anything that would leave the page.
 4. Run the check again.
-5. Name the pages that changed and ask the developer to reload the project in Power BI Desktop and look at each one. The script prints the list. Never say a page looks right from the files alone.
+5. Look at the pages that changed. Where the developer has agreed to the Desktop Bridge, reload and take the pictures yourself (`desktop-bridge.md`, beside this file). Otherwise name the pages and ask the developer to reload the project in Power BI Desktop and to look at each one. The script prints the list. Never say a page looks right from the files alone.
 
 ## Sources
 

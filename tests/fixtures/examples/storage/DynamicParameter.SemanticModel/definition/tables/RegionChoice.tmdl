@@ -1,0 +1,22 @@
+/// Example of the table of values for a dynamic M query parameter: readers pick a region here, and the pick goes to RegionParameter.
+table RegionChoice
+
+	/// The region to show. Bound to the parameter RegionParameter.
+	column 'Region Pick'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: [Region Pick]
+
+	partition RegionChoice = calculated
+		mode: import
+		source =
+				DATATABLE (
+				    "Region Pick", STRING,
+				    {
+				        { "North" },
+				        { "South" }
+				    }
+				)
+
+	annotation CalculatedReason = Shipped example: the values readers pick for a dynamic M query parameter; Microsoft's page builds this table in the model.
+

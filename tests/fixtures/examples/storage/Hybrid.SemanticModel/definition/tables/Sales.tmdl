@@ -1,0 +1,54 @@
+/// Example of a hybrid table: an incremental refresh policy in hybrid mode adds a DirectQuery partition for the newest rows. One row per order line. Made-up source.
+table Sales
+
+	refreshPolicy
+		policyType: basic
+		mode: hybrid
+		rollingWindowGranularity: year
+		rollingWindowPeriods: 3
+		incrementalGranularity: day
+		incrementalPeriods: 10
+		sourceExpression =
+			let
+			    // Connect to the made-up shop database.
+			    Source = Sql.Database("sql.example.com", "Shop"),
+			    // Pick the order line view.
+			    Data = Source{[Schema="dbo",Item="Sales"]}[Data],
+			    // Keep the order lines inside the refresh window that RangeStart and RangeEnd set.
+			    #"Filtered Rows" = Table.SelectRows(Data, each [Order Date] >= RangeStart and [Order Date] < RangeEnd)
+			in
+			    #"Filtered Rows"
+
+	column 'Date Key'
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: Date Key
+
+	column 'Order Date'
+		dataType: dateTime
+		isHidden
+		formatString: Short Date
+		summarizeBy: none
+		sourceColumn: Order Date
+
+	column Amount
+		dataType: decimal
+		isHidden
+		formatString: #,0.00
+		summarizeBy: none
+		sourceColumn: Amount
+
+	partition Sales = m
+		mode: import
+		source =
+				let
+				    // Connect to the made-up shop database.
+				    Source = Sql.Database("sql.example.com", "Shop"),
+				    // Pick the order line view.
+				    Data = Source{[Schema="dbo",Item="Sales"]}[Data],
+				    // Keep the order lines inside the refresh window that RangeStart and RangeEnd set.
+				    #"Filtered Rows" = Table.SelectRows(Data, each [Order Date] >= RangeStart and [Order Date] < RangeEnd)
+				in
+				    #"Filtered Rows"
+

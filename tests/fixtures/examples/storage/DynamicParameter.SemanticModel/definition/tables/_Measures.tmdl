@@ -1,0 +1,19 @@
+/// Example of the measure table as a calculated table: it holds every measure of the model.
+table _Measures
+
+	/// Sum of the order line amounts of the picked region.
+	measure 'Total Sales' = SUM ( Sales[Amount] )
+		formatString: #,0.00
+		displayFolder: Finance\Base
+
+	column Placeholder
+		isHidden
+		isNameInferred
+		sourceColumn: [Placeholder]
+
+	partition _Measures = calculated
+		mode: import
+		source = ROW ( "Placeholder", BLANK () )
+
+	annotation CalculatedReason = Shipped example: an entered (imported) table would add an import table to this model, so the measure table is a calculated table that names no other table.
+
