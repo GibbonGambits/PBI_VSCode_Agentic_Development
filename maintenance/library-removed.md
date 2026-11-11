@@ -13,12 +13,11 @@ The library started from 2,318 notes drawn from public SQLBI articles. Notes wer
 | Group | Removed |
 |---|---:|
 | 1. Outdated | 35 |
-| 2. Conflicts with the checklist | 19 |
-| 3. The repository already says it | 99 |
+| 2. Conflicts with the checklist | 20 |
+| 3. The repository already says it | 102 |
 | 4. Not adopted: a higher source says otherwise | 20 |
 | 5. Duplicate in another topic | 0 |
-| Kept in the library | 2052 |
-| Not yet decided | 93 |
+| Kept in the library | 2141 |
 
 | Note | Group | Covered by |
 |---|---|---|
@@ -186,6 +185,10 @@ The library started from 2,318 notes drawn from public SQLBI articles. Notes wer
 | T15-A276-2 | 3 | `.github/skills/pbi-semantic-model/references/model-objects.md`, section D, Dynamic format string |
 | T15-A317-13 | 4 | `.github/skills/pbi-semantic-model/references/model-standard.md`, rule 1 |
 | T15-A317-4 | 3 | `.github/skills/pbi-report/references/report-standard.md`, rule 44 (checklist item 54) |
+| T15-A322-2 | 3 | `.github/skills/pbi-report/references/theme.md`, section The theme, third paragraph (V009) |
+| T15-A325-17 | 2 | `checklist/checklist.md`, Item 49 |
+| T15-A325-21 | 3 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rules 17 to 19 |
+| T15-A325-3 | 3 | `.github/skills/pbi-report/references/report-standard.md`, rule 44 (checklist item 54) |
 | T15-A351-3 | 1 | - |
 | T16-A081-1 | 3 | `.github/skills/pbi-semantic-model/references/model-objects.md`, section D, "Translations and cultures" |
 | T16-A123-10 | 3 | `checklist/checklist.md`, Item 68 |
