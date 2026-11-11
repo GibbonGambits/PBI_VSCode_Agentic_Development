@@ -1,0 +1,27 @@
+/// Holds every measure of the model.
+table _Measures
+
+	/// Sum of the order line amounts.
+	measure 'Total Sales' = SUM ( Sales[Amount] )
+		formatString: #,0.00
+		displayFolder: Finance\Base
+
+	/// Total sales from the start of the year to the last day shown.
+	measure 'Total Sales YTD' = CALCULATE ( [Total Sales], DATESYTD ( 'Date'[Date] ) )
+		formatString: #,0.00
+		displayFolder: Finance\Time Intelligence
+
+	column Placeholder
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: Placeholder
+
+	partition _Measures = m
+		mode: import
+		source =
+				let
+				    // An empty one-column table: it only holds the measures.
+				    Source = #table(type table [Placeholder = text], {})
+				in
+				    Source
