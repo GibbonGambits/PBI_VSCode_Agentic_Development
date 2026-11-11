@@ -14,11 +14,11 @@ The library started from 2,318 notes drawn from public SQLBI articles. Notes wer
 |---|---:|
 | 1. Outdated | 35 |
 | 2. Conflicts with the checklist | 19 |
-| 3. The repository already says it | 63 |
+| 3. The repository already says it | 67 |
 | 4. Not adopted: a higher source says otherwise | 16 |
 | 5. Duplicate in another topic | 0 |
-| Kept in the library | 927 |
-| Not yet decided | 1258 |
+| Kept in the library | 963 |
+| Not yet decided | 1218 |
 
 | Note | Group | Covered by |
 |---|---|---|
@@ -134,6 +134,10 @@ The library started from 2,318 notes drawn from public SQLBI articles. Notes wer
 | T07-A119-3 | 3 | `checklist/checklist.md`, Item 34 |
 | T07-A156-2 | 2 | `checklist/checklist.md`, item 68 |
 | T07-A179-2 | 1 | - |
+| T08-A016-1 | 3 | `.github/skills/pbi-semantic-model/references/storage-and-security.md`, rule 20 |
+| T08-A016-6 | 3 | `.github/skills/pbi-semantic-model/references/storage-and-security.md`, rule 18 |
+| T08-A030-1 | 3 | `checklist/checklist.md`, Item 5 |
+| T08-A030-8 | 3 | `.github/skills/pbi-semantic-model/references/storage-and-security.md`, rule 18 |
 | T09-W380-2 | 2 | `checklist/checklist.md`, item 68 |
 | T09-W380-32 | 1 | - |
 | T09-A227-1 | 1 | - |
