@@ -1,0 +1,39 @@
+/// Home of the measures. Made-up test data.
+table _Measures
+	isHidden
+
+	/// Number of order lines, a second time.
+	measure 'Order Count' = COUNTROWS(Orders)
+		formatString: #,0
+		displayFolder: Finance\Counts
+
+	/// Units sold.
+	measure Quantity = SUM(Orders[Quantity])
+		formatString: #,0
+		displayFolder: Finance\Base
+
+	measure 'Old Measure' = 1
+		isHidden
+		formatString: 0
+		displayFolder: Finance\Base
+
+	column Placeholder
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: Placeholder
+
+	/// A second column that should not be here.
+	column Extra
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Extra
+
+	partition _Measures = m
+		mode: import
+		source =
+				let
+				    // Build an empty in-line table so the sample needs no outside data source.
+				    #"Created Rows" = #table({"A"}, {})
+				in
+				    #"Created Rows"

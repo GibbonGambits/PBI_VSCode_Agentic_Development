@@ -1,0 +1,137 @@
+/// One row per product. Made-up rows.
+table Product
+
+	/// Code of the product.
+	column 'Product Code'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: ProductCode
+
+	/// Made-up product attribute number 01.
+	column 'Attribute 01'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Attribute01
+
+	/// Made-up product attribute number 02.
+	column 'Attribute 02'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Attribute02
+
+	/// Made-up product attribute number 03.
+	column 'Attribute 03'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Attribute03
+
+	/// Made-up product attribute number 04.
+	column 'Attribute 04'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Attribute04
+
+	/// Made-up product attribute number 05.
+	column 'Attribute 05'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Attribute05
+
+	/// Made-up product attribute number 06.
+	column 'Attribute 06'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Attribute06
+
+	/// Made-up product attribute number 07.
+	column 'Attribute 07'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Attribute07
+
+	/// Made-up product attribute number 08.
+	column 'Attribute 08'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Attribute08
+
+	/// Made-up product attribute number 09.
+	column 'Attribute 09'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Attribute09
+
+	/// Made-up product attribute number 10.
+	column 'Attribute 10'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Attribute10
+
+	/// Made-up product attribute number 11.
+	column 'Attribute 11'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Attribute11
+
+	/// Made-up product attribute number 12.
+	column 'Attribute 12'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Attribute12
+
+	/// Made-up product attribute number 13.
+	column 'Attribute 13'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Attribute13
+
+	/// Made-up product attribute number 14.
+	column 'Attribute 14'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Attribute14
+
+	/// Made-up product attribute number 15.
+	column 'Attribute 15'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Attribute15
+
+	/// Made-up product attribute number 16.
+	column 'Attribute 16'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Attribute16
+
+	/// Made-up product attribute number 17.
+	column 'Attribute 17'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Attribute17
+
+	/// Made-up product attribute number 18.
+	column 'Attribute 18'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Attribute18
+
+	/// Made-up product attribute number 19.
+	column 'Attribute 19'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Attribute19
+
+	/// Made-up product attribute number 20.
+	column 'Attribute 20'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Attribute20
+
+	partition Product = m
+		mode: import
+		source =
+				let
+				    // Build an empty in-line table so the sample needs no outside data source.
+				    #"Created Rows" = #table({"A"}, {})
+				in
+				    #"Created Rows"

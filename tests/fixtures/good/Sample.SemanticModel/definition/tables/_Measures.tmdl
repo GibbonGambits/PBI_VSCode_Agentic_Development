@@ -1,0 +1,43 @@
+/// Home of every measure in the model. Made-up test data; in a real project the developer makes this table in Power BI Desktop.
+table _Measures
+
+	/// Total order amount in US dollars. Adds up the Amount column.
+	measure 'Total Sales' = SUM(Sales[Amount]) // one-line DAX comment is allowed here
+		formatString: #,0
+		displayFolder: Finance\Base
+
+	/// Share of order lines that were returned. Returned lines divided by all lines.
+	measure 'Return Rate' =
+			// Count the returned lines, then divide by all lines.
+			DIVIDE(
+				COUNTROWS(FILTER(Sales, Sales[Returned] = TRUE())),
+				COUNTROWS(Sales)
+			)
+		formatString: 0.0%
+		displayFolder: Customer\Ratios
+
+	/// Number of different orders.
+	measure '# Orders' = DISTINCTCOUNT(Sales[OrderId])
+		formatString: #,0
+		displayFolder: Customer\Counts
+
+	/// Label for a link. The text "http://" inside a one-line expression is not a comment.
+	measure 'Help Link' = "http://example.com/help"
+		displayFolder: Customer\Base
+
+	column Placeholder
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: Placeholder
+
+	partition _Measures = m
+		mode: import
+		source =
+				let
+				    // Build a one-column, one-row table that only gives the measures a home.
+				    #"Created Placeholder" = #table(type table [Placeholder = text], {{""}})
+				in
+				    #"Created Placeholder"
+
+	annotation SampleSource = https://example.com/made-up-data

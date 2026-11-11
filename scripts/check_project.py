@@ -8,11 +8,11 @@ Usage:
 Needs Python 3.8 or later. Uses the standard library only. Reads files; never changes them.
 Exit code: 0 = no errors, 1 = at least one error, 2 = wrong usage or nothing to check.
 
-Finding codes (errors unless marked info):
+Finding codes (errors unless marked warn or note; only errors change the exit code):
     D001  visible table, column or measure has no '///' description
     D002  shared Power Query query or parameter ('expression') has no '///' description
     D003  '///' description is not directly above an object
-    I001  (info) description still holds the placeholder TODO(owner)
+    I001  (note) description still holds the placeholder TODO(owner)
     C001  '//' comment outside a Power Query (M) or DAX expression block
     P001  Power Query step has no '//' (or '/* */') description line directly above it (template convention)
     F001  a .Report or .SemanticModel folder is not in PBIR / TMDL format (no 'definition' folder)
@@ -30,6 +30,49 @@ Finding codes (errors unless marked info):
     H002  Tooltips are on, or not set, on the visual itself (or on in its mobile layout)
     T001  report has no custom theme registered, or the registered theme file is missing or unreadable
     R0xx  problems in a review table (see --review)
+
+  Model standard (.github/skills/pbi-semantic-model/references/model-standard.md):
+    M001  measure outside the table _Measures
+    M002  the table _Measures is hidden, or does not have exactly one column, hidden
+    M003  measure has no display folder, or not one folder with exactly two levels, Subject\\Type
+    M004  a display folder level of a measure is not on its list
+    M005  two measures share a name
+    M006  measure has the name of a column in the model
+    M007  measure name is code-style (underscores, CamelCase, ALL CAPS) or has a space at either end
+    M008  (warn) measure name: Title Case, period spelling, unit, '#', 'vs', order; or folder type against name
+    M009  visible measure has no format string
+    M010  (warn) DAX names a column without its table, or a measure with its table
+    M101  (warn) table with 20 or more visible fields has columns outside the four column folders
+    M102  (warn) visible foreign key or sort-by key
+    M103  (warn) visible numeric column that a measure already totals
+    M104  (warn) hidden column used by a hierarchy or a report visual
+    M105  calculated column or calculated table has no CalculatedReason annotation
+    M106  (warn) more than five calculated columns, or a calculated column that uses RELATED
+    M107  visible numeric column whose summarizeBy is not none
+    M108  (warn) column has the floating-point type (double)
+    M109  the two columns of a relationship have different data types
+    M110  (warn) relationship column is not a whole number
+    M111  (warn) column may hold a date and a time together
+    M112  (warn) visible date or numeric column has no format string
+    M201  (note) hidden column or measure that nothing refers to
+    M301  (note) hidden columns whose isAvailableInMdx could be turned off (only when the brief turns this on)
+    M302  (note) description longer than 200 characters (only when the brief turns this on)
+
+  Layout standard (.github/skills/pbi-report/references/layout-standard.md):
+    G001  visual reaches outside the page
+    G002  two data visuals overlap
+    G003  (warn) x, y, width or height is not on the grid
+    G004  (warn) outer margins differ from the margin
+    G005  (warn) visuals of the same kind in one row have different heights
+    G006  (warn) gap between neighbours differs from the gap
+    G007  (warn) page size differs from the brief or the standard
+    G008  (note) rotated visual, not checked
+
+    B001  a report file uses a table, column or measure the model in this project does not have
+
+The M, G and B checks read their numbers, lists and exceptions from docs/report-brief.md under <folder>.
+An exception counts only when its row there names the same code and object and gives a reason.
+The DAX checks (M010, M103, M201) read text; they are not a DAX parser.
 
 A visual may keep Header icons or Tooltips on only with a HeaderTooltipException annotation whose value
 names what stays on and why: "header: <reason>", "tooltip: <reason>" or "both: <reason>".
@@ -49,6 +92,44 @@ EXCEPTION_SCOPES = {"header": ("visualHeader",), "tooltip": ("visualTooltip",),
 PLACEHOLDER = "TODO(owner)"                          # template convention
 SCHEMA_PREFIX = "https://developer.microsoft.com/json-schemas/fabric/"
 REVIEW_STATUSES = ("Pass", "Fail", "Not applicable")
+
+# The model standard: .github/skills/pbi-semantic-model/references/model-standard.md
+MEASURE_TABLE = "_Measures"                          # Microsoft Learn, "Organize your measures"
+FOLDER_SUBJECTS = ("Reliability", "Energy and Gas", "Customer", "Safety", "Finance", "Workforce",
+                   "IT and Security", "Work Management")             # the eight business definition areas
+FOLDER_TYPES = ("Base", "Time Intelligence", "Comparisons", "Ratios", "Counts")
+COLUMN_FOLDERS = ("Attributes", "Keys", "Facts", "Hierarchy")
+FOLDER_THRESHOLD = 20                                # checklist item 22
+REASON_ANNOTATION = "CalculatedReason"               # template convention
+CALCULATED_COLUMN_LIMIT = 5                          # Microsoft's best practice rule "Reduce number of calculated columns"
+COPILOT_DESCRIPTION_LIMIT = 200                      # Microsoft Learn, "Use Copilot with semantic models"
+NUMERIC_TYPES = ("int64", "decimal", "double")
+AUTO_DATE_PREFIXES = ("LocalDateTable_", "DateTableTemplate_")       # tables Power BI makes for Auto date/time
+SMALL_WORDS = frozenset(("a", "an", "and", "as", "at", "by", "for", "in", "of", "on", "or", "per", "the", "to",
+                         "vs", "with"))
+TOTAL_FUNCTIONS = ("SUM", "AVERAGE", "AVERAGEA", "COUNT", "COUNTA", "COUNTBLANK", "DISTINCTCOUNT", "MIN", "MINA",
+                   "MAX", "MAXA", "VALUES", "DISTINCT")              # the list in "Hide fact table columns"
+CODE_RE = re.compile(r"[A-Z][0-9]{3}\Z")
+
+# The layout standard: .github/skills/pbi-report/references/layout-standard.md
+PAGE_SIZE = (1280, 720)
+LAYOUT_SETS = {1280: (24, 16), 1920: (32, 24)}       # page width -> (outer margin, gap between visuals)
+GRID_STEP = 8
+EPSILON = 0.01
+
+# What the checks read from the brief. scripts/check_template.py fails if the brief loses one of these.
+BRIEF = os.path.join("docs", "report-brief.md")
+BRIEF_LABELS = {"page_size": "Page size in pixels, width x height",
+                "margin": "Outer margin in pixels",
+                "gap": "Gap between visuals in pixels",
+                "grid": "Grid step in pixels",
+                "subjects": "Measure folder subjects",
+                "own_spelling": "Acronyms and words with their own spelling",
+                "excel": "Excel check on",
+                "copilot": "Power BI Copilot check on"}
+MODEL_EXCEPTIONS = "Exceptions to the model standard"
+LAYOUT_EXCEPTIONS = "Exceptions to the layout standard"
+BEFORE_COPY = "_before"                              # the untouched copy made by scripts/improve.py
 ITEM_COUNT = 79
 FAILED = object()                                    # returned by load_json when a file cannot be parsed
 
@@ -67,25 +148,34 @@ PLAIN_VALUE_KEYS = frozenset(("changedproperty",))               # 'key = value'
 FREE_TEXT_KEYS = frozenset(("sourcecolumn", "formatstring", "displayfolder", "sortbycolumn",
                             "sourcelineagetag", "description", "displayname", "caption"))
 HIDING_FLAGS = frozenset(("ishidden", "ishidden:true", "isprivate", "isprivate:true"))
+BARE_FLAG_RE = re.compile(r"[A-Za-z_]\w*\Z")
 QUOTED = re.compile(r"'(?:[^']|'')*'|\"(?:[^\"]|\"\")*\"")
 EMPTY_EVIDENCE = frozenset(("todo", "tbd", "na", "n/a", "none", "nbsp", "br", "x", "evidence"))
 
 
 class Findings:
+    """Each item is (code, path, line, message, level): level is False for an error, else "warn" or "note"."""
+
     def __init__(self):
         self.items = []
+        self.fixes = []       # (code, object key, property, value): changes a script may apply after approval
 
-    def add(self, code, path, line, message, info=False):
-        self.items.append((code, path, line, message, info))
+    def add(self, code, path, line, message, info=False, level=None):
+        if level is None:
+            level = "note" if info else "error"
+        self.items.append((code, path, line, message, False if level == "error" else level))
 
     def errors(self):
         return [f for f in self.items if not f[4]]
 
+    def warnings(self):
+        return [f for f in self.items if f[4] == "warn"]
+
     def print_all(self, base):
-        for code, path, line, message, info in self.items:
+        for code, path, line, message, level in self.items:
             rel = os.path.relpath(path, base) if path else "-"
             where = "%s:%d" % (rel, line) if line else rel
-            print("%s  %s  %s" % (code, where.replace(os.sep, "/"), message))
+            print("%s  %s  %s%s" % (code, where.replace(os.sep, "/"), "(%s) " % level if level else "", message))
 
 
 def safe_output():
@@ -105,6 +195,14 @@ def _unquote(name):
     if len(name) >= 2 and name[0] == "'" and name[-1] == "'":
         return name[1:-1].replace("''", "'")
     return name
+
+
+def _property_text(value):
+    """The text of a 'name: value' property: outer double quotes removed, as TMDL reads it."""
+    value = value.strip()
+    if len(value) >= 2 and value[0] == '"' and value[-1] == '"':
+        return value[1:-1].replace('""', '"')
+    return value
 
 
 def _has_comment(text):
@@ -215,6 +313,11 @@ def check_tmdl_file(path, findings):
     except UnicodeDecodeError:
         findings.add("J001", path, 0, "file is not UTF-8 text, so it cannot be checked; save it as UTF-8 without BOM")
         return
+    return check_tmdl_lines(path, lines, findings)
+
+
+def check_tmdl_lines(path, lines, findings):
+    """The file checks on the lines of one .tmdl file. Returns the objects declared in it."""
     uses_tabs = any(line.startswith("\t") for line in lines)
 
     objects = []          # dicts: kind, name, line, described, hidden, table, top, placeholder
@@ -224,10 +327,25 @@ def check_tmdl_file(path, findings):
     partition_is_m = False
     translations = False  # inside a cultureInfo file: names there are translations, not model objects
 
-    def close_block():
+    def close_block(end=None):
+        """end: line number of a closing fence; None when the block ends at its last line of text."""
         nonlocal block
         if block and block["is_m"]:
             check_m_steps(block["lines"], path, block["owner"], findings)
+        if block:
+            written = [n for n, t in block["lines"] if t.strip()]
+            last = end or (written[-1] if written else block["start"])
+            text = "\n".join(t for _, t in block["lines"])
+            kind, target, key = block["target"]
+            if kind == "object":
+                target["expr"] = text
+                target["expr_end"] = last
+            elif kind == "property" and target is not None:
+                target["props"][key] = text
+            elif kind == "annotation" and target is not None:
+                target["annotations"][key] = text
+            for owner_object in block["owners"]:
+                owner_object["last_line"] = max(owner_object["last_line"], last)
         block = None
 
     def comment(number):
@@ -239,7 +357,7 @@ def check_tmdl_file(path, findings):
         if block is not None:
             if block["fenced"]:
                 if stripped == "```":
-                    close_block()
+                    close_block(number)
                 else:
                     block["lines"].append((number, line))
                 continue
@@ -279,6 +397,10 @@ def check_tmdl_file(path, findings):
 
         while stack and stack[-1][0] >= width:
             stack.pop()
+        for _, enclosing in stack:
+            enclosing["last_line"] = number
+        parent = stack[-1][1] if stack else None
+        target = ("none", None, "")
 
         decl = DECL_RE.match(stripped)
         keyword = decl.group(1).lower() if decl else ""
@@ -315,6 +437,10 @@ def check_tmdl_file(path, findings):
             if keyword in VALUE_ONLY:
                 if had_pending:
                     findings.add("D003", path, pending_line, "'///' description is not directly above an object")
+                if keyword == "annotation" and parent is not None:
+                    parent["annotations"][name] = tail or ""
+                    parent["annotation_lines"][name] = number
+                    target = ("annotation", parent, name)
             else:
                 if keyword == "cultureinfo":
                     translations = True
@@ -324,9 +450,14 @@ def check_tmdl_file(path, findings):
                         table = enclosing
                 obj = {"kind": keyword, "name": name, "line": number, "described": bool(description),
                        "hidden": False, "table": table, "top": not stack, "translation": translations,
-                       "placeholder": PLACEHOLDER.lower() in description.lower()}
+                       "placeholder": PLACEHOLDER.lower() in description.lower(),
+                       "file": path, "parent": parent, "description": description, "props": {}, "prop_lines": {},
+                       "annotations": {}, "annotation_lines": {}, "expr": tail if tail not in (None, "", "```") else None,
+                       "has_expr": tail is not None, "expr_end": number, "last_line": number,
+                       "indent": line[:len(line) - len(line.lstrip(" \t"))]}
                 objects.append(obj)
                 stack.append((width, obj))
+                target = ("object", obj, "")
                 if keyword == "partition":
                     partition_is_m = (tail or "").split("//")[0].strip().lower() == "m"
                 is_m = keyword == "expression"
@@ -340,6 +471,10 @@ def check_tmdl_file(path, findings):
             if prop:
                 key = prop.group(1).lower()
                 tail = prop.group(2).strip()
+                if parent is not None:
+                    parent["props"][key] = tail
+                    parent["prop_lines"][key] = number
+                    target = ("property", parent, key)
                 if tail == "":
                     opens_block = True
                 elif tail == "```":
@@ -362,11 +497,18 @@ def check_tmdl_file(path, findings):
                     comment(number)
                 if stripped.replace(" ", "").lower() in HIDING_FLAGS and stack:
                     stack[-1][1]["hidden"] = True
+                if parent is not None and colon:
+                    parent["props"][key] = _property_text(stripped.split(":", 1)[1])
+                    parent["prop_lines"][key] = number
+                elif parent is not None and BARE_FLAG_RE.match(stripped):
+                    parent["props"][stripped.lower()] = "true"
+                    parent["prop_lines"][stripped.lower()] = number
 
         if opens_block:
             limit = width + steps_deeper if uses_tabs and line.startswith("\t") or (uses_tabs and width == 0) else None
             block = {"limit": limit, "owner_width": width, "fenced": fenced, "is_m": is_m,
-                     "owner": owner, "lines": []}
+                     "owner": owner, "lines": [], "start": number, "target": target,
+                     "owners": [enclosing for _, enclosing in stack]}
 
     if block is not None:
         close_block()
@@ -391,6 +533,7 @@ def check_tmdl_file(path, findings):
             findings.add("I001", path, obj["line"],
                          "%s '%s' still has a %s placeholder as its description" % (kind, obj["name"], PLACEHOLDER),
                          info=True)
+    return objects
 
 
 # ---------------------------------------------------------------- PBIR
@@ -515,7 +658,7 @@ def is_label(label, page_name, page_display):
 def _walk(root):
     """os.walk that skips Git folders and the template's own test data."""
     for folder, dirs, files in os.walk(root):
-        dirs[:] = [d for d in dirs if not d.startswith(".git") and d != "node_modules"
+        dirs[:] = [d for d in dirs if not d.startswith(".git") and d not in ("node_modules", BEFORE_COPY)
                    and not (d == "fixtures" and os.path.basename(folder) == "tests")]
         yield folder, dirs, files
 
@@ -717,7 +860,8 @@ def check_page(page_folder, page_path, bad, findings):
             check_header_and_tooltip(data, visual_path, findings)
 
 
-def check_report(report_dir, findings):
+def check_report(report_dir, findings, brief=None):
+    brief = brief or read_brief(os.path.dirname(report_dir))
     bad = check_all_json(report_dir, findings)
     definition = os.path.join(report_dir, "definition")
     report_path = os.path.join(definition, "report.json")
@@ -747,24 +891,779 @@ def check_report(report_dir, findings):
             if not os.path.isfile(os.path.join(folder, "page.json")):
                 findings.add("F002", folder, 0, "page folder has no page.json, so its visuals cannot be checked")
 
+    hidden_by_bookmark = bookmark_hidden(report_dir)
     for page_folder_name, page_folder, page_path in iter_pages(report_dir):
         try:
             check_page(page_folder, page_path, bad, findings)
+            if page_path not in bad:
+                check_layout(report_dir, page_folder_name, page_folder, page_path, hidden_by_bookmark, brief, findings)
         except (AttributeError, TypeError, KeyError, ValueError) as exc:
             findings.add("J002", page_path, 0, "a file of this page has an unexpected structure (%s)" % exc)
 
 
 def check_model(model_dir, findings):
+    """File checks of one model. Returns the objects read from its .tmdl files."""
     check_all_json(model_dir, findings)
     definition = os.path.join(model_dir, "definition")
     count = 0
+    objects = []
     for folder, dirs, files in os.walk(definition):
+        dirs.sort()
         for name in sorted(files):
             if name.lower().endswith(".tmdl"):
                 count += 1
-                check_tmdl_file(os.path.join(folder, name), findings)
+                objects.extend(check_tmdl_file(os.path.join(folder, name), findings) or [])
     if count == 0:
         findings.add("F003", definition, 0, "the model's 'definition' folder holds no .tmdl file")
+    return objects
+
+
+# ---------------------------------------------------------------- the brief
+
+def _brief_value(lines, label):
+    """Text after 'label ...:' on the first list line that holds the label; '' when there is none."""
+    for line in lines:
+        text = line.strip()
+        if text.startswith("-") and label.lower() in text.lower():
+            rest = text[text.lower().index(label.lower()) + len(label):]
+            if ":" in rest:
+                return rest.split(":", 1)[1].strip().strip("`").strip()
+    return ""
+
+
+def _brief_list(text):
+    return [part.strip().strip("`").strip() for part in text.split(",") if part.strip().strip("`").strip()]
+
+
+def _brief_rows(lines, heading, cells):
+    """Rows of the first table under the heading that holds 'heading': lists of exactly 'cells' cells."""
+    rows = []
+    inside = False
+    for line in lines:
+        text = line.strip()
+        if text.startswith("#"):
+            inside = heading.lower() in text.lower()
+            continue
+        if not inside or not text.startswith("|"):
+            continue
+        parts = [c.replace("\\|", "|").strip().strip("`").strip()
+                 for c in re.split(r"(?<!\\)\|", text.strip("|"))]
+        if len(parts) == cells and CODE_RE.match(parts[0]) and re.search(r"[^\W_]", parts[-1]):
+            rows.append(parts)
+    return rows
+
+
+def read_brief(root):
+    """The numbers, lists, switches and exceptions the checks take from docs/report-brief.md under root.
+
+    A missing brief, or an empty field, gives the default of the model standard or the layout standard.
+    """
+    path = os.path.join(root, BRIEF)
+    lines = []
+    if os.path.isfile(path):
+        try:
+            with open(path, encoding="utf-8-sig") as fh:
+                lines = fh.read().splitlines()
+        except (OSError, UnicodeDecodeError):
+            lines = []
+    numbers = {key: [int(n) for n in re.findall(r"\d+", _brief_value(lines, BRIEF_LABELS[key]))]
+               for key in ("page_size", "margin", "gap", "grid")}
+    size = tuple(numbers["page_size"][:2]) if len(numbers["page_size"]) >= 2 else None
+    subjects = _brief_list(_brief_value(lines, BRIEF_LABELS["subjects"]))
+    return {
+        "page_size": size,
+        "margin": numbers["margin"][0] if numbers["margin"] else None,
+        "gap": numbers["gap"][0] if numbers["gap"] else None,
+        "grid": numbers["grid"][0] if numbers["grid"] and numbers["grid"][0] > 0 else GRID_STEP,
+        "subjects": subjects or list(FOLDER_SUBJECTS),
+        "own_spelling": set(_brief_list(_brief_value(lines, BRIEF_LABELS["own_spelling"]))),
+        "excel": _brief_value(lines, BRIEF_LABELS["excel"]).lower().startswith("yes"),
+        "copilot": _brief_value(lines, BRIEF_LABELS["copilot"]).lower().startswith("yes"),
+        "model_exceptions": {(row[0], row[1]) for row in _brief_rows(lines, MODEL_EXCEPTIONS, 3)},
+        "layout_exceptions": {(row[0], row[1], row[2]) for row in _brief_rows(lines, LAYOUT_EXCEPTIONS, 4)},
+    }
+
+
+def model_excused(brief, code, *keys):
+    return any((code, key) in brief["model_exceptions"] for key in keys)
+
+
+def layout_excused(brief, code, page_keys, visual_keys):
+    return any((code, page, visual) in brief["layout_exceptions"] for page in page_keys for visual in visual_keys)
+
+
+def page_numbers(brief, width):
+    """(margin, gap) for a page of this width: the brief first, then the layout standard's set for that width."""
+    margin, gap = LAYOUT_SETS.get(int(width), (None, None)) if width == int(width) else (None, None)
+    return (brief["margin"] if brief["margin"] is not None else margin,
+            brief["gap"] if brief["gap"] is not None else gap)
+
+
+# ---------------------------------------------------------------- model standard
+
+def _dax_code(text):
+    """DAX with text values and comments removed, so a name inside them is not read as a reference."""
+    text = re.sub(r'"(?:[^"]|"")*"', '""', text or "")
+    text = re.sub(r"/\*.*?\*/", " ", text, flags=re.S)
+    return re.sub(r"(//|--)[^\n]*", " ", text)
+
+
+def _dax_text_only(text):
+    """DAX with comments removed and text values kept: used to see that a measure is one text value and no more."""
+    kept = []
+    for part in re.split(r'("(?:[^"]|"")*")', text):
+        kept.append(part if part.startswith('"') else re.sub(r"(//|--)[^\n]*", " ", re.sub(r"/\*.*?\*/", " ", part, flags=re.S)))
+    return "".join(kept)
+
+
+def _split_reference(text):
+    """'Table'.'Column' or Table.Column -> (table, column), or None."""
+    m = re.match(r"\s*('(?:[^']|'')*'|[^.']+)\.('(?:[^']|'')*'|.+?)\s*\Z", text or "")
+    return (_unquote(m.group(1).strip()), _unquote(m.group(2).strip())) if m else None
+
+
+def build_model(objects):
+    """Tables, columns, measures, hierarchies and relationships of one model, from the objects of its files."""
+    tables = {}
+    relationships = []
+    expressions = []                    # (owner text, DAX) of every DAX expression in the model
+    for obj in objects:
+        if obj["translation"]:
+            continue
+        kind = obj["kind"]
+        if kind == "table" and obj["top"]:
+            table = tables.setdefault(obj["name"], {"name": obj["name"], "objects": [], "columns": [], "measures": [],
+                                                    "hierarchies": [], "partitions": [], "hidden": False,
+                                                    "annotations": {}})
+            table["objects"].append(obj)
+            table["hidden"] = table["hidden"] or obj["hidden"]
+            table["annotations"].update(obj["annotations"])
+    for obj in objects:
+        if obj["translation"]:
+            continue
+        kind = obj["kind"]
+        owner = obj["table"]
+        table = tables.get(owner["name"]) if owner is not None and owner["top"] else None
+        if kind == "relationship" and obj["top"]:
+            relationships.append(obj)
+        elif table is not None and obj["parent"] is owner:
+            if kind == "column":
+                table["columns"].append(obj)
+                obj["calculated"] = obj["has_expr"]
+            elif kind == "measure":
+                table["measures"].append(obj)
+            elif kind == "hierarchy":
+                table["hierarchies"].append(obj)
+                obj["levels"] = []
+            elif kind == "partition":
+                table["partitions"].append(obj)
+        elif kind == "level" and obj["parent"] is not None and obj["parent"]["kind"] == "hierarchy":
+            obj["parent"].setdefault("levels", []).append(_unquote(obj["props"].get("column", "")))
+        if obj["has_expr"] and kind in ("measure", "column", "tablepermission", "calculationitem"):
+            expressions.append((obj, obj["expr"] or ""))
+        if kind == "partition" and (obj["expr"] or "").split("//")[0].strip().lower() == "calculated":
+            expressions.append((obj, obj["props"].get("source", "")))
+        for key in ("formatstringdefinition", "detailrowsdefinition"):
+            if key in obj["props"]:
+                expressions.append((obj, obj["props"][key]))
+    for table in tables.values():
+        table["calculated"] = any((p["expr"] or "").split("//")[0].strip().lower() == "calculated"
+                                  for p in table["partitions"])
+    return {"tables": tables, "relationships": relationships, "expressions": expressions}
+
+
+def _is_hidden(table, obj):
+    return table["hidden"] or obj["hidden"]
+
+
+def _name_problems(name, brief):
+    """(errors, warnings) of one measure name against rule 3 of the model standard."""
+    errors, warnings = [], []
+    own = brief["own_spelling"]
+    if name != name.strip():
+        errors.append("it starts or ends with a space")
+    words = [w for w in name.split() if w]
+    letters = [re.sub(r"[^A-Za-z]", "", w) for w in words]
+    if "_" in name:
+        errors.append("it uses underscores")
+    if any(re.search(r"[a-z][A-Z]", w) and w not in own and w.strip("()") not in own for w in words):
+        errors.append("it runs words together (CamelCase)")
+    spelled = [w for w in letters if w]
+    if (len(spelled) >= 2 and all(w.isupper() for w in spelled)
+            and any(len(w) > 4 and w not in own for w in spelled)):
+        errors.append("it is all in capitals")
+    for index, word in enumerate(words):
+        bare = word.strip("()")
+        if bare in own or word in own or not bare[:1].isalpha():
+            continue
+        if bare[:1].islower() and (index == 0 or bare.lower() not in SMALL_WORDS):
+            warnings.append("'%s' should start with a capital (Title Case)" % bare)
+            break
+    for match in re.finditer(r"(?i)\b(ytd|qtd|mtd|py)\b", name):
+        if match.group(1) != match.group(1).upper():
+            warnings.append("write the period as %s" % match.group(1).upper())
+    if re.search(r"\bLY\b|(?i:\b(last|prior|previous) year\b)", name):
+        warnings.append("write the prior year as PY")
+    if re.search(r"(?i)\b(year|quarter|month)[ -]to[ -]date\b", name):
+        warnings.append("write the period as YTD, QTD or MTD")
+    if re.search(r"(?i)\bvs\.|\bversus\b", name) or re.search(r"\b(VS|Vs)\b", name):
+        warnings.append("write comparisons with 'vs'")
+    if "%" in name and not name.rstrip().endswith("(%)"):
+        warnings.append("write the unit as '(%)' at the end of the name")
+    elif re.search(r"\([^()]*\)\s*\S", name):
+        warnings.append("a unit in brackets goes at the end of the name")
+    if re.match(r"(?i)(count of|number of|no\.? of|nr\.? of)\b", name) or re.search(r"(?i)\scount\Z", name):
+        warnings.append("start a count measure with '# '")
+    if re.match(r"(?i)(ytd|qtd|mtd|py)\b", name):
+        warnings.append("put the period after the base name")
+    return errors, warnings
+
+
+def _expected_type(name):
+    """The level 2 folder a name points to, when exactly one of the three signals is in the name."""
+    signals = []
+    if name.startswith("#"):
+        signals.append("Counts")
+    if re.search(r"\bvs\b", name):
+        signals.append("Comparisons")
+    if re.search(r"\b(YTD|QTD|MTD|PY)\b", name):
+        signals.append("Time Intelligence")
+    return signals[0] if len(signals) == 1 else None
+
+
+def check_standards(model_dir, objects, usage, brief, findings):
+    """The model standard (codes M...). usage: (file, entity, property) of every field a report of this model uses."""
+    model = build_model(objects)
+    tables = model["tables"]
+    if not tables:
+        return model
+    measure_tables = {MEASURE_TABLE} | {name for name in tables if model_excused(brief, "M001", name)}
+    all_measures = [(t, m) for t in tables.values() for m in t["measures"]]
+    all_columns = [(t, c) for t in tables.values() for c in t["columns"]]
+    column_names = {}
+    for table, column in all_columns:
+        column_names.setdefault(column["name"].lower(), "%s[%s]" % (table["name"], column["name"]))
+    measure_names = {m["name"].lower() for _, m in all_measures}
+    code_by_owner = [(owner, _dax_code(text)) for owner, text in model["expressions"]]
+    used_fields = {(entity, prop) for _, entity, prop in usage}
+
+    def add(code, obj, message, level="error", keys=()):
+        if not model_excused(brief, code, *keys):
+            findings.add(code, obj["file"], obj["line"], message, level=level)
+            return True
+        return False
+
+    # ---- A. measures
+    seen = {}
+    for table, measure in all_measures:
+        name = measure["name"]
+        key = "[%s]" % name
+        if table["name"] not in measure_tables:
+            add("M001", measure, "measure %s lives in table '%s'; every measure lives in '%s' (or in a measure table "
+                "the brief lists). In an existing model the developer moves it in Power BI Desktop (Home table)"
+                % (key, table["name"], MEASURE_TABLE), keys=(key, table["name"]))
+        folder = measure["props"].get("displayfolder", "")
+        levels = [part.strip() for part in folder.split("\\")]
+        if not folder:
+            add("M003", measure, "measure %s has no display folder; give it one as Subject\\Type" % key, keys=(key,))
+        elif ";" in folder or len(levels) != 2 or not all(levels):
+            hint = " Levels are separated by a backslash, not a forward slash." if "/" in folder else ""
+            add("M003", measure, "measure %s has display folder '%s'; it needs one folder with exactly two levels, "
+                "Subject\\Type.%s" % (key, folder, hint), keys=(key,))
+        else:
+            wrong = []
+            if levels[0] not in brief["subjects"]:
+                wrong.append("'%s' is not one of the subjects (%s)" % (levels[0], ", ".join(brief["subjects"])))
+            if levels[1] not in FOLDER_TYPES:
+                wrong.append("'%s' is not one of the types (%s)" % (levels[1], ", ".join(FOLDER_TYPES)))
+            if wrong:
+                add("M004", measure, "measure %s, display folder '%s': %s" % (key, folder, "; ".join(wrong)), keys=(key,))
+        if name.lower() in seen:
+            add("M005", measure, "measure name %s is used twice (also in table '%s')" % (key, seen[name.lower()]),
+                keys=(key,))
+        seen.setdefault(name.lower(), table["name"])
+        if name.lower() in column_names:
+            add("M006", measure, "measure %s has the same name as column %s; a measure never takes the name of a column"
+                % (key, column_names[name.lower()]), keys=(key,))
+        errors, warnings = _name_problems(name, brief)
+        if errors:
+            add("M007", measure, "measure name %s is not a business name: %s. Renaming needs the developer's yes"
+                % (key, "; ".join(errors)), keys=(key,))
+        expected = _expected_type(name)
+        if expected and len(levels) == 2 and levels[1] in FOLDER_TYPES and levels[1] != expected:
+            warnings.append("its name points to the folder type '%s', not '%s'" % (expected, levels[1]))
+        if warnings:
+            add("M008", measure, "measure name %s: %s" % (key, "; ".join(warnings)), level="warn", keys=(key,))
+        only_text = re.match(r'\s*"(?:[^"]|"")*"\s*\Z', _dax_text_only(measure["expr"] or ""))
+        if (not _is_hidden(table, measure) and not measure["props"].get("formatstring")
+                and "formatstringdefinition" not in measure["props"] and not only_text):
+            add("M009", measure, "visible measure %s has no format string" % key, keys=(key,))
+
+    for name in sorted(measure_tables):
+        table = tables.get(name)
+        if table is None or not table["measures"]:
+            continue
+        first = table["objects"][0]
+        problems = []
+        if table["hidden"]:
+            problems.append("the table is hidden, which hides its measures; keep it visible")
+        if len(table["columns"]) != 1:
+            problems.append("it has %d columns; it needs exactly one placeholder column" % len(table["columns"]))
+        if any(not c["hidden"] for c in table["columns"]) and not table["hidden"]:
+            problems.append("its placeholder column is visible; hide the column")
+        if problems:
+            add("M002", first, "measure table '%s': %s" % (name, "; ".join(problems)), keys=(name,))
+
+    # ---- rule 5: references in DAX (a text check, not a parser)
+    for owner, code in code_by_owner:
+        if owner["kind"] not in ("measure", "column"):
+            continue
+        loose = set()
+        for match in re.finditer(r"(?<![\w'\]])\s*\[([^\]]+)\]", code):
+            before = code[:match.start()].rstrip()
+            if before[-1:] in ("'",) or re.search(r"\w\Z", before):
+                continue
+            name = match.group(1)
+            if name.lower() in column_names and name.lower() not in measure_names:
+                loose.add("[%s]" % name)
+        tied = set()
+        for match in re.finditer(r"(?:'((?:[^']|'')+)'|([A-Za-z_]\w*))\s*\[([^\]]+)\]", code):
+            table_name = (match.group(1) or match.group(2)).replace("''", "'")
+            name = match.group(3)
+            table = tables.get(table_name)
+            if (name.lower() in measure_names and table is not None
+                    and name.lower() not in {c["name"].lower() for c in table["columns"]}):
+                tied.add("%s[%s]" % (table_name, name))
+        if loose or tied:
+            parts = []
+            if loose:
+                parts.append("write the column with its table: %s" % ", ".join(sorted(loose)))
+            if tied:
+                parts.append("write the measure without its table: %s" % ", ".join(sorted(tied)))
+            label = "[%s]" % owner["name"] if owner["kind"] == "measure" else "%s[%s]" % (owner["table"]["name"], owner["name"])
+            add("M010", owner, "DAX of %s: %s" % (label, "; ".join(parts)), level="warn", keys=(label,))
+
+    # ---- B. columns and tables
+    relationship_ends = []
+    foreign = {}                        # (table, column) -> relationship line
+    sort_keys = {}
+    for relationship in model["relationships"]:
+        ends = [_split_reference(relationship["props"].get(k, "")) for k in ("fromcolumn", "tocolumn")]
+        if None in ends:
+            continue
+        relationship_ends.append((relationship, ends[0], ends[1]))
+        if relationship["props"].get("fromcardinality", "many").lower() == "many":
+            foreign[ends[0]] = relationship
+    column_at = {(t["name"], c["name"]): (t, c) for t, c in all_columns}
+    for table, column in all_columns:
+        target = _unquote(column["props"].get("sortbycolumn", ""))
+        if target:
+            sort_keys[(table["name"], target)] = column["name"]
+    hierarchy_columns = {(t["name"], level) for t in tables.values() for h in t["hierarchies"]
+                         for level in h.get("levels", [])}
+    totalled = {}
+    for owner, code in code_by_owner:
+        if owner["kind"] != "measure":
+            continue
+        for match in re.finditer(r"(?i)\b(%s)\s*\(\s*(?:'((?:[^']|'')+)'|([A-Za-z_]\w*))\s*\[([^\]]+)\]\s*\)"
+                                 % "|".join(TOTAL_FUNCTIONS), code):
+            totalled.setdefault(((match.group(2) or match.group(3)).replace("''", "'"), match.group(4)), owner["name"])
+
+    calculated_columns = []
+    for table, column in all_columns:
+        key = "%s[%s]" % (table["name"], column["name"])
+        place = (table["name"], column["name"])
+        props = column["props"]
+        kind = props.get("datatype", "").lower()
+        visible = not _is_hidden(table, column)
+        in_measure_table = table["name"] in measure_tables
+        if visible and place in foreign:
+            if add("M102", column, "column %s is the many side of a relationship (a foreign key) and is visible; hide it, "
+                   "or record its use in the brief" % key, level="warn", keys=(key,)):
+                findings.fixes.append(("M102", key, "isHidden", "true"))
+        elif visible and place in sort_keys:
+            if add("M102", column, "column %s only sorts column '%s' and is visible; hide it, or record its use in the brief"
+                   % (key, sort_keys[place]), level="warn", keys=(key,)):
+                findings.fixes.append(("M102", key, "isHidden", "true"))
+        if visible and kind in NUMERIC_TYPES and place in totalled:
+            if add("M103", column, "numeric column %s is visible, and measure [%s] already totals it; hide the column, "
+                   "or record its use in the brief" % (key, totalled[place]), level="warn", keys=(key,)):
+                findings.fixes.append(("M103", key, "isHidden", "true"))
+        if column["hidden"] and not table["hidden"] and not in_measure_table:
+            needed = []
+            if place in hierarchy_columns:
+                needed.append("a hierarchy")
+            if place in used_fields:
+                needed.append("a report visual")
+            if needed:
+                add("M104", column, "hidden column %s is used by %s; check that it still works for report users"
+                    % (key, " and ".join(needed)), level="warn", keys=(key,))
+        if column.get("calculated"):
+            calculated_columns.append((table, column))
+            if not re.search(r"[^\W_]", column["annotations"].get(REASON_ANNOTATION, "")):
+                add("M105", column, "calculated column %s has no '%s' annotation saying why it is calculated in the "
+                    "model and cannot come from the source" % (key, REASON_ANNOTATION), keys=(key,))
+            if re.search(r"(?i)\bRELATED\s*\(", _dax_code(column["expr"] or "")):
+                add("M106", column, "calculated column %s uses RELATED; consider bringing the value in at the source"
+                    % key, level="warn", keys=(key,))
+        if visible and kind in NUMERIC_TYPES and props.get("summarizeby", "").lower() != "none":
+            add("M107", column, "visible numeric column %s still totals by default (summarizeBy is '%s'); set it to "
+                "none and use a measure, or list the column in the brief. Changing it needs the developer: Microsoft "
+                "does not document the effect on visuals that already total the column"
+                % (key, props.get("summarizeby", "not set")), keys=(key,))
+        if kind == "double":
+            add("M108", column, "column %s has the floating-point type (double, 'Decimal number' in Desktop); "
+                "fixed decimal or whole number avoids rounding differences. A type change is the developer's decision"
+                % key, level="warn", keys=(key,))
+        if kind == "datetime":
+            style = props.get("formatstring", "")
+            if not style or style.lower() == "general date" or re.search(r"(?i)\bh{1,2}\b|:mm|\bss\b|time|am/pm|\btt\b", style):
+                add("M111", column, "column %s may hold a date and a time together (format '%s'); if it does, "
+                    "split it or keep the date only. The check cannot see the data" % (key, style or "not set"),
+                    level="warn", keys=(key,))
+        if visible and kind in NUMERIC_TYPES + ("datetime",) and not props.get("formatstring"):
+            add("M112", column, "visible %s column %s has no format string"
+                % ("date" if kind == "datetime" else "numeric", key), level="warn", keys=(key,))
+
+    for table in tables.values():
+        if table["name"] in measure_tables or table["hidden"]:
+            continue
+        shown = [c for c in table["columns"] if not c["hidden"]]
+        fields = len(shown) + len([m for m in table["measures"] if not m["hidden"]]) \
+            + len([h for h in table["hierarchies"] if not h["hidden"]])
+        loose = [c["name"] for c in shown if c["props"].get("displayfolder", "") not in COLUMN_FOLDERS]
+        if fields >= FOLDER_THRESHOLD and loose:
+            add("M101", table["objects"][0], "table '%s' shows %d fields; group its columns in the folders %s. "
+                "Not in one of them: %s" % (table["name"], fields, ", ".join(COLUMN_FOLDERS), ", ".join(loose[:12])
+                                           + (" ..." if len(loose) > 12 else "")), level="warn", keys=(table["name"],))
+    for table in tables.values():
+        if table["calculated"] and not table["name"].startswith(AUTO_DATE_PREFIXES):
+            if not re.search(r"[^\W_]", table["annotations"].get(REASON_ANNOTATION, "")):
+                add("M105", table["objects"][0], "calculated table '%s' has no '%s' annotation saying why it is "
+                    "calculated in the model and cannot come from the source" % (table["name"], REASON_ANNOTATION),
+                    keys=(table["name"],))
+    if len(calculated_columns) > CALCULATED_COLUMN_LIMIT:
+        table, column = calculated_columns[0]
+        add("M106", column, "the model has %d calculated columns (more than %d): review whether they can come from "
+            "the source: %s" % (len(calculated_columns), CALCULATED_COLUMN_LIMIT,
+                                ", ".join("%s[%s]" % (t["name"], c["name"]) for t, c in calculated_columns)),
+            level="warn", keys=("model",))
+
+    for relationship, start, end in relationship_ends:
+        if start not in column_at or end not in column_at:
+            continue
+        kinds = [column_at[side][1]["props"].get("datatype", "").lower() for side in (start, end)]
+        label = "%s[%s] to %s[%s]" % (start[0], start[1], end[0], end[1])
+        if kinds[0] and kinds[1] and kinds[0] != kinds[1]:
+            add("M109", relationship, "relationship %s joins a %s column to a %s column; both need the same type"
+                % (label, kinds[0], kinds[1]), keys=(label,))
+        elif any(k and k != "int64" for k in kinds):
+            add("M110", relationship, "relationship %s uses %s columns; whole number is preferred"
+                % (label, " and ".join(sorted({k for k in kinds if k}))), level="warn", keys=(label,))
+
+    # ---- C. assess only
+    everything = "\n".join(code for _, code in code_by_owner)
+    for table, column in all_columns:
+        place = (table["name"], column["name"])
+        if not _is_hidden(table, column) or table["name"] in measure_tables:
+            continue
+        if (place in foreign or place in sort_keys or place in hierarchy_columns or place in used_fields
+                or any(place in (start, end) for _, start, end in relationship_ends)
+                or column["props"].get("sortbycolumn") or "[%s]" % column["name"].lower() in everything.lower()):
+            continue
+        add("M201", column, "hidden column %s[%s]: nothing in the model or the report refers to it"
+            % place, level="note", keys=("%s[%s]" % place,))
+    for table, measure in all_measures:
+        if not _is_hidden(table, measure):
+            continue
+        marker = "[%s]" % measure["name"].lower()
+        others = "\n".join(code for owner, code in code_by_owner if owner is not measure).lower()
+        if marker in others or any(prop == measure["name"] for _, _, prop in usage):
+            continue
+        add("M201", measure, "hidden measure [%s]: nothing in the model or the report refers to it" % measure["name"],
+            level="note", keys=("[%s]" % measure["name"],))
+
+    # ---- D. only when the brief turns them on
+    if brief["excel"]:
+        for table in tables.values():
+            if table["name"] in measure_tables:
+                continue
+            found = [c["name"] for c in table["columns"]
+                     if _is_hidden(table, c) and (table["name"], c["name"]) not in sort_keys
+                     and not c["props"].get("sortbycolumn") and (table["name"], c["name"]) not in hierarchy_columns
+                     and c["props"].get("isavailableinmdx", "true").lower() != "false"]
+            if found:
+                add("M301", table["objects"][0], "table '%s': isAvailableInMdx could be turned off on hidden column(s) %s. "
+                    "That saves memory but removes them from Excel PivotTables. Change nothing without the developer's yes"
+                    % (table["name"], ", ".join(found)), level="note", keys=(table["name"],))
+    if brief["copilot"]:
+        for obj in objects:
+            if (not obj["translation"] and obj["kind"] in DESCRIBED_KINDS
+                    and len(obj["description"]) > COPILOT_DESCRIPTION_LIMIT):
+                findings.add("M302", obj["file"], obj["line"],
+                             "%s '%s': its description has %d characters; Copilot in Power BI reads the first %d, so "
+                             "put the key words first" % (obj["kind"], obj["name"], len(obj["description"]),
+                                                          COPILOT_DESCRIPTION_LIMIT), level="note")
+    return model
+
+
+# ---------------------------------------------------------------- fields a report uses
+
+def report_model(report_dir):
+    """The model folder a report points to with a relative path, or None (a published model, or unreadable)."""
+    data = load_object(os.path.join(report_dir, "definition.pbir"))
+    try:
+        path = data["datasetReference"]["byPath"]["path"]
+    except (TypeError, KeyError):
+        return None
+    return os.path.normpath(os.path.join(report_dir, path)) if isinstance(path, str) else None
+
+
+def _field_references(node, found):
+    if isinstance(node, dict):
+        for kind in ("Column", "Measure"):
+            value = node.get(kind)
+            if isinstance(value, dict) and isinstance(value.get("Property"), str):
+                source = value.get("Expression")
+                source = source.get("SourceRef") if isinstance(source, dict) else None
+                if isinstance(source, dict) and isinstance(source.get("Entity"), str):
+                    found.append((source["Entity"], value["Property"]))
+        for value in node.values():
+            _field_references(value, found)
+    elif isinstance(node, list):
+        for value in node:
+            _field_references(value, found)
+
+
+def report_fields(report_dir):
+    """(file, table, field) for every column or measure the report's files name by table (SourceRef.Entity)."""
+    out = []
+    definition = os.path.join(report_dir, "definition")
+    for folder, dirs, files in os.walk(definition):
+        for name in sorted(files):
+            if not name.lower().endswith(".json") or name == "reportExtensions.json":
+                continue
+            path = os.path.join(folder, name)
+            data = load_json(path)
+            if data is FAILED:
+                continue
+            found = []
+            try:
+                _field_references(data, found)
+            except RecursionError:
+                continue
+            out.extend((path, entity, prop) for entity, prop in found)
+    return out
+
+
+def report_measures(report_dir):
+    """(table, measure) of every measure defined in the report itself (reportExtensions.json)."""
+    data = load_object(os.path.join(report_dir, "definition", "reportExtensions.json")) or {}
+    out = set()
+    for entity in data.get("entities") if isinstance(data.get("entities"), list) else []:
+        if isinstance(entity, dict):
+            for measure in entity.get("measures") if isinstance(entity.get("measures"), list) else []:
+                if isinstance(measure, dict):
+                    out.add((entity.get("name"), measure.get("name")))
+    return out
+
+
+def check_bindings(report_dir, model, usage, brief, findings):
+    """B001: a report file names a table, column or measure the model in this project does not have."""
+    own = report_measures(report_dir)
+    tables = model["tables"]
+    missing = {}
+    for path, entity, prop in usage:
+        if (entity, prop) in own or model_excused(brief, "B001", "%s[%s]" % (entity, prop)):
+            continue
+        table = tables.get(entity)
+        if table is None:
+            missing.setdefault(path, set()).add("table '%s'" % entity)
+        elif prop not in {o["name"] for o in table["columns"] + table["measures"]}:
+            missing.setdefault(path, set()).add("%s[%s]" % (entity, prop))
+    for path in sorted(missing):
+        findings.add("B001", path, 0, "this file uses field(s) the model does not have: %s. A rename or a move of a "
+                     "measure breaks such references" % ", ".join(sorted(missing[path])))
+
+
+# ---------------------------------------------------------------- layout standard
+
+def _is_number(value):
+    return isinstance(value, (int, float)) and not isinstance(value, bool)
+
+
+def _text(value):
+    return value if isinstance(value, str) else None
+
+
+def bookmark_hidden(report_dir):
+    """{page name: (visual names, group names)} that at least one bookmark hides."""
+    out = {}
+    folder = os.path.join(report_dir, "definition", "bookmarks")
+    if not os.path.isdir(folder):
+        return out
+
+    def groups(states, names):
+        for name, state in states.items() if isinstance(states, dict) else []:
+            if isinstance(state, dict):
+                if state.get("isHidden") is True:
+                    names.add(name)
+                groups(state.get("children"), names)
+
+    for name in sorted(os.listdir(folder)):
+        if not name.endswith(".bookmark.json"):
+            continue
+        data = load_object(os.path.join(folder, name)) or {}
+        state = data.get("explorationState")
+        sections = state.get("sections") if isinstance(state, dict) else None
+        for page, section in sections.items() if isinstance(sections, dict) else []:
+            if not isinstance(section, dict):
+                continue
+            visuals, hidden_groups = out.setdefault(page, (set(), set()))
+            containers = section.get("visualContainers")
+            for visual, saved in containers.items() if isinstance(containers, dict) else []:
+                try:
+                    if saved["singleVisual"]["display"]["mode"] == "hidden":
+                        visuals.add(visual)
+                except (TypeError, KeyError):
+                    pass
+            groups(section.get("visualContainerGroups"), hidden_groups)
+    return out
+
+
+def page_layout(page_folder):
+    """Position and kind of every visual on a page whose visual.json can be read."""
+    out = []
+    for folder_name, path in iter_visuals(page_folder):
+        data = load_object(path)
+        position = data.get("position") if data else None
+        if not isinstance(position, dict) or not all(_is_number(position.get(k)) for k in ("x", "y", "width", "height")):
+            continue
+        visual = data.get("visual") if isinstance(data.get("visual"), dict) else {}
+        angle = position.get("angle")
+        out.append({"folder": folder_name, "path": path, "name": _text(data.get("name")) or folder_name,
+                    "label": _text(annotation(data, LABEL_ANNOTATION)),
+                    "x": position["x"], "y": position["y"], "w": position["width"], "h": position["height"],
+                    "group": isinstance(data.get("visualGroup"), dict), "parent": _text(data.get("parentGroupName")),
+                    "hidden": data.get("isHidden") is True, "type": _text(visual.get("visualType")),
+                    "data": isinstance(visual.get("query"), dict),
+                    "rotated": _is_number(angle) and angle != 0})
+    return out
+
+
+def _shown(visual):
+    return visual["label"] or visual["name"]
+
+
+def _keys(visual):
+    return {k for k in (visual["label"], visual["name"], visual["folder"]) if k}
+
+
+def check_layout(report_dir, page_folder_name, page_folder, page_path, hidden_by_bookmark, brief, findings):
+    """The layout standard (codes G...) for one page."""
+    page = load_object(page_path)
+    if page is None or not _is_number(page.get("width")) or not _is_number(page.get("height")):
+        return
+    width, height = page["width"], page["height"]
+    page_keys = {k for k in (page_folder_name, _text(page.get("name")), _text(page.get("displayName"))) if k}
+    visuals = page_layout(page_folder)
+    by_name = {v["name"]: v for v in visuals}
+    hidden_visuals, hidden_groups = hidden_by_bookmark.get(_text(page.get("name")) or page_folder_name, (set(), set()))
+
+    def is_hidden(visual, depth=0):
+        if visual["hidden"] or visual["name"] in hidden_visuals or (visual["group"] and visual["name"] in hidden_groups):
+            return True
+        parent = by_name.get(visual["parent"]) if visual["parent"] else None
+        return parent is not None and depth < 20 and is_hidden(parent, depth + 1)
+
+    def excused(code, *some):
+        keys = set()
+        for visual in some:
+            keys |= _keys(visual)
+        return layout_excused(brief, code, page_keys, keys or {"-"})
+
+    def right(v):
+        return v["x"] + v["w"]
+
+    def bottom(v):
+        return v["y"] + v["h"]
+
+    top_level = [v for v in visuals if not v["parent"]]
+    for visual in top_level:
+        if visual["rotated"]:
+            findings.add("G008", visual["path"], 0, "visual '%s' is rotated; its position is not checked" % _shown(visual),
+                         level="note")
+        elif (visual["x"] < -EPSILON or visual["y"] < -EPSILON or right(visual) > width + EPSILON
+              or bottom(visual) > height + EPSILON) and not excused("G001", visual):
+            findings.add("G001", visual["path"], 0, "visual '%s' (x %g, y %g, width %g, height %g) reaches outside the "
+                         "page (%g x %g)" % (_shown(visual), visual["x"], visual["y"], visual["w"], visual["h"], width, height))
+
+    plotted = [v for v in visuals if v["data"] and not v["rotated"] and not is_hidden(v)]
+    for index, first in enumerate(plotted):
+        for second in plotted[index + 1:]:
+            if first["parent"] != second["parent"]:
+                continue            # a member's position may count from its group: compare like with like only
+            across = min(right(first), right(second)) - max(first["x"], second["x"])
+            down = min(bottom(first), bottom(second)) - max(first["y"], second["y"])
+            if across > EPSILON and down > EPSILON and not excused("G002", first) and not excused("G002", second):
+                findings.add("G002", first["path"], 0, "data visuals '%s' and '%s' overlap by %g x %g pixels"
+                             % (_shown(first), _shown(second), across, down))
+
+    if page.get("type") == "Tooltip":
+        return
+    size = brief["page_size"] or PAGE_SIZE
+    if (width, height) != tuple(size) and not layout_excused(brief, "G007", page_keys, {"-"}):
+        findings.add("G007", page_path, 0, "page is %g x %g; the brief or the layout standard says %d x %d. "
+                     "An existing report keeps its size: write it in the brief" % (width, height, size[0], size[1]),
+                     level="warn")
+    grid = brief["grid"]
+    margin, gap = page_numbers(brief, width)
+    placed = [v for v in top_level if not v["group"] and not v["rotated"] and not is_hidden(v)]
+    for visual in placed:
+        off = [k for k, value in (("x", visual["x"]), ("y", visual["y"]), ("width", visual["w"]), ("height", visual["h"]))
+               if abs(value / grid - round(value / grid)) > EPSILON]
+        if off and not excused("G003", visual):
+            findings.add("G003", visual["path"], 0, "visual '%s': %s not on the %d-pixel grid (x %g, y %g, width %g, "
+                         "height %g)" % (_shown(visual), ", ".join(off), grid, visual["x"], visual["y"], visual["w"], visual["h"]),
+                         level="warn")
+    edge = [v for v in placed if not excused("G004", v)]
+    if edge and margin is not None:
+        sides = (("left", min(v["x"] for v in edge)), ("top", min(v["y"] for v in edge)),
+                 ("right", width - max(right(v) for v in edge)))
+        below = height - max(bottom(v) for v in edge)
+        wrong = ["%s %g" % (name, value) for name, value in sides if abs(value - margin) > EPSILON]
+        if below < margin - EPSILON:
+            wrong.append("bottom %g" % below)
+        if wrong:
+            findings.add("G004", page_path, 0, "outer margins differ from %d pixels: %s (left, top and right equal the "
+                         "margin; bottom is at least the margin)" % (margin, ", ".join(wrong)), level="warn")
+    rows = {}
+    for visual in placed:
+        if visual["type"]:
+            rows.setdefault((visual["type"], visual["y"]), []).append(visual)
+    for (kind, y), members in sorted(rows.items(), key=lambda item: (item[0][1], item[0][0])):
+        if len({v["h"] for v in members}) > 1 and not any(excused("G005", v) for v in members):
+            findings.add("G005", members[0]["path"], 0, "%s visuals in the row at y %g have different heights: %s"
+                         % (kind, y, ", ".join("%s %g" % (_shown(v), v["h"]) for v in members)), level="warn")
+    if gap is not None:
+        spaced = [v for v in placed if not excused("G006", v)]
+        wrong = []
+        for first in spaced:
+            beside = [v for v in spaced if v is not first and v["x"] >= right(first) - EPSILON
+                      and min(bottom(first), bottom(v)) - max(first["y"], v["y"]) > EPSILON]
+            under = [v for v in spaced if v is not first and v["y"] >= bottom(first) - EPSILON
+                     and min(right(first), right(v)) - max(first["x"], v["x"]) > EPSILON]
+            if beside:
+                nearest = min(beside, key=lambda v: v["x"])
+                if abs(nearest["x"] - right(first) - gap) > EPSILON:
+                    wrong.append("%s to %s: %g across" % (_shown(first), _shown(nearest), nearest["x"] - right(first)))
+            if under:
+                nearest = min(under, key=lambda v: v["y"])
+                if abs(nearest["y"] - bottom(first) - gap) > EPSILON:
+                    wrong.append("%s to %s: %g down" % (_shown(first), _shown(nearest), nearest["y"] - bottom(first)))
+        if wrong:
+            findings.add("G006", page_path, 0, "gaps between neighbours differ from %d pixels: %s%s"
+                         % (gap, "; ".join(wrong[:8]), " ..." if len(wrong) > 8 else ""), level="warn")
 
 
 # ---------------------------------------------------------------- review table
@@ -836,10 +1735,24 @@ def run(root):
         findings.add("F001", folder, 0,
                      "no 'definition' folder: this item is saved in an older format these checks cannot read; "
                      "save it from Power BI Desktop as a project with TMDL and PBIR")
-    for model in models:
-        check_model(model, findings)
+    brief = read_brief(root)
+    parsed = {os.path.normpath(model): check_model(model, findings) for model in models}
+    usage = {}
     for report in reports:
-        check_report(report, findings)
+        check_report(report, findings, brief)
+        target = report_model(report)
+        if target in parsed:
+            usage.setdefault(target, []).append((report, report_fields(report)))
+    for model in models:
+        used = usage.get(os.path.normpath(model), [])
+        every = [field for _, fields in used for field in fields]
+        try:
+            built = check_standards(model, parsed[os.path.normpath(model)], every, brief, findings)
+            for report, fields in used:
+                check_bindings(report, built, fields, brief, findings)
+        except (AttributeError, TypeError, KeyError, ValueError, RecursionError) as exc:
+            findings.add("J002", os.path.join(model, "definition"), 0,
+                         "the model has a structure the standard checks cannot read (%s)" % exc)
     return findings, models, reports
 
 
@@ -865,8 +1778,10 @@ def main(argv):
         return 2
     findings.print_all(root)
     errors = findings.errors()
-    infos = len(findings.items) - len(errors)
-    print("Checked %d model(s) and %d report(s): %d error(s), %d note(s)." % (len(models), len(reports), len(errors), infos))
+    warnings = findings.warnings()
+    infos = len(findings.items) - len(errors) - len(warnings)
+    print("Checked %d model(s) and %d report(s): %d error(s), %d warning(s), %d note(s)."
+          % (len(models), len(reports), len(errors), len(warnings), infos))
     if errors:
         codes = sorted({f[0] for f in errors})
         print("If you created or changed these files in this task, fix them and record one lesson for each code (%s): "

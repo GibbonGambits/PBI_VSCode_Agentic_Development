@@ -1,0 +1,11 @@
+relationship 11111111-aaaa-bbbb-cccc-000000000001
+	fromColumn: Orders.CustomerKey
+	toColumn: Customer.CustomerKey
+
+relationship 11111111-aaaa-bbbb-cccc-000000000002
+	fromColumn: Orders.'Store Code'
+	toColumn: Store.StoreId
+
+relationship 11111111-aaaa-bbbb-cccc-000000000003
+	fromColumn: Orders.'Product Code'
+	toColumn: Product.'Product Code'

@@ -1,0 +1,432 @@
+#!/usr/bin/env python3
+"""The evaluate-and-improve flow: safety first, a fix plan, and before-and-after counts.
+
+Usage (run from the repository root; <folder> is '.' when left out):
+    python scripts/improve.py next [<folder>]        say which step the flow is at, and what to run
+    python scripts/improve.py start [<folder>]       stop unless everything is committed; make a new branch;
+                                                     copy the project, unchanged, to _before/
+    python scripts/improve.py snapshot [<folder>]    keep the first review as docs/checklist-review-before.md
+    python scripts/improve.py plan [<folder>]        write docs/fix-plan.md from the review and the project check
+    python scripts/improve.py check-plan [<folder>]  check the plan: every row has a kind, a change, files, a risk
+    python scripts/improve.py compare [<folder>]     Pass, Fail and Not applicable before and after; the items
+                                                     that changed; the pages to look at; what needs a person
+
+The steps, and who does what, are in the skill 'pbi-improve'. This script changes no report or model file.
+'start' makes a Git branch and the copy; 'snapshot' and 'plan' write the two files named above.
+
+The copy: the .pbip file points to the report folder, and the report points to the model, both by relative
+path (Microsoft Learn, "Power BI Desktop projects"). So the three are copied together, names unchanged, and
+nothing inside them is edited. Each .platform file holds a logicalId that must stay unique in a Git branch
+(Microsoft Learn, "Git integration source code format"), so the copy must never be committed: 'start' makes
+it only when Git ignores _before/, and skips it, saying so, when a path would pass 260 characters.
+
+Kinds of fix: Mechanical (descriptions, format strings, folders, hiding, header icons and tooltips),
+Layout (positions and sizes), Needs a person (everything else, and anything a file cannot settle).
+
+Needs Python 3.8 or later and Git. Uses the standard library only.
+Exit code: 0 = done, 1 = stopped or a problem found, 2 = wrong usage.
+"""
+import datetime
+import os
+import re
+import shutil
+import subprocess
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import check_project as cp  # noqa: E402
+
+REVIEW = os.path.join("docs", "checklist-review.md")
+REVIEW_BEFORE = os.path.join("docs", "checklist-review-before.md")
+PLAN = os.path.join("docs", "fix-plan.md")
+BRANCH_PREFIX = "improve/"
+PATH_LIMIT = 260                                     # Microsoft Learn, "Power BI Desktop projects", limitations
+COMMITS = {"Mechanical": "Improve: mechanical fixes", "Layout": "Improve: layout fixes"}
+KINDS = ("Mechanical", "Layout", "Needs a person")
+PLAN_HEADER = ["Id", "Kind", "Item or code", "Object", "What will change", "Files", "What could break", "Approved"]
+
+# code -> (kind, what will change, what could break). A code that is not here needs a person.
+MECHANICAL = {
+    "D001": ("Add a '///' description from the brief, or a TODO(owner) question when the brief does not say",
+             "Nothing in the report. A placeholder still leaves checklist item 23 open"),
+    "D002": ("Add a '///' description above the shared query or parameter", "Nothing in the report"),
+    "D003": ("Move the '///' description directly above its object", "Nothing in the report"),
+    "C001": ("Turn the '//' comment into a '///' description, or move it inside the expression", "Nothing in the report"),
+    "P001": ("Add a '//' line above the Power Query step that says what it does", "Nothing in the report"),
+    "H001": ("Set Header icons off on the visual (scripts/set_visual_defaults.py)",
+             "Drill, focus and export icons no longer show in reading view"),
+    "H002": ("Set Tooltips off on the visual (scripts/set_visual_defaults.py)", "Hover tooltips no longer show"),
+    "N003": ("Add a VisualLabel annotation; the visual keeps its name", "Nothing: Power BI Desktop ignores annotations"),
+    "M003": ("Set the measure's display folder to Subject\\Type (scripts/set_model_properties.py)",
+             "The measure moves in the Data pane; visuals keep working"),
+    "M004": ("Set the measure's display folder to a subject and a type from the lists",
+             "The measure moves in the Data pane; visuals keep working"),
+    "M009": ("Set the measure's format string to the brief's format for that kind of number",
+             "Numbers show differently wherever the measure is used"),
+    "M101": ("Put each visible column in one of the four column folders", "Columns move in the Data pane"),
+    "M102": ("Hide the key column (scripts/set_model_properties.py --from-findings M102)",
+             "Report authors no longer see it; a visual that uses it is reported as M104"),
+    "M103": ("Hide the numeric column the measure totals (--from-findings M103)",
+             "Report authors no longer see it; a visual that uses it is reported as M104"),
+    "M112": ("Set the column's format string to the brief's format", "Values show differently wherever the column is used"),
+}
+LAYOUT = {
+    "G001": ("Move or resize the visual so that it sits inside the page (scripts/set_positions.py)", "The page looks different"),
+    "G002": ("Move or resize one of the two visuals so that they no longer overlap", "The page looks different"),
+    "G003": ("Put x, y, width and height on the grid (scripts/set_positions.py --snap)", "Sizes change by a few pixels; text may wrap"),
+    "G004": ("Move the outer visuals to the margin", "The page looks different"),
+    "G005": ("Give the visuals of one row the same height", "The page looks different"),
+    "G006": ("Make the gaps between neighbours equal to the gap", "The page looks different"),
+    "G007": ("Write the page size in the brief; or resize the page in Power BI Desktop", "A resized page changes every position"),
+}
+PERSON = {
+    "M001": "The developer moves the measure to _Measures in Power BI Desktop (Home table). DAX that names it with a table, and visuals, can break",
+    "M002": "The developer makes or repairs the _Measures table in Power BI Desktop",
+    "M005": "Rename one of the two measures: renaming may break visuals and other reports",
+    "M006": "Rename the measure or the column: renaming may break visuals and other reports",
+    "M007": "Rename the measure: renaming may break visuals and other reports",
+    "M008": "Rename the measure, or accept the name: renaming may break visuals and other reports",
+    "M010": "Edit the DAX reference; the developer checks the result",
+    "M104": "Decide whether the hidden column should be shown again",
+    "M105": "The developer states why it is calculated in the model; then the reason is written as an annotation",
+    "M106": "Decide whether the calculated columns can come from the source",
+    "M107": "Decide on 'do not summarise': Microsoft does not document its effect on visuals that already total the column",
+    "M108": "Decide on the data type: a change alters stored precision",
+    "M109": "Give both relationship columns the same type, at the source or in Power Query",
+    "M110": "Decide whether the relationship can use whole-number keys",
+    "M111": "Look at the data: split date and time, or keep the date only",
+    "B001": "Repair the field reference in Power BI Desktop",
+}
+PERSON_ITEMS = frozenset((3, 11, 14, 17, 18, 21, 31, 39, 40, 41, 42, 43, 44, 45, 67, 68, 76, 77, 78, 79))
+
+
+def git(root, *args):
+    try:
+        done = subprocess.run(("git", "-C", root) + args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    except OSError:
+        return 127, "git was not found"
+    return done.returncode, done.stdout.decode("utf-8", "replace").strip()
+
+
+def project_parts(root):
+    """The .pbip files and the .Report and .SemanticModel folders directly under root."""
+    return sorted(name for name in os.listdir(root)
+                  if name.lower().endswith(".pbip") or name.endswith((".Report", ".SemanticModel")))
+
+
+def read_review(path):
+    """{item: status} of a review table, or None when the file cannot be read."""
+    try:
+        with open(path, encoding="utf-8-sig") as fh:
+            lines = fh.read().splitlines()
+    except (OSError, UnicodeDecodeError):
+        return None
+    rows = {}
+    inside = False
+    for line in lines:
+        text = line.strip()
+        if not text.startswith("|"):
+            if inside:
+                break
+            continue
+        cells = [cp._plain(c) for c in text.strip("|").split("|")]
+        if not inside:
+            inside = [c.lower() for c in cells[:3]] == ["item", "status", "evidence"]
+        elif len(cells) >= 3 and cells[0].isdigit():
+            rows[int(cells[0])] = (cells[1], cells[2])
+    return rows
+
+
+def counts(rows):
+    return tuple(sum(1 for status, _ in rows.values() if status == wanted) for wanted in cp.REVIEW_STATUSES)
+
+
+def _cell(text):
+    return " ".join(str(text).split()).replace("|", "\\|")
+
+
+def read_plan(path):
+    """(rows, problems) of a fix plan. rows: dicts keyed by PLAN_HEADER."""
+    try:
+        with open(path, encoding="utf-8-sig") as fh:
+            lines = fh.read().splitlines()
+    except (OSError, UnicodeDecodeError) as exc:
+        return [], ["cannot read %s: %s" % (PLAN.replace(os.sep, "/"), exc)]
+    rows, problems = [], []
+    inside = False
+    for number, line in enumerate(lines, 1):
+        text = line.strip()
+        if not text.startswith("|"):
+            continue
+        cells = [c.replace("\\|", "|").strip() for c in re.split(r"(?<!\\)\|", text.strip("|"))]
+        if cells == PLAN_HEADER:
+            inside = True
+        elif inside and not all(set(c) <= set("-: ") for c in cells):
+            if len(cells) != len(PLAN_HEADER):
+                problems.append("line %d: the row has %d cells, expected %d" % (number, len(cells), len(PLAN_HEADER)))
+                continue
+            row = dict(zip(PLAN_HEADER, cells))
+            where = "row %s" % (row["Id"] or "on line %d" % number)
+            if row["Kind"] not in KINDS:
+                problems.append("%s: Kind must be one of: %s" % (where, ", ".join(KINDS)))
+            for column in ("Item or code", "What will change", "Files", "What could break"):
+                if not re.search(r"[^\W_]", row[column]) or row[column].startswith("<"):
+                    problems.append("%s: '%s' is empty" % (where, column))
+            if row["Approved"] and not re.match(r"(?i)(yes|no)\b", row["Approved"]):
+                problems.append("%s: Approved must be empty, or start with yes or no" % where)
+            rows.append(row)
+    if not inside:
+        problems.append("no table with the header | %s |" % " | ".join(PLAN_HEADER))
+    return rows, problems
+
+
+def approved(rows, kind):
+    return [r for r in rows if r["Kind"] == kind and r["Approved"].lower().startswith("yes")]
+
+
+# ---------------------------------------------------------------- commands
+
+def start(root):
+    code, out = git(root, "rev-parse", "--is-inside-work-tree")
+    if code != 0:
+        print("Stopped: %s is not a Git repository, so the original cannot be kept on a branch." % root)
+        return 1
+    code, out = git(root, "status", "--porcelain")
+    if code != 0 or out:
+        print("Stopped: not everything is committed. Commit these first, then run this again:")
+        print(out)
+        return 1
+    parts = project_parts(root)
+    if not parts:
+        print("Stopped: no .pbip file, .Report or .SemanticModel folder directly under %s." % root)
+        return 1
+    _, old_branch = git(root, "rev-parse", "--abbrev-ref", "HEAD")
+    _, commit = git(root, "rev-parse", "HEAD")
+    name = BRANCH_PREFIX + datetime.date.today().isoformat()
+    number = 1
+    while git(root, "rev-parse", "--verify", "--quiet", "refs/heads/" + name)[0] == 0:
+        number += 1
+        name = "%s%s-%d" % (BRANCH_PREFIX, datetime.date.today().isoformat(), number)
+    code, out = git(root, "checkout", "-b", name)
+    if code != 0:
+        print("Stopped: could not make the branch %s: %s" % (name, out))
+        return 1
+    git(root, "config", "improve.base", commit)
+    print("New branch: %s. The original stays untouched on %s (commit %s)." % (name, old_branch, commit[:7]))
+
+    target = os.path.join(root, cp.BEFORE_COPY)
+    longest = max((len(os.path.join(target, os.path.relpath(os.path.join(folder, f), root)))
+                   for part in parts for folder, _, files in os.walk(os.path.join(root, part)) for f in files),
+                  default=0)
+    if git(root, "check-ignore", "-q", cp.BEFORE_COPY + "/x")[0] != 0:
+        print("No second copy: Git does not ignore %s/, and a committed copy would repeat each logicalId. "
+              "Add '%s/' to .gitignore if you want the copy. The branch is the safeguard." % (cp.BEFORE_COPY, cp.BEFORE_COPY))
+    elif os.path.exists(target):
+        print("No second copy: %s/ is already there. Remove it yourself if you want a new one. The branch is the safeguard."
+              % cp.BEFORE_COPY)
+    elif longest >= PATH_LIMIT:
+        print("No second copy: a path in it would be %d characters long (the limit is %d). The branch is the safeguard."
+              % (longest, PATH_LIMIT))
+    else:
+        os.mkdir(target)
+        for part in parts:
+            source = os.path.join(root, part)
+            if os.path.isdir(source):
+                shutil.copytree(source, os.path.join(target, part))
+            else:
+                shutil.copy2(source, os.path.join(target, part))
+        print("Second copy: %s/ holds the project as it was (%s). Open its .pbip file to see 'before'. "
+              "Git ignores the folder and the checks skip it. Do not edit it." % (cp.BEFORE_COPY, ", ".join(parts)))
+    return 0
+
+
+def snapshot(root):
+    source, target = os.path.join(root, REVIEW), os.path.join(root, REVIEW_BEFORE)
+    if not os.path.isfile(source):
+        print("Stopped: %s does not exist yet. Evaluate first (skill pbi-checklist-review)." % REVIEW.replace(os.sep, "/"))
+        return 1
+    findings = cp.Findings()
+    cp.check_review(source, findings)
+    if findings.errors():
+        print("Stopped: the review is not finished. Run: python scripts/check_project.py --review docs/checklist-review.md")
+        return 1
+    if os.path.isfile(target):
+        print("Stopped: %s is already there. It is the 'before' of this flow and is not replaced."
+              % REVIEW_BEFORE.replace(os.sep, "/"))
+        return 1
+    shutil.copyfile(source, target)
+    print("Kept the first review as %s." % REVIEW_BEFORE.replace(os.sep, "/"))
+    return 0
+
+
+def plan(root):
+    target = os.path.join(root, PLAN)
+    if os.path.isfile(target):
+        print("Stopped: %s is already there. Change it by hand, or remove it to start again." % PLAN.replace(os.sep, "/"))
+        return 1
+    review = read_review(os.path.join(root, REVIEW))
+    if review is None:
+        print("Stopped: %s does not exist yet. Evaluate first (skill pbi-checklist-review)." % REVIEW.replace(os.sep, "/"))
+        return 1
+    findings, _, _ = cp.run(root)
+    rows, notes = [], []
+    for code, path, line, message, level in findings.items:
+        rel = os.path.relpath(path, root).replace(os.sep, "/") if path else "-"
+        if level == "note":
+            notes.append("- %s  %s  %s" % (code, rel, message))
+        elif code in MECHANICAL:
+            rows.append(("Mechanical", code, message, MECHANICAL[code][0], rel, MECHANICAL[code][1]))
+        elif code in LAYOUT:
+            rows.append(("Layout", code, message, LAYOUT[code][0], rel, LAYOUT[code][1]))
+        else:
+            rows.append(("Needs a person", code, message, PERSON.get(code, "Decide with the developer"), rel,
+                         "Depends on the decision"))
+    for item in sorted(review):
+        status, evidence = review[item]
+        if status == "Fail":
+            kind = "Needs a person" if item in PERSON_ITEMS else "?"
+            rows.append((kind, "Item %d" % item, evidence, "<what will change>", "<files>", "<what could break>"))
+    order = {kind: index for index, kind in enumerate(KINDS + ("?",))}
+    rows.sort(key=lambda row: order[row[0]])
+    lines = ["# Fix plan", "",
+             "Made on %s by `python scripts/improve.py plan` from the checklist review and the project check. "
+             "Rules: skill `pbi-improve`." % datetime.date.today().isoformat(), "",
+             "Kinds: Mechanical, Layout, Needs a person. A `?` or a `<...>` cell is still to be filled in. "
+             "Approved: `yes` or `no` with the date, written when the developer answers. Nothing is changed before a yes.", "",
+             "| %s |" % " | ".join(PLAN_HEADER), "|%s|" % "|".join("---" for _ in PLAN_HEADER)]
+    for number, (kind, source, what, change, files, risk) in enumerate(rows, 1):
+        lines.append("| F%d | %s | %s | %s | %s | %s | %s |  |"
+                     % (number, kind, source, _cell(what)[:300], _cell(change), _cell(files), _cell(risk)))
+    lines += ["", "## For information", "",
+              "Notes from the project check. They are not errors and need no approval.", ""] + (notes or ["- none"])
+    os.makedirs(os.path.dirname(target), exist_ok=True)
+    with open(target, "w", encoding="utf-8", newline="\n") as fh:
+        fh.write("\n".join(lines) + "\n")
+    print("Wrote %s with %d row(s). Sort every '?' row, fill in the '<...>' cells, then run: python scripts/improve.py check-plan"
+          % (PLAN.replace(os.sep, "/"), len(rows)))
+    return 0
+
+
+def check_plan(root):
+    rows, problems = read_plan(os.path.join(root, PLAN))
+    for line in problems:
+        print("X  %s" % line)
+    for kind in KINDS:
+        of_kind = [r for r in rows if r["Kind"] == kind]
+        print("%s: %d row(s), %d approved." % (kind, len(of_kind), len(approved(rows, kind))))
+    print("Fix plan: %d problem(s)." % len(problems))
+    return 1 if problems else 0
+
+
+def changed_pages(root):
+    """Tab names of the pages whose files changed since 'start', or None when that cannot be told."""
+    code, base = git(root, "config", "--get", "improve.base")
+    if code != 0 or not base:
+        return None
+    code, out = git(root, "diff", "--name-only", base, "HEAD")
+    if code != 0:
+        return None
+    pages = []
+    for name in out.splitlines():
+        m = re.match(r"(.+\.Report/definition/pages/[^/]+)/", name.strip().strip('"'))
+        if m:
+            page = cp.load_object(os.path.join(root, m.group(1), "page.json")) or {}
+            tab = page.get("displayName") if isinstance(page.get("displayName"), str) else os.path.basename(m.group(1))
+            if tab not in pages:
+                pages.append(tab)
+    return pages
+
+
+def compare(root):
+    before = read_review(os.path.join(root, REVIEW_BEFORE))
+    after = read_review(os.path.join(root, REVIEW))
+    if before is None or after is None:
+        print("Stopped: both %s and %s are needed." % (REVIEW_BEFORE.replace(os.sep, "/"), REVIEW.replace(os.sep, "/")))
+        return 1
+    print("            Pass  Fail  Not applicable")
+    print("Before      %4d  %4d  %4d" % counts(before))
+    print("After       %4d  %4d  %4d" % counts(after))
+    moved = [(item, before[item][0], after[item][0]) for item in sorted(after)
+             if item in before and before[item][0] != after[item][0]]
+    print("Items that changed: %s" % ("none" if not moved else ""))
+    for item, old, new in moved:
+        print("  Item %d: %s -> %s" % (item, old, new))
+    pages = changed_pages(root)
+    if pages is None:
+        print("Pages to look at in Power BI Desktop: every page a fix touched (the start of this flow was not recorded).")
+    else:
+        print("Pages to look at in Power BI Desktop: %s" % (", ".join(pages) if pages else "none changed"))
+    rows, _ = read_plan(os.path.join(root, PLAN))
+    people = [r for r in rows if r["Kind"] == "Needs a person"]
+    print("Needs a person: %d row(s)%s" % (len(people), ":" if people else "."))
+    for row in people:
+        print("  %s  %s  %s" % (row["Id"], row["Item or code"], row["What will change"]))
+    return 0
+
+
+def _has_commit(root, subject):
+    code, base = git(root, "config", "--get", "improve.base")
+    span = "%s..HEAD" % base if code == 0 and base else "HEAD"
+    code, out = git(root, "log", "--format=%s", span)
+    return code == 0 and subject in out.splitlines()
+
+
+def next_step(root):
+    def say(step, text):
+        print("Step %s. %s" % (step, text))
+        return 0
+
+    code, branch = git(root, "rev-parse", "--abbrev-ref", "HEAD")
+    if code != 0:
+        return say(23, "This folder is not a Git repository. The flow needs one: the original stays on a branch.")
+    if not branch.startswith(BRANCH_PREFIX):
+        return say(23, "Safety first. Ask the developer to save in Power BI Desktop and commit. Then run: python scripts/improve.py start")
+    exists = {name: os.path.isfile(os.path.join(root, name)) for name in (REVIEW, REVIEW_BEFORE, PLAN)}
+    if not exists[REVIEW_BEFORE]:
+        if not exists[REVIEW]:
+            return say(24, "Evaluate with the skill pbi-checklist-review. It writes docs/checklist-review.md.")
+        return say(24, "Keep the review as the 'before': python scripts/improve.py snapshot")
+    if not exists[PLAN]:
+        return say(25, "Write the fix plan: python scripts/improve.py plan. Then sort the '?' rows and fill in the '<...>' cells.")
+    rows, problems = read_plan(os.path.join(root, PLAN))
+    if problems:
+        return say(25, "Finish the fix plan (%d problem(s)): python scripts/improve.py check-plan" % len(problems))
+    answered = [r for r in rows if r["Approved"]]
+    if not answered:
+        return say(26, "Stop. Show the developer docs/fix-plan.md. They approve all of it, one kind, or single rows. "
+                       "Write yes or no with the date in 'Approved'. Change nothing before that.")
+    for kind in ("Mechanical", "Layout"):
+        if approved(rows, kind) and not _has_commit(root, COMMITS[kind]):
+            return say(27, "Apply the approved %s rows only. Run python scripts/check_project.py . and fix what it reports. "
+                           "Then commit with the message '%s'." % (kind, COMMITS[kind]))
+    before = read_review(os.path.join(root, REVIEW_BEFORE))
+    after = read_review(os.path.join(root, REVIEW)) if exists[REVIEW] else None
+    with_fixes = any(_has_commit(root, subject) for subject in COMMITS.values())
+    same = False
+    if exists[REVIEW]:
+        with open(os.path.join(root, REVIEW), "rb") as one, open(os.path.join(root, REVIEW_BEFORE), "rb") as two:
+            same = one.read() == two.read()
+    if after is None or (same and with_fixes):
+        return say(28, "Evaluate again with the skill pbi-checklist-review (confirm that docs/checklist-review.md may be replaced; "
+                       "the first review is kept as docs/checklist-review-before.md).")
+    return say("28 and 29", "Show the result: python scripts/improve.py compare. Then tell the developer which pages to "
+                            "look at in Power BI Desktop and which rows need a person. Do not merge, publish or deploy.")
+
+
+def main(argv):
+    cp.safe_output()
+    commands = {"next": next_step, "start": start, "snapshot": snapshot, "plan": plan, "check-plan": check_plan,
+                "compare": compare}
+    args = argv[1:]
+    if not args or args[0] not in commands or len(args) > 2:
+        print(__doc__)
+        return 2
+    root = os.path.abspath(args[1] if len(args) == 2 else ".")
+    if not os.path.isdir(root):
+        print("Not a folder: %s" % args[1])
+        return 2
+    return commands[args[0]](root)
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))
