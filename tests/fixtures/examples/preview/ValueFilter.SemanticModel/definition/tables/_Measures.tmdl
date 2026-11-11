@@ -1,0 +1,28 @@
+/// Example of the measure table as a calculated table: it holds every measure of the model.
+table _Measures
+
+	/// Number of product, colour and year combinations.
+	measure '# Catalog Rows' = COUNTROWS ( Catalog )
+		formatString: #,0
+		displayFolder: Finance\Counts
+
+	/// Number of product, colour and year combinations over all years; with value filter behavior Independent, a filter on colour keeps every colour picked.
+	measure '# Catalog Rows All Years' =
+			CALCULATE (
+			    [# Catalog Rows],
+			    REMOVEFILTERS ( Catalog[Year] )
+			)
+		formatString: #,0
+		displayFolder: Finance\Counts
+
+	column Placeholder
+		isHidden
+		isNameInferred
+		sourceColumn: [Placeholder]
+
+	partition _Measures = calculated
+		mode: import
+		source = ROW ( "Placeholder", BLANK () )
+
+	annotation CalculatedReason = Shipped example: an entered (imported) table would add an import table to this model, so the measure table is a calculated table that names no other table.
+

@@ -1,0 +1,5 @@
+database ModelOptions
+	compatibilityLevel: 1702
+	compatibilityMode: powerBI
+	unicodeCharacterBehavior: codePoints
+

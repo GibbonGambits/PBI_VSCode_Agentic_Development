@@ -1,0 +1,8 @@
+/// Example of the shared expression for Direct Lake on SQL: it points to the SQL analytics endpoint of a made-up warehouse, by its ID.
+expression DatabaseQuery =
+		let
+		    // Connect to the SQL analytics endpoint of the made-up warehouse; the second value is the endpoint's ID.
+		    database = Sql.Database("sqlendpoint.example.com", "00000000-0000-0000-0000-000000000000")
+		in
+		    database
+

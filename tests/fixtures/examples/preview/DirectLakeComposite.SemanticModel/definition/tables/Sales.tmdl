@@ -1,0 +1,29 @@
+/// Example of a Direct Lake on OneLake fact table next to an import table: one row per order line. Made-up source.
+table Sales
+
+	column 'Date Key'
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: date_key
+
+	column 'Store Key'
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: store_key
+
+	column Amount
+		dataType: decimal
+		isHidden
+		formatString: #,0.00
+		summarizeBy: none
+		sourceColumn: amount
+
+	partition Sales = entity
+		mode: directLake
+		source
+			entityName: sales
+			schemaName: dbo
+			expressionSource: 'DirectLake - Shop'
+

@@ -80,7 +80,9 @@ The model standard is `.github/skills/pbi-semantic-model/references/model-standa
 
 | Code | Page | Visual | Reason |
 |---|---|---|---|
-| | | | |
+| V012 | - | Sales per Order Line | Shipped example of a report-level measure; its name is kept so that the existing example and the index stay as they are |
+| V016 | AI_Visuals | AI_Visuals_RScript_StoreSales | Shipped example of the R visual, which Microsoft is retiring; it shows the file form only, and is not a model for new work |
+| V016 | AI_Visuals | AI_Visuals_PythonScript_StoreSales | Shipped example of the Python visual, which Microsoft is retiring; it shows the file form only, and is not a model for new work |
 
 ## 11. Preview features and optional tools the developer agreed to
 

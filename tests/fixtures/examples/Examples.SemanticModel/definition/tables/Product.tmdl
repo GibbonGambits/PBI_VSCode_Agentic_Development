@@ -33,6 +33,13 @@ table Product
 		summarizeBy: none
 		sourceColumn: Unit Cost
 
+	/// Example of the data category Barcode: the made-up barcode on the product, which the Power BI mobile app can scan to filter a report.
+	column Barcode
+		dataType: string
+		dataCategory: Barcode
+		summarizeBy: none
+		sourceColumn: Barcode
+
 	/// Example of a hierarchy: category, subcategory, product.
 	hierarchy 'Product Hierarchy'
 
@@ -51,10 +58,10 @@ table Product
 				let
 				    // Build a small made-up list of products.
 				    Source = #table(
-				        type table [#"Product Key" = Int64.Type, #"Product Name" = text, Category = text, Subcategory = text, #"Unit Cost" = Currency.Type],
+				        type table [#"Product Key" = Int64.Type, #"Product Name" = text, Category = text, Subcategory = text, #"Unit Cost" = Currency.Type, Barcode = text],
 				        {
-				            {1, "Garden Chair", "Garden", "Furniture", 35.00},
-				            {2, "Watering Can", "Garden", "Tools", 6.50}
+				            {1, "Garden Chair", "Garden", "Furniture", 35.00, "2000000000015"},
+				            {2, "Watering Can", "Garden", "Tools", 6.50, "2000000000022"}
 				        }
 				    )
 				in

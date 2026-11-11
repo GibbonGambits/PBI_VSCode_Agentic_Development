@@ -1,9 +1,13 @@
 /// Example of a calculation group: shows any measure as current, year to date, prior year or change against prior year.
 table 'Time Calculation'
 
-	/// Example of a calculation group with a precedence.
+	/// Example of a calculation group with a precedence and two selection expressions: blank when two or more items (or none that exists) are picked, the measure as it is when nothing is picked.
 	calculationGroup
 		precedence: 10
+
+		multipleOrEmptySelectionExpression = BLANK ()
+
+		noSelectionExpression = SELECTEDMEASURE ()
 
 		/// The measure as it is.
 		calculationItem Current = SELECTEDMEASURE ()

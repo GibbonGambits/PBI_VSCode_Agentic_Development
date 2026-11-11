@@ -12,8 +12,15 @@
     "AI_Visuals",
     "Bookmarks",
     "Elements",
+    "Filters_Kinds",
+    "Charts_Features",
+    "Tables_Features",
+    "Slicers_More",
+    "Data_Function",
     "Drillthrough_Store",
+    "Drillthrough_CrossReport",
     "Tooltip_StoreSales"
   ],
-  "activePageName": "Charts_Bars"
+  "activePageName": "Charts_Bars",
+  "landingPageName": "Elements"
 }

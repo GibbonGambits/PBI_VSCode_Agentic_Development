@@ -1,0 +1,4 @@
+relationship 'Sales to Date'
+	fromColumn: Sales.'Date Key'
+	toColumn: Date.'Date Key'
+

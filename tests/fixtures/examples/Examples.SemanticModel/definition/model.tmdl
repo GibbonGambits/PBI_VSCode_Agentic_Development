@@ -2,6 +2,7 @@ model Model
 	culture: en-US
 	defaultPowerBIDataSourceVersion: powerBI_V3
 	discourageImplicitMeasures
+	selectionExpressionBehavior: nonVisual
 
 /// Example of a query group: holds the parameters.
 queryGroup Parameters

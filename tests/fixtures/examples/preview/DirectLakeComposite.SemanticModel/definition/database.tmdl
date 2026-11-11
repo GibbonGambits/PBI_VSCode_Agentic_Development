@@ -1,0 +1,4 @@
+database DirectLakeComposite
+	compatibilityLevel: 1705
+	compatibilityMode: powerBI
+
