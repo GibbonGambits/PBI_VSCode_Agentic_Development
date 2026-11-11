@@ -60,6 +60,9 @@ def dax_index():
                         group = line[3:].strip().lower()
                     elif line.startswith("- ") and ": https://" in line and group not in ("statements", "language"):
                         name = line[2:].split(":", 1)[0].strip().upper()
+                        name = name.split(" (")[0]              # 'DISTINCT (column)' and 'DISTINCT (table)' are DISTINCT
+                        if " " in name:
+                            continue                            # a page about functions, not a function
                         _index["functions"].add(name)
                         if group.startswith("time intelligence"):
                             _index["time"].add(name)

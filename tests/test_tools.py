@@ -403,7 +403,7 @@ class SourcesRoutine(TempCase):
     def test_shipped_index_lists_the_functions_the_checks_rely_on(self):
         import model_rules
         index = model_rules.dax_index()
-        for name in ("SUM", "DIVIDE", "CALCULATE", "SELECTEDVALUE", "USERELATIONSHIP", "DATESYTD"):
+        for name in ("SUM", "DIVIDE", "CALCULATE", "SELECTEDVALUE", "USERELATIONSHIP", "DATESYTD", "DISTINCT", "PERCENTILE.INC"):
             self.assertIn(name, index["functions"])
         self.assertIn("DATESYTD", index["time"])
         self.assertNotIn("SUM", index["time"])
