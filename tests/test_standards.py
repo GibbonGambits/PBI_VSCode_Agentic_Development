@@ -747,11 +747,17 @@ class FieldReferences(Case):
                    json.dumps({"name": "extension", "entities": [{"name": "Sales", "measures": [{"name": "Report Only"}]}]}))
         self.assertNot("B001")
 
-    def test_report_on_a_published_model_is_not_checked(self):
+    def test_report_on_a_published_model_is_checked_against_the_saved_field_list(self):
         self.bind("Measure", "Elsewhere", "Anything")
         self.edit_json(os.path.join("Sample.Report", "definition.pbir"),
                        lambda d: d.update({"datasetReference": {"byConnection": {"connectionString": "semanticmodelid=x"}}}))
+        self.assertNot("B001")                                    # no saved field list: nothing to check against
+        self.assertEqual([f[4] for f in self.found() if f[0] == "B002"], ["note"])
+        self.write(os.path.join("docs", "model-fields.md"), "| Table | Field | Kind |\n|---|---|---|\n| Elsewhere | Other | measure |\n")
+        self.assertIn("Elsewhere[Anything]", self.messages("B001")[0])
+        self.write(os.path.join("docs", "model-fields.md"), "| Table | Field | Kind |\n|---|---|---|\n| Elsewhere | Anything | measure |\n")
         self.assertNot("B001")
+        self.assertNot("B002")
 
     def test_hidden_column_used_by_a_visual_warns(self):
         self.bind("Column", "Sales", "Amount")
@@ -1556,19 +1562,63 @@ class TemplateFiles(unittest.TestCase):
             ct.errors[:] = saved_errors
             shutil.rmtree(tmp, ignore_errors=True)
 
-    def test_every_new_code_is_listed_in_the_script_help_and_sorted_by_the_flow(self):
+    def all_codes(self):
+        """{code: levels} for every finding the project check can give, read from the three check files."""
+        import re
+        found = {}
+        for name, default in (("check_project.py", "fail"), ("model_rules.py", "fail"), ("report_rules.py", "warn")):
+            with open(os.path.join(REPO, "scripts", name), encoding="utf-8") as fh:
+                source = fh.read()
+            for match in re.finditer(r'add\("([A-Z][0-9]{3})"', source):
+                following = re.search(r'\badd\("[A-Z][0-9]{3}"', source[match.end():])
+                call = source[match.end():match.end() + (following.start() if following else 900)][:900]
+                level = ("note" if 'level="note"' in call or "info=True" in call else "warn" if 'level="warn"' in call
+                         else "fail" if 'level="error"' in call else default)
+                found.setdefault(match.group(1), set()).add(level)
+        return found
+
+    def test_every_code_is_listed_in_the_script_help_with_its_level(self):
+        import re
         with open(os.path.join(REPO, "scripts", "check_project.py"), encoding="utf-8") as fh:
             source = fh.read()
-        import re
-        used = set(re.findall(r'add\("([MGB][0-9]{3})"', source))
-        listed = set(re.findall(r"^    ([MGB][0-9]{3})  ", source, re.M))
-        self.assertEqual(used, listed)
-        sorted_codes = set(improve.MECHANICAL) | set(improve.LAYOUT) | set(improve.PERSON)
-        errors_and_warnings = {c for c in used if c not in ("M201", "M301", "M302", "G008")}
-        self.assertEqual(errors_and_warnings - sorted_codes, set())
-        for never in ("M001", "M005", "M006", "M007", "M107", "M108", "B001"):
-            self.assertNotIn(never, improve.MECHANICAL)                       # renames, moves, types, summarisation
+        listed = dict(re.findall(r"^ {4}([A-Z][0-9]{3})  (\(warn\)|\(note\))?", source, re.M))
+        codes = {c: levels for c, levels in self.all_codes().items() if c[0] not in "R"}
+        self.assertEqual(sorted(set(codes) - set(listed)), [])
+        for code in ("M402", "M502", "M901", "V001", "V006"):                # the new failures
+            self.assertEqual((codes[code], listed[code]), ({"fail"}, ""), code)
+        for code, levels in codes.items():
+            if code[0] in "UVAP" or code[:2] in ("M4", "M5", "M6", "M7", "M8", "M9") or code in (
+                    "M113", "M114", "M115", "M116", "M117", "M118", "M119"):
+                if levels == {"warn"}:
+                    self.assertEqual(listed[code], "(warn)", code)
+                elif levels == {"note"}:
+                    self.assertEqual(listed[code], "(note)", code)
+                elif levels == {"fail"}:
+                    self.assertEqual(listed[code], "", code)
 
+    def test_every_error_and_warning_is_sorted_by_the_improve_flow(self):
+        sorted_codes = set(improve.MECHANICAL) | set(improve.LAYOUT) | set(improve.PERSON)
+        errors_and_warnings = {c for c, levels in self.all_codes().items()
+                               if levels - {"note"} and c[0] in "MGBPVA"}
+        self.assertEqual(sorted(errors_and_warnings - sorted_codes), [])
+        for never in ("M001", "M005", "M006", "M007", "M107", "M108", "B001", "M118", "M119", "M502", "M802"):
+            self.assertNotIn(never, improve.MECHANICAL)                       # renames, moves, types, summarisation, numbers
+
+    def test_every_code_is_named_in_the_checklist_review_skill(self):
+        import re
+        with open(os.path.join(REPO, ".github", "skills", "pbi-checklist-review", "SKILL.md"), encoding="utf-8") as fh:
+            text = fh.read()
+        named = set(re.findall(r"\b([A-Z][0-9]{3})\b", text))
+        for first, last in re.findall(r"\b([A-Z][0-9]{3})-([A-Z][0-9]{3})\b", text):
+            named |= {"%s%03d" % (first[0], n) for n in range(int(first[1:]), int(last[1:]) + 1)}
+        missing = sorted(c for c in self.all_codes() if c not in named and c[0] not in "RF" and c != "F001")
+        self.assertEqual(missing, [])
+
+    def test_suggestions_are_always_notes_and_never_start_the_lessons_loop(self):
+        codes = self.all_codes()
+        for code, levels in codes.items():
+            if code.startswith("U"):
+                self.assertEqual(levels, {"note"}, code)
 
 if __name__ == "__main__":
     unittest.main()

@@ -6,13 +6,17 @@ One fixed standard for every model built from this template, so that models look
 - Evaluating an existing model: report every breach. Change nothing.
 - Changing an existing model: see "Existing models" at the end. Never rename or move without a clear yes.
 
+This file covers measures, folders, hiding, calculated objects, summarising, data types and formats. The rest of the standard is in the files beside it: `relationships-and-dates.md` (star schema, relationships, dates, names of tables and columns), `dax-standard.md` (DAX), `storage-and-security.md` (Power Query, storage modes, security) and `model-objects.md` (functions, calculation groups, field parameters and the other object kinds).
+
 ## A. Measures
 
 **1. Home.** Every measure lives in one table named `_Measures`. The table is visible. It has exactly one column, and that column is hidden. Item: beyond. Checks: M001, M002 (fail).
 
-- The developer makes the table in Power BI Desktop, the way Microsoft Learn describes: Enter data, one column, load it, then hide the column and not the table. Microsoft Learn gives the table no name; the name `_Measures` is the owner's choice and is also the name used in GitHub's modeling skill and in an example of Microsoft's skill. Do not write this table from memory; ask the developer to make it.
-- Direct Lake model: an entered table is an imported table and would make the model composite. There the developer makes `_Measures` as a calculated table whose formula names no Direct Lake table (Microsoft's skill shows `ROW("Dummy", BLANK())`). It then needs its reason line (rule 8).
-- DirectQuery model: an entered table also makes the model composite. Ask the developer which form they want and record it in section 4 of the brief.
+- Copilot makes the table itself: `python scripts/scaffold.py measures-table .`. The script copies the shipped example and picks the form from the model's storage modes.
+- Import model: an imported table with one hidden text column and no rows, read by a one-step Power Query query. This is the files' form of what Microsoft Learn describes for Power BI Desktop (Enter data, one column, load it, hide the column and not the table). Microsoft Learn gives the table no name; the name `_Measures` is the owner's choice and is also the name used in GitHub's modeling skill and in an example of Microsoft's skill.
+- Direct Lake model: an imported table would make the model composite. There `_Measures` is a calculated table whose formula names no other table (Microsoft's skill shows a one-row table made with ROW). It carries its reason line (rule 8); the script writes the standard's own reason.
+- DirectQuery model: the same calculated form, for the same reason. This is the template's default; if the developer wants an imported table instead, they say so and section 4 of the brief records it.
+- A report on a published model has no model here: its measures live in the published model.
 - More than one measure table is allowed only when section 9 of the brief lists the extra table with the code `M001` and the reason.
 
 **2. Folders.** Every measure has one display folder with exactly two levels: subject, then type. Never one level, never three, never a list of folders. Item 22. Checks: M003, M004 (fail).
@@ -85,13 +89,24 @@ A check passes only for an object that section 9 of the brief lists with the sam
 
 ## Existing models: moving and renaming
 
-Before a measure moves to `_Measures`, or anything is renamed, tell the developer what can break, then wait for a clear yes (rename rule in the project instructions).
+Before a measure moves to `_Measures`, or anything is renamed, tell the developer what can break, then wait for a clear yes (rename rule in the project instructions). In a fix plan such a row stays under "Needs a person" until that yes.
+
+What can break:
 
 - DAX: a formula that names the measure with its table (`Sales[Total Sales]`) breaks when the measure's table changes. Formulas that write `[Total Sales]` keep working.
 - Report visuals: a visual stores the measure's table beside its name, so a move or a rename can break visuals, filters and bookmarks in this report.
-- Other reports connected to a published model can break in the same way. Say so every time.
-- A move is done by the developer in Power BI Desktop: Model view, select the measure, set Home table. Do not move measures by editing files.
-- Afterwards run `python scripts/check_project.py .`. B001 lists every report file that names a field the model no longer has; M010 lists formulas that still name a measure with its table.
+- Other reports connected to a published model can break in the same way, and no file here can show it. Say so every time.
+
+After the yes, Copilot does the work itself:
+
+1. Run `python scripts/find_references.py . "<object>"`, written as `[Measure]`, `Table[Column]` or `Table`. It prints the references it recognises, and the text it cannot classify.
+2. If the second list is not empty, show it to the developer and change only what they confirm. If the script cannot confirm the references at all (the object is not in the model, or a file cannot be read), stop and say so.
+3. Moving a measure: cut the measure, with its description lines and its properties, from its table file and paste it into the `_Measures` file. Its name does not change. Rewrite every `OldTable[Measure]` in DAX to `[Measure]`. In report files, change the table (`Entity`) of that measure and the `OldTable.Measure` query names to the new table.
+4. Renaming: change the definition and every reference in the first list: DAX, relationship columns, sort column, hierarchy level, group-by column, aggregation, perspective, translation, role, and in report files the `Property` and the `Table.Field` query names. Change no display text the developer typed (a title, a label in a field parameter) without asking.
+5. Run `python scripts/check_project.py .`. M901 to M903 and M908 fail on a model reference that was missed; B001 fails on a report file that names a field the model no longer has; M010 lists formulas that still name a measure with its table. Fix until they are clean.
+6. Reload and look (project instructions), then tell the developer what changed and repeat the warning about other reports.
+
+Renaming a table is done the same way, and its file is renamed with it. Microsoft notes that Power BI Desktop must be restarted after a file or folder of a report is renamed.
 
 ## Sources
 
@@ -116,6 +131,9 @@ Where sources disagree, and what was decided:
 - Summarising: Microsoft's skill names identifiers, years and the like; awesome-copilot keeps "sum" on amounts and accepts column totals for simple exploration; the best practice rule covers every visible number column. The owner chose every column, with exceptions in the brief.
 - Column formats: the best practice rules demand fixed formats; items 71 and 72 leave the format to the organisation. The check only asks that a format exists.
 
-Not confirmed from Microsoft's documentation: that Power BI Desktop keeps a `CalculatedReason` annotation when it saves (Microsoft's saved projects do keep annotations of other tools); whether Desktop repairs visuals when a measure's table changes in the files; what turning summarisation off does to visuals that already total the column.
+- The measures table in a DirectQuery model: no source prescribes a form. The calculated form is this template's default, chosen so that Copilot can build it without a question.
+- Moving a measure by editing files: Microsoft Learn describes the Home table setting of Power BI Desktop; it also documents TMDL files as open to outside edits. The template edits the files and then proves every reference with the checks.
+
+Not confirmed from Microsoft's documentation: that Power BI Desktop keeps a `CalculatedReason` annotation when it saves (Microsoft's saved projects do keep annotations of other tools); what turning summarisation off does to visuals that already total the column; that an empty one-column imported table shows at the top of the Data pane the way a table made with Enter data does.
 
 Checklist items: 5, 6, 7, 19, 22, 23, 25, 27, 28, 29, 36, 38, 59, 71, 72

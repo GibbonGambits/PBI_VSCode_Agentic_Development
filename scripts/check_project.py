@@ -70,15 +70,141 @@ Finding codes (errors unless marked warn or note; only errors change the exit co
     G007  (warn) page size differs from the brief or the standard
     G008  (note) position not checked: a rotated visual, or visuals inside a group
 
-    B001  a report file uses a table, column or measure the model in this project does not have
+  Relationships, dates and names (.github/skills/pbi-semantic-model/references/relationships-and-dates.md):
+    M113  (warn) text column that looks like a month name has no sort column
+    M114  (warn) column that looks like a place has no data category
+    M115  (warn) column repeated in the related table
+    M116  (warn) flag column shown as a number
+    M117  (warn) the one partition of a table is not named after the table
+    M118  (warn) visible table, column or hierarchy name: capital, underscores, words run together, technical prefix
+    M119  (warn) column and hierarchy of one table share a name
+    M401  (warn) Auto date/time is on
+    M402  time intelligence is used and no table is marked as a date table
+    M403  (warn) date columns, and no table marked as a date table
+    M404  (warn) table that looks like a date table is not marked as one
+    M405  (warn) relationship filters in both directions
+    M406  (warn) many-to-many relationship
+    M407  (warn) many-to-many relationship that filters in both directions
+    M408  (warn) more than 30% of the relationships are both-direction or many-to-many
+    M409  (warn) one-to-one relationship
+    M410  (warn) inactive relationship that no formula turns on
+    M411  (warn) table with no relationship
+    M412  (warn) snowflake: a table is the many side of one relationship and the one side of another
+    M413  (warn) one-side column of a relationship is not marked as the key
+    M414  (warn) security roles in a model with inactive relationships
+    M415  USERELATIONSHIP towards a table that has a row-level security rule
+    M417  (warn) a number column for each month: unpivot
+    M901  relationship names a table or column the model does not have
+    M902  hierarchy level on a column the table does not have
+    M903  sort column the table does not have
+    M904  data column without sourceColumn
+    M905  measure, calculated column or calculation item with an empty expression
+    M906  control character in a name or a description
+    M907  isAvailableInMdx off on a column used for sorting or in a hierarchy
+
+  DAX (.github/skills/pbi-semantic-model/references/dax-standard.md):
+    M501  (warn) IFERROR or ISERROR
+    M502  division with '/' by something that is not a fixed number: use DIVIDE
+    M503  (warn) COUNT or COUNTA of a column where COUNTROWS says what is meant
+    M504  (warn) HASONEVALUE with VALUES: use SELECTEDVALUE
+    M505  (warn) FILTER over a whole table as a filter argument of CALCULATE
+    M506  (warn) a blank turned into a value
+    M507  (warn) the same expression written twice: use a variable
+    M508  (warn) two measures with the same formula
+    M509  (warn) a measure that only repeats another measure
+    M510  (warn) INTERSECT where TREATAS is meant
+    M511  (warn) a number plus or minus a ratio (1 - x / y)
+    M512  (warn) EVALUATEANDLOG left in a formula
+    M513  (warn) time intelligence in a model with DirectQuery tables
+    M514  (warn) EARLIER or EARLIEST: use a variable
+    M516  (warn) window function without ORDERBY
+    M517  (warn) VALUES compared with one value
+    M520  (warn) formulas that do not follow the DAX style (one finding for each table file)
+    M908  DAX names a Table[Column] the model does not have
+    M909  (warn) DAX calls a function that is not in the DAX function index
+
+  Power Query, storage modes and security (.github/skills/pbi-semantic-model/references/storage-and-security.md):
+    P002  (warn) native query built by joining text
+    P003  (warn) one shared query feeds two or more tables
+    P004  (warn) Dataverse query without its options
+    P005  (warn) query reads a file from a local drive
+    P006  (warn) heavy reshaping in Power Query
+    M601  (warn) row-level security rule uses text or lookup functions
+    M602  (warn) row-level security rule on a fact table
+    M603  (warn) row-level security rule uses USERNAME
+    M604  (warn) row-level security rule next to a many-to-many relationship
+    M605  (warn) user-based rule that ends in TRUE for everyone else
+    M606  (warn) object-level security hides a field that a report visual uses
+    M607  (warn) row rules and object rules in different roles
+    M608  object-level security on a table in the middle of a chain of relationships
+    M701  DirectQuery native query with a common table expression or a stored procedure
+    M702  (warn) DirectQuery table with transformation steps in Power Query
+    M703  (warn) DirectQuery table filtered on the current date in Power Query
+    M704  (warn) calculated column of a DirectQuery table used in a relationship
+    M705  calculated column of a DirectQuery table that uses CALCULATE or an iterator
+    M706  (warn) imported dimension of a DirectQuery fact: consider Dual
+    M707  incremental refresh without the parameters RangeStart and RangeEnd, or not of type Date/Time
+    M708  (warn) incremental refresh on a native query
+    M709  incremental refresh filter that includes both ends of the window
+
+  Model objects (.github/skills/pbi-semantic-model/references/model-objects.md):
+    M801  user-defined function in a model below compatibility level 1702
+    M802  user-defined function name breaks Microsoft's naming rules
+    M803  (warn) user-defined function has no '///' description
+    M804  (warn) user-defined function parameter has no type
+    M805  user-defined function calls itself
+    M811  (warn) calculation group with no items
+    M812  (warn) calculation item has no '///' description
+    M813  (warn) two or more calculation groups without their own precedence
+    M814  (warn) calculation group in a model without discourageImplicitMeasures
+    M821  field parameter names a field the model does not have
+    M822  (warn) field parameter not wired the way Power BI Desktop writes it
+    M831  (warn) perspective with no objects
+
+  Report standard (.github/skills/pbi-report/references/report-standard.md):
+    V001  drillthrough page without a back button
+    V002  (warn) tooltip page that is not hidden
+    V003  (warn) tooltip page much larger than the built-in tooltip size
+    V004  (warn) slicer or button on a tooltip page
+    V005  (warn) tooltip page with fewer than three fields
+    V006  more than 16 visuals that show data on one page
+    V007  (warn) 13 to 16 visuals that show data on one page
+    V008  (warn) button whose action goes to a page or bookmark the report does not have
+    V009  (warn) colour, font, size, border, shadow or background set on a single visual
+    V010  (warn) bookmark that holds a page or visual the report no longer has
+    V011  (warn) pages.json and the page folders disagree
+    A001  (warn) visuals without alt text (one finding for each page)
+    A002  (warn) visuals that share a tab order number
+    A003  (warn) visuals that show a title made up from field names (one finding for each page)
+    A004  (warn) alt text longer than 250 characters
+
+  Suggestions: a native feature may do this better (.github/skills/pbi-checklist-review/references/native-features.md):
+    U001  (note) three or more measures of one formula pattern: a user-defined function
+    U002  (note) many time variants of measures: a calculation group
+    U003  (note) a measure that switches between measures: a field parameter
+    U004  (note) DirectQuery tables and no aggregation table
+    U005  (note) a measure that returns formatted text: a dynamic format string
+    U006  (note) two or more inactive relationships to one table: a role-playing dimension
+    U007  (note) a natural drill path and no hierarchy
+    U101  (note) the same slicer on two or more pages, not synced
+    U102  (note) three or more page buttons on a page: a page navigator
+    U103  (note) stacked visuals switched by bookmarks: a field parameter
+
+    B001  a report file uses a table, column or measure the model in this project does not have; for a report on
+          a published model: one that the saved field list, docs/model-fields.md, does not have
+    B002  (note) a report on a published model has no saved field list, so its fields are not checked
 
 The M, G and B checks read their numbers, lists and exceptions from docs/report-brief.md under <folder>.
 An exception counts only when its row there names the same code and object and gives a reason.
-The DAX checks (M010, M103, M201) read text; they are not a DAX parser.
+Formulas are read once, in six states, by scripts/formula_scanner.py (separate rules for DAX and Power Query).
+It is a scanner, not a parser: it knows names, text, comments and brackets, not what a formula means.
+Levels of the checks added in round 3: fail when Microsoft says it breaks something or gives wrong numbers, or
+the checklist gives a hard number, and the files show it for certain; warn for every other rule; note (U) for a
+suggestion. The checks are in scripts/model_rules.py and scripts/report_rules.py.
 
 A visual may keep Header icons or Tooltips on only with a HeaderTooltipException annotation whose value
 names what stays on and why: "header: <reason>", "tooltip: <reason>" or "both: <reason>".
-The Power Query step check reads the outer 'let' of each query; it is a plain text check, not a parser.
+The Power Query step check reads the outer 'let' of each query with the same scanner.
 """
 import json
 import os
@@ -137,6 +263,7 @@ BRIEF_LABELS = {"page_size": "Page size in pixels, width x height",
                 "copilot": "Power BI Copilot check on"}
 MODEL_EXCEPTIONS = "Exceptions to the model standard"
 LAYOUT_EXCEPTIONS = "Exceptions to the layout standard"
+FIELD_LIST = os.path.join("docs", "model-fields.md")  # the saved field list of a published model (skill pbi-report)
 BEFORE_COPY = "_before"                              # the untouched copy made by scripts/improve.py
 ITEM_COUNT = 79
 FAILED = object()                                    # returned by load_json when a file cannot be parsed
@@ -1519,6 +1646,30 @@ def report_measures(report_dir):
     return out
 
 
+def read_field_list(root):
+    """The saved field list of a published model as a model the binding check can read, or None when there is none.
+
+    docs/model-fields.md holds one table: | Table | Field | Kind |, with Kind column, measure or hierarchy.
+    """
+    path = os.path.join(root, FIELD_LIST)
+    try:
+        with open(path, encoding="utf-8-sig") as fh:
+            lines = fh.read().splitlines()
+    except (OSError, UnicodeDecodeError):
+        return None
+    tables = {}
+    for line in lines:
+        text = line.strip()
+        if not text.startswith("|"):
+            continue
+        cells = [c.replace("\\|", "|").strip().strip("`").strip() for c in re.split(r"(?<!\\)\|", text.strip("|"))]
+        if len(cells) < 3 or cells[2].lower() not in ("column", "measure", "hierarchy") or not cells[0] or not cells[1]:
+            continue
+        table = tables.setdefault(cells[0], {"name": cells[0], "columns": [], "measures": [], "hierarchies": []})
+        table[{"column": "columns", "measure": "measures", "hierarchy": "hierarchies"}[cells[2].lower()]].append({"name": cells[1]})
+    return {"tables": tables} if tables else None
+
+
 def check_bindings(report_dir, model, usage, brief, findings):
     """B001: a report file names a table, column or measure the model in this project does not have."""
     own = report_measures(report_dir)
@@ -1836,6 +1987,14 @@ def run(root):
                          "the report points to a model folder that does not exist: %s" % os.path.basename(target))
         if target in parsed:
             usage.setdefault(target, []).append((report, report_fields(report)))
+        elif target is None:
+            listed = read_field_list(root)
+            if listed is None:
+                findings.add("B002", os.path.join(report, "definition.pbir"), 0, "this report reads a published model and "
+                             "%s does not exist, so its fields are not checked. Save the field list there (skill pbi-report)"
+                             % FIELD_LIST.replace(os.sep, "/"), level="note")
+            else:
+                check_bindings(report, listed, report_fields(report), brief, findings)
     for model in models:
         used = usage.get(os.path.normpath(model), [])
         every = [field for _, fields in used for field in fields]

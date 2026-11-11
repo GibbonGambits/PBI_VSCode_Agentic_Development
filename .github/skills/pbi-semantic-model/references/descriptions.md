@@ -16,14 +16,14 @@
 
 ## When the meaning is not stated
 
-Write a placeholder and tell the developer. The check script lists every placeholder.
+Write a placeholder and carry on with the work. A missing meaning never stops a task, and the placeholder is the only record of the question: do not keep a second list. At the end of the task run `python scripts/list_todos.py .` and ask the developer about all the open questions in one message.
 
 ```
 	/// TODO(owner): Does Returned mean any return, or full returns only?
 	column Returned
 ```
 
-A placeholder is not a description. While one remains, checklist item 23 is not met.
+A placeholder is not a description. While one remains, checklist item 23 is not met, and the project check lists it as a note (I001). When the developer answers, replace the line with the description and record a confirmed definition in section 5 of the brief.
 
 ## Power Query: queries and steps
 

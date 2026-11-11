@@ -427,7 +427,7 @@ def _table_column_name(name, brief):
         problems.append("it uses underscores instead of spaces")
     if any(re.search(r"[a-z][A-Z]", word) and word not in own for word in stripped.split()):
         problems.append("it runs words together")
-    if re.match(r"(?i)(dim|fact|tbl|vw|stg)[ _A-Z]", stripped) and stripped.split()[0] not in own:
+    if re.match(r"(?i)(dim|fact|stg)[ _A-Z]", stripped) and stripped.split()[0] not in own:
         problems.append("it carries a technical prefix")
     return problems
 
