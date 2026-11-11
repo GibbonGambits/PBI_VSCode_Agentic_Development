@@ -76,6 +76,8 @@ The model standard also follows naming and folder guidance from the skill `power
 
 The DAX style, the DAX practice rules marked with a SQLBI address and the list of DAX patterns in `.github/skills/pbi-semantic-model/references/dax-standard.md` restate ideas from SQLBI's public articles (https://www.sqlbi.com), its DAX Patterns site (https://www.daxpatterns.com) and DAX Guide (https://dax.guide). SQLBI's material is not under an open licence. No text, code or image from it is in this template: each rule is written in new words and carries the address of the page, and the look-up skill forbids copying SQLBI text into a project.
 
+The practice library (`.github/skills/pbi-practice-library/`) credits SQLBI as the source of its ideas. Its notes restate, one idea at a time, advice and facts from SQLBI's public articles and from two white papers that SQLBI's site links to as free downloads; the pages were read on 11 November 2026. Every note is written in this template's own words, is one or two lines long, and carries the year and the address of its article, which stays the place for the detail. No sentence, code sample or image of SQLBI is in the library, and no article is summarised. The skill tells Copilot to treat the notes as information and never to copy SQLBI material into a project.
+
 ## Microsoft Learn
 
 Rules marked with a Microsoft Learn address restate Microsoft's public documentation in new words. The DAX function index lists function names and page addresses only. No page text is reproduced.
