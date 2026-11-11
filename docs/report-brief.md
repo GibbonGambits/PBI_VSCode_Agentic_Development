@@ -34,7 +34,7 @@ An empty field means the layout standard: 1280 x 720, margin 24, gap 16, grid 8.
 - Measure folder subjects (22):
 - Acronyms and words with their own spelling (7, 28):
 - Measure table: `_Measures`, made in Power BI Desktop with Enter data; for a Direct Lake model a calculated table. Write here if this model differs, and why:
-- Large tables: row counts, and the decision on incremental refresh or partitions (17):
+- Large tables: row counts, and the decision on incremental refresh or partitions:
 - Excel check on (yes or no):
 - Power BI Copilot check on (yes or no):
 - Number formats and date formats (71, 72):
