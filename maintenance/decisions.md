@@ -62,6 +62,12 @@ The three cases in which the work would have stopped to ask did not arise: no so
 36. **The good test project uses the new card visual.** The legacy card now gives the note U105, so the fixture that stands for a correct project was moved to `cardVisual`.
 37. **Variable names.** The DAX standard's own snippets used the `_` prefix that its rule 31 does not adopt. The snippets were renamed; the rule did not change.
 
+38. **Multiple-language reports are in scope.** The owner's list of pages that are out of scope does not name them, so the eleven guidance pages got a guidance file (`multiple-languages.md`), a shipped label measure and five checks (M524, M525, V019, V020, V021). A report counts as multiple-language when a culture file of its model holds translations. Checks that would rest on a file form no Microsoft Learn page confirms were not built; the guidance says so at each rule.
+39. **Preview features in files.** M841 now also reads value filter behavior, user-context calculated columns and calculated tables over Direct Lake data; V022 reads the Gantt visual and a format string on one visual. Each needs its row in section 11 of the brief.
+40. **Descriptions above three child objects** (`multipleOrEmptySelectionExpression`, `noSelectionExpression`, `dataCoverageDefinition`) no longer give D003: Microsoft's serializer writes descriptions there. This widens what an existing check accepts; its level did not change.
+41. **The example report measure got the prefix** (`_Sales per Order Line`), so the shipped example follows V012 instead of being excused from it.
+42. **Checkpoint commits.** Two commits on the branch hold examples that a helper was still writing; the commits after them complete the work. The branch is squashed or kept as the owner prefers.
+
 ## Could not be verified
 
 - Anything that needs Power BI Desktop: every example, the starter project, the Desktop Bridge script.

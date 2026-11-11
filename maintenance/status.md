@@ -17,4 +17,4 @@ Updated at every commit, so that a stop loses nothing.
 
 ## Where to pick up
 
-The open rows are being closed: 26 more checks are in the scripts with tests; guidance was added to the five standard files; helpers are writing `visual-features.md`, `more-model-features.md` and `multiple-languages.md` and their examples. Next: merge their index rows, re-rate `coverage.md` and `feature-inventory.md`, run the two reviews, open the pull request.
+The open rows were closed with 32 more checks, guidance in the standard files, three new guidance files (`visual-features.md`, `more-model-features.md`, `multiple-languages.md`) and more shipped examples. `coverage.md` and `feature-inventory.md` are being re-rated against the repository. Next: the two read-only reviews, their fixes, the pull request.
