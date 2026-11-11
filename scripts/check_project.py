@@ -89,6 +89,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import formula_scanner as fs  # noqa: E402
 import json_schema  # noqa: E402
 import model_rules  # noqa: E402
+import report_rules  # noqa: E402
 
 NAME_OK = re.compile(r"[A-Za-z0-9_-]+\Z")           # Microsoft Learn: PBIR naming convention
 NAME_MAX = 50                                        # Microsoft schemas: page 2.1.0, visualContainer 2.13.0
@@ -873,6 +874,10 @@ def check_report(report_dir, findings, brief=None):
                 check_layout(report_dir, page_folder_name, page_folder, page_path, hidden_by_bookmark, brief, findings)
         except (AttributeError, TypeError, KeyError, ValueError, OverflowError) as exc:
             findings.add("J002", page_path, 0, "a file of this page has an unexpected structure (%s)" % exc)
+    try:
+        report_rules.check(sys.modules[__name__], report_dir, brief, findings)
+    except (AttributeError, TypeError, KeyError, ValueError, OverflowError, RecursionError) as exc:
+        findings.add("J002", report_path, 0, "the report has a structure the report checks cannot read (%s)" % exc)
 
 
 def check_model(model_dir, findings):

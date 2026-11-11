@@ -160,9 +160,10 @@ class BadProject(Case):
     FIXTURE = "bad"
     ERRORS = ("B001", "D001", "G001", "G002", "H001", "H002", "M001", "M002", "M003", "M004", "M005", "M006",
               "M007", "M009", "M105", "M107", "M109", "M402", "N003")
-    WARNINGS = ("G003", "G004", "G005", "G006", "G007", "M008", "M010", "M101", "M102", "M103", "M104", "M106",
-                "M108", "M110", "M111", "M112", "M114", "M118", "M404", "M411", "M413", "M508")
-    NOTES = ("G008", "M201", "M301", "M302")
+    WARNINGS = ("A001", "A002", "A003", "G003", "G004", "G005", "G006", "G007", "M008", "M010", "M101", "M102",
+                "M103", "M104", "M106", "M108", "M110", "M111", "M112", "M114", "M118", "M404", "M411", "M413",
+                "M508", "V002", "V005")
+    NOTES = ("G008", "M201", "M301", "M302", "U103")
 
     def test_every_breach_is_caught(self):
         items = self.found()
@@ -692,7 +693,7 @@ class Layout(Case):
     def test_same_kind_in_one_row_with_other_height_warns(self):
         shutil.copytree(os.path.dirname(self.path(CARD)), self.path(os.path.join(PAGE, "visuals", "Overview_Card_Second")))
         second = os.path.join(PAGE, "visuals", "Overview_Card_Second", "visual.json")
-        self.edit_json(second, lambda d: d.update({"name": "Overview_Card_Second"}))
+        self.edit_json(second, lambda d: (d.update({"name": "Overview_Card_Second"}), d["position"].update({"tabOrder": 5})))
         self.move(second, x=648, height=104)
         self.assertEqual(sorted(set(self.codes("warn"))), ["G005", "G006"])
         self.move(second, height=120)
@@ -722,7 +723,10 @@ class FieldReferences(Case):
     def bind(self, kind, entity, prop):
         field = {"field": {kind: {"Expression": {"SourceRef": {"Entity": entity}}, "Property": prop}},
                  "queryRef": "%s.%s" % (entity, prop)}
-        self.edit_json(CARD, lambda d: d["visual"].update({"query": {"queryState": {"Values": {"projections": [field]}}}}))
+        text = {"expr": {"Literal": {"Value": "'Made-up card for a test'"}}}
+        self.edit_json(CARD, lambda d: (d["visual"].update({"query": {"queryState": {"Values": {"projections": [field]}}}}),
+                                        d["visual"]["visualContainerObjects"].update(
+                                            {"general": [{"properties": {"altText": text}}], "title": [{"properties": {"text": text}}]})))
 
     def test_field_the_model_has_passes(self):
         self.bind("Measure", "_Measures", "Total Sales")
