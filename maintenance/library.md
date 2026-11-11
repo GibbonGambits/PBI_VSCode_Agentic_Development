@@ -26,7 +26,8 @@ Updated at every commit, so that a stop loses nothing.
 | T11 Calculation groups and field parameters | Compared with the repository, rewritten, rendered |
 | T12 Window functions and visual calculations | Compared with the repository, rewritten, rendered |
 | T16 Tooling, workflow and AI assistance | Compared with the repository, rewritten, rendered |
-| The other two topics | Not yet done |
+| T14 Business calculation patterns | Compared with the repository, rewritten, rendered |
+| The other one topic | Not yet done |
 | Duplicates across topics | Not yet done |
 | Index, tests, README, notices, evals | Index started; the rest not yet done |
 | Two read-only reviews | Not yet done |

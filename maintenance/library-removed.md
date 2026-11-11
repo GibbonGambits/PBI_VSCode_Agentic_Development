@@ -14,11 +14,11 @@ The library started from 2,318 notes drawn from public SQLBI articles. Notes wer
 |---|---:|
 | 1. Outdated | 35 |
 | 2. Conflicts with the checklist | 19 |
-| 3. The repository already says it | 95 |
+| 3. The repository already says it | 99 |
 | 4. Not adopted: a higher source says otherwise | 20 |
 | 5. Duplicate in another topic | 0 |
-| Kept in the library | 1923 |
-| Not yet decided | 226 |
+| Kept in the library | 2052 |
+| Not yet decided | 93 |
 
 | Note | Group | Covered by |
 |---|---|---|
@@ -172,8 +172,12 @@ The library started from 2,318 notes drawn from public SQLBI articles. Notes wer
 | T14-A088-7 | 3 | `.github/skills/pbi-semantic-model/references/model-standard.md`, rule 7 |
 | T14-A136-2 | 1 | - |
 | T14-A183-7 | 3 | `.github/skills/pbi-checklist-review/references/native-features.md`, The list, Model: row "Calculation groups" |
+| T14-A252-8 | 3 | `.github/skills/pbi-report/references/report-standard.md`, rule 65 |
+| T14-A304-3 | 3 | `.github/skills/pbi-semantic-model/references/storage-and-security.md`, rule 17 |
 | T14-A323-10 | 2 | `checklist/checklist.md`, item 35 |
 | T14-A326-7 | 2 | `checklist/checklist.md`, item 38 |
+| T14-A346-9 | 3 | `.github/skills/pbi-semantic-model/references/model-objects.md`, section A, rules 2, 3 and 5 |
+| T14-A349-4 | 3 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, rule 6 |
 | T15-A166-2 | 2 | `checklist/checklist.md`, item 14 |
 | T15-A166-5 | 2 | `checklist/checklist.md`, item 12 |
 | T15-A166-6 | 3 | `.github/skills/pbi-semantic-model/references/model-standard.md`, rule 7 |
