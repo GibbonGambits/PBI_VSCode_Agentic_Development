@@ -6,7 +6,7 @@ Usage:
 
 Microsoft publishes a JSON schema for every report file of a Power BI project (page.json, visual.json,
 report.json, bookmarks and so on) at https://github.com/microsoft/json-schemas (MIT licence). A copy of
-the newest version of each schema is kept in scripts/schemas/, so this check needs no network and gives
+every published version of each schema is kept in scripts/schemas/, so this check needs no network and gives
 the same answer every time. maintenance/sources.md records the commit the copy was taken from.
 
 A file whose '$schema' names a version that is not in scripts/schemas/ is not checked; the script says so.

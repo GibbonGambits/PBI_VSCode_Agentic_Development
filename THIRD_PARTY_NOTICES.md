@@ -62,7 +62,7 @@ SOFTWARE.
 
 ## Microsoft json-schemas (report schemas)
 
-`scripts/schemas/` holds unchanged copies of the newest version of each schema Microsoft publishes for Power BI project files, from `microsoft/json-schemas` (https://github.com/microsoft/json-schemas), under the MIT licence ("Copyright (c) Microsoft Corporation"). Its licence file is kept beside the copies, as `scripts/schemas/LICENSE`. The copies are used by `scripts/json_schema.py` and the project check. `maintenance/sources.md` records the commit.
+`scripts/schemas/` holds unchanged copies of every version of each schema Microsoft publishes for Power BI project files, from `microsoft/json-schemas` (https://github.com/microsoft/json-schemas), under the MIT licence ("Copyright (c) Microsoft Corporation"). Its licence file is kept beside the copies, as `scripts/schemas/LICENSE`. The copies are used by `scripts/json_schema.py` and the project check. `maintenance/sources.md` records the commit.
 
 ## GitHub awesome-copilot
 

@@ -5,8 +5,8 @@ Usage (run from the repository root):
     python scripts/refresh_sources.py check                  compare each Git source in maintenance/sources.md
                                                              with its repository today; list the ones that moved
     python scripts/refresh_sources.py dax-index              rebuild the DAX function index from Microsoft Learn
-    python scripts/refresh_sources.py schemas <folder>       copy the newest Microsoft report schemas from a local
-                                                             clone of https://github.com/microsoft/json-schemas
+    python scripts/refresh_sources.py schemas <folder>       copy every version of Microsoft's report schemas from a
+                                                             local clone of https://github.com/microsoft/json-schemas
 
 The routine, in order:
     1. python scripts/refresh_sources.py check
@@ -173,10 +173,6 @@ def dax_index():
 
 # ---------------------------------------------------------------- schemas
 
-def _version(text):
-    return tuple(int(part) for part in text.split("."))
-
-
 def _references(path, relative):
     """Schema files that one schema file refers to, as paths relative to the clone's root."""
     out = set()
@@ -202,18 +198,19 @@ def _references(path, relative):
 
 
 def schemas(clone):
-    """Copy the newest version of each schema, and every file those refer to, into scripts/schemas."""
+    """Copy every published version of each schema, and every file those refer to, into scripts/schemas.
+
+    Every version, not only the newest: a project saved by an older Power BI Desktop names older versions,
+    and its files should be checked too.
+    """
     if not os.path.isdir(os.path.join(clone, "fabric")):
         print("Not a clone of microsoft/json-schemas (no 'fabric' folder): %s" % clone)
         return 1
-    newest = {}
+    wanted = set()
     for folder, _, files in os.walk(os.path.join(clone, "fabric")):
         parts = os.path.relpath(folder, clone).split(os.sep)
         if "schema.json" in files and re.match(r"\d+\.\d+\.\d+\Z", parts[-1]) and not set(parts) & set(NOT_COPIED):
-            key = "/".join(parts[:-1])
-            if key not in newest or _version(parts[-1]) > _version(newest[key]):
-                newest[key] = parts[-1]
-    wanted = {"%s/%s/schema.json" % (key, version) for key, version in newest.items()}
+            wanted.add("/".join(parts) + "/schema.json")
     todo = list(wanted)
     while todo:
         relative = todo.pop()

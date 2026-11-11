@@ -33,7 +33,7 @@ theme/theme.json                     the report theme, unchanged
 docs/report-brief.md                 what you tell Copilot before it builds
 docs/lessons.md                      each Copilot mistake, its correction, and where the fix went
 scripts/                             machine checks, the tools Copilot builds with, the flow tool and the lessons tool
-scripts/schemas/                     a copy of Microsoft's schemas for report files (MIT), used by the checks
+scripts/schemas/                     a copy of every version of Microsoft's schemas for report files (MIT), used by the checks
 tests/                               tests of the scripts, on made-up data
 tests/fixtures/examples/             one working example of every native object kind, with INDEX.md
 evals/prompts.md                     test prompts for the guidance (not yet run)

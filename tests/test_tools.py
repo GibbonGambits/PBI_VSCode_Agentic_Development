@@ -418,7 +418,7 @@ class SourcesRoutine(TempCase):
         self.assertEqual([r["source"] for r in rows], ["A repository", "A page"])
         self.assertEqual(rows[0]["licence"], "MIT")
 
-    def test_schemas_are_copied_newest_version_with_what_they_refer_to(self):
+    def test_every_schema_version_is_copied_with_what_it_refers_to(self):
         clone = os.path.join(self.tmp, "clone")
         for version, body in (("1.0.0", {"old": True}), ("1.1.0", {"$ref": "../../other/2.0.0/schema-embedded.json"})):
             folder = os.path.join(clone, "fabric", "item", "thing", version)
@@ -440,7 +440,7 @@ class SourcesRoutine(TempCase):
         copied = sorted(os.path.relpath(os.path.join(folder, name), os.path.join(self.tmp, "out")).replace(os.sep, "/")
                         for folder, _, names in os.walk(os.path.join(self.tmp, "out")) for name in names)
         self.assertEqual(copied, ["fabric/item/other/2.0.0/schema-embedded.json", "fabric/item/other/2.0.0/schema.json",
-                                  "fabric/item/thing/1.1.0/schema.json"])
+                                  "fabric/item/thing/1.0.0/schema.json", "fabric/item/thing/1.1.0/schema.json"])
 
 
 if __name__ == "__main__":

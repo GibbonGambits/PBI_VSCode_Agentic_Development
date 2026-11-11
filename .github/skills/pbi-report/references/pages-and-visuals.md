@@ -23,7 +23,7 @@ Sources: Microsoft Learn "Power BI Desktop project report folder" (file layout, 
 
 ## `$schema`
 
-Take `$schema` from a file of the same kind already in this report. If the report has none, copy it from the shipped example of that kind (`tests/fixtures/examples/INDEX.md`). The addresses the examples carry are the newest in Microsoft's schema repository when this template was last refreshed, and a copy of each schema is in `scripts/schemas`:
+Take `$schema` from a file of the same kind already in this report. If the report has none, copy it from the shipped example of that kind (`tests/fixtures/examples/INDEX.md`). The addresses the examples carry are the newest in Microsoft's schema repository when this template was last refreshed. A copy of every version Microsoft has published is in `scripts/schemas`, so a file saved by an older Power BI Desktop is checked against its own version:
 
 - page: `https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.1.0/schema.json`
 - visual: `https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json`
