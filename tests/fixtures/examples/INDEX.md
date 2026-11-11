@@ -67,7 +67,7 @@ The starter registers a placeholder theme so that it passes the check here. `sca
 | Culture with translations (captions, a description) | `Examples.SemanticModel/definition/cultures/nl-NL.tmdl` | nl-NL | https://learn.microsoft.com/analysis-services/tmdl/tmdl-reference-tabular-object; Microsoft's TMDL serializer | GA |
 | Culture with linguisticMetadata (minimal JSON) | `Examples.SemanticModel/definition/cultures/en-US.tmdl` | en-US | https://learn.microsoft.com/analysis-services/tmdl/tmdl-reference-tabular-object; Microsoft's TMDL serializer | GA |
 | DirectQuery fact table | `storage/DirectQuery.SemanticModel/definition/tables/Sales.tmdl` | Sales | https://learn.microsoft.com/power-bi/transform-model/desktop-composite-models; Microsoft's TMDL serializer | GA |
-| Dual storage mode dimensions | `storage/DirectQuery.SemanticModel/definition/tables/Date.tmdl; .../Store.tmdl` | Date; Store | https://learn.microsoft.com/power-bi/transform-model/desktop-storage-mode; Microsoft's TMDL serializer | GA |
+| Dual storage mode dimensions | `storage/DirectQuery.SemanticModel/definition/tables/Date.tmdl; storage/DirectQuery.SemanticModel/definition/tables/Store.tmdl` | Date; Store | https://learn.microsoft.com/power-bi/transform-model/desktop-storage-mode; Microsoft's TMDL serializer | GA |
 | Imported aggregation table (alternateOf groupBy, sum, count) | `storage/DirectQuery.SemanticModel/definition/tables/Sales Aggregate.tmdl` | Sales Aggregate | https://learn.microsoft.com/power-bi/transform-model/aggregations-advanced; Microsoft's TMDL serializer | GA |
 | Measure table as a calculated table | `storage/DirectQuery.SemanticModel/definition/tables/_Measures.tmdl; storage/DirectLake.SemanticModel/definition/tables/_Measures.tmdl` | _Measures | https://learn.microsoft.com/fabric/fundamentals/direct-lake-overview; Microsoft's TMDL serializer | GA |
 | Direct Lake entity partitions | `storage/DirectLake.SemanticModel/definition/tables/Sales.tmdl, Date.tmdl, Store.tmdl` | Sales; Date; Store | https://learn.microsoft.com/fabric/fundamentals/direct-lake-develop; https://learn.microsoft.com/rest/api/fabric/articles/item-management/definitions/ontology-definition; Microsoft's TMDL serializer | GA |
@@ -155,6 +155,24 @@ Notes on the model examples:
 | Sort definition | `query.sortDefinition` | `Examples.Report/definition/pages/Charts_Bars/visuals/Charts_Bars_ClusteredColumn_SalesBySubcategory/visual.json` | - | Microsoft's report skill, authoring/cartesian.md (Sort Definition) | GA |
 | Hidden visual | `isHidden` | `Examples.Report/definition/pages/Tables/visuals/Tables_Table_HiddenStoreList/visual.json (also Bookmarks_Table_SalesByChannel)` | Values | scripts/schemas (Microsoft json-schemas) visualContainer 2.13.0 | GA |
 | Visual inside a group | `parentGroupName` | `Examples.Report/definition/pages/Elements/visuals/Elements_Text_NoteText/visual.json` | - | scripts/schemas (Microsoft json-schemas) visualContainer 2.13.0 | GA |
+
+## Supporting files
+
+Files that an example above needs beside it. Each is verified in the same way.
+
+| Kind | File | Why it is there |
+|---|---|---|
+| actionButton | `Examples.Report/definition/pages/Bookmarks/visuals/Bookmarks_Button_ShowTable/visual.json` | Supports the examples on its page |
+| cardVisual | `Examples.Report/definition/pages/Drillthrough_Store/visuals/Drillthrough_Store_Card_StoreFigures/visual.json` | Supports the examples on its page |
+| cardVisual | `Examples.Report/definition/pages/Slicers/visuals/Slicers_Card_SalesAfterDiscount/visual.json` | Supports the examples on its page |
+| cardVisual | `Examples.Report/definition/pages/Tooltip_StoreSales/visuals/Tooltip_StoreSales_Card_StoreFigures/visual.json` | Supports the examples on its page |
+| clusteredColumnChart | `Examples.Report/definition/pages/Bookmarks/visuals/Bookmarks_ClusteredColumn_SalesByChannel/visual.json` | Supports the examples on its page |
+| shape | `Examples.Report/definition/pages/Elements/visuals/Elements_Shape_NoteFrame/visual.json` | Supports the examples on its page |
+| slicer | `Examples.Report/definition/pages/Field_Parameters/visuals/Field_Parameters_Slicer_Breakdown/visual.json` | Supports the examples on its page |
+| slicer | `Examples.Report/definition/pages/Field_Parameters/visuals/Field_Parameters_Slicer_Metric/visual.json` | Supports the examples on its page |
+| table | `Examples.SemanticModel/definition/tables/Store Detail.tmdl` | The second table of the one-to-one relationship example |
+| tableEx | `Examples.Report/definition/pages/Bookmarks/visuals/Bookmarks_Table_SalesByChannel/visual.json` | Supports the examples on its page |
+| tableEx | `Examples.Report/definition/pages/Drillthrough_Store/visuals/Drillthrough_Store_Table_StoreFacts/visual.json` | Supports the examples on its page |
 
 ## Not built
 
