@@ -99,6 +99,15 @@ A smaller model refreshes faster, answers faster and fits its capacity. Each tec
 - A calculated column in a DirectQuery table may only use values of its own row. With an iterator or CALCULATE it saves, then errors in a visual. Check: M705 (fail).
 - A relationship on a calculated column of a DirectQuery table: use a real source column instead; COMBINEVALUES is the one allowed form. Check: M704 (warn).
 - Values from one source can be sent inside queries to another source; Power BI Desktop warns about this. No check.
+- A model built on a published model (a remote model, also called chaining). Microsoft's points, none of which a file here can show, so there is no check; Copilot says each one that applies when such a model is changed:
+  - A CALCULATE whose first argument is a measure of the remote model can give another result than the same sum written out. Test the numbers of every such measure.
+  - A calculated column or calculated table cannot depend on a chained model. After adding any calculated column to a composite model, test every calculation again.
+  - A calculation group in the remote model can change results in ways that surprise.
+  - Power BI Desktop does not fully check relationships between source groups, so two paths between the same tables can exist without a warning. Keep such relationships few, on columns with few distinct values, and at a coarser grain (month, not day) when that is enough.
+  - Security roles work only inside the source group that defines them. A role cannot filter a table of another source group, nor a local table that is related to one. The remote model's own roles are not copied.
+  - The model that the organisation trusts as its one version of the truth is not a composite model: it would break when a model below it changes. Others extend it; it extends nothing.
+  - Renaming the remote model or its workspace breaks the connection. After a schema change upstream, refresh in Power BI Desktop, publish again and test.
+  - How the files hold the remote connection: `more-model-features.md`, beside this file, block 8.
 - The measures table of a DirectQuery or Direct Lake model is a calculated table (model standard rule 1; the shipped `_Measures.tmdl` in both storage examples).
 - Source: https://learn.microsoft.com/en-us/power-bi/guidance/composite-model-guidance ; https://learn.microsoft.com/en-us/power-bi/transform-model/desktop-storage-mode ; https://learn.microsoft.com/en-us/power-bi/transform-model/desktop-composite-models ; https://learn.microsoft.com/en-us/power-bi/guidance/directquery-model-guidance
 
