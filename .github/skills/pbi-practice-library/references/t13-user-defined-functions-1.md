@@ -199,7 +199,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 
 **T13-A364-2.** An optional parameter in the middle can be skipped by leaving its place empty between two commas while a later argument is still given. It is valid, though not pleasant to read. Optional arguments at the end are simply left out.
 - Option. 2026. https://www.sqlbi.com/articles/optional-parameters-in-dax-user-defined-functions/
-- When: A function has several optional parameters and the caller wants to set only a later one.
+- When: The caller wants to set only a later one of several optional parameters.
 
 **T13-A364-3.** The default expression of an optional parameter cannot refer to another parameter of the same function. It must respect the parameter's type hints, runs only for calls that omit the argument, and may use built-in and user-defined functions.
 - Fact. 2026. https://www.sqlbi.com/articles/optional-parameters-in-dax-user-defined-functions/

@@ -1,6 +1,6 @@
 # Tooling, workflow and AI assistance
 
-Part 1 of 3 of this topic. Covers: Scripting with TOM and APIs; Choosing development tools; Translations and renaming objects; Model edits with external tools.
+Part 1 of 3 of this topic. Covers: Scripting with TOM and APIs; Choosing development tools; Translations and renaming objects.
 
 Practice notes drawn from public SQLBI articles, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail.
 
@@ -236,80 +236,3 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T16-A081-10.** A translation file is plain text, so no particular tool is needed: it can be edited in any text editor that handles UTF-8, or through a script of your own that turns the JSON into a simpler format.
 - Option. 2016. https://www.sqlbi.com/articles/translations-in-analysis-services-2016/
 - When: Editing JSON translation files exported from an Analysis Services Tabular model, outside Visual Studio.
-
-### Model edits with external tools
-
-**T16-A110-1.** A Power BI Desktop model takes its culture from the operating system locale when the file is created, and the user interface cannot change it. Regional Settings in Options change only query behaviour, not the formatting that DAX functions such as FORMAT produce.
-- Fact. Check. 2017. https://www.sqlbi.com/articles/changing-the-culture-of-a-power-bi-desktop-file/
-- When: DAX formatting must follow a culture other than that of the machine that created the file.
-- Version: Stated in 2017; check whether current Power BI Desktop still behaves this way.
-
-**T16-A110-2.** One way to change a model's culture: save the report as a .pbit template, open it in Tabular Editor with unsupported Power BI features allowed, set the model's culture property, save, and open the template in Power BI, which builds a new model.
-- Option. Check. 2017. https://www.sqlbi.com/articles/changing-the-culture-of-a-power-bi-desktop-file/
-- When: The culture inherited from the creating machine is wrong; an undocumented edit at your own risk.
-- Version: Tabular Editor replaced an earlier text-editor approach in April 2018.
-
-**T16-A110-3.** Before changing a Power BI Desktop file's culture by editing its template outside Power BI, always keep a backup copy of every file you modify: the procedure alters an undocumented file at your own risk.
-- Must. 2017. https://www.sqlbi.com/articles/changing-the-culture-of-a-power-bi-desktop-file/
-- When: Editing a Power BI template file with Tabular Editor to change the model culture.
-
-**T16-A110-4.** A culture change made through a template cannot keep the data already loaded. The edited template holds no data, so the new model must be processed again by reading the data sources.
-- Fact. 2017. https://www.sqlbi.com/articles/changing-the-culture-of-a-power-bi-desktop-file/
-- When: Changing the model culture of a Power BI Desktop file through a template.
-
-**T16-A200-1.** A KPI defined on the measure is one option: Excel, through Analyze in Excel, and every Power BI visual reuse it with identical properties, whereas indicators built from extra measures and conditional formatting take much effort and must be redone for Excel.
-- Option. 2020. https://www.sqlbi.com/articles/creating-kpis-in-power-bi-desktop/
-- When: A measure needs a goal-based status and a trend indicator in both Power BI and Excel.
-- Version: Power BI Desktop models accept KPIs through external tools since July 2020; earlier only Analysis Services or Premium models.
-
-**T16-A200-2.** Turning a measure into a KPI replaces it in the Fields pane: Power BI lists the KPI, with Trend added when one is defined, instead of the measure. The original measure stays usable in DAX code and serves as the KPI Value.
-- Fact. 2020. https://www.sqlbi.com/articles/creating-kpis-in-power-bi-desktop/
-- When: A KPI is created on top of an existing measure.
-
-**T16-A200-3.** A KPI can be built in Tabular Editor, started from the External Tools ribbon: right-click the measure, choose Create New, KPI, then give Status and Trend a description, expression and graphic, and Target an expression and format string. Power BI shows Target as Goal.
-- Option. 2020. https://www.sqlbi.com/articles/creating-kpis-in-power-bi-desktop/
-- When: Creating a KPI directly in a Power BI Desktop model.
-- Version: Relies on the External Tools support of Power BI Desktop, July 2020 version or later.
-
-**T16-A200-4.** After changing a KPI in Tabular Editor, save the project there, from the menu or with Ctrl+S. Power BI Desktop is updated only by that save, which is what pushes the KPI into it.
-- Must. 2020. https://www.sqlbi.com/articles/creating-kpis-in-power-bi-desktop/
-- When: Editing a Power BI Desktop model through Tabular Editor as an external tool.
-
-**T16-A200-5.** The Status expression of a KPI must return an integer that matches one state of the chosen graphic, for example -1, 0 and 1 for bad, average and good on a traffic light. The Trend expression is technically another status and follows the same pattern.
-- Must. 2020. https://www.sqlbi.com/articles/creating-kpis-in-power-bi-desktop/
-- When: Defining the Status or Trend expression of a KPI.
-
-**T16-A200-6.** A KPI generates measures named after the base measure, with a leading underscore and a Goal, Status or Trend suffix. They behave as ordinary measures, so DAX can reference them, for instance the goal measure inside the Status expression.
-- Option. 2020. https://www.sqlbi.com/articles/creating-kpis-in-power-bi-desktop/
-- When: Writing DAX that needs the goal, status or trend of a KPI.
-
-**T16-A200-7.** If the Trend property of a new KPI does not show in Power BI Desktop, collapse and re-expand the Fields pane to force the field list to refresh.
-- Must. Check. 2020. https://www.sqlbi.com/articles/creating-kpis-in-power-bi-desktop/
-- When: Trend is missing from the KPI in the Fields pane after saving the KPI from Tabular Editor.
-- Version: Seen in 2020; check whether current Power BI Desktop still needs it.
-
-**T16-A200-8.** Rename the KPI Value, Status and Trend fields inside the visual that shows them: the generated names are long, waste space in the visual headers and cannot be changed in the model.
-- Should. 2020. https://www.sqlbi.com/articles/creating-kpis-in-power-bi-desktop/
-- When: Report visuals that display KPI properties.
-
-**T16-A200-9.** When building KPIs, be aware that three areas carry further important details beyond the basic steps: the graphics available, the numeric values Status and Trend return, and how a KPI behaves when the model also has calculation groups.
-- Consider. Check. 2020. https://www.sqlbi.com/articles/creating-kpis-in-power-bi-desktop/
-- When: Designing KPI Status and Trend graphics and values, or using KPIs beside calculation groups.
-
-**T16-A232-1.** One way to give an ordinary numeric column the slicer Single Value option of New Parameter columns: in Tabular Editor, add to the column an extended property named ParameterMetadata whose value is the JSON text `{"version":0}`, then save the model.
-- Option. Check. 2021. https://www.sqlbi.com/articles/how-to-enable-the-single-value-option-in-a-power-bi-slicer/
-- When: A slicer on your own numeric column should offer Single Value; unsupported by Microsoft, so back up first.
-- Version: Described in 2021; the steps are the same in the free and commercial Tabular Editor.
-
-**T16-A232-2.** Always back up the Power BI file before adding the ParameterMetadata extended property to a column with Tabular Editor: the change is not supported by Microsoft and is made at your own risk.
-- Should. 2021. https://www.sqlbi.com/articles/how-to-enable-the-single-value-option-in-a-power-bi-slicer/
-- When: Adding the ParameterMetadata extended property to enable the slicer Single Value option.
-
-**T16-A232-3.** The ParameterMetadata extended property enables the slicer Single Value option for numeric columns only; on a date column the option does not appear.
-- Fact. Check. 2021. https://www.sqlbi.com/articles/how-to-enable-the-single-value-option-in-a-power-bi-slicer/
-- When: Using the ParameterMetadata extended property to get Single Value in a slicer.
-- Version: Observed in 2021; check current behaviour.
-
-**T16-A232-4.** Be careful about changing a column's data type after the ParameterMetadata extended property has been added to it: the change may harm how the slicer behaves.
-- Consider. 2021. https://www.sqlbi.com/articles/how-to-enable-the-single-value-option-in-a-power-bi-slicer/
-- When: A column carries the ParameterMetadata extended property for the slicer Single Value option.

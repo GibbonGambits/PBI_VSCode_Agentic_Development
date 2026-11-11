@@ -28,7 +28,7 @@ Each entry names one file in this folder, what it covers, and the DAX functions 
 ### `t01-evaluation-context-1.md` (55 notes)
 
 - Covers: KEEPFILTERS and arbitrary filters; CALCULATE filter arguments; Visual queries and auto-exist.
-- DAX functions: CALCULATE, KEEPFILTERS, FILTER, ALL, CALCULATETABLE, CROSSJOIN, VALUES, SUMMARIZE, SUMMARIZECOLUMNS, OR, ISFILTERED, LASTDATE, AND, AVERAGEX, REMOVEFILTERS, MAX, CONTAINS, IF.
+- DAX functions: CALCULATE, KEEPFILTERS, FILTER, ALL, CALCULATETABLE, CROSSJOIN, VALUES, SUMMARIZE, SUMMARIZECOLUMNS, OR, ISFILTERED, LASTDATE, AND, AVERAGEX, REMOVEFILTERS, MAX, IF, CONTAINS.
 - Features: iterators, DAX queries, auto-exist, filter context, cardinality, context transition, slicers, variables, totals and subtotals, error handling, sort by column, blank handling, Excel and MDX clients, storage engine, expanded tables, running totals, dimension tables.
 
 ### `t01-evaluation-context-2.md` (55 notes)
@@ -40,7 +40,7 @@ Each entry names one file in this folder, what it covers, and the DAX functions 
 ### `t01-evaluation-context-3.md` (55 notes)
 
 - Covers: Context transition; Removing filters with ALL; ALLSELECTED and shadow filters; Totals and additivity.
-- DAX functions: CALCULATE, ALL, ALLSELECTED, VALUES, CALCULATETABLE, REMOVEFILTERS, ALLEXCEPT, FILTER, ALLCROSSFILTERED, MAX, SUMMARIZE, SUMX, SELECTEDVALUE, SUMMARIZECOLUMNS, LASTDATE, DISTINCTCOUNT, AVERAGEX, IF, SUM, ADDCOLUMNS, SAMEPERIODLASTYEAR, RELATEDTABLE, EARLIER, MINX, MAXX.
+- DAX functions: CALCULATE, ALL, ALLSELECTED, VALUES, CALCULATETABLE, REMOVEFILTERS, ALLEXCEPT, FILTER, ALLCROSSFILTERED, MAX, SUMMARIZE, SUMX, SELECTEDVALUE, SUMMARIZECOLUMNS, LASTDATE, DISTINCTCOUNT, AVERAGEX, IF, SUM, ADDCOLUMNS, SAMEPERIODLASTYEAR, RELATEDTABLE, EARLIER, MAXX, MINX.
 - Features: iterators, filter context, context transition, row context, totals and subtotals, shadow filter context, DAX queries, calculated columns, fact tables, variables, relationships, limited relationships, dimension tables, time intelligence, error handling, matrix visual, expanded tables.
 
 ## DAX authoring style
@@ -48,13 +48,13 @@ Each entry names one file in this folder, what it covers, and the DAX functions 
 ### `t02-dax-authoring-style-1.md` (75 notes)
 
 - Covers: Formatting, naming and references; Variables and their evaluation; BLANK handling and conditions.
-- DAX functions: IF, BLANK, SWITCH, DIVIDE, SUMX, ADDCOLUMNS, ISBLANK, CALCULATE, VALUES, COALESCE, VAR, FILTER, TOPN, AVERAGEX, NOT, FALSE, COUNTROWS, MINX, SUM, RELATED, ALL, CALCULATETABLE, VALUE, TREATAS, CONCATENATEX, RELATEDTABLE, ERROR, MAXX.
+- DAX functions: IF, BLANK, SWITCH, DIVIDE, SUMX, ADDCOLUMNS, ISBLANK, CALCULATE, VALUES, COALESCE, VAR, FILTER, TOPN, AVERAGEX, NOT, FALSE, COUNTROWS, MINX, SUM, RELATED, CALCULATETABLE, ALL, VALUE, TREATAS, CONCATENATEX, RELATEDTABLE, ERROR, MAXX.
 - Features: variables, blank handling, iterators, error handling, DAX queries, filter context, relationships, blank row of an invalid relationship, row context, data types, DAX formatting, calculated columns, calculated tables, naming, data lineage, testing and debugging, totals and subtotals.
 
 ### `t02-dax-authoring-style-2.md` (48 notes)
 
 - Covers: IN operator and constructors; Data types and comparisons.
-- DAX functions: CALCULATE, NOT, ALL, FILTER, OR, CONTAINSROW, CONVERT, INT, CONTAINS, TREATAS, SUMMARIZE, CALCULATETABLE, SUMX, VALUES, EXCEPT, AND, ISEMPTY, INTERSECT, DIVIDE, LOWER, UNION.
+- DAX functions: CALCULATE, NOT, FILTER, ALL, OR, CONTAINSROW, CONVERT, INT, CONTAINS, TREATAS, SUMMARIZE, CALCULATETABLE, SUMX, VALUES, EXCEPT, AND, INTERSECT, ISEMPTY, DIVIDE, UNION, LOWER.
 - Features: data types, error handling, iterators, testing and debugging, fact tables, currency conversion, virtual relationships, DAX formatting, conditional formatting, totals and subtotals.
 
 ## DAX table functions and queries
@@ -62,13 +62,13 @@ Each entry names one file in this folder, what it covers, and the DAX functions 
 ### `t03-table-functions-and-queries-1.md` (84 notes)
 
 - Covers: Grouping and adding columns; Writing DAX queries; Filter and text conditions.
-- DAX functions: SUMMARIZE, ADDCOLUMNS, CALCULATE, CALCULATETABLE, GROUPBY, FILTER, CURRENTGROUP, SEARCH, SELECTCOLUMNS, DEFINE, EVALUATE, CONTAINSSTRING, ISEMPTY, MAXX, DETAILROWS, VALUES, GENERATE, CONTAINS, ROW, LEFT, OR, ALL, FIND, AND, ROLLUP, SUM, NOT, COUNTROWS, DATATABLE, TREATAS, KEEPFILTERS, REMOVEFILTERS, MAX, BLANK, CROSSJOIN, TOPN, ALLEXCEPT, SUBSTITUTE, CONTAINSSTRINGEXACT, RIGHT, IFERROR, RELATEDTABLE.
+- DAX functions: SUMMARIZE, ADDCOLUMNS, CALCULATE, CALCULATETABLE, GROUPBY, FILTER, CURRENTGROUP, SEARCH, SELECTCOLUMNS, DEFINE, EVALUATE, CONTAINSSTRING, ISEMPTY, MAXX, DETAILROWS, VALUES, GENERATE, CONTAINS, ROW, LEFT, OR, ALL, FIND, AND, ROLLUP, SUM, COUNTROWS, NOT, DATATABLE, TREATAS, KEEPFILTERS, REMOVEFILTERS, MAX, BLANK, CROSSJOIN, TOPN, ALLEXCEPT, CONTAINSSTRINGEXACT, SUBSTITUTE, IFERROR, RIGHT, RELATEDTABLE.
 - Features: DAX queries, iterators, variables, relationships, filter context, Excel and MDX clients, totals and subtotals, blank handling, row context, context transition, fact tables, materialization, testing and debugging, query plans, slicers, expanded tables, dimension tables, formula engine, blank row of an invalid relationship, external tools, detail rows.
 
 ### `t03-table-functions-and-queries-2.md` (78 notes)
 
 - Covers: Calculated and static tables; SUMMARIZECOLUMNS behaviour; Joins and lookups; Set functions.
-- DAX functions: SUMMARIZECOLUMNS, LOOKUPVALUE, SUMMARIZE, NATURALLEFTOUTERJOIN, NATURALINNERJOIN, ADDCOLUMNS, UNION, TREATAS, INTERSECT, EXCEPT, VALUES, RELATED, CROSSJOIN, SELECTCOLUMNS, GENERATE, CALCULATE, GENERATESERIES, FILTER, CONTAINS, ROW, CALCULATETABLE, SELECTEDVALUE, DATATABLE, RELATEDTABLE, CURRENCY, CALENDAR, HASONEVALUE, IF, GENERATEALL, CONVERT, ALL, ISBLANK, REMOVEFILTERS, COALESCE, NOT.
+- DAX functions: SUMMARIZECOLUMNS, LOOKUPVALUE, SUMMARIZE, NATURALLEFTOUTERJOIN, NATURALINNERJOIN, ADDCOLUMNS, UNION, TREATAS, INTERSECT, EXCEPT, VALUES, RELATED, CROSSJOIN, GENERATE, SELECTCOLUMNS, CALCULATE, GENERATESERIES, FILTER, CONTAINS, ROW, CALCULATETABLE, SELECTEDVALUE, DATATABLE, RELATEDTABLE, CURRENCY, CALENDAR, IF, HASONEVALUE, GENERATEALL, CONVERT, ALL, ISBLANK, REMOVEFILTERS, COALESCE, NOT.
 - Features: relationships, data lineage, virtual relationships, fact tables, error handling, calculated tables, DAX queries, blank handling, variables, data types, query plans, storage engine, iterators, row context, filter context, expanded tables, limited relationships, auto-exist, calculated columns, currency conversion, compression, parameter tables, blank row of an invalid relationship.
 
 ## Time intelligence and date tables
@@ -76,19 +76,19 @@ Each entry names one file in this folder, what it covers, and the DAX functions 
 ### `t04-time-intelligence-and-dates-1.md` (61 notes)
 
 - Covers: Time intelligence functions; Week-based and fiscal calendars; Mark as date table.
-- DAX functions: CALCULATE, DATEADD, LASTDATE, VALUES, FILTER, DATESYTD, ALL, CALCULATETABLE, PARALLELPERIOD, REMOVEFILTERS, FIRSTDATE, ALLEXCEPT, DATESINPERIOD, SAMEPERIODLASTYEAR, TOTALYTD, CONTAINS, PREVIOUSDAY, NEXTDAY, KEEPFILTERS, FILTERS, AVERAGEX, YEAR, MAX, MIN, DATESBETWEEN, COUNTROWS, WEEKDAY, SELECTEDMEASURE, QUARTER, MONTH, DAY, NEXTQUARTER, NEXTMONTH, NEXTYEAR, PREVIOUSYEAR, PREVIOUSMONTH, PREVIOUSQUARTER.
+- DAX functions: CALCULATE, DATEADD, LASTDATE, FILTER, VALUES, DATESYTD, ALL, CALCULATETABLE, PARALLELPERIOD, REMOVEFILTERS, FIRSTDATE, ALLEXCEPT, DATESINPERIOD, SAMEPERIODLASTYEAR, TOTALYTD, CONTAINS, NEXTDAY, PREVIOUSDAY, KEEPFILTERS, FILTERS, AVERAGEX, YEAR, MAX, MIN, COUNTROWS, DATESBETWEEN, WEEKDAY, SELECTEDMEASURE, QUARTER, MONTH, DAY, NEXTYEAR, PREVIOUSMONTH, PREVIOUSQUARTER, NEXTQUARTER, NEXTMONTH, PREVIOUSYEAR.
 - Features: date table, time intelligence, calendar-based time intelligence, week-based calendars, relationships, fiscal calendars, row context, fact tables, iterators, moving averages, slicers, totals and subtotals, context transition, DAX queries, data types, filter context, calculated columns, blank handling, external tools, Power Query.
 
 ### `t04-time-intelligence-and-dates-2.md` (65 notes)
 
 - Covers: Incomplete periods and future dates; Period-over-period comparisons; Building a Date table.
-- DAX functions: CALCULATE, REMOVEFILTERS, MAX, SAMEPERIODLASTYEAR, DATESYTD, LASTNONBLANK, ALLEXCEPT, TODAY, SELECTEDVALUE, YEAR, DATESBETWEEN, DIVIDE, FILTER, SELECTEDMEASURE, KEEPFILTERS, CALENDARAUTO, CALCULATETABLE, IF, VALUES, ALL, EDATE, PARALLELPERIOD, QUARTER, MONTH, TREATAS, ALLNOBLANKROW, USERELATIONSHIP, COUNTROWS, ALLSELECTED, DATESINPERIOD, RANKX, ERROR, IFERROR, SELECTCOLUMNS, DATATABLE, CALENDAR, MIN.
+- DAX functions: CALCULATE, REMOVEFILTERS, SAMEPERIODLASTYEAR, MAX, DATESYTD, LASTNONBLANK, ALLEXCEPT, TODAY, SELECTEDVALUE, YEAR, DIVIDE, DATESBETWEEN, FILTER, SELECTEDMEASURE, KEEPFILTERS, CALENDARAUTO, CALCULATETABLE, IF, VALUES, ALL, EDATE, TREATAS, QUARTER, MONTH, PARALLELPERIOD, ALLNOBLANKROW, USERELATIONSHIP, COUNTROWS, ALLSELECTED, DATESINPERIOD, RANKX, IFERROR, ERROR, SELECTCOLUMNS, DATATABLE, CALENDAR, MIN.
 - Features: date table, slicers, calculated columns, time intelligence, external tools, fact tables, calculation groups, relationships, blank handling, charts, calendar-based time intelligence, filter context, auto date/time, DAX queries, visual-level filters, context transition, calculated tables, hierarchies, fiscal calendars, refresh and processing, inactive relationships, error handling.
 
 ### `t04-time-intelligence-and-dates-3.md` (46 notes)
 
 - Covers: Date columns, sorting and formats; Blank and placeholder dates; Calendar-based time intelligence.
-- DAX functions: DATEADD, DATESINPERIOD, ISBLANK, VALUES, SAMEPERIODLASTYEAR, FORMAT, NOT, SUMX, CALENDARAUTO, DATESBETWEEN, BLANK, CALCULATE, FILTER, REMOVEFILTERS, NEXTMONTH, DATESYTD.
+- DAX functions: DATEADD, DATESINPERIOD, ISBLANK, VALUES, SAMEPERIODLASTYEAR, FORMAT, NOT, SUMX, CALENDARAUTO, BLANK, DATESBETWEEN, CALCULATE, FILTER, REMOVEFILTERS, DATESYTD, NEXTMONTH.
 - Features: date table, calendar-based time intelligence, blank handling, time intelligence, charts, format strings, blank row of an invalid relationship, hierarchies, relationships, slicers, fact tables, totals and subtotals, data categories and geography, fiscal calendars, sort by column, TMDL and project files.
 
 ## Relationships and filter propagation
@@ -110,7 +110,7 @@ Each entry names one file in this folder, what it covers, and the DAX functions 
 ### `t06-data-model-design-2.md` (65 notes)
 
 - Covers: Business-rule grain and testing; Duplicate names, Group By Columns; Circular dependency errors; Sankey chart funnels; User-context calculated columns.
-- DAX functions: CALCULATE, SUMMARIZE, ALLEXCEPT, ALLNOBLANKROW, VALUES, SELECTEDVALUE, ALL, SUMX, AVERAGE, FILTER, IF, UNICHAR, CALCULATETABLE, HASONEVALUE, TREATAS, COUNTROWS, USERELATIONSHIP, USERCULTURE, LOOKUPVALUE, MAX, MIN, REMOVEFILTERS, COMBINEVALUES, REPT, RANKX, ADDCOLUMNS, SUMMARIZECOLUMNS, SELECTCOLUMNS, ISFILTERED, USERPRINCIPALNAME, USEROBJECTID, CUSTOMDATA, USERNAME, FALSE.
+- DAX functions: CALCULATE, SUMMARIZE, ALLEXCEPT, ALLNOBLANKROW, VALUES, SELECTEDVALUE, ALL, SUMX, AVERAGE, FILTER, IF, UNICHAR, CALCULATETABLE, HASONEVALUE, TREATAS, COUNTROWS, USERELATIONSHIP, USERCULTURE, LOOKUPVALUE, MIN, MAX, REMOVEFILTERS, COMBINEVALUES, REPT, RANKX, ADDCOLUMNS, SUMMARIZECOLUMNS, SELECTCOLUMNS, ISFILTERED, USERPRINCIPALNAME, CUSTOMDATA, USEROBJECTID, USERNAME, FALSE.
 - Features: calculated columns, relationships, error handling, context transition, blank handling, slicers, charts, iterators, totals and subtotals, calculated tables, Excel and MDX clients, testing and debugging, DAX queries, blank row of an invalid relationship, cardinality, refresh and processing, row-level security, storage engine, CallbackDataID, virtual relationships, memory.
 
 ## DAX performance and optimization
@@ -118,7 +118,7 @@ Each entry names one file in this folder, what it covers, and the DAX functions 
 ### `t07-dax-performance-1.md` (64 notes)
 
 - Covers: Filters, counts and emptiness tests; Measuring and testing performance; Formula and storage engine.
-- DAX functions: CALCULATE, ISEMPTY, DISTINCTCOUNT, SUMX, COUNTROWS, FILTER, IF, LASTNONBLANK, CALCULATETABLE, KEEPFILTERS, VALUES, AND, ISBLANK, ALL, BLANK, SUM, NOT, FIRSTNONBLANK, EXCEPT, SUMMARIZECOLUMNS, INTERSECT, SELECTEDVALUE, DIVIDE, MIN, AVERAGE.
+- DAX functions: CALCULATE, ISEMPTY, DISTINCTCOUNT, SUMX, COUNTROWS, FILTER, IF, LASTNONBLANK, CALCULATETABLE, KEEPFILTERS, VALUES, AND, ISBLANK, ALL, BLANK, SUM, NOT, FIRSTNONBLANK, SUMMARIZECOLUMNS, INTERSECT, EXCEPT, SELECTEDVALUE, DIVIDE, MIN, AVERAGE.
 - Features: distinct counts, storage engine, DAX queries, fact tables, Performance Analyzer, formula engine, external tools, testing and debugging, query plans, iterators, refresh and processing, filter context, materialization, totals and subtotals, DirectQuery, memory, relationships, AI assistance, cardinality, date table, CallbackDataID, import mode.
 
 ### `t07-dax-performance-2.md` (54 notes)
@@ -138,44 +138,44 @@ Each entry names one file in this folder, what it covers, and the DAX functions 
 ### `t08-storage-engine-and-model-size-1.md` (36 notes)
 
 - Covers: Reducing column cardinality; Calculated column and table storage; Measuring model size; Analysis Services processing.
-- DAX functions: NOW, SUMX, SUMMARIZE, DISTINCTCOUNT, COUNTROWS, CALCULATETABLE, INT, MOD, CALCULATE, RELATED, MONTH, LOOKUPVALUE, CROSSJOIN, ALL, MAX.
+- DAX functions: NOW, SUMX, SUMMARIZE, COUNTROWS, DISTINCTCOUNT, INT, MOD, CALCULATETABLE, CALCULATE, RELATED, MONTH, LOOKUPVALUE, CROSSJOIN, ALL, MAX.
 - Features: refresh and processing, memory, dictionaries, calculated columns, VertiPaq, external tools, compression, calculated tables, fact tables, data types, partitions, error handling.
 
 ## Storage modes
 
-### `t09-storage-modes-1.md` (63 notes)
+### `t09-storage-modes-1.md` (51 notes)
 
-- Covers: DirectQuery DAX and limits; DirectQuery model and source design; Choosing a storage mode.
-- DAX functions: SUMMARIZECOLUMNS, ADDCOLUMNS, CALCULATE, BLANK, SAMEPERIODLASTYEAR, COMBINEVALUES, MEDIANX, ALL, INT, LASTNONBLANK, ISEMPTY, NOT, TRIM, LOG, LN, MID, REPLACE, LOG10, SUBSTITUTE, SEARCH, LEFT, CEILING, LEN, SECOND, POWER, SUMMARIZE, MAX, REMOVEFILTERS, DATESYTD, DATEADD, DATESBETWEEN.
-- Features: DirectQuery, memory, import mode, relationships, formula engine, time intelligence, partitions, calculated columns, external tools, DAX queries, row-level security, refresh and processing, fact tables, storage engine, query plans, VertiPaq, error handling, granularity, materialization, totals and subtotals, detail rows, testing and debugging, blank handling, Excel and MDX clients.
+- Covers: DirectQuery DAX and limits; DirectQuery model and source design.
+- DAX functions: SUMMARIZECOLUMNS, ADDCOLUMNS, CALCULATE, BLANK, SAMEPERIODLASTYEAR, COMBINEVALUES, MEDIANX, ALL, INT, ISEMPTY, LASTNONBLANK, NOT, REPLACE, SUBSTITUTE, SEARCH, POWER, LEN, MID, LOG10, LEFT, CEILING, SECOND, TRIM, LOG, LN, SUMMARIZE, REMOVEFILTERS, MAX, DATEADD, DATESYTD, DATESBETWEEN.
+- Features: DirectQuery, memory, relationships, import mode, formula engine, time intelligence, calculated columns, external tools, DAX queries, partitions, row-level security, storage engine, query plans, VertiPaq, fact tables, error handling, granularity, totals and subtotals, detail rows, refresh and processing, testing and debugging, blank handling, Excel and MDX clients.
 
-### `t09-storage-modes-2.md` (38 notes)
+### `t09-storage-modes-2.md` (50 notes)
 
-- Covers: Composite models; Push datasets.
+- Covers: Choosing a storage mode; Composite models; Push datasets.
 - DAX functions: ALLSELECTED, DISTINCTCOUNT, RELATED, SUMX, LOOKUPVALUE, USERELATIONSHIP, SUM.
-- Features: push datasets, composite models, calculation groups, DAX queries, relationships, refresh and processing, DirectQuery, import mode, limited relationships, date table, hierarchies, blank handling.
+- Features: push datasets, composite models, DirectQuery, memory, import mode, refresh and processing, calculation groups, DAX queries, relationships, fact tables, limited relationships, date table, hierarchies, blank handling.
 
 ## Security
 
 ### `t10-security-1.md` (48 notes)
 
 - Covers: Dynamic security, relationships and testing; Role filter performance; Totals under row-level security; Object-level security and active roles.
-- DAX functions: ALL, USERELATIONSHIP, TREATAS, VALUES, CALCULATETABLE, LEFT, PATHCONTAINS, CROSSFILTER, CALCULATE, ISCROSSFILTERED, SUMMARIZE, FALSE, FILTER, SELECTEDVALUE, CONCATENATEX, CONTAINSSTRING, ERROR, IF.
+- DAX functions: ALL, USERELATIONSHIP, TREATAS, VALUES, CALCULATETABLE, LEFT, PATHCONTAINS, CROSSFILTER, CALCULATE, ISCROSSFILTERED, SUMMARIZE, FILTER, FALSE, SELECTEDVALUE, CONCATENATEX, CONTAINSSTRING, IF, ERROR.
 - Features: row-level security, dimension tables, totals and subtotals, relationships, fact tables, calculated tables, hierarchies, object-level security, storage engine, error handling, dynamic security, inactive relationships, virtual relationships, bidirectional filters, blank handling, DAX queries.
 
 ## Calculation groups and field parameters
 
-### `t11-calculation-groups-and-field-parameters-1.md` (82 notes)
+### `t11-calculation-groups-and-field-parameters-1.md` (48 notes)
 
-- Covers: Calculation group design patterns; Calculation item application; Format string expressions; Calculation group precedence; Per-user defaults and slicers; Field parameters.
-- DAX functions: CALCULATE, SELECTEDMEASURE, ISSELECTEDMEASURE, VALUES, IF, SELECTEDMEASURENAME, USERPRINCIPALNAME, ISCROSSFILTERED, SWITCH, SELECTEDMEASUREFORMATSTRING, ALLSELECTED, FALSE, SELECTEDVALUE, CALCULATETABLE, INT, TRUE, MAX, TREATAS, SELECTCOLUMNS, HASONEVALUE, DATATABLE, SUMX, ADDCOLUMNS, NATURALLEFTOUTERJOIN, USERELATIONSHIP, DATESBETWEEN, SAMEPERIODLASTYEAR, DATESYTD, ALL, FILTER, CONCATENATEX, NAMEOF.
-- Features: calculation groups, slicers, format strings, field parameters, DAX queries, dynamic format strings, parameter tables, relationships, totals and subtotals, bidirectional filters, bridge tables, error handling, calculated tables, filter context, formula engine, DAX formatting, conditional formatting, many-to-many, time intelligence, naming, SVG and custom visuals, testing and debugging, row-level security, visual-level filters.
+- Covers: Calculation group design patterns; Calculation item application; Format string expressions.
+- DAX functions: CALCULATE, ISSELECTEDMEASURE, SELECTEDMEASURE, IF, SELECTEDMEASURENAME, SELECTEDMEASUREFORMATSTRING, SWITCH, VALUES, FALSE, TREATAS, SELECTCOLUMNS, HASONEVALUE, ADDCOLUMNS, SUMX, NATURALLEFTOUTERJOIN, DATATABLE, USERELATIONSHIP, DATESBETWEEN, SELECTEDVALUE, CALCULATETABLE, SAMEPERIODLASTYEAR, DATESYTD.
+- Features: calculation groups, format strings, DAX queries, dynamic format strings, totals and subtotals, bridge tables, error handling, slicers, time intelligence, bidirectional filters, SVG and custom visuals, calculated tables, filter context, relationships, fact tables, currency conversion.
 
-### `t11-calculation-groups-and-field-parameters-2.md` (10 notes)
+### `t11-calculation-groups-and-field-parameters-2.md` (44 notes)
 
-- Covers: Selection expressions.
-- DAX functions: ERROR, ISCROSSFILTERED.
-- Features: calculation groups, slicers, currency conversion, error handling, format strings, data categories and geography, naming, dynamic format strings, totals and subtotals.
+- Covers: Calculation group precedence; Per-user defaults and slicers; Field parameters; Selection expressions.
+- DAX functions: CALCULATE, ISCROSSFILTERED, USERPRINCIPALNAME, SELECTEDMEASURE, VALUES, ALLSELECTED, INT, FALSE, TRUE, SELECTEDVALUE, MAX, SELECTEDMEASURENAME, SWITCH, ALL, FILTER, CALCULATETABLE, CONCATENATEX, NAMEOF, ERROR.
+- Features: calculation groups, slicers, field parameters, parameter tables, format strings, many-to-many, relationships, currency conversion, testing and debugging, row-level security, visual-level filters, dynamic format strings, dynamic security, variables, formula engine, hierarchies, naming, DAX formatting, conditional formatting, error handling.
 
 ## Window functions and visual calculations
 
@@ -190,7 +190,7 @@ Each entry names one file in this folder, what it covers, and the DAX functions 
 ### `t13-user-defined-functions-1.md` (49 notes)
 
 - Covers: Naming and model-independent functions; Functions, measures and calculation groups; Parameters, types and passing modes; Calendar filters and result checks.
-- DAX functions: CALCULATE, REMOVEFILTERS, TABLEOF, SUMX, BLANK, ISBLANK, SUM, ISFILTERED, ISCROSSFILTERED, AVERAGEX, FILTER, ERROR, IF, NAMEOF, MAX, DATESINPERIOD, RANGE.
+- DAX functions: CALCULATE, REMOVEFILTERS, TABLEOF, SUMX, BLANK, ISBLANK, SUM, ISFILTERED, ISCROSSFILTERED, FILTER, AVERAGEX, IF, ERROR, NAMEOF, DATESINPERIOD, MAX, RANGE.
 - Features: user-defined functions, calendar-based time intelligence, calculation groups, iterators, DAX queries, row context, testing and debugging, naming, context transition, error handling, filter context, data types, blank handling, visual calculations.
 
 ## Business calculation patterns
@@ -204,13 +204,13 @@ Each entry names one file in this folder, what it covers, and the DAX functions 
 ### `t14-business-calculation-patterns-2.md` (49 notes)
 
 - Covers: Customer, product and campaign analysis.
-- DAX functions: CALCULATE, REMOVEFILTERS, VALUES, ISBLANK, FILTER, CALCULATETABLE, MIN, SUMMARIZE, CROSSFILTER, RELATED, SUMX, GENERATE, EXCEPT, ALLSELECTED, SWITCH, WINDOW, ISINSCOPE, DATESINPERIOD, DATEADD, AVERAGE, GENERATEALL, SELECTCOLUMNS, ALL, COUNTROWS, CONTAINS, ADDCOLUMNS, UNION, INTERSECT, DATESBETWEEN, BLANK, ERROR, PARTITIONBY, KEEPFILTERS, DIVIDE, RELATEDTABLE, ISEMPTY.
+- DAX functions: CALCULATE, REMOVEFILTERS, VALUES, ISBLANK, FILTER, CALCULATETABLE, MIN, SUMMARIZE, CROSSFILTER, RELATED, SUMX, GENERATE, EXCEPT, ALLSELECTED, SWITCH, WINDOW, ISINSCOPE, DATEADD, DATESINPERIOD, AVERAGE, GENERATEALL, SELECTCOLUMNS, CONTAINS, COUNTROWS, ALL, ADDCOLUMNS, INTERSECT, UNION, DATESBETWEEN, BLANK, ERROR, PARTITIONBY, KEEPFILTERS, DIVIDE, RELATEDTABLE, ISEMPTY.
 - Features: fact tables, charts, blank handling, dimension tables, bridge tables, calculated tables, totals and subtotals, calculated columns, ABC and segmentation, DAX queries, slicers, relationships, tooltips, blank row of an invalid relationship, running totals, refresh and processing, error handling, matrix visual, variables, visual calculations.
 
 ### `t14-business-calculation-patterns-3.md` (48 notes)
 
 - Covers: Semi-additive and running totals; Building and testing calculations.
-- DAX functions: CALCULATE, MAX, LASTDATE, ALL, LASTNONBLANK, SUMX, FILTER, FIRSTNONBLANK, SUM, VALUES, COUNTROWS, GROUPBY, CLOSINGBALANCEQUARTER, OPENINGBALANCEYEAR, OPENINGBALANCEMONTH, ENDOFMONTH, STARTOFMONTH, ENDOFYEAR, CLOSINGBALANCEMONTH, ENDOFQUARTER, CLOSINGBALANCEYEAR, STARTOFYEAR, STARTOFQUARTER, OPENINGBALANCEQUARTER, TREATAS, ISCROSSFILTERED, FIRSTDATE, CURRENTGROUP, IF, DATEADD, PARALLELPERIOD, QUARTER, YEAR, ADDCOLUMNS, CALCULATETABLE, DATESYTD, SELECTEDVALUE, TRUE, REMOVEFILTERS, ALLNOBLANKROW, TOPN.
+- DAX functions: CALCULATE, MAX, LASTDATE, ALL, LASTNONBLANK, SUMX, FILTER, FIRSTNONBLANK, SUM, VALUES, COUNTROWS, GROUPBY, STARTOFQUARTER, CLOSINGBALANCEQUARTER, OPENINGBALANCEQUARTER, STARTOFMONTH, STARTOFYEAR, OPENINGBALANCEYEAR, ENDOFQUARTER, CLOSINGBALANCEMONTH, ENDOFMONTH, CLOSINGBALANCEYEAR, ENDOFYEAR, OPENINGBALANCEMONTH, TREATAS, ISCROSSFILTERED, FIRSTDATE, CURRENTGROUP, IF, DATEADD, YEAR, QUARTER, PARALLELPERIOD, ADDCOLUMNS, CALCULATETABLE, DATESYTD, SELECTEDVALUE, REMOVEFILTERS, TRUE, ALLNOBLANKROW, TOPN.
 - Features: snapshot tables, totals and subtotals, semi-additive measures, dimension tables, DAX queries, variables, filter context, iterators, blank handling, memory, running totals, date table, cardinality, relationships, context transition, calculated tables, testing and debugging, AI assistance.
 
 ### `t14-business-calculation-patterns-4.md` (56 notes)
@@ -222,7 +222,7 @@ Each entry names one file in this folder, what it covers, and the DAX functions 
 ### `t14-business-calculation-patterns-5.md` (49 notes)
 
 - Covers: Events, durations and sequences; Averages, working days and trends.
-- DAX functions: COUNTROWS, AVERAGEX, LINESTX, ALLEXCEPT, FILTER, CALCULATE, SELECTCOLUMNS, DIVIDE, LINEST, CALCULATETABLE, VALUES, TRUE, FALSE, MIN, IF, ALL, ALLNOBLANKROW, GENERATE, SUM, HASONEVALUE, NETWORKDAYS, RANKX, ADDCOLUMNS, COALESCE, ISBLANK, KEEPFILTERS, REMOVEFILTERS.
+- DAX functions: COUNTROWS, AVERAGEX, LINESTX, ALLEXCEPT, FILTER, CALCULATE, SELECTCOLUMNS, DIVIDE, LINEST, CALCULATETABLE, VALUES, FALSE, TRUE, MIN, IF, ALL, GENERATE, ALLNOBLANKROW, SUM, HASONEVALUE, NETWORKDAYS, RANKX, ADDCOLUMNS, COALESCE, KEEPFILTERS, ISBLANK, REMOVEFILTERS.
 - Features: date table, calculated columns, moving averages, dimension tables, blank handling, DAX queries, calendar-based time intelligence, charts, relationships, fact tables, iterators, totals and subtotals, variables, context transition, calculated tables, running totals, slicers.
 
 ## Report-facing DAX and report design
@@ -230,25 +230,25 @@ Each entry names one file in this folder, what it covers, and the DAX functions 
 ### `t15-report-facing-dax-1.md` (52 notes)
 
 - Covers: Slicers and measure filters; Report design and requirements.
-- DAX functions: CALCULATE, OR, AND, FILTER, VALUES, ALL, SUMMARIZE, COUNTROWS, UNION, ALLSELECTED, SELECTEDMEASURE, GROUPBY, CROSSJOIN, CALCULATETABLE, SELECTCOLUMNS, SUMMARIZECOLUMNS, REMOVEFILTERS, KEEPFILTERS, SWITCH, SELECTEDVALUE.
+- DAX functions: CALCULATE, OR, FILTER, AND, VALUES, ALL, SUMMARIZE, COUNTROWS, UNION, ALLSELECTED, SELECTEDMEASURE, GROUPBY, CROSSJOIN, CALCULATETABLE, SELECTCOLUMNS, SUMMARIZECOLUMNS, REMOVEFILTERS, KEEPFILTERS, SELECTEDVALUE, SWITCH.
 - Features: slicers, granularity, charts, DAX queries, visual-level filters, matrix visual, DAX formatting, calculation groups, totals and subtotals, drillthrough, budget and forecast, filter context, relationships, many-to-many, cardinality, blank handling.
 
 ### `t15-report-facing-dax-2.md` (71 notes)
 
 - Covers: Measures written for visuals; Model support for reports; Tooltips, drillthrough and detail rows.
-- DAX functions: CONCATENATEX, DETAILROWS, CALCULATETABLE, TOPN, VALUES, CALCULATE, COUNTROWS, ISINSCOPE, SUMMARIZE, UNICHAR, BLANK, RAND, SAMEPERIODLASTYEAR, FILTER, CROSSFILTER, RELATED, SUMMARIZECOLUMNS, MIN, IF, MAX, DISTINCTCOUNT, ISEMPTY, SELECTEDVALUE, ADDCOLUMNS, NATURALINNERJOIN, UNION, DISTINCTCOUNTNOBLANK, MEASURE, ISFILTERED, FILTERS, DEFINE.
+- DAX functions: CONCATENATEX, DETAILROWS, CALCULATETABLE, TOPN, VALUES, CALCULATE, COUNTROWS, ISINSCOPE, SUMMARIZE, UNICHAR, BLANK, RAND, SAMEPERIODLASTYEAR, FILTER, CROSSFILTER, RELATED, SUMMARIZECOLUMNS, MIN, IF, MAX, SELECTEDVALUE, ISEMPTY, DISTINCTCOUNT, NATURALINNERJOIN, ADDCOLUMNS, UNION, DISTINCTCOUNTNOBLANK, FILTERS, DEFINE, MEASURE, ISFILTERED.
 - Features: detail rows, blank handling, drillthrough, Excel and MDX clients, tooltips, charts, filter context, matrix visual, DAX queries, calculated tables, dimension tables, external tools, refresh and processing, DAX formatting, format strings, documentation and descriptions, testing and debugging, calculation groups, parameter tables, date table, calculated columns, fact tables, bidirectional filters, iterators.
 
 ### `t15-report-facing-dax-3.md` (47 notes)
 
 - Covers: Choosing and building charts.
-- DAX functions: MAX, CALCULATE, ALLEXCEPT, EOMONTH, INT, DIVIDE, DATE, MIN, KEEPFILTERS, DATESBETWEEN, ALLSELECTED, IF, MAXX, REMOVEFILTERS, ROUNDUP, TREATAS, FLOOR, SELECTEDVALUE, RAND.
+- DAX functions: MAX, CALCULATE, ALLEXCEPT, EOMONTH, DIVIDE, INT, DATE, IF, KEEPFILTERS, ALLSELECTED, MIN, DATESBETWEEN, MAXX, REMOVEFILTERS, ROUNDUP, TREATAS, FLOOR, SELECTEDVALUE, RAND.
 - Features: charts, hierarchies, calendar-based time intelligence, DAX formatting, tooltips, ABC and segmentation, totals and subtotals, data categories and geography, week-based calendars, slicers, error handling.
 
 ### `t15-report-facing-dax-4.md` (69 notes)
 
 - Covers: Conditional formatting and KPIs; Format strings in reports.
-- DAX functions: ALLSELECTED, SELECTEDMEASURE, ISINSCOPE, RANKX, REMOVEFILTERS, VALUES, CALCULATETABLE, SWITCH, CALCULATE, FORMAT, SELECTEDVALUE, MOD, HASONEVALUE, SUMMARIZE, ADDCOLUMNS, MAXX, MINX, TREATAS, TRUE, UNICHAR, UNICODE, TRUNC.
+- DAX functions: ALLSELECTED, SELECTEDMEASURE, ISINSCOPE, RANKX, REMOVEFILTERS, VALUES, CALCULATETABLE, SWITCH, CALCULATE, FORMAT, SELECTEDVALUE, MOD, HASONEVALUE, SUMMARIZE, MAXX, ADDCOLUMNS, MINX, TREATAS, TRUE, UNICHAR, UNICODE, TRUNC.
 - Features: DAX formatting, format strings, dynamic format strings, KPIs, Excel and MDX clients, conditional formatting, visual calculations, hierarchies, totals and subtotals, DAX queries, matrix visual, calculation groups, charts, ranking, report themes, documentation and descriptions, filter context, blank handling, slicers, testing and debugging.
 
 ### `t15-report-facing-dax-5.md` (60 notes)
@@ -274,5 +274,5 @@ Each entry names one file in this folder, what it covers, and the DAX functions 
 ### `t16-tooling-and-workflow-3.md` (62 notes)
 
 - Covers: Reusable libraries and templates; AI assistants and agents; Testing measures.
-- DAX functions: CALCULATE, RANK, EVALUATE, UNION, COALESCE, TREATAS.
+- DAX functions: CALCULATE, RANK, EVALUATE, UNION, TREATAS, COALESCE.
 - Features: AI assistance, testing and debugging, DAX queries, report themes, user-defined functions, TMDL and project files, error handling, DAX formatting, ranking, documentation and descriptions, filter context, date table, external tools, totals and subtotals, dimension tables, blank handling.

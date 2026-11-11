@@ -1,10 +1,28 @@
 # Time intelligence and date tables
 
-Part 2 of 3 of this topic. Covers: Period-over-period comparisons; Building a Date table; Date columns, sorting and formats; Blank and placeholder dates.
+Part 2 of 3 of this topic. Covers: Incomplete periods and future dates; Period-over-period comparisons; Building a Date table.
 
 Practice notes drawn from public SQLBI articles, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail.
 
 ## General practice
+
+### Incomplete periods and future dates
+
+**T04-A144-1.** To hide dates after the last data, change the filter context; do not delete rows from the Date table, which would break the behaviour of several time intelligence functions.
+- Should. 2019. https://www.sqlbi.com/articles/hiding-future-dates-for-calculations-in-dax/
+- When: Models that use DAX time intelligence functions.
+
+**T04-A144-4.** To stop time intelligence measures showing values past the last data, add a Boolean calculated column to the Date table, true up to the final date reports should show (for example the latest fact date), and let every time intelligence function use only flagged dates.
+- Should. 2019. https://www.sqlbi.com/articles/hiding-future-dates-for-calculations-in-dax/
+- When: The model can be changed and the cut-off date does not vary, for example from measure to measure.
+
+**T04-A144-5.** When fact tables hold data for different date ranges, give the Date table one date-flag calculated column per fact table, and let each measure filter on the flag of its own fact table.
+- Should. 2019. https://www.sqlbi.com/articles/hiding-future-dates-for-calculations-in-dax/
+- When: Future dates are hidden with a Date table flag column and several fact tables differ in range.
+
+**T04-A144-7.** Avoid hiding future dates with an IF that returns blank when the filtered dates lie past the last data. It only hides rows: prior-year figures still cover whole periods, and an inner IF is lost once a time shift is applied.
+- Should. 2019. https://www.sqlbi.com/articles/hiding-future-dates-for-calculations-in-dax/
+- When: Hiding dates past the last data; IF may do for plain year-to-date, not for prior-year comparisons.
 
 ### Period-over-period comparisons
 
@@ -47,55 +65,64 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - Should. 2024. https://www.sqlbi.com/articles/blank-in-date-columns-and-dax-time-intelligence-functions/
 - When: Several date columns, such as an order date and a delivery date, with all but one relationship inactive.
 
-### Date columns, sorting and formats
-
-**T04-A121-5.** One naming option for a Date table: hidden helper columns, used in internal calculations or to sort other columns, get Pascal case without spaces, which sets them apart from the columns meant for report users.
-- Option. 2018. https://www.sqlbi.com/articles/reference-date-table-in-dax-and-power-bi/
-- When: Naming the columns of a Date table.
-
-**T04-A121-6.** In a Date table each text period label (year, quarter, month, week) can sort by its own integer column; a label that combines a period with its year, such as month and year, sorts by an integer that keeps increasing across years.
-- Option. 2018. https://www.sqlbi.com/articles/reference-date-table-in-dax-and-power-bi/
-- When: Designing the text period columns of a Date table.
-
-**T04-A204-7.** Custom format strings in Power BI resemble the FORMAT function's syntax but are not identical. Check each one against Microsoft's documentation of the supported custom format syntax; do not assume FORMAT codes carry over. A quarter number, for instance, cannot be shown.
-- Must. 2020. https://www.sqlbi.com/articles/creating-a-simpler-and-chart-friendly-date-table-in-power-bi/
-- When: Writing custom format strings for model columns in Power BI.
-
-**T04-A204-8.** In a custom format string, put a backslash before every literal character that must show as written, such as each letter of a fiscal-year prefix, so that it is not read as a format code.
-- Should. 2020. https://www.sqlbi.com/articles/creating-a-simpler-and-chart-friendly-date-table-in-power-bi/
-- When: A fixed text prefix is added to a value shown through a custom format string.
-
-### Blank and placeholder dates
-
-**T04-A321-1.** Store a missing date as blank, not as a placeholder code or a far-future date: blank says the information is absent and matches the blank row of the Date table without adding unused dates to the calendar.
-- Should. 2024. https://www.sqlbi.com/articles/blank-in-date-columns-and-dax-time-intelligence-functions/
-- When: Date columns where a missing value is normal, such as a delivery date of orders not yet shipped.
-
-**T04-A321-2.** The Date table's date column never holds a placeholder for a missing date, such as 00000000: real dates only, plus the blank of an invalid relationship. Moving the placeholder to a number or text key does not help: time intelligence needs a true date column.
-- Must. 2024. https://www.sqlbi.com/articles/blank-in-date-columns-and-dax-time-intelligence-functions/
-- When: Models that use DAX time intelligence and mark missing dates with a code.
-
-**T04-A321-7.** To hide the blank Date row in one slicer only, set a filter that excludes blank on that slicer visual: a visual-level filter has no effect on the other visuals of the report.
-- Option. 2024. https://www.sqlbi.com/articles/blank-in-date-columns-and-dax-time-intelligence-functions/
-- When: The blank row that blank fact dates add to Date should not be shown in a slicer.
-
-**T04-A321-8.** When a page-level filter hides the blank Date row, put the not-blank test on the date column of the Date table, not on another Date column: it reaches every column of Date and leaves real blanks, such as an empty holiday name, alone.
-- Should. 2024. https://www.sqlbi.com/articles/blank-in-date-columns-and-dax-time-intelligence-functions/
-- When: The blank Date row is hidden for a whole page, not per visual.
-
-**T04-A321-10.** Do not turn the relationship between Date and a fact table into a many-to-many, limited one just to stop the blank row in Date: totals then need extra measure logic, time intelligence gets slower, and dates missing from Date show only in the total.
-- Should. 2024. https://www.sqlbi.com/articles/blank-in-date-columns-and-dax-time-intelligence-functions/
-- When: A blank date in the fact table creates a blank row in the Date table.
-
-**T04-A321-11.** Whenever a Date column is compared with < or <=, also test NOT ISBLANK on it: a blank date counts as earlier than every real date, so the blank row is picked up too. For > and >= the test is optional, as a safeguard.
-- Must. 2024. https://www.sqlbi.com/articles/blank-in-date-columns-and-dax-time-intelligence-functions/
-- When: Filters comparing Date table columns when the table can hold a blank row, as in cumulative totals.
-
-**T04-A321-12.** Keep in mind when iterating the Date table: a plain table reference skips the blank row that an invalid relationship adds, while VALUES of the table includes it. Amounts on blank dates can so go missing without notice.
-- Consider. 2024. https://www.sqlbi.com/articles/blank-in-date-columns-and-dax-time-intelligence-functions/
-- When: Iterators over a Date table that may hold a blank row because a related fact table has blank dates.
-
 ## Special-case techniques and facts
+
+### Incomplete periods and future dates
+
+**T04-A093-1.** With a partly loaded current period, a prior-year comparison can be limited to matching days: take the latest selected date with a non-blank value, build the range from the first selected date to it, shift the range back one year, and evaluate the measure there.
+- Option. Check. 2017. https://www.sqlbi.com/articles/compare-equivalent-periods-in-dax/
+- When: Year-over-year where the latest period is incomplete and only days present for the current selection should count.
+- Version: Without variables (Excel 2010/2013, Analysis Services Tabular 2012/2014) the code is less efficient.
+
+**T04-A093-2.** In an equivalent-period comparison the cut-off can instead be the latest date with data for any store: run the last-non-blank date search with the store selection ignored, not under the current selection.
+- Option. Check. 2017. https://www.sqlbi.com/articles/compare-equivalent-periods-in-dax/
+- When: Year-over-year over an incomplete latest period, with one cut-off day shared across all stores.
+- Version: Excel 2010/2013 and Analysis Services Tabular 2012/2014 have no variables for this measure.
+
+**T04-A093-3.** Consider taking the cut-off day of an equivalent-period comparison from the data, not from the calendar (such as yesterday), when loads can be late: otherwise the prior-year side covers days the current data does not yet hold.
+- Consider. Check. 2017. https://www.sqlbi.com/articles/compare-equivalent-periods-in-dax/
+- When: Year-over-year over an incomplete latest period; a cut-off tied to today is less reliable when loads are delayed.
+
+**T04-A144-2.** With a Date table of complete years, a measure on a standard time intelligence function, such as year-to-date with DATESYTD, keeps returning values for periods after the last date with data, which can confuse readers.
+- Fact. 2019. https://www.sqlbi.com/articles/hiding-future-dates-for-calculations-in-dax/
+- When: The Date table extends past the last date with data.
+
+**T04-A144-6.** When the model cannot be changed, hide future dates in the measure: reduce the dates visible in the filter context to those not later than the last date with data, and give that table to the time intelligence function in place of the date column.
+- Should. 2019. https://www.sqlbi.com/articles/hiding-future-dates-for-calculations-in-dax/
+- When: No flag column can be added, as with a live connection; the code is slower and more complex.
+
+**T04-A168-1.** A previous-year measure that only shifts dates with SAMEPERIODLASTYEAR returns the whole prior period even when the current one has data for part of its days. At month and year level a full period then faces a partial one, so year-over-year percentages come out wrong.
+- Fact. 2019. https://www.sqlbi.com/articles/hiding-future-dates-for-calculations-in-dax/ ; https://www.sqlbi.com/articles/previous-year-up-to-a-certain-date/
+- When: The current period's fact data ends before the end of the month or year.
+
+**T04-A168-2.** A previous-year figure can be limited to dates matching the current data with a Boolean calculated column in the Date table, true up to the last fact date moved back twelve months with EDATE, and a previous-year measure that also filters that column to true.
+- Option. Check. 2019. https://www.sqlbi.com/articles/previous-year-up-to-a-certain-date/
+- When: The current year's fact data ends at some date, and later dates of earlier years should be ignored.
+
+**T04-A289-1.** Take care showing the latest period with a Relative Date slicer or a TODAY-based filter: 'This Day' or 'This Month' can be empty when data stops the day before, and 'This Month' ends at month end, which can break month-to-date comparisons with the previous month.
+- Consider. 2023. https://www.sqlbi.com/articles/computing-mtd-qtd-ytd-in-power-bi-for-the-current-period/
+- When: Reports meant to show MTD, QTD and YTD values for the latest available period.
+
+**T04-A289-2.** To show MTD, QTD and YTD for the latest period, filter the visual or page on the last transaction date with a filter that updates by itself; a date picked by hand is wrong as soon as a refresh brings later data.
+- Should. 2023. https://www.sqlbi.com/articles/computing-mtd-qtd-ytd-in-power-bi-for-the-current-period/
+- When: Visuals or pages that must reflect the most recent date with data.
+
+**T04-A289-3.** One option: a calculated column in the Date table marks the last date with transactions with a fixed text, and a visual, page or report filter selects that text. Inside the column, find the last date in CALCULATE with REMOVEFILTERS, because of context transition.
+- Option. 2023. https://www.sqlbi.com/articles/computing-mtd-qtd-ytd-in-power-bi-for-the-current-period/
+- When: Reports showing the latest period in the data; needs a Date column flagging dates with transactions.
+- Version: A Date table generated by Bravo already has the column that flags dates with transactions.
+
+**T04-A289-4.** Another option: a calculation group whose item finds the last date with transactions and evaluates SELECTEDMEASURE filtered to it. Used as a visual filter, it makes every measure, MTD, QTD and YTD too, use that date; further items can select its whole month or quarter.
+- Option. 2023. https://www.sqlbi.com/articles/computing-mtd-qtd-ytd-in-power-bi-for-the-current-period/
+- When: Reports that show time intelligence results for the latest period available in the data.
+
+**T04-A289-5.** A calculation item that selects the month of the last date with data through a Date column other than the date column, such as a year-month number, must clear the Date filters itself with REMOVEFILTERS: only a filter on the date column removes them automatically.
+- Must. 2023. https://www.sqlbi.com/articles/computing-mtd-qtd-ytd-in-power-bi-for-the-current-period/
+- When: Calculation items that move the filter to a whole period through a Date column other than the date column.
+
+**T04-A289-6.** Without a year-month or year-quarter number column, a calculation item can still select the whole month or quarter of the last date with data: turn that date into a Date filter with TREATAS and give it to PARALLELPERIOD with zero intervals of MONTH or QUARTER.
+- Option. 2023. https://www.sqlbi.com/articles/computing-mtd-qtd-ytd-in-power-bi-for-the-current-period/
+- When: The Date table has no year-month or year-quarter number column.
 
 ### Period-over-period comparisons
 
@@ -260,78 +287,3 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T04-A264-6.** The configuration file of a custom Bravo Date template can change default parameter values, fix parameters so that people applying the template are not asked for them, and set parameters the Bravo screen does not show.
 - Option. 2022. https://www.sqlbi.com/articles/customizing-date-and-time-intelligence-templates-in-bravo-for-power-bi/
 - When: A custom Bravo Date template whose parameters should be preset for the people who apply it.
-
-### Date columns, sorting and formats
-
-**T04-A121-7.** A Date table can carry a running day number, counted from a fixed origin and skipping February 29, to support moving annual totals that always span 365 days.
-- Option. Check. 2018. https://www.sqlbi.com/articles/reference-date-table-in-dax-and-power-bi/
-- When: Moving annual totals that must always cover 365 days.
-
-**T04-A175-2.** For reports sliced by fiscal year, add a separate fiscal month-name column that copies the month name and sort it by a new fiscal month-number column. Do not renumber the existing month-number column: the calendar-year order would be lost.
-- Should. 2019. https://www.sqlbi.com/articles/sorting-months-in-fiscal-calendars/
-- When: A report replaces the calendar year with a fiscal year, for example one starting in July.
-
-**T04-A204-1.** A Power BI line chart with a text column on its X axis treats the axis as Categorical: when many points fall in a small area it shows a scrollbar and does not fit all points.
-- Fact. Check. 2020. https://www.sqlbi.com/articles/creating-a-simpler-and-chart-friendly-date-table-in-power-bi/
-- When: A text attribute of the Date table, such as a month-and-year label, sits on the X axis.
-
-**T04-A204-2.** A Date table can store period attributes such as Year and Year Month as dates, for example the period's last day, shown as text through a custom format string. They sort correctly and allow a continuous line-chart axis without extra or Sort by Column columns.
-- Option. 2020. https://www.sqlbi.com/articles/creating-a-simpler-and-chart-friendly-date-table-in-power-bi/
-- When: Period columns used in line charts; not for quarters, and a between slicer then lists every date.
-- Version: Custom format strings were a recent addition to Power BI in 2020.
-
-**T04-A204-3.** Where Year and Year Month columns hold dates shown through custom format strings, consider storing the first day of the year or month, not the last: reader feedback reports that line charts then look better.
-- Consider. 2020. https://www.sqlbi.com/articles/creating-a-simpler-and-chart-friendly-date-table-in-power-bi/
-- When: Date-typed Year and Year Month columns with custom format strings, used in line charts.
-
-**T04-A204-5.** Month or Day of Week could be a single date column, mapping each month or weekday to one arbitrary date shown through a custom format string, in place of name and sort columns. Users gain nothing real; on line charts the axis must become Categorical.
-- Option. 2020. https://www.sqlbi.com/articles/creating-a-simpler-and-chart-friendly-date-table-in-power-bi/
-- When: Month and Day of Week attributes, which have 12 and 7 values across all years.
-
-**T04-A204-6.** For quarters in a calendar hierarchy keep a text label with a numeric sort column, not a date column with a custom format string, which cannot display quarters. Drop the sort column only when the label sorts by itself, as with year before quarter.
-- Should. 2020. https://www.sqlbi.com/articles/creating-a-simpler-and-chart-friendly-date-table-in-power-bi/
-- When: A Date table that otherwise stores Year and Year Month as formatted dates.
-
-**T04-A204-9.** A between slicer on a Year or Year Month column of datetime type lists every possible date although the real grain is the year or month. It still selects whole periods whose stored date falls in the range, but the view can mislead.
-- Fact. Check. 2020. https://www.sqlbi.com/articles/creating-a-simpler-and-chart-friendly-date-table-in-power-bi/
-- When: Year or Year Month columns stored as datetime values in a Date table, used in a between slicer.
-
-**T04-A204-11.** For a continuous X axis over Date table periods, one option is to add columns holding the first or last day of each period and put those on the axis: every point fits without a scrollbar and label density adapts.
-- Option. 2020. https://www.sqlbi.com/articles/creating-a-simpler-and-chart-friendly-date-table-in-power-bi/
-- When: Line charts over periods of the Date table; the cost is extra columns in that table.
-
-**T04-A371-2.** A continuous line-chart axis on years, quarters, months or weeks of your own Date table needs a hierarchy there: on top a year column with dataCategory Years, at the bottom the key date column with PaddedDateTableDates. Table-level dataCategory, once listed too, has no effect.
-- Must. 2026. https://www.sqlbi.com/articles/continuous-axis-for-any-date-table-in-power-bi/
-- When: Line charts on a date hierarchy above the day; other visuals, slicers and filters work as usual.
-- Version: PaddedDateTableDates is an undocumented property.
-
-**T04-A371-3.** Date-related dataCategory values on columns, such as PaddedDateTableDates or Years, must be written in the model definition itself, for example in the TMDL view or in Tabular Editor: the Data category list of Power BI Desktop does not offer them.
-- Must. 2026. https://www.sqlbi.com/articles/continuous-axis-for-any-date-table-in-power-bi/
-- When: Setting date-related column categories, for example for a continuous date axis on a line chart.
-- Version: Power BI Desktop's Data category list shows only geography, URL, image and barcode values, none for dates.
-
-**T04-A371-4.** When the month level of a continuous-axis date hierarchy already holds the year, as Year Month does, a separate hierarchy built from plain Quarter and Month columns lets the line chart tooltip show names without the year twice. The issue is mostly cosmetic.
-- Option. 2026. https://www.sqlbi.com/articles/continuous-axis-for-any-date-table-in-power-bi/
-- When: Line charts with a continuous axis on a date hierarchy whose lower-level labels repeat the year.
-
-**T04-A371-5.** Setting dataCategory metadata on a Date hierarchy is an alternative to a Date table whose levels are DateTime columns shown through custom format strings. Choose it for more control over level names, or when other client tools do not fully support such columns as levels.
-- Option. 2026. https://www.sqlbi.com/articles/continuous-axis-for-any-date-table-in-power-bi/
-- When: A Date table for a continuous axis at month level or coarser.
-
-### Blank and placeholder dates
-
-**T04-A321-4.** When a calculated Date table finds its range by itself, as with CALENDARAUTO, a far-future placeholder date makes it hold every day up to that date: tens of thousands of rows, or even millions.
-- Fact. 2024. https://www.sqlbi.com/articles/blank-in-date-columns-and-dax-time-intelligence-functions/
-- When: Fact tables that use a far-future date, such as a day in 2199 or 9999, for a missing date.
-
-**T04-A321-6.** A blank in a fact date column related to Date, through an inactive relationship too, also makes the engine add the blank row to Date; it then shows as a blank item in every slicer on a Date column.
-- Fact. 2024. https://www.sqlbi.com/articles/blank-in-date-columns-and-dax-time-intelligence-functions/
-- When: Fact table date columns that can be blank, related to Date by an active or inactive relationship.
-
-**T04-A321-9.** A page-level filter that removes the blank Date row also acts on every measure of the page that uses the relationship from the date column with blanks: rows with no date in that column drop out of those measures.
-- Fact. 2024. https://www.sqlbi.com/articles/blank-in-date-columns-and-dax-time-intelligence-functions/
-- When: Pages that exclude the blank Date row and show measures over a date column with blanks.
-
-**T04-A321-13.** BLANK can serve as an open boundary: in DATESBETWEEN it means no lower or no upper limit, and as the start date of DATESINPERIOD it acts as a date before 1900, returning the first dates of the Date table.
-- Option. 2024. https://www.sqlbi.com/articles/blank-in-date-columns-and-dax-time-intelligence-functions/
-- When: Open-ended date ranges; unrelated to blank values stored in date columns, which these functions never return.

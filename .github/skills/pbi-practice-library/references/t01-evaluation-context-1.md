@@ -1,6 +1,6 @@
 # DAX evaluation context
 
-Part 1 of 3 of this topic. Covers: KEEPFILTERS and arbitrary filters; CALCULATE filter arguments; Visual queries and auto-exist; Reading the selected value.
+Part 1 of 3 of this topic. Covers: KEEPFILTERS and arbitrary filters; CALCULATE filter arguments; Visual queries and auto-exist.
 
 Practice notes drawn from public SQLBI articles, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail.
 
@@ -97,28 +97,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T01-A135-2.** If a single-table model gives wrong results because of auto-exist when users slice by several of its columns, the simplest fix is a proper star schema: auto-exist then acts only on dimension tables. Slicers and ALL removals in measures must then reference the dimension columns.
 - Should. Check. 2018. https://www.sqlbi.com/articles/understanding-dax-auto-exist/
 - When: Simple one-table models with an unusual distribution of values.
-
-### Reading the selected value
-
-**T01-A105-2.** Where a row context exists, read the column directly, through RELATED when it lives in a lookup table, not with SELECTEDVALUE or VALUES: those look at the filter context, not at the current row.
-- Should. 2017. https://www.sqlbi.com/articles/using-the-selectedvalue-function-in-dax/
-- When: The expression runs in a row context.
-
-**T01-A105-10.** Use SELECTEDVALUE, or the equivalent HASONEVALUE with VALUES, only in top-level calculations, not in measures evaluated many times inside large iterations: they work like DISTINCT internally and can multiply storage engine requests when filters flow through limited relationships.
-- Should. 2017. https://www.sqlbi.com/articles/using-the-selectedvalue-function-in-dax/
-- When: A measure that reads a selection would be called for many cells or rows.
-
-**T01-A193-2.** Use ISINSCOPE when the check is about the visual itself, such as which hierarchy level is browsed or special behaviour at the grand total: it tells the visual's grouping from a slicer filter. When it is TRUE the column can still have zero values.
-- Should. 2020. https://www.sqlbi.com/articles/distinguishing-hasonevalue-from-isinscope/
-- When: A measure must react to the grouping of the visual, not to slicer selections.
-
-**T01-A193-3.** Use HASONEVALUE when a measure makes sense only with one selected value, whether that value comes from the visual's grouping or from a slicer, such as a year-to-date figure for one year. It is slower than ISINSCOPE, because it counts the visible values.
-- Should. 2020. https://www.sqlbi.com/articles/distinguishing-hasonevalue-from-isinscope/
-- When: A measure is meaningful only if exactly one value of a column is visible.
-
-**T01-A193-4.** When it matters whether a grouped column has no value or one, guard the calculation with HASONEVALUE, not ISINSCOPE, although ISINSCOPE is faster: ISINSCOPE can be TRUE with no visible value. This does not make HASONEVALUE the better choice in general.
-- Should. Check. 2020. https://www.sqlbi.com/articles/distinguishing-hasonevalue-from-isinscope/
-- When: A visual groups by columns of different tables and many combinations have no rows.
 
 ## Special-case techniques and facts
 
@@ -268,41 +246,3 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T01-A135-5.** When a query really needs every combination of values, including those absent from the data, a table function such as CROSSJOIN can produce them; grouping under auto-exist returns existing combinations only.
 - Option. 2018. https://www.sqlbi.com/articles/understanding-dax-auto-exist/
 - When: The rare case where non-existing combinations of column values must be returned.
-
-### Reading the selected value
-
-**T01-A058-1.** To give a measure parameter values, one option is a hidden table per parameter holding every value needed: call the measure in CALCULATE with a filter that sets the column to the wanted value, and let the measure read it with VALUES.
-- Option. Check. 2015. https://www.sqlbi.com/articles/parameters-in-dax-measures/
-- When: Complex expressions compute a measure with different argument values; simple cases can keep the condition in inner measures.
-- Version: Written in 2015, when DAX had no way to pass arguments to a measure.
-
-**T01-A058-2.** Hide measures that read their parameter values from hidden parameter tables, so users never call them directly: with several values selected in a parameter table such a measure fails with an error.
-- Should. 2015. https://www.sqlbi.com/articles/parameters-in-dax-measures/
-- When: Measures receive parameter values through hidden parameter tables and CALCULATE filter arguments.
-
-**T01-A105-4.** Where the DAX engine has no SELECTEDVALUE, the same patterns can be written with the equivalent IF combined with HASONEVALUE and VALUES.
-- Option. Check. 2017. https://www.sqlbi.com/articles/using-the-selectedvalue-function-in-dax/
-- When: The engine in use does not offer SELECTEDVALUE.
-- Version: SELECTEDVALUE arrived in July 2017 in Power BI Desktop and Analysis Services; Power Pivot for Excel lacks it.
-
-**T01-A105-5.** A measure that shows a dimension attribute with SELECTEDVALUE should also test that another measure returns data, when the attribute must appear only beside data; without the test it also shows values for items with no sales.
-- Should. Check. 2017. https://www.sqlbi.com/articles/using-the-selectedvalue-function-in-dax/
-- When: The attribute measure sits in a matrix, pivot table or table visual next to other measures.
-- Version: As of March 2024 the Table visual behaves this way too; older Power BI versions did not.
-
-**T01-A105-6.** To read a snowflaked lookup table's attribute from the filter context, wrap SELECTEDVALUE in CALCULATE with CROSSFILTER set to both directions on the relationships to cross; prefer this to passing the expanded base table as a filter, which may have side effects in complex models.
-- Should. 2017. https://www.sqlbi.com/articles/using-the-selectedvalue-function-in-dax/
-- When: The attribute is several relationships away, such as category from product, and is shown in a matrix.
-
-**T01-A105-8.** When a parameter must not accept several selections, ERROR can be passed as the alternate result of SELECTEDVALUE so that the visual shows an error message; the message mentions MdxScript, which may look meaningless in Power BI Desktop.
-- Option. 2017. https://www.sqlbi.com/articles/using-the-selectedvalue-function-in-dax/
-- When: A calculation needs one selected value and must reject multiple selections.
-
-**T01-A105-9.** Do not read a field parameter's slicer selection with SELECTEDVALUE: it cannot return a column grouped by other columns. Group the parameter table by its display and fields columns, for example with SUMMARIZE, and return the display column when that result has rows.
-- Must. Check. 2017. https://www.sqlbi.com/articles/using-the-selectedvalue-function-in-dax/
-- When: The value to read is the visible column of a table made by the field parameters feature.
-- Version: Guidance added in June 2022.
-
-**T01-A193-1.** HASONEVALUE and ISINSCOPE are not interchangeable. HASONEVALUE is TRUE when exactly one value of the column is visible, even because of a slicer; ISINSCOPE is TRUE only when the column is grouped by, as on a visual's rows. At the grand total both are FALSE.
-- Fact. 2020. https://www.sqlbi.com/articles/distinguishing-hasonevalue-from-isinscope/
-- When: A measure tests the hierarchy level or the selection with either function.

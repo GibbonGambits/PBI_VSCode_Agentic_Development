@@ -1,6 +1,6 @@
 # Time intelligence and date tables
 
-Part 1 of 3 of this topic. Covers: Time intelligence functions; Week-based and fiscal calendars; Mark as date table; Incomplete periods and future dates.
+Part 1 of 3 of this topic. Covers: Time intelligence functions; Week-based and fiscal calendars; Mark as date table.
 
 Practice notes drawn from public SQLBI articles, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail.
 
@@ -55,24 +55,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T04-A199-7.** A model may hold more than one marked date table. In each of them, a filter on the date column chosen at marking clears the other filters on that same table.
 - Option. 2020. https://www.sqlbi.com/articles/mark-as-date-table/
 - When: A model holds two or more tables marked as date tables.
-
-### Incomplete periods and future dates
-
-**T04-A144-1.** To hide dates after the last data, change the filter context; do not delete rows from the Date table, which would break the behaviour of several time intelligence functions.
-- Should. 2019. https://www.sqlbi.com/articles/hiding-future-dates-for-calculations-in-dax/
-- When: Models that use DAX time intelligence functions.
-
-**T04-A144-4.** To stop time intelligence measures showing values past the last data, add a Boolean calculated column to the Date table, true up to the final date reports should show (for example the latest fact date), and let every time intelligence function use only flagged dates.
-- Should. 2019. https://www.sqlbi.com/articles/hiding-future-dates-for-calculations-in-dax/
-- When: The model can be changed and the cut-off date does not vary, for example from measure to measure.
-
-**T04-A144-5.** When fact tables hold data for different date ranges, give the Date table one date-flag calculated column per fact table, and let each measure filter on the flag of its own fact table.
-- Should. 2019. https://www.sqlbi.com/articles/hiding-future-dates-for-calculations-in-dax/
-- When: Future dates are hidden with a Date table flag column and several fact tables differ in range.
-
-**T04-A144-7.** Avoid hiding future dates with an IF that returns blank when the filtered dates lie past the last data. It only hides rows: prior-year figures still cover whole periods, and an inner IF is lost once a time shift is applied.
-- Should. 2019. https://www.sqlbi.com/articles/hiding-future-dates-for-calculations-in-dax/
-- When: Hiding dates past the last data; IF may do for plain year-to-date, not for prior-year comparisons.
 
 ## Special-case techniques and facts
 
@@ -304,60 +286,3 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - Fact. Check. 2019. https://www.sqlbi.com/articles/year-to-date-filtering-weekdays-in-dax/ ; https://www.sqlbi.com/articles/mark-as-date-table/ ; https://www.sqlbi.com/articles/filtering-weekdays-in-dax/
 - When: Time intelligence measures while the report filters other date table columns, such as day of the week.
 - Version: Marking a date table is possible in Power BI since the February 2018 update.
-
-### Incomplete periods and future dates
-
-**T04-A093-1.** With a partly loaded current period, a prior-year comparison can be limited to matching days: take the latest selected date with a non-blank value, build the range from the first selected date to it, shift the range back one year, and evaluate the measure there.
-- Option. Check. 2017. https://www.sqlbi.com/articles/compare-equivalent-periods-in-dax/
-- When: Year-over-year where the latest period is incomplete and only days present for the current selection should count.
-- Version: Without variables (Excel 2010/2013, Analysis Services Tabular 2012/2014) the code is less efficient.
-
-**T04-A093-2.** In an equivalent-period comparison the cut-off can instead be the latest date with data for any store: run the last-non-blank date search with the store selection ignored, not under the current selection.
-- Option. Check. 2017. https://www.sqlbi.com/articles/compare-equivalent-periods-in-dax/
-- When: Year-over-year over an incomplete latest period, with one cut-off day shared across all stores.
-- Version: Excel 2010/2013 and Analysis Services Tabular 2012/2014 have no variables for this measure.
-
-**T04-A093-3.** Consider taking the cut-off day of an equivalent-period comparison from the data, not from the calendar (such as yesterday), when loads can be late: otherwise the prior-year side covers days the current data does not yet hold.
-- Consider. Check. 2017. https://www.sqlbi.com/articles/compare-equivalent-periods-in-dax/
-- When: Year-over-year over an incomplete latest period; a cut-off tied to today is less reliable when loads are delayed.
-
-**T04-A144-2.** With a Date table of complete years, a measure on a standard time intelligence function, such as year-to-date with DATESYTD, keeps returning values for periods after the last date with data, which can confuse readers.
-- Fact. 2019. https://www.sqlbi.com/articles/hiding-future-dates-for-calculations-in-dax/
-- When: The Date table extends past the last date with data.
-
-**T04-A144-6.** When the model cannot be changed, hide future dates in the measure: reduce the dates visible in the filter context to those not later than the last date with data, and give that table to the time intelligence function in place of the date column.
-- Should. 2019. https://www.sqlbi.com/articles/hiding-future-dates-for-calculations-in-dax/
-- When: No flag column can be added, as with a live connection; the code is slower and more complex.
-
-**T04-A168-1.** A previous-year measure that only shifts dates with SAMEPERIODLASTYEAR returns the whole prior period even when the current one has data for part of its days. At month and year level a full period then faces a partial one, so year-over-year percentages come out wrong.
-- Fact. 2019. https://www.sqlbi.com/articles/hiding-future-dates-for-calculations-in-dax/ ; https://www.sqlbi.com/articles/previous-year-up-to-a-certain-date/
-- When: The current period's fact data ends before the end of the month or year.
-
-**T04-A168-2.** A previous-year figure can be limited to dates matching the current data with a Boolean calculated column in the Date table, true up to the last fact date moved back twelve months with EDATE, and a previous-year measure that also filters that column to true.
-- Option. Check. 2019. https://www.sqlbi.com/articles/previous-year-up-to-a-certain-date/
-- When: The current year's fact data ends at some date, and later dates of earlier years should be ignored.
-
-**T04-A289-1.** Take care showing the latest period with a Relative Date slicer or a TODAY-based filter: 'This Day' or 'This Month' can be empty when data stops the day before, and 'This Month' ends at month end, which can break month-to-date comparisons with the previous month.
-- Consider. 2023. https://www.sqlbi.com/articles/computing-mtd-qtd-ytd-in-power-bi-for-the-current-period/
-- When: Reports meant to show MTD, QTD and YTD values for the latest available period.
-
-**T04-A289-2.** To show MTD, QTD and YTD for the latest period, filter the visual or page on the last transaction date with a filter that updates by itself; a date picked by hand is wrong as soon as a refresh brings later data.
-- Should. 2023. https://www.sqlbi.com/articles/computing-mtd-qtd-ytd-in-power-bi-for-the-current-period/
-- When: Visuals or pages that must reflect the most recent date with data.
-
-**T04-A289-3.** One option: a calculated column in the Date table marks the last date with transactions with a fixed text, and a visual, page or report filter selects that text. Inside the column, find the last date in CALCULATE with REMOVEFILTERS, because of context transition.
-- Option. 2023. https://www.sqlbi.com/articles/computing-mtd-qtd-ytd-in-power-bi-for-the-current-period/
-- When: Reports showing the latest period in the data; needs a Date column flagging dates with transactions.
-- Version: A Date table generated by Bravo already has the column that flags dates with transactions.
-
-**T04-A289-4.** Another option: a calculation group whose item finds the last date with transactions and evaluates SELECTEDMEASURE filtered to it. Used as a visual filter, it makes every measure, MTD, QTD and YTD too, use that date; further items can select its whole month or quarter.
-- Option. 2023. https://www.sqlbi.com/articles/computing-mtd-qtd-ytd-in-power-bi-for-the-current-period/
-- When: Reports that show time intelligence results for the latest period available in the data.
-
-**T04-A289-5.** A calculation item that selects the month of the last date with data through a Date column other than the date column, such as a year-month number, must clear the Date filters itself with REMOVEFILTERS: only a filter on the date column removes them automatically.
-- Must. 2023. https://www.sqlbi.com/articles/computing-mtd-qtd-ytd-in-power-bi-for-the-current-period/
-- When: Calculation items that move the filter to a whole period through a Date column other than the date column.
-
-**T04-A289-6.** Without a year-month or year-quarter number column, a calculation item can still select the whole month or quarter of the last date with data: turn that date into a Date filter with TREATAS and give it to PARALLELPERIOD with zero intervals of MONTH or QUARTER.
-- Option. 2023. https://www.sqlbi.com/articles/computing-mtd-qtd-ytd-in-power-bi-for-the-current-period/
-- When: The Date table has no year-month or year-quarter number column.

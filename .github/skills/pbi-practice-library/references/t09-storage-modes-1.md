@@ -1,6 +1,6 @@
 # Storage modes
 
-Part 1 of 2 of this topic. Covers: DirectQuery DAX and limits; DirectQuery model and source design; Choosing a storage mode.
+Part 1 of 2 of this topic. Covers: DirectQuery DAX and limits; DirectQuery model and source design.
 
 Practice notes drawn from public SQLBI articles, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail.
 
@@ -132,62 +132,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - Consider. 2018. https://www.sqlbi.com/articles/using-combinevalues-to-optimize-directquery-performance/
 - When: A relationship would need two or more columns; true most of the time, not always.
 
-### Choosing a storage mode
-
-**T09-W380-1.** Consider the trade-offs per model, then tune the model for the mode chosen: DirectQuery gives current data with no processing, memory limit or data copy, but loses in-memory speed and moves the query work to the database.
-- Consider. 2017. https://www.sqlbi.com/whitepapers/directquery-in-analysis-services-2016/
-- When: Deciding between DirectQuery and Import for a model.
-- Version: Analysis Services 2016 Tabular; 2017 white paper.
-
-**T09-W380-4.** Before choosing DirectQuery, check that the relational server can serve report queries while it handles its normal update workload: every query goes to the engine that receives the updates, whereas an in-memory model reads the source once.
-- Should. 2017. https://www.sqlbi.com/whitepapers/directquery-in-analysis-services-2016/
-- When: Deciding whether a source can carry DirectQuery.
-- Version: Analysis Services 2016 Tabular; 2017 white paper.
-
-**T09-W380-5.** When a source table feeds an in-memory model, tune the source for one large read of the whole table during processing; indexes bring no benefit to that workload, which is a single SELECT over every row.
-- Must. 2017. https://www.sqlbi.com/whitepapers/directquery-in-analysis-services-2016/
-- When: Preparing source tables for import.
-- Version: Analysis Services 2016 Tabular; 2017 white paper.
-
-**T09-W380-6.** If a source table that feeds an in-memory model is partitioned, make its partitions match the partitions defined in the Tabular model.
-- Should. 2017. https://www.sqlbi.com/whitepapers/directquery-in-analysis-services-2016/
-- When: Only where the source table needs partitioning.
-- Version: Analysis Services 2016 Tabular; 2017 white paper.
-
-**T09-W380-8.** On SQL Server, give tables that a DirectQuery model queries a columnstore index; for tables that only feed an in-memory model such an index is far from ideal. The source design has to match how the model uses it.
-- Should. 2017. https://www.sqlbi.com/whitepapers/directquery-in-analysis-services-2016/
-- When: Choosing indexes for model source tables on SQL Server.
-- Version: Analysis Services 2016 Tabular; 2017 white paper.
-
-**T09-W380-9.** Before committing a project to DirectQuery, build a prototype, collect the SQL queries your DAX formulas produce and take time to understand them: knowing that workload helps you design the best relational data model.
-- Should. 2017. https://www.sqlbi.com/whitepapers/directquery-in-analysis-services-2016/
-- When: Evaluating DirectQuery for a new project.
-- Version: Analysis Services 2016 Tabular; 2017 white paper.
-
-**T09-W380-30.** When only recent data must be real time, build two models: a small DirectQuery model for the last few days with simple calculations, and an in-memory model for the full history with the complex calculations.
-- Should. Check. 2017. https://www.sqlbi.com/whitepapers/directquery-in-analysis-services-2016/
-- When: Real-time needs cover only recent days.
-- Version: Analysis Services 2016 Tabular; 2017 white paper.
-
-**T09-W380-42.** Avoid enabling paging for an in-memory Tabular model.
-- Should. 2017. https://www.sqlbi.com/whitepapers/directquery-in-analysis-services-2016/
-- When: Configuring memory for an Analysis Services in-memory model.
-- Version: Analysis Services 2016 Tabular; 2017 white paper.
-
-**T09-W380-43.** When an in-memory model does not fit in memory, prefer adding RAM: reducing the memory the data model uses is the harder alternative, because optimising it is a complex task.
-- Should. 2017. https://www.sqlbi.com/whitepapers/directquery-in-analysis-services-2016/
-- When: An Analysis Services in-memory model outgrows the memory of its server.
-- Version: Analysis Services 2016 Tabular; 2017 white paper.
-
-**T09-W380-44.** Build solid DAX skills before adopting DirectQuery, so you can judge how each calculation behaves there: which functions a project needs, and how much data they materialise, is hard to foresee at the start.
-- Should. 2017. https://www.sqlbi.com/whitepapers/directquery-in-analysis-services-2016/
-- When: Planning a DirectQuery project.
-- Version: Analysis Services 2016 Tabular; 2017 white paper.
-
-**T09-A234-1.** Avoid making a whole model DirectQuery only because a handful of dashboards need real-time data: a pure DirectQuery model puts the cost of every query on the source. DirectQuery mainly fits when data cannot be imported fast enough for most reports.
-- Should. Check. 2021. https://www.sqlbi.com/articles/creating-real-time-dashboards-in-power-bi-with-push-datasets/
-- When: Everything else in the model could be imported.
-
 ## Special-case techniques and facts
 
 ### DirectQuery DAX and limits
@@ -316,10 +260,3 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - Option. 2018. https://www.sqlbi.com/articles/using-combinevalues-to-optimize-directquery-performance/
 - When: A DirectQuery relationship built on COMBINEVALUES calculated columns.
 - Version: Observed with Power BI in 2018.
-
-### Choosing a storage mode
-
-**T09-W380-3.** In one benchmark, queries took 1.5 to 2.9 times as long in DirectQuery as in memory, varying with the query and its number of joins; DirectQuery was never the faster of the two.
-- Fact. Check. 2017. https://www.sqlbi.com/whitepapers/directquery-in-analysis-services-2016/
-- When: Measured on a 4-billion-row fact table in a SQL Server clustered columnstore; results may differ elsewhere.
-- Version: Analysis Services 2016 benchmark published in 2017.
