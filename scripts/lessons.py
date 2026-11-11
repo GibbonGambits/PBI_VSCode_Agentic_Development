@@ -32,6 +32,11 @@ The file is docs/lessons.md. It holds one table row per lesson:
           It must then be built into the template, or the developer must decline
     X004  a row with a template file has no pull request number or address in 'Approved in'
 
+What a lesson may reach: every template file, which includes the model standard, the layout standard, their
+checks in check_project.py, the fix scripts and the skill pbi-improve. A failed check of those standards
+(a code that starts with M, G or B) is a trigger like any other failed check. Copilot asks first and a
+person approves by pull request. The checklist and the theme stay outside: X002 refuses them.
+
 The check cannot see a lesson that was deleted from the end of the table or reworded; the pull request
 diff shows that. Needs Python 3.8 or later. Uses the standard library only.
 Exit code: 0 = no errors, 1 = at least one error, 2 = wrong usage or a row that is not valid.

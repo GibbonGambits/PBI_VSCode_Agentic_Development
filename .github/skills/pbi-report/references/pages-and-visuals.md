@@ -84,6 +84,7 @@ A visual listed in section 7 of the brief keeps what the brief names switched on
 
 - `python scripts/list_visuals.py . --page <page>` lists label, type, x, y, width, height and folder for one page. Use it to count the visuals on a page (item 20) and to check alignment (item 49).
 - `python scripts/set_visual_defaults.py .` sets Header icons off and Tooltips off on every visual; `--label` adds labels.
-- `python scripts/check_project.py .` fails on a bad name, a missing label, or a visual with header icons or tooltips on or not set.
+- `python scripts/set_positions.py .` writes approved positions; see `layout-standard.md`, beside this file.
+- `python scripts/check_project.py .` fails on a bad name, a missing label, a visual with header icons or tooltips on or not set, a visual outside its page, two data visuals that overlap, and a field the model does not have.
 
 Checklist items: 20, 49, 52, 73

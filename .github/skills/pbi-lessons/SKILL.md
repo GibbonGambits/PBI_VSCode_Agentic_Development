@@ -7,7 +7,7 @@ description: Use this skill when the developer points out a mistake in your work
 ## When this starts
 
 - **The developer points it out**: they say something you produced is wrong, or they correct it.
-- **A check fails**: `scripts/check_project.py`, `scripts/check_template.py` or the tests report an error in something you created or changed in this task. An error that was already in a report before you touched it is a gap for the review, not a lesson.
+- **A check fails**: `scripts/check_project.py`, `scripts/check_template.py` or the tests report an error in something you created or changed in this task. That includes the checks of the model standard, the layout standard and field references (codes that start with M, G and B). A warning or a note is not a trigger. An error that was already in a report before you touched it is a gap for the review, not a lesson.
 
 ## Steps
 
@@ -23,6 +23,10 @@ description: Use this skill when the developer points out a mistake in your work
 5. Ask the developer. Show the exact change and the file it goes in, and wait for a clear yes.
    - No: record the decision as a new lesson with the same key and `--fix "declined: <reason>"`.
    - Yes: make a new branch from the current one and make the change there. Run `python -m unittest discover -s tests`. The developer opens the pull request and tells you its number or address. Then add a lesson with the same key, `--fix "<file changed>, <second file>"` and `--approved "<pull request number or address>"`, commit it to that branch, and run `python scripts/check_template.py` (until that row is added, X003 is expected). Merging the pull request is the approval. Never merge it yourself.
+
+## What a lesson may change
+
+The model standard, the layout standard, their checks, the fix scripts and the skill `pbi-improve` are template files like any other. A lesson may propose a change to them: a new or corrected rule, a new check with its test, a line in a skill. The steps above apply unchanged: ask first, show the exact change, and a person approves by pull request.
 
 ## Limits
 

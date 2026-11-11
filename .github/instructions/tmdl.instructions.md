@@ -5,7 +5,7 @@ applyTo: "**/*.tmdl"
 ---
 # Rules for TMDL files
 
-`python scripts/check_project.py .` enforces rules 1, 3 and 4 and lists every placeholder left by rule 2. How-to detail is in the skill `pbi-semantic-model`.
+`python scripts/check_project.py .` enforces rules 1, 3, 4, 8 and 9 and lists every placeholder left by rule 2. How-to detail is in the skill `pbi-semantic-model`.
 
 1. Every visible table, column and measure has a `///` description directly above it. So does every shared query and parameter (`expression`). No blank line between the description and the object.
 2. A description says only what the brief, the model or the developer states. The placeholder for unknown meaning (project instructions) goes here as a `///` line: `/// TODO(owner): <question>`.
@@ -14,5 +14,8 @@ applyTo: "**/*.tmdl"
 5. Indent with tabs, the way Power BI Desktop writes these files.
 6. Do not write `lineageTag` on new objects and do not touch existing ones. Do not add annotations whose names start with `PBI_`. Power BI manages both.
 7. Hiding a table or column is decided under checklist items 19 and 25, never by the description check.
+8. A new measure goes in the table `_Measures`, with a business name, a format string and a display folder of exactly two levels, `Subject\Type`. Do not move or rename a measure that already exists without a clear yes.
+9. A calculated column or calculated table carries `annotation CalculatedReason = <why it is calculated in the model>`, in the developer's words.
+10. Never change a data type, and never turn summarisation off on an existing column, without the developer's decision.
 
-Checklist items: 8, 19, 23, 25
+Checklist items: 8, 19, 22, 23, 25, 27, 28

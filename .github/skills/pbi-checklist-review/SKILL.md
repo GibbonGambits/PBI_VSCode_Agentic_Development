@@ -37,7 +37,23 @@ More rules:
 |---|---|
 | D001, D002, I001 | Item 23 |
 | T001, and T105 from `check_template.py` | Item 50 |
-| C001, D003, P001, F002, F003, J001, J002, S001, N001-N005, H001, H002, and any other finding of `check_template.py` | Template rules, not checklist items. List them in the "Template rules" section of the report |
+| M005, M006, M007, M008 | Items 7 and 28 |
+| M101 | Item 22 |
+| M102, M103, M104 | Items 19 and 25 |
+| M105, M106 | Items 27 and 38 |
+| M107 | Item 29 |
+| M108, M109, M110 | Item 6 |
+| M009 | Item 36 |
+| M112 | Items 71 and 72 |
+| M201 | Items 5 and 25 |
+| G001, G002 | Item 49 (Fail: the item asks for 0 overlapping visuals) |
+| G003, G004, G005, G006 | Item 49 (Fail when they name 3 or more visuals on one page, unless the brief justifies it) |
+| G007 | Item 52 |
+| M001-M004, M010, M111, M301, M302, B001, G008, C001, D003, P001, F002, F003, J001, J002, S001, N001-N005, H001, H002, and any other finding of `check_template.py` | Template rules, not checklist items. List them in the "Template rules" section of the report |
+
+A warning or a note from the script is evidence, not a verdict: read the item and judge it by its own thresholds. Item 22 is judged by the checklist's thresholds; the two-level measure folders (M003, M004) are a template rule. A finding excused in section 9 or 10 of the brief counts as justified; quote the row.
+
+Two rules of the model standard have no script. Judge them from the model files and the brief: hierarchies for natural drill paths (item 59), and the decision on incremental refresh or partitions for large tables (section 4 of the brief; ask for row counts).
 
 ## Evidence only people can give
 

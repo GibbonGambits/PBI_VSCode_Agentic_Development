@@ -71,7 +71,7 @@ Every visual has both off. List each visual that must keep one on, and why. Copi
 
 ## 9. Exceptions to the model standard
 
-The model standard is in the skill `pbi-semantic-model` (`references/model-standard.md`). A check passes only for an object listed here with a reason. Code: the finding code, for example `M107`. Object: as the check prints it, `Table[Column]`, `[Measure]` or `Table`. A second measure table is listed with the code `M001` and its table name.
+The model standard is `.github/skills/pbi-semantic-model/references/model-standard.md`. A check passes only for an object listed here with a reason. Code: the finding code, for example `M107`. Object: as the check prints it, `Table[Column]`, `[Measure]` or `Table`. A second measure table is listed with the code `M001` and its table name.
 
 | Code | Object | Reason |
 |---|---|---|
@@ -79,7 +79,7 @@ The model standard is in the skill `pbi-semantic-model` (`references/model-stand
 
 ## 10. Exceptions to the layout standard
 
-The layout standard is in the skill `pbi-report` (`references/layout-standard.md`). Page and Visual: as `python scripts/list_visuals.py .` prints them. For a finding about a whole page (`G007`), write `-` under Visual. A full-page background shape is listed with the code `G004`.
+The layout standard is `.github/skills/pbi-report/references/layout-standard.md`. Page and Visual: as `python scripts/list_visuals.py .` prints them. For a finding about a whole page (`G007`), write `-` under Visual. A full-page background shape is listed with the code `G004`.
 
 | Code | Page | Visual | Reason |
 |---|---|---|---|

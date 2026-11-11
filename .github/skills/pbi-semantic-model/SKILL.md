@@ -13,6 +13,10 @@ Not for report pages or visuals (skill `pbi-report`) and not for the full 79-ite
 
 Checklist items are in `checklist/checklist.md`. Read only the items a step names, by searching for the heading, for example `## Item 23`.
 
+## The model standard
+
+`references/model-standard.md` is the one standard for where measures live, folders, names, hiding, calculated objects, summarising, data types and formats. Read it before you add or change a measure, a column or a table. It adds detail to the checklist and never overrides it. `python scripts/check_project.py .` checks it (codes that start with M) and reads its exceptions from section 9 of the brief.
+
 ## New model, or new objects in a model
 
 Work in this order.
@@ -20,16 +24,17 @@ Work in this order.
 1. Sources and queries: items 1-6 and 9. Query and step descriptions: `references/descriptions.md`.
 2. Tables and relationships: items 10-17 and 38.
 3. Date handling: items 18 and 31. Auto date/time is switched off by the developer in Desktop (see "Only Desktop can tell").
-4. Columns: items 19, 22, 24, 25, 26. File syntax: `references/tmdl.md`.
-5. Measures: items 27-35 and 64. Give every new measure a description, a format string, and a display folder when the table uses folders.
-6. Names: items 7 and 28. Use the naming standard in the brief. If the brief has none, follow the names already in the model, or ask.
+4. Columns: items 19, 22, 24, 25, 26, and part B of the model standard (hiding, summarising, data types, formats, the reason line of a calculated column). File syntax: `references/tmdl.md`.
+5. Measures: items 27-35 and 64, and part A of the model standard. Every new measure goes in the table `_Measures`, with a description, a format string and a display folder of two levels, `Subject\Type`. If the model has no `_Measures` table yet, ask the developer to make it in Power BI Desktop; do not write it from memory.
+6. Names: items 7 and 28. Measure names follow the model standard, unless the brief names another standard. For tables and columns use the brief; if it says nothing, follow the names already in the model, or ask.
 7. Descriptions: items 8, 23, 37, 46, 48. Rules: `references/descriptions.md`.
 8. Formats: items 36, 71, 72. File syntax: `references/tmdl.md`.
 
 ## Existing model
 
-- Follow the patterns the model already uses for names, folders and layout.
-- Microsoft notes that renaming a field may break report visuals that use it. The rename rule is in the project instructions.
+- New objects follow the model standard. Existing objects keep their names and their home table. A breach in what already exists is reported, not changed: it is changed only when the developer asks, or through the skill `pbi-improve`.
+- Microsoft notes that renaming a field may break report visuals that use it, and that a formula naming a measure with its table breaks when the measure moves. The model standard ("Existing models") says what to tell the developer first. The rename rule is in the project instructions.
+- To set a display folder, a format string, hidden, or the reason line of a calculated object on something that exists, use `python scripts/set_model_properties.py` with `--dry-run` first. It changes that one line and nothing else. The value comes from the brief or the developer.
 - When you add a description, change nothing else on that object.
 - A measure's DAX shows how it is calculated, not what it means to the business. If the brief and the developer do not state the meaning, use the placeholder in `references/descriptions.md`.
 - To report gaps without changing anything, use the skill `pbi-checklist-review`.
@@ -44,4 +49,4 @@ Work in this order.
 
 TMDL depends on indentation. One wrong tab stops the whole model from loading.
 
-Checklist items: 1-19, 22-38, 46, 48, 64, 71, 72
+Checklist items: 1-19, 22-38, 46, 48, 59, 64, 71, 72
