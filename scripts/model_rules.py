@@ -893,6 +893,11 @@ def _objects(context, functions, function_names):
         if problems:
             add("M822", table["objects"][0], "field parameter '%s' is not wired the way Power BI Desktop writes it: %s"
                 % (table["name"], "; ".join(problems)), level="warn", keys=(table["name"],))
+    calendars = [o for o in context["objects"] if o["kind"] == "calendar" and not o["translation"]]
+    if calendars and not any("calendar" in name for name in context["brief"].get("agreed", [])):
+        add("M841", calendars[0], "the model uses calendar-based time intelligence (calendar '%s'), which Microsoft "
+            "still lists as a preview feature. A preview feature is used only after the developer's yes: add its row "
+            "to section 11 of the brief" % calendars[0]["name"], level="warn", keys=("model",))
     for perspective in [o for o in context["objects"] if o["kind"] == "perspective" and o["top"] and not o["translation"]]:
         if not any(o["kind"] == "perspectivetable" and o["parent"] is perspective for o in context["objects"]):
             add("M831", perspective, "perspective '%s' holds no objects" % perspective["name"], level="warn",

@@ -81,3 +81,9 @@ The model standard is `.github/skills/pbi-semantic-model/references/model-standa
 | Code | Page | Visual | Reason |
 |---|---|---|---|
 | | | | |
+
+## 11. Preview features and optional tools the developer agreed to
+
+| Feature or tool | Agreed by | Date | Notes |
+|---|---|---|---|
+| calendar-based time intelligence | The template (shipped example) | 2026-11-11 | The example under `preview/` exists to show the form; a real project needs the developer's own yes |

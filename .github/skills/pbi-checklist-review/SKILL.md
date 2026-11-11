@@ -12,9 +12,9 @@ A review reports. It never fixes. Change files only after the developer has read
 2. Read `docs/report-brief.md`, the model files and the report files. If the brief is empty or missing, carry on; ask for the facts in step 5 and mark what stays unknown as Fail with "Evidence missing".
 3. Copy `references/review-template.md` to `docs/checklist-review.md`. If that file already exists, ask the developer to commit it or to confirm it can be replaced.
 4. Go through `checklist/checklist.md` from item 1 to item 79, in order, reading each item in full. Fill one row per item.
-5. Before finishing, ask the developer, in one message, for the facts the files cannot show (see "Evidence only people can give"). Use their answers as evidence, with the date.
+5. Before finishing, get the facts the files cannot show (see "Evidence only people can give"). Facts about the data: read them yourself where the developer has set up Microsoft's modeling server (the file data-facts.md of the skill `pbi-semantic-model`); for the rest, ask the developer in one message. Use the answers as evidence, with the date. Where the Desktop Bridge is agreed, look at the pages yourself for what only the screen shows (the file desktop-bridge.md of the skill `pbi-report`).
 6. Run `python scripts/check_project.py --review docs/checklist-review.md` and fix the table until it passes.
-7. Report: the script findings, the 79 rows, and a short list of the Fail items with what would close each gap.
+7. Report: the script findings, the 79 rows, a short list of the Fail items with what would close each gap, the open `TODO(owner)` questions (`python scripts/list_todos.py .`), and the suggestions.
 
 ## The three statuses
 
@@ -82,7 +82,7 @@ More rules:
 | V002, V003, V004, V005 | Item 65 |
 | A001, A002, A004 | Item 66 |
 | V006, V007 | Item 20 (V006 is Fail unless the brief gives the reason) |
-| M001-M004, M010, M108, M111, M116, M117, M301, M302, M501, M503, M504, M506, M510, M511, M512, M516, M517, M520, M707, M709, M801, M802, M804, M805, M831, M901-M909, P004, V011, B001, B002, G008, C001, D003, P001, F002, F003, J001-J004, S001, N001-N005, H001, H002, U001, U002, U005, and any other finding of `check_template.py` | Template rules, not checklist items. List them in the "Template rules" section of the report |
+| M001-M004, M010, M108, M111, M116, M117, M301, M302, M501, M503, M504, M506, M510, M511, M512, M516, M517, M520, M707, M709, M801, M802, M804, M805, M831, M841, M901-M909, P004, V011, B001, B002, G008, C001, D003, P001, F002, F003, J001-J004, S001, N001-N005, H001, H002, U001, U002, U005, and any other finding of `check_template.py` | Template rules, not checklist items. List them in the "Template rules" section of the report |
 
 A warning or a note from the script is evidence, not a verdict: read the item and judge it by its own thresholds. Item 22 is judged by the checklist's thresholds; the two-level measure folders (M003, M004) are a template rule. A finding excused in section 9 or 10 of the brief counts as justified; quote the row.
 

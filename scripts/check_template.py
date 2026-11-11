@@ -329,7 +329,7 @@ def check_brief():
         error("S008", "docs/report-brief.md", "the report brief is missing")
         return
     text = read_text(path).lower()
-    for label in list(cp.BRIEF_LABELS.values()) + [cp.MODEL_EXCEPTIONS, cp.LAYOUT_EXCEPTIONS]:
+    for label in list(cp.BRIEF_LABELS.values()) + [cp.MODEL_EXCEPTIONS, cp.LAYOUT_EXCEPTIONS, cp.PREVIEW_AGREED]:
         if label.lower() not in text:
             error("S008", "docs/report-brief.md", "the label '%s' is gone; scripts/check_project.py reads it" % label)
 

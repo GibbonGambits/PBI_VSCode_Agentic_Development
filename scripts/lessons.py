@@ -216,6 +216,10 @@ def add(path, trigger, key, mistake, correction, fix="report", approved="-", tod
 
     Raises ValueError, and writes nothing, when the file or the new row is not valid.
     """
+    level = cp.code_levels().get(key)
+    if trigger == "check" and level in ("warn", "note"):
+        raise ValueError("%s is a %s of the project check. Only a failed check starts the loop: a warning or a note "
+                         "(a suggestion) is not a mistake to record" % (key, "warning" if level == "warn" else "note"))
     with open(path, "rb") as fh:
         raw = fh.read()
     text = raw.decode("utf-8-sig")

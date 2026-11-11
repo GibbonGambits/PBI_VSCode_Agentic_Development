@@ -619,6 +619,15 @@ class Objects(StarCase):
         self.parameter(self.PARAMETER.replace("\t\trelatedColumnDetails\n\t\t\tgroupByColumn: 'Sales Metric Fields'\n\n", ""))
         self.assertFinds("M822", "warn")
 
+    def test_M841_preview_feature_without_the_developers_yes_warns(self):
+        self.replace(DATE, "\tpartition Date = m", "\tcalendar 'Shop Calendar'\n\n\t\tcalendarColumnGroup = year\n"
+                     "\t\t\tprimaryColumn: Year\n\n\tpartition Date = m")
+        self.assertFinds("M841", "warn")
+        self.write(os.path.join("docs", "report-brief.md"), "## 11. Preview features and optional tools the developer agreed to\n\n"
+                   "| Feature or tool | Agreed by | Date | Notes |\n|---|---|---|---|\n"
+                   "| calendar-based time intelligence | A. Developer | 2026-11-11 | fiscal weeks |\n")
+        self.assertNot("M841")
+
     def test_M831_empty_perspective_warns(self):
         self.write(os.path.join(DEFINITION, "perspectives", "Sales Only.tmdl"), "perspective 'Sales Only'\n")
         self.assertFinds("M831", "warn")

@@ -1,6 +1,6 @@
 # Report brief
 
-Fill this in before building, and keep it up to date. GitHub Copilot reads it and must not fill gaps by itself: leave a field empty rather than guess, and Copilot will ask. Numbers in brackets are the checklist items a field gives evidence for.
+Fill this in before building, and keep it up to date. GitHub Copilot reads it and does not fill gaps by itself: leave a field empty rather than guess. For a meaning the brief does not give, Copilot writes a `TODO(owner)` question in the model, carries on, and asks about all of them at the end of the task. For a fact about the data that no file holds, it asks once. Numbers in brackets are the checklist items a field gives evidence for.
 
 ## 1. Purpose and audience
 
@@ -30,10 +30,11 @@ An empty field means the layout standard: 1280 x 720, margin 24, gap 16, grid 8.
 
 ## 4. Standards to follow
 
-- Naming standard for tables, columns and measures (7, 28): the model standard of this template, unless another is written here:
+- Naming standard for tables, columns and measures (7, 28): the standards of this template (business words with spaces, a capital first letter, no technical prefixes), unless another is written here:
 - Measure folder subjects (22):
 - Acronyms and words with their own spelling (7, 28):
-- Measure table: `_Measures`, made in Power BI Desktop with Enter data; for a Direct Lake model a calculated table. Write here if this model differs, and why:
+- Measure table: `_Measures`. Copilot makes it: an imported one-column table, or a calculated table when the model reads its data in Direct Lake or DirectQuery mode. Write here if this model differs, and why:
+- Facts about the data that Copilot was given or read (row counts, distinct values, unique keys, steps that fold), each with its date and where it came from (3, 11, 14, 17, 31):
 - Large tables: row counts, and the decision on incremental refresh or partitions:
 - Excel check on (yes or no):
 - Power BI Copilot check on (yes or no):
@@ -82,5 +83,13 @@ The model standard is `.github/skills/pbi-semantic-model/references/model-standa
 The layout standard is `.github/skills/pbi-report/references/layout-standard.md`. Page and Visual: as `python scripts/list_visuals.py .` prints them. For a finding about a whole page (`G007`), write `-` under Visual. A full-page background shape is listed with the code `G004`.
 
 | Code | Page | Visual | Reason |
+|---|---|---|---|
+| | | | |
+
+## 11. Preview features and optional tools the developer agreed to
+
+Copilot uses a preview feature, or one of Microsoft's optional tools, only after the developer's yes. Write one row for each yes. Feature or tool: for example `calendar-based time intelligence`, `Desktop Bridge`, `Microsoft's modeling server`, `registering the theme in the files`.
+
+| Feature or tool | Agreed by | Date | Notes |
 |---|---|---|---|
 | | | | |

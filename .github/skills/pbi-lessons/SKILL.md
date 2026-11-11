@@ -7,12 +7,12 @@ description: Use this skill when the developer points out a mistake in your work
 ## When this starts
 
 - **The developer points it out**: they say something you produced is wrong, or they correct it.
-- **A check fails**: `scripts/check_project.py`, `scripts/check_template.py` or the tests report an error in something you created or changed in this task. That includes the checks of the model standard, the layout standard and field references (codes that start with M, G and B). A warning or a note is not a trigger. An error that was already in a report before you touched it is a gap for the review, not a lesson.
+- **A check fails**: `scripts/check_project.py`, `scripts/check_template.py` or the tests report an error in something you created or changed in this task. That includes every standard: codes that start with M, P, G, B, V and A. A warning or a note is not a trigger, and a note whose code starts with U is a suggestion, never a mistake: `scripts/lessons.py` refuses to record either as a failed check. An error that was already in a report before you touched it is a gap for the review, not a lesson. T001 on a project that `scripts/scaffold.py` has just made is not a lesson either: the developer has yet to import the theme.
 
 ## Steps
 
 1. Put the mistake right in the report or model, and run the check again.
-2. Read `docs/lessons.md`. If an earlier lesson is the same kind of mistake, reuse its key.
+2. Read `docs/lessons.md`. If an earlier lesson is the same kind of mistake, reuse its key. If you are not sure what the right way is, look it up before you write the lesson (skill `pbi-lookup`), so that the lesson records a fact.
 3. Record the lesson, one for each kind of mistake in this task, however many places it showed up:
    `python scripts/lessons.py add --trigger developer --key <key> --mistake "<what was wrong>" --correction "<what is right>"`
    Use `--trigger check` when a check failed, with the finding code as the key (for example `D001`). Otherwise the key is a short name in lower-case words joined by hyphens. Write what the developer said or the check reported. Do not guess at causes.
@@ -26,11 +26,12 @@ description: Use this skill when the developer points out a mistake in your work
 
 ## What a lesson may change
 
-The model standard, the layout standard, their checks, the fix scripts and the skill `pbi-improve` are template files like any other. A lesson may propose a change to them: a new or corrected rule, a new check with its test, a line in a skill. The steps above apply unchanged: ask first, show the exact change, and a person approves by pull request.
+Every standard, its checks, the shipped examples, the fix scripts and the skills are template files like any other. A lesson may propose a change to them: a new or corrected rule, a new check with its test, a line in a skill. The steps above apply unchanged: ask first, show the exact change, and a person approves by pull request.
 
 ## Limits
 
 - Never change a template file without asking first (the list is in the project instructions).
+- One lesson for each kind of mistake in a task, however many findings it gave. Do not record a lesson for each line of the check output.
 - Never change `checklist/checklist.md` or `theme/theme.json` this way, nor the two hashes that guard them in `scripts/check_template.py`. If a lesson seems to call for it, tell the developer and stop.
 - Never loosen or remove a check, or soften an existing rule, so that something passes.
 - Never edit the business-definitions reference files through a lesson.

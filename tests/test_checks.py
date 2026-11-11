@@ -1305,6 +1305,14 @@ class LessonsFile(LessonsCase):
         self.assertEqual(row["Fix went to"], "report")
         self.assertEqual(self.codes(), [])
 
+    def test_a_warning_or_a_note_of_the_check_does_not_start_the_loop(self):
+        for key in ("M520", "A001", "U001"):                # two warnings and a suggestion
+            with self.assertRaises(ValueError, msg=key):
+                self.add(key=key, trigger="check")
+        self.assertEqual(self.rows(), [])
+        self.assertEqual(self.add(key="M502", trigger="check"), (1, 0))      # a failed check is recorded
+        self.assertEqual(self.add(key="M520", trigger="developer"), (2, 0))  # the developer may still point one out
+
     def test_lessons_are_numbered_in_order_and_earlier_rows_are_untouched(self):
         self.add()
         before = self.text()

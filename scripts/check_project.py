@@ -160,6 +160,7 @@ Finding codes (errors unless marked warn or note; only errors change the exit co
     M821  field parameter names a field the model does not have
     M822  (warn) field parameter not wired the way Power BI Desktop writes it
     M831  (warn) perspective with no objects
+    M841  (warn) the model uses a preview feature that section 11 of the brief does not list
 
   Report standard (.github/skills/pbi-report/references/report-standard.md):
     V001  drillthrough page without a back button
@@ -263,6 +264,7 @@ BRIEF_LABELS = {"page_size": "Page size in pixels, width x height",
                 "copilot": "Power BI Copilot check on"}
 MODEL_EXCEPTIONS = "Exceptions to the model standard"
 LAYOUT_EXCEPTIONS = "Exceptions to the layout standard"
+PREVIEW_AGREED = "Preview features and optional tools"       # section 11 of the brief: one row for each yes
 FIELD_LIST = os.path.join("docs", "model-fields.md")  # the saved field list of a published model (skill pbi-report)
 BEFORE_COPY = "_before"                              # the untouched copy made by scripts/improve.py
 ITEM_COUNT = 79
@@ -290,6 +292,14 @@ HIDING_FLAGS = frozenset(("ishidden", "ishidden:true", "isprivate", "isprivate:t
 BARE_FLAG_RE = re.compile(r"[A-Za-z_]\w*\Z")
 QUOTED = re.compile(r"'(?:[^']|'')*'|\"(?:[^\"]|\"\")*\"")
 EMPTY_EVIDENCE = frozenset(("todo", "tbd", "na", "n/a", "none", "nbsp", "br", "x", "evidence"))
+
+
+def code_levels():
+    """{code: 'fail', 'warn' or 'note'} for every finding code, read from the list at the top of this file."""
+    levels = {}
+    for code, mark in re.findall(r"^ {4}([A-Z][0-9]{3})  (\(warn\)|\(note\))?", __doc__, re.M):
+        levels[code] = mark.strip("()") or "fail"
+    return levels
 
 
 class Findings:
@@ -1091,7 +1101,25 @@ def read_brief(root):
         "copilot": _brief_value(lines, BRIEF_LABELS["copilot"]).lower().startswith("yes"),
         "model_exceptions": {(row[0], row[1]) for row in _brief_rows(lines, MODEL_EXCEPTIONS, 3)},
         "layout_exceptions": {(row[0], row[1], row[2]) for row in _brief_rows(lines, LAYOUT_EXCEPTIONS, 4)},
+        "agreed": _agreed(lines),
     }
+
+
+def _agreed(lines):
+    """Lower-case names of the preview features and optional tools that section 11 of the brief lists with a name."""
+    names = []
+    inside = False
+    for line in lines:
+        text = line.strip()
+        if text.startswith("#"):
+            inside = PREVIEW_AGREED.lower() in text.lower()
+            continue
+        if inside and text.startswith("|"):
+            cells = [c.strip().strip("`").strip() for c in text.strip("|").split("|")]
+            if len(cells) >= 3 and cells[0] and not set(cells[0]) <= set("-: ") and cells[0].lower() != "feature or tool" \
+                    and not _no_evidence(cells[1]):
+                names.append(cells[0].lower())
+    return names
 
 
 def model_excused(brief, code, *keys):
@@ -1287,7 +1315,8 @@ def check_standards(model_dir, objects, usage, brief, findings):
         key = "[%s]" % name
         if table["name"] not in measure_tables:
             add("M001", measure, "measure %s lives in table '%s'; every measure lives in '%s' (or in a measure table "
-                "the brief lists). In an existing model the developer moves it in Power BI Desktop (Home table)"
+                "the brief lists). A new measure is written there. Moving an existing one needs the developer's yes; after it, "
+                "Copilot moves it and proves every reference (model standard, 'Existing models')"
                 % (key, table["name"], MEASURE_TABLE), keys=(key, table["name"]))
         folder = measure["props"].get("displayfolder", "")
         levels = folder.split("\\")

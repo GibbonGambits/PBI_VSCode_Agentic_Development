@@ -21,8 +21,10 @@ nothing inside them is edited. Each .platform file holds a logicalId that must s
 (Microsoft Learn, "Git integration source code format"), so the copy must never be committed: 'start' makes
 it only when Git ignores _before/, and skips it, saying so, when a path would pass 260 characters.
 
-Kinds of fix: Mechanical (descriptions, format strings, folders, hiding, header icons and tooltips),
-Layout (positions and sizes), Needs a person (everything else, and anything a file cannot settle).
+Kinds of fix: Mechanical (descriptions, format strings, folders, hiding, header icons and tooltips, alt text,
+titles, the DAX style), Layout (positions and sizes, a back button, tab order), Needs a person (everything
+else: a decision, a number to check, a rename or a move, and anything a file cannot settle). A row under
+"Needs a person" is not work handed back: once the developer has answered it, Copilot does the work.
 
 Needs Python 3.8 or later and Git. Uses the standard library only.
 Exit code: 0 = done, 1 = stopped or a problem found, 2 = wrong usage.
@@ -103,8 +105,11 @@ LAYOUT = {
              "Keyboard users reach the visuals in a new order"),
 }
 PERSON = {
-    "M001": "The developer moves the measure to _Measures in Power BI Desktop (Home table). DAX that names it with a table, and visuals, can break",
-    "M002": "The developer makes or repairs the _Measures table in Power BI Desktop",
+    "M001": "A move needs the developer's yes for this measure. After it, Copilot moves the measure to _Measures itself and proves "
+            "every reference (scripts/find_references.py, then the checks). DAX that names it with its table, visuals, and other "
+            "reports on a published model can break",
+    "M002": "After the developer's yes, Copilot repairs the _Measures table: the table visible, exactly one column, that column "
+            "hidden (scripts/scaffold.py measures-table makes the table when it is missing)",
     "M005": "Rename one of the two measures: renaming may break visuals and other reports",
     "M006": "Rename the measure or the column: renaming may break visuals and other reports",
     "M007": "Rename the measure: renaming may break visuals and other reports",
@@ -183,6 +188,7 @@ PERSON = {
     "M821": "Say which field the field parameter should name",
     "M822": "Rebuild the field parameter from the shipped example; slicers and visuals bound to it must be checked",
     "M831": "Add objects to the perspective, or remove it",
+    "M841": "The developer says yes or no to the preview feature; a yes gets its row in section 11 of the brief",
     "M901": "Say which column the relationship should use; the model does not load until it is repaired",
     "M902": "Say which column the hierarchy level should use",
     "M903": "Say which column sorts this one",

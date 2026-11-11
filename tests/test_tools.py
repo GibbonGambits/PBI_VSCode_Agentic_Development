@@ -340,6 +340,52 @@ class DesktopBridge(TempCase):
             self.assertNotIn(word, code)
 
 
+class FindReferences(TempCase):
+    def run_script(self, root, target):
+        import find_references
+        return quiet(find_references.main, ["find_references.py", root, target])
+
+    def test_measure_references_in_dax_and_in_the_report_are_listed(self):
+        root = self.copy("good")
+        code, out = self.run_script(root, "[Total Sales]")
+        self.assertEqual(code, 0, out)
+        self.assertIn("DEFINITION of the measure", out)
+        self.assertIn("1. References recognised", out)
+        self.assertIn("other reports that use this model", out)
+
+    def test_column_references_cover_relationships_sort_and_hierarchy(self):
+        root = self.copy("star")
+        code, out = self.run_script(root, "Date[Month Number]")
+        self.assertEqual(code, 0, out)
+        self.assertIn("sortbycolumn of column 'Month Name'", out)
+        code, out = self.run_script(root, "Store[Store Key]")
+        self.assertIn("tocolumn of relationship 'SalesToStore'", out)
+        code, out = self.run_script(root, "Date[Year]")
+        self.assertIn("column of level 'Year'", out)
+        code, out = self.run_script(root, "Sales[Amount]")
+        self.assertIn("DAX of [Total Sales] names Sales[Amount]", out)
+
+    def test_table_references_and_text_that_cannot_be_classified(self):
+        root = self.copy("star")
+        path = os.path.join(root, "Star.SemanticModel", "definition", "tables", "Sales.tmdl")
+        with open(path, encoding="utf-8") as fh:
+            text = fh.read()
+        with open(path, "w", encoding="utf-8", newline="\n") as fh:
+            fh.write(text.replace("// Build a small made-up list of order lines.", "// Order lines; compare with Store totals."))
+        code, out = self.run_script(root, "Store")
+        self.assertEqual(code, 0, out)
+        self.assertIn("DEFINITION of the table", out)
+        self.assertIn("tocolumn of relationship 'SalesToStore'", out)
+        loose = out.split("2. Text that cannot be classified")[1].split("3. Not in this repository")[0]
+        self.assertIn("compare with Store totals", loose)
+
+    def test_object_that_is_not_in_the_model_is_reported(self):
+        root = self.copy("star")
+        code, out = self.run_script(root, "[No Such Measure]")
+        self.assertEqual(code, 1)
+        self.assertIn("has no measure", out)
+
+
 class SourcesRoutine(TempCase):
     def test_dax_index_is_built_from_names_and_addresses_only(self):
         toc = {"items": [{"toc_title": "DAX", "children": [
