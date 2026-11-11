@@ -1218,7 +1218,7 @@ def check_standards(model_dir, objects, usage, brief, findings):
 
     # ---- rule 5: references in DAX (a text check, not a parser)
     for owner, parsed in code_by_owner:
-        if owner["kind"] not in ("measure", "column"):
+        if owner["kind"] not in ("measure", "column", "calculationitem", "tablepermission"):
             continue
         loose = set()
         tied = set()
@@ -1237,7 +1237,7 @@ def check_standards(model_dir, objects, usage, brief, findings):
                 parts.append("write the column with its table: %s" % ", ".join(sorted(loose)))
             if tied:
                 parts.append("write the measure without its table: %s" % ", ".join(sorted(tied)))
-            label = "[%s]" % owner["name"] if owner["kind"] == "measure" else "%s[%s]" % (owner["table"]["name"], owner["name"])
+            label = model_rules._label(owner)
             add("M010", owner, "DAX of %s: %s" % (label, "; ".join(parts)), level="warn", keys=(label,))
 
     # ---- B. columns and tables

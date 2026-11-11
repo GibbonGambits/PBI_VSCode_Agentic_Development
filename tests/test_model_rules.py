@@ -377,6 +377,15 @@ class Dax(StarCase):
         self.check("M511", "warn", "1 - DIVIDE ( [Total Sales], [Total Sales YTD] )",
                    "DIVIDE ( [Total Sales YTD] - [Total Sales], [Total Sales YTD] )")
 
+    def test_M511_one_minus_a_division(self):
+        self.measure("Test Measure", "1 - SUM ( Sales[Amount] ) / 1000")
+        self.assertFinds("M511", "warn")
+
+    def test_M010_also_reads_role_rules_and_calculation_items(self):
+        self.role("Store", '[City] = "Utrecht"')
+        self.assertFinds("M010", "warn")
+        self.assertIn("role 'Readers', table 'Store'", " ".join(f[3] for f in self.found() if f[0] == "M010"))
+
     def test_M512_evaluateandlog(self):
         self.check("M512", "warn", "EVALUATEANDLOG ( [Total Sales] )")
 

@@ -534,9 +534,17 @@ def _dax(context, measure_names, direct_query, index):
             add("M510", owner, "DAX of %s uses INTERSECT; for a relationship made in a formula, Microsoft's rule "
                 "asks for TREATAS" % label, level="warn", keys=keys)
         for position, token in enumerate(stream[:-2]):
-            if (token.kind == "number" and stream[position + 1].kind == "symbol" and stream[position + 1].value in "+-"
-                    and stream[position + 2].kind == "word" and stream[position + 2].value.upper() == "DIVIDE"
+            if not (token.kind == "number" and stream[position + 1].kind == "symbol" and stream[position + 1].value in "+-"
                     and (position == 0 or stream[position - 1].kind == "symbol")):
+                continue
+            then = position + 2
+            while then < len(stream) and fs.is_symbol(stream[then], "("):
+                then += 1
+            ratio = then < len(stream) and stream[then].kind == "word" and stream[then].value.upper() == "DIVIDE"
+            if not ratio and then + 1 < len(stream) and stream[then].kind == "word" and fs.is_symbol(stream[then + 1], "("):
+                closer = fs.match_close(stream, then + 1)          # 1 - SUM ( x ) / ...
+                ratio = closer + 1 < len(stream) and fs.is_symbol(stream[closer + 1], "/")
+            if ratio:
                 add("M511", owner, "DAX of %s is written as a number plus or minus a ratio (such as 1 - x / y). "
                     "Microsoft's rule asks for one DIVIDE of the difference: it returns blank where the ratio does"
                     % label, level="warn", keys=keys)
