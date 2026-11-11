@@ -24,11 +24,11 @@
                       "Entity": "_Measures"
                     }
                   },
-                  "Property": "Sales per Order Line"
+                  "Property": "_Sales per Order Line"
                 }
               },
-              "queryRef": "_Measures.Sales per Order Line",
-              "nativeQueryRef": "Sales per Order Line"
+              "queryRef": "_Measures._Sales per Order Line",
+              "nativeQueryRef": "_Sales per Order Line"
             }
           ]
         }

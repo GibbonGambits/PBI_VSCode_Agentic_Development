@@ -1191,6 +1191,42 @@ def _more(context, rels, column_at, permissions, functions, direct_query):
                         "filter in a CALCULATETABLE around SUMMARIZECOLUMNS instead" % label, level="warn", keys=keys)
                     break
 
+    # ---- reports in more than one language
+    model_object = context["model_object"]
+    cultures = {o["name"].lower() for o in context["objects"] if o["kind"] == "cultureinfo"}
+    if model_object is not None and model_object["props"].get("culture"):
+        cultures.add(model_object["props"]["culture"].strip().lower())
+    for owner, parsed in context["expressions"]:
+        stream = parsed["tokens"]
+        label = _label(owner)
+        if any(call.name == "USERCULTURE" for call in parsed["calls"]):
+            home = owner.get("table")
+            fixed = (owner["kind"] == "partition"
+                     or (owner["kind"] == "column" and owner.get("calculated")
+                         and owner["props"].get("expressioncontext", "").lower() != "usercontext"))
+            if fixed and (home is None or home["name"] not in direct_query):
+                add("M524", owner, "DAX of %s calls USERCULTURE. In an imported calculated column or table the value is "
+                    "fixed when the data is refreshed, so it is not the reader's language: use a measure"
+                    % label, level="warn", keys=(label,))
+        for call in _calls(parsed, "SWITCH"):
+            if not call.args or not any(c.name == "USERCULTURE" and call.args[0][0] <= c.at < call.args[0][1]
+                                        for c in parsed["calls"]):
+                continue
+            problems = []
+            if len(call.args) % 2 == 1:
+                problems.append("it has no last value for every other language, so those readers see a blank")
+            named = [stream[span[0]].value for span in call.args[1::2]
+                     if span[1] - span[0] == 1 and stream[span[0]].kind == fs.TEXT
+                     and re.match(r"[A-Za-z]{2,3}-[A-Za-z]{2,4}\Z", stream[span[0]].value)]
+            lost = sorted({name for name in named if name.lower() not in cultures})
+            if lost:
+                problems.append("the model has no culture file for %s, so table and column names stay untranslated "
+                                "for those readers" % ", ".join(lost))
+            if problems:
+                add("M525", owner, "the SWITCH over USERCULTURE in %s: %s" % (label, "; ".join(problems)),
+                    level="warn", keys=(label,))
+                break
+
     # ---- user-defined functions
     hidden_tables, hidden_columns = set(), set()
     for permission in permissions:

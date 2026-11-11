@@ -128,6 +128,8 @@ Finding codes (errors unless marked warn or note; only errors change the exit co
     M521  (warn) CALCULATE written directly inside CALCULATE
     M522  (warn) SUMMARIZE that adds a new column
     M523  (warn) SUMMARIZECOLUMNS with a filter argument inside a measure
+    M524  (warn) USERCULTURE in an imported calculated column or calculated table
+    M525  (warn) SWITCH over USERCULTURE with no default value, or naming a culture that has no culture file
     M908  DAX names a Table[Column] the model does not have
     M909  (warn) DAX calls a function that is not in the DAX function index
 
@@ -198,6 +200,11 @@ Finding codes (errors unless marked warn or note; only errors change the exit co
     V016  (warn) visual type that Microsoft is retiring or has deprecated
     V017  (warn) image or other resource that is not registered or not in the report folder
     V018  (note) page with no text box for its title
+    V019  (warn) report-level measure that calls USERCULTURE
+    V020  (warn) typed text in a report on a model with translations (one finding for each report)
+    V021  (warn) more than one page tab in a report on a model with translations
+    V022  (warn) the report uses a preview feature that section 11 of the brief does not list (Gantt visual,
+          format string on a visual)
     A001  (warn) visuals without alt text (one finding for each page)
     A002  (warn) visuals that share a tab order number
     A003  (warn) visuals that show a title made up from field names (one finding for each page)

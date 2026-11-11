@@ -26,6 +26,7 @@ Checklist items are in `checklist/checklist.md`. Read only the items a step name
 | File layout, names, labels, `$schema`, a new visual, the shipped examples | `references/pages-and-visuals.md` | N00x, H00x, J00x, S001 |
 | Positions and sizes | `references/layout-standard.md` | G00x |
 | Field parameters, bookmarks and buttons, tooltip and drillthrough pages, sync slicers, conditional formatting, phone layout, chart choice, titles, filters, accessibility, page density | `references/report-standard.md` | V0xx, A00x, U1xx |
+| Features inside a visual and on a page: filter kinds, drilling, small multiples, totals, sparklines, analytics lines, more slicers and buttons, cross-report drillthrough; what has no file form | `references/visual-features.md` | V022 |
 | Colour, text sizes, header icons and tooltips | `references/theme.md` | H00x, V009, T001 |
 | Reloading and looking at pages yourself (optional) | `references/desktop-bridge.md` | - |
 

@@ -6,7 +6,7 @@
       "name": "_Measures",
       "measures": [
         {
-          "name": "Sales per Order Line",
+          "name": "_Sales per Order Line",
           "dataType": "Double",
           "expression": "DIVIDE ( [Total Sales], [# Order Lines] )",
           "formatString": "#,0.00",

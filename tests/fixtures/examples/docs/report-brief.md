@@ -74,13 +74,15 @@ The model standard is `.github/skills/pbi-semantic-model/references/model-standa
 | M408 | model | Shipped examples of a both-direction, a many-to-many and a one-to-one relationship in one small model |
 | M414 | model | Shipped examples of security roles and of an inactive relationship (ship date) in one model |
 | M607 | model | Shipped examples show a role with row rules and a role with object rules side by side; a real model puts both kinds in one role |
+| M411 | Region Choice | Shipped example of the table of values for a dynamic M query parameter; it only feeds the parameter, so it has no relationship |
 | M009 | [Store Page Link] | Shipped example of the data category WebUrl on a measure: the measure returns text, so it has no format string |
 
 ## 10. Exceptions to the layout standard
 
 | Code | Page | Visual | Reason |
 |---|---|---|---|
-| V012 | - | Sales per Order Line | Shipped example of a report-level measure; its name is kept so that the existing example and the index stay as they are |
+| V020 | - | - | The examples are in one language; the culture `nl-NL` is there only to show the file form of translations |
+| V021 | - | - | The examples are in one language; the culture `nl-NL` is there only to show the file form of translations |
 | V016 | AI_Visuals | AI_Visuals_RScript_StoreSales | Shipped example of the R visual, which Microsoft is retiring; it shows the file form only, and is not a model for new work |
 | V016 | AI_Visuals | AI_Visuals_PythonScript_StoreSales | Shipped example of the Python visual, which Microsoft is retiring; it shows the file form only, and is not a model for new work |
 
@@ -89,3 +91,8 @@ The model standard is `.github/skills/pbi-semantic-model/references/model-standa
 | Feature or tool | Agreed by | Date | Notes |
 |---|---|---|---|
 | calendar-based time intelligence | The template (shipped example) | 2026-11-11 | The example under `preview/` exists to show the form; a real project needs the developer's own yes |
+| value filter behavior | The template (shipped example) | 2026-11-11 | As above: `preview/ValueFilter.SemanticModel` shows the form only |
+| user-context calculated columns | The template (shipped example) | 2026-11-11 | As above: `preview/DirectLakeComposite.SemanticModel` shows the form only |
+| calculated tables over Direct Lake | The template (shipped example) | 2026-11-11 | As above: `preview/DirectLakeComposite.SemanticModel` shows the form only |
+| Gantt visual | The template (shipped example) | 2026-11-11 | As above: `Charts_Features_Gantt_ProductTasks` shows the form only |
+| format string on a visual | The template (shipped example) | 2026-11-11 | As above: `Tables_Features_Table_VisualFormatString` shows the form only |

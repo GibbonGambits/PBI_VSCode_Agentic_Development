@@ -394,6 +394,50 @@ class ClosingTheCoverage(ReportCase):
         self.assertNot("U104")
 
 
+    def test_V019_report_level_measure_that_calls_userculture_warns(self):
+        self.extension("_Double Sales")
+        self.assertNot("V019")
+        data = self.read_json(os.path.join(DEFINITION, "reportExtensions.json"))
+        data["entities"][0]["measures"][0]["expression"] = 'IF ( USERCULTURE () = "nl-NL", 1, 2 )'
+        self.write_json(os.path.join(DEFINITION, "reportExtensions.json"), data)
+        self.assertFinds("V019", "warn")
+
+    def culture(self):
+        path = os.path.join(self.root, "Sample.SemanticModel", "definition", "cultures", "nl-NL.tmdl")
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w", encoding="utf-8", newline="\n") as fh:
+            fh.write("cultureInfo nl-NL\n\ttranslations\n\t\tmodel Model\n\t\t\ttable Sales\n\t\t\t\tcaption: Verkoop\n")
+
+    def test_V020_V021_typed_text_and_page_tabs_in_a_translated_report_warn(self):
+        self.page("Detail")
+        self.visual("Detail", "Detail_Textbox_Title", kind="textbox")
+        self.assertNot("V020")
+        self.assertNot("V021")
+        self.culture()
+        self.assertFinds("V020", "warn")
+        self.assertFinds("V021", "warn")
+        brief = os.path.join(self.root, "docs", "report-brief.md")
+        os.makedirs(os.path.dirname(brief), exist_ok=True)
+        with open(brief, "a", encoding="utf-8") as fh:
+            fh.write("\n## 10. Exceptions to the layout standard\n\n| Code | Page | Visual | Reason |\n|---|---|---|---|\n"
+                     "| V020 | - | - | One language. |\n| V021 | - | - | One language. |\n")
+        self.assertNot("V020")
+        self.assertNot("V021")
+
+    def test_V022_report_preview_features_need_the_developers_yes(self):
+        self.visual("Overview", "Overview_Gantt_Tasks", kind="ganttChart")
+        self.assertFinds("V022", "warn")
+        brief = os.path.join(self.root, "docs", "report-brief.md")
+        os.makedirs(os.path.dirname(brief), exist_ok=True)
+        with open(brief, "a", encoding="utf-8") as fh:
+            fh.write("\n## 11. Preview features and optional tools the developer agreed to\n\n"
+                     "| Feature or tool | Agreed by | Date | Notes |\n|---|---|---|---|\n| Gantt visual | A. Developer | 2026-11-11 | made-up |\n")
+        self.assertNot("V022")
+        formatted = dict(SALES, format="#,0")
+        self.visual("Overview", "Overview_Table_Formatted", kind="tableEx", fields=[formatted])
+        self.assertFinds("V022", "warn")
+
+
 class Schema(ReportCase):
     def test_J003_property_that_is_not_in_microsofts_schema_fails(self):
         path = os.path.join(PAGES, "Overview", "page.json")

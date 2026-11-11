@@ -878,5 +878,31 @@ class ClosingTheCoverage(StarCase):
         self.assertNot("D003")
 
 
+    def test_M524_userculture_in_a_calculated_column_warns_and_a_measure_passes(self):
+        self.replace(STORE, "\tpartition Store = m", "\t/// Language at refresh time.\n\tcolumn 'Reader Language' = USERCULTURE ()\n"
+                     "\t\tdataType: string\n\t\tsummarizeBy: none\n\n\t\tannotation CalculatedReason = Made-up reason for a test.\n\n"
+                     "\tpartition Store = m")
+        self.assertFinds("M524", "warn")
+
+    LABEL = ('SWITCH (\n\t\t\t    USERCULTURE (),\n\t\t\t    "nl-NL",\n\t\t\t    "Verkoop"%s\n\t\t\t)')
+
+    def label(self, default):
+        text = ("\t/// Made-up label for a test.\n\tmeasure 'Sales Label' =\n\t\t\t" + self.LABEL % default
+                + "\n\t\tdisplayFolder: Finance\\Base\n\n")
+        self.replace(MEASURES, "\tcolumn Placeholder", text + "\tcolumn Placeholder")
+
+    def test_M525_label_without_a_default_warns(self):
+        self.write(os.path.join(DEFINITION, "cultures", "nl-NL.tmdl"), "cultureInfo nl-NL\n")
+        self.label("")
+        self.assertFinds("M525", "warn")
+        self.assertNot("M524")
+
+    def test_M525_label_naming_a_culture_without_a_file_warns(self):
+        self.label(',\n\t\t\t    "Sales"')
+        self.assertFinds("M525", "warn")
+        self.write(os.path.join(DEFINITION, "cultures", "nl-NL.tmdl"), "cultureInfo nl-NL\n")
+        self.assertNot("M525")
+
+
 if __name__ == "__main__":
     unittest.main()

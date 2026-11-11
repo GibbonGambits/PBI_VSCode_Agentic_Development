@@ -82,7 +82,7 @@ More rules:
 | V002, V003, V004, V005 | Item 65 |
 | A001, A002, A004 | Item 66 |
 | V006, V007 | Item 20 (V006 is Fail unless the brief gives the reason) |
-| M001-M004, M010, M108, M111, M116, M117, M301, M302, M303, M501, M503, M504, M506, M510, M511, M512, M516, M517-M523, M707, M709, M801, M802, M804, M805, M807, M831-M833, M841, M901-M910, P004, V011, V012, V015-V018, B001, B002, G008, C001, D003, P001, F002, F003, J001-J004, S001, N001-N005, H001, H002, U001, U002, U005, U105, and any other finding of `check_template.py` | Template rules, not checklist items. List them in the "Template rules" section of the report |
+| M001-M004, M010, M108, M111, M116, M117, M301, M302, M303, M501, M503, M504, M506, M510, M511, M512, M516, M517-M525, M707, M709, M801, M802, M804, M805, M807, M831-M833, M841, M901-M910, P004, V011, V012, V015-V022, B001, B002, G008, C001, D003, P001, F002, F003, J001-J004, S001, N001-N005, H001, H002, U001, U002, U005, U105, and any other finding of `check_template.py` | Template rules, not checklist items. List them in the "Template rules" section of the report |
 
 A warning or a note from the script is evidence, not a verdict: read the item and judge it by its own thresholds. Item 22 is judged by the checklist's thresholds; the two-level measure folders (M003, M004) are a template rule. A finding excused in section 9 or 10 of the brief counts as justified; quote the row.
 

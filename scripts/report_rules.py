@@ -502,6 +502,35 @@ def _reads_direct_query(cp, report_dir):
     return False
 
 
+def _projection_format(node):
+    """True when a field of a visual's query carries its own format string."""
+    if isinstance(node, dict):
+        projections = node.get("projections")
+        if isinstance(projections, list) and any(isinstance(p, dict) and isinstance(p.get("format"), str) for p in projections):
+            return True
+        return any(_projection_format(value) for value in node.values())
+    if isinstance(node, list):
+        return any(_projection_format(value) for value in node)
+    return False
+
+
+def _translated(cp, report_dir):
+    """True when the report's model is in this project and a culture file of it holds translations."""
+    model_dir = cp.report_model(report_dir)
+    folder = os.path.join(model_dir, "definition", "cultures") if model_dir else None
+    if not folder or not os.path.isdir(folder):
+        return False
+    for name in sorted(os.listdir(folder)):
+        if name.lower().endswith(".tmdl"):
+            try:
+                with open(os.path.join(folder, name), encoding="utf-8-sig") as handle:
+                    if re.search(r"(?m)^\s*translations\s*$", handle.read()):
+                        return True
+            except (OSError, UnicodeDecodeError):
+                continue
+    return False
+
+
 def _report_level(cp, report_dir, pages, brief, findings):
     """V012: a report-level measure without the prefix. V015 and V017 for report.json itself."""
     definition = os.path.join(report_dir, "definition")
@@ -520,6 +549,42 @@ def _report_level(cp, report_dir, pages, brief, findings):
                      "measures a report defines, so that a measure added to the model later can never have the same "
                      "name. Renaming one changes the visuals that use it" % (", ".join("[%s]" % n for n in bare), prefix),
                      level="warn")
+    if data is not None and "USERCULTURE" in str(data).upper() and not cp.layout_excused(brief, "V019", {"-"}, {"-"}):
+        findings.add("V019", path, 0, "a report-level measure calls USERCULTURE. Microsoft says it can return the wrong "
+                     "language there: write the measure in the model", level="warn")
+    if _translated(cp, report_dir):
+        typed, titled = [], 0
+        for page in pages:
+            for visual in page["visuals"]:
+                if visual["visual"].get("visualType") == "textbox":
+                    typed.append(visual["label"] or visual["name"])
+                if literal(card(visual["visual"], "title").get("text")) is not None:
+                    titled += 1
+        if (typed or titled) and not cp.layout_excused(brief, "V020", {"-"}, {"-"}):
+            findings.add("V020", os.path.join(definition, "report.json"), 0, "the model has translations, and this report "
+                         "holds typed text that Power BI never translates: %d text box(es) and %d typed visual title(s). "
+                         "Take such text from a label measure (multiple-languages.md), or list the reason in section 10 "
+                         "of the brief with '-' for the page and the visual" % (len(typed), titled), level="warn")
+        tabs = [p["page"].get("displayName") or p["name"] for p in pages
+                if p["page"].get("visibility") != "HiddenInViewMode"]
+        if len(tabs) > 1 and not cp.layout_excused(brief, "V021", {"-"}, {"-"}):
+            findings.add("V021", os.path.join(definition, "pages", "pages.json"), 0, "the model has translations, and "
+                         "this report shows %d page tabs. Tab names are never translated: Microsoft's design hides every "
+                         "page but one and moves between pages with buttons" % len(tabs), level="warn")
+    agreed = brief.get("agreed", [])
+    seen = {}
+    for page in pages:
+        for visual in page["visuals"]:
+            if visual["visual"].get("visualType") == "ganttChart":
+                seen.setdefault(("gantt",), ("the Gantt visual", visual))
+            if _projection_format(visual["visual"].get("query")):
+                seen.setdefault(("format string on a visual", "visual-level format"),
+                                ("a format string set on one visual (format on a field of the visual)", visual))
+    for words, (what, visual) in sorted(seen.items()):
+        if not any(word in name for word in words for name in agreed):
+            findings.add("V022", visual["path"], 0, "the report uses %s, which Microsoft still lists as a preview "
+                         "feature. A preview feature is used only after the developer's yes: add its row to section 11 "
+                         "of the brief (name it '%s')" % (what, words[0]), level="warn")
     report_path = os.path.join(definition, "report.json")
     report = cp.load_object(report_path) or {}
     lost = _lost_sources(report)
@@ -532,5 +597,4 @@ def _report_level(cp, report_dir, pages, brief, findings):
     if missing:
         findings.add("V017", report_path, 0, "report.json registers the resource file(s) %s, which are not in "
                      "StaticResources/RegisteredResources" % ", ".join(missing), level="warn")
-    del pages
 

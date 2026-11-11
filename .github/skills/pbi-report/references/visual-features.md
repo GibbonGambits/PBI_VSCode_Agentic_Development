@@ -9,7 +9,7 @@ How to read a block:
 - **Use** says when Microsoft points to the feature, with the page address. **Limits** are the limits Microsoft lists there.
 - **Stored** gives the property names, copied exactly, and the schema (copies in `scripts/schemas`) or Microsoft source that gives them.
 - **Copy** names the shipped example: a page folder under `tests/fixtures/examples/Examples.Report/definition/pages/` and the visual's name. "Set it in Power BI Desktop" means no Microsoft source gives the file form.
-- **Status** is Microsoft's release status. A preview feature is used only after the developer's yes, written in section 11 of `docs/report-brief.md`.
+- **Status** is Microsoft's release status; a block that names none is generally available. A preview feature is used only after the developer's yes, written in section 11 of `docs/report-brief.md`.
 - **Check** names what `python scripts/check_project.py .` reads, when a check exists.
 
 ## A. Filters
@@ -73,7 +73,7 @@ How to read a block:
     - Copy: `Tables_Features_Table_TotalsOffWidths` (total off) and `Tables_Features_Matrix_ProductHierarchy` (row subtotals on, column subtotals off).
 16. **Column widths** (B41, B42, B43). Fix a width only when a column must not move; otherwise leave the automatic sizing. Source: https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-tables
     - Limits: a width a reader drags lasts for that session only.
-    - Stored: `columnHeaders.columnAdjustment` `'fixedWidth'` with `autoSizeColumnWidth` false, then one `columnWidth` entry per column with `value` and a `metadata` selector naming the column's queryRef. `'growToFit'` and `'fitToContent'` are the automatic choices (table.md of Microsoft's skill). A width cannot follow data. Freezing matrix row headers (`rowHeaders.unfrozen` in the catalogue) has no source that shows it: set it in Power BI Desktop.
+    - Stored: `columnHeaders.columnAdjustment` `'fixedWidth'` with `autoSizeColumnWidth` false, then one `columnWidth` entry per column with `value` and a `metadata` selector naming the column's queryRef. `'growToFit'` and `'fitToContent'` are the automatic choices (table.md of Microsoft's skill). The Learn page also describes a width driven by a measure; Microsoft's skill says its validator rejects a data-bound width, so never write one by hand. Freezing matrix row headers (`rowHeaders.unfrozen` in the catalogue) has no source that shows it: set it in Power BI Desktop.
     - Copy: `Tables_Features_Table_TotalsOffWidths`.
 17. **Sparklines** (B46). A small trend line inside each row of a table or matrix. Source: https://learn.microsoft.com/en-us/power-bi/create-reports/power-bi-sparklines-tables
     - Limits: at most five per visual and 52 points each; a matrix with sparklines takes at most 25 columns; not on on-premises Analysis Services; such a visual cannot be pinned.
@@ -134,6 +134,7 @@ How to read a block:
 ## G. Bookmarks and pages
 
 31. **Spotlight in a bookmark** (B86). Fades every other visual of the page. Source: https://learn.microsoft.com/en-us/power-bi/explore-reports/end-user-spotlight
+    - Limits: readers set a spotlight in the Power BI service; a bookmark captured with it keeps it.
     - Stored: in the bookmark, `singleVisual.display.mode` `spotlight` (schema `bookmark` 2.1.0).
     - Copy: `tests/fixtures/examples/Examples.Report/definition/bookmarks/Bookmark_SpotlightChart.bookmark.json`. Check: V010 reports a bookmark that holds a visual or page that is gone.
 32. **Bookmark groups and navigators** (FR23). A group lets one bookmark navigator show only its bookmarks. Source: https://learn.microsoft.com/en-us/power-bi/create-reports/button-navigators
