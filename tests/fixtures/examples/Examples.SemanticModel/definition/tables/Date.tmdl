@@ -1,0 +1,89 @@
+/// Example of a marked date table (data category Time, key column Date). One row per calendar day. Made-up data.
+table Date
+	dataCategory: Time
+
+	/// The calendar day.
+	column Date
+		dataType: dateTime
+		isKey
+		formatString: Short Date
+		summarizeBy: none
+		sourceColumn: Date
+
+	column 'Date Key'
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: Date Key
+
+	/// Calendar year.
+	column Year
+		dataType: int64
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: Year
+
+	/// Calendar quarter, Q1 to Q4.
+	column Quarter
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Quarter
+
+	/// Example of a sort-by column: the month name sorts by Month Number.
+	column 'Month Name'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Month Name
+		sortByColumn: 'Month Number'
+
+	column 'Month Number'
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: Month Number
+
+	/// Example of a second sort-by column: the weekday name sorts by Weekday Number.
+	column 'Weekday Name'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Weekday Name
+		sortByColumn: 'Weekday Number'
+
+	column 'Weekday Number'
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: Weekday Number
+
+	/// Example of a hierarchy with levels: year, quarter, month, day.
+	hierarchy Calendar
+
+		level Year
+			column: Year
+
+		level Quarter
+			column: Quarter
+
+		level Month
+			column: 'Month Name'
+
+		level Day
+			column: Date
+
+	partition Date = m
+		mode: import
+		source =
+				let
+				    // Build a small made-up calendar.
+				    Source = #table(
+				        type table [Date = date, #"Date Key" = Int64.Type, Year = Int64.Type, Quarter = text, #"Month Name" = text, #"Month Number" = Int64.Type, #"Weekday Name" = text, #"Weekday Number" = Int64.Type],
+				        {
+				            {#date(2024, 1, 5), 20240105, 2024, "Q1", "January", 1, "Friday", 5},
+				            {#date(2024, 1, 8), 20240108, 2024, "Q1", "January", 1, "Monday", 1},
+				            {#date(2024, 2, 12), 20240212, 2024, "Q1", "February", 2, "Monday", 1},
+				            {#date(2024, 2, 14), 20240214, 2024, "Q1", "February", 2, "Wednesday", 3}
+				        }
+				    )
+				in
+				    Source
+

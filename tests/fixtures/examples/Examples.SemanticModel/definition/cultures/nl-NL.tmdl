@@ -1,0 +1,14 @@
+cultureInfo nl-NL
+	translations
+		model Model
+			table Date
+				caption: Datum
+			table Store
+				caption: Winkel
+				column 'Store Name'
+					caption: Winkelnaam
+			table _Measures
+				measure 'Total Sales'
+					caption: Totale verkoop
+					description: Som van de bedragen van de orderregels.
+

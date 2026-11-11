@@ -1,0 +1,7 @@
+/// Example of object-level security on a whole table: the table Sales Target is hidden from this role.
+role 'No Sales Targets'
+	modelPermission: read
+
+	tablePermission 'Sales Target'
+		metadataPermission: none
+

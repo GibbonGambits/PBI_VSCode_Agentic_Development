@@ -1,0 +1,14 @@
+/// Example of a user-defined function with typed parameters: returns the amount including tax; the rate is optional and is 0.21 when left out.
+function AddTax = ( amount : NUMERIC, taxRate : NUMERIC = 0.21 ) => amount * ( 1 + taxRate )
+
+/// Example of a user-defined function that takes a measure reference and a column reference: the measure as a share of its value with no filter on the column.
+function ShareOfAll =
+		( measureToShare : MEASUREREF, filterColumn : COLUMNREF ) =>
+		    DIVIDE (
+		        measureToShare,
+		        CALCULATE (
+		            measureToShare,
+		            REMOVEFILTERS ( filterColumn )
+		        )
+		    )
+

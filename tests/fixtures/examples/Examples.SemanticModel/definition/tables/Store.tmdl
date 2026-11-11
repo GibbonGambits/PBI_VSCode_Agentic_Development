@@ -1,0 +1,67 @@
+/// Example of a dimension table with data categories (City, WebUrl), column display folders, an annotation and an extended property. One row per store. Made-up data.
+table Store
+
+	column 'Store Key'
+		dataType: int64
+		isHidden
+		isKey
+		summarizeBy: none
+		sourceColumn: Store Key
+
+	/// Name of the store.
+	column 'Store Name'
+		dataType: string
+		displayFolder: Attributes
+		summarizeBy: none
+		sourceColumn: Store Name
+
+	/// Example of the data category City: the city the store is in.
+	column City
+		dataType: string
+		displayFolder: Attributes
+		dataCategory: City
+		summarizeBy: none
+		sourceColumn: City
+
+	/// Region the store belongs to.
+	column Region
+		dataType: string
+		displayFolder: Attributes
+		summarizeBy: none
+		sourceColumn: Region
+
+	/// Example of the data category WebUrl: web address of the store page.
+	column 'Store Page'
+		dataType: string
+		displayFolder: Links
+		dataCategory: WebUrl
+		summarizeBy: none
+		sourceColumn: Store Page
+
+	column 'Manager Email'
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: Manager Email
+
+	partition Store = m
+		mode: import
+		source =
+				let
+				    // Build a small made-up list of stores.
+				    Source = #table(
+				        type table [#"Store Key" = Int64.Type, #"Store Name" = text, City = text, Region = text, #"Store Page" = text, #"Manager Email" = text],
+				        {
+				            {1, "Harbour Shop", "Northport", "North", "https://www.example.com/stores/1", "manager1@example.com"},
+				            {2, "Market Shop", "Northport", "North", "https://www.example.com/stores/2", "manager2@example.com"}
+				        }
+				    ),
+				    // Keep the stores of the region that the Store Region parameter names.
+				    #"Kept Region" = Table.SelectRows(Source, each [Region] = #"Store Region")
+				in
+				    #"Kept Region"
+
+	extendedProperty ExampleSettings = {"purpose":"example"}
+
+	annotation ExampleSource = Made-up store register
+

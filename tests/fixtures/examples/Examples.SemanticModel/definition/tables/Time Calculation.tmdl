@@ -1,0 +1,57 @@
+/// Example of a calculation group: shows any measure as current, year to date, prior year or change against prior year.
+table 'Time Calculation'
+
+	/// Example of a calculation group with a precedence.
+	calculationGroup
+		precedence: 10
+
+		/// The measure as it is.
+		calculationItem Current = SELECTEDMEASURE ()
+
+		/// The measure from the start of the year to the last day shown.
+		calculationItem YTD =
+				CALCULATE (
+				    SELECTEDMEASURE (),
+				    DATESYTD ( 'Date'[Date] )
+				)
+
+		/// The measure in the same period one year earlier.
+		calculationItem PY =
+				CALCULATE (
+				    SELECTEDMEASURE (),
+				    SAMEPERIODLASTYEAR ( 'Date'[Date] )
+				)
+
+		/// Example of a calculation item with a format string expression: change against the same period one year earlier, as a percentage.
+		calculationItem 'PY Change (%)' =
+				VAR CurrentValue = SELECTEDMEASURE ()
+				VAR PriorValue =
+				    CALCULATE (
+				        SELECTEDMEASURE (),
+				        SAMEPERIODLASTYEAR ( 'Date'[Date] )
+				    )
+				RETURN
+				    DIVIDE (
+				        CurrentValue - PriorValue,
+				        PriorValue
+				    )
+
+			formatStringDefinition = "0.0%"
+
+	/// The calculation to apply to the measures shown.
+	column 'Time Calculation'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Name
+		sortByColumn: Ordinal
+
+	column Ordinal
+		dataType: int64
+		isHidden
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: Ordinal
+
+	partition 'Time Calculation' = calculationGroup
+		mode: import
+

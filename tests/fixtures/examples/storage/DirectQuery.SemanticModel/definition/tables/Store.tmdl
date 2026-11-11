@@ -1,0 +1,27 @@
+/// Example of a Dual storage mode dimension: one row per store. Made-up source.
+table Store
+
+	column 'Store Key'
+		dataType: int64
+		isHidden
+		isKey
+		summarizeBy: none
+		sourceColumn: Store Key
+
+	/// Name of the store.
+	column 'Store Name'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Store Name
+
+	partition Store = m
+		mode: dual
+		source =
+				let
+				    // Connect to the made-up shop database.
+				    Source = Sql.Database("sql.example.com", "Shop"),
+				    // Pick the store view.
+				    Data = Source{[Schema="dbo",Item="Store"]}[Data]
+				in
+				    Data
+

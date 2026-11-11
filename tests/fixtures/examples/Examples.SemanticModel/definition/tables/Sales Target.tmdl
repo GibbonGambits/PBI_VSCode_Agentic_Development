@@ -1,0 +1,26 @@
+/// Example of a hidden table and of a many-to-many relationship: one row per product category with its sales target. Made-up data.
+table 'Sales Target'
+	isHidden
+
+	column Category
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: Category
+
+	column 'Target Amount'
+		dataType: decimal
+		isHidden
+		formatString: #,0.00
+		summarizeBy: none
+		sourceColumn: Target Amount
+
+	partition 'Sales Target' = m
+		mode: import
+		source =
+				let
+				    // Build a small made-up list of sales targets per category.
+				    Source = #table(type table [Category = text, #"Target Amount" = Currency.Type], {{"Garden", 500.00}})
+				in
+				    Source
+

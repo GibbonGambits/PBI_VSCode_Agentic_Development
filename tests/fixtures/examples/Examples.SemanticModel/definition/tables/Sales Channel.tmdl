@@ -1,0 +1,22 @@
+/// Example of a calculated table: one row per sales channel.
+table 'Sales Channel'
+
+	column 'Channel Key'
+		dataType: int64
+		isHidden
+		isKey
+		summarizeBy: none
+		sourceColumn: [Channel Key]
+
+	/// How the order was placed: in a store or online.
+	column Channel
+		dataType: string
+		summarizeBy: none
+		sourceColumn: [Channel]
+
+	partition 'Sales Channel' = calculated
+		mode: import
+		source = DATATABLE ( "Channel Key", INTEGER, "Channel", STRING, { { 1, "Store" }, { 2, "Online" } } )
+
+	annotation CalculatedReason = Shipped example of a calculated table: a fixed list of two channels written with DATATABLE.
+

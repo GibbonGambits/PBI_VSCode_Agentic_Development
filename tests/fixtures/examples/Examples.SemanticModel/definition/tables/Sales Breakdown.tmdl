@@ -1,0 +1,38 @@
+/// Example of a field parameter over two columns: lets a reader pick the column a visual groups by.
+table 'Sales Breakdown'
+
+	/// The column a reader picks to group by.
+	column 'Sales Breakdown'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: [Value1]
+		sortByColumn: 'Sales Breakdown Order'
+
+		relatedColumnDetails
+			groupByColumn: 'Sales Breakdown Fields'
+
+	column 'Sales Breakdown Fields'
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: [Value2]
+		sortByColumn: 'Sales Breakdown Order'
+
+		extendedProperty ParameterMetadata = {"version":3,"kind":2}
+
+	column 'Sales Breakdown Order'
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: [Value3]
+
+	partition 'Sales Breakdown' = calculated
+		mode: import
+		source =
+				{
+				    ("Store", NAMEOF('Store'[Store Name]), 0),
+				    ("Category", NAMEOF('Product'[Category]), 1)
+				}
+
+	annotation CalculatedReason = Shipped example of a field parameter over columns; Power BI Desktop makes a field parameter as a calculated table.
+

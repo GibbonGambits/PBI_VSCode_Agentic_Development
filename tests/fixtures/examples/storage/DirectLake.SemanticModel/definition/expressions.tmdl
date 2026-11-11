@@ -1,0 +1,14 @@
+/// Example of the shared expression that Direct Lake partitions point to (Direct Lake on OneLake).
+expression 'DirectLake - Shop' =
+		let
+		    // Connect to the OneLake folder of the made-up lakehouse.
+		    Source = AzureStorage.DataLake("https://onelake.dfs.fabric.microsoft.com/" & WorkspaceId & "/" & LakehouseId, [HierarchicalNavigation = true])
+		in
+		    Source
+
+/// Example of a text parameter: ID of the workspace that holds the lakehouse.
+expression WorkspaceId = "00000000-0000-0000-0000-000000000000" meta [IsParameterQuery = true, IsParameterQueryRequired = true, Type = "Text"]
+
+/// Example of a text parameter: ID of the lakehouse.
+expression LakehouseId = "00000000-0000-0000-0000-000000000000" meta [IsParameterQuery = true, IsParameterQueryRequired = true, Type = "Text"]
+

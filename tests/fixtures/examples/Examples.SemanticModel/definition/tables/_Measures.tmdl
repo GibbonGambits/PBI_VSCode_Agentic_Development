@@ -1,0 +1,152 @@
+/// Holds every measure of the model. Example of the measure table in its import form (an entered table).
+table _Measures
+
+	/// Example of a base measure: sum of the order line amounts.
+	measure 'Total Sales' = SUM ( Sales[Amount] )
+		formatString: #,0.00
+		displayFolder: Finance\Base
+
+	/// Example of a count and of a detail rows expression: number of order lines.
+	measure '# Order Lines' = COUNTROWS ( Sales )
+		formatString: #,0
+		displayFolder: Finance\Counts
+
+		detailRowsDefinition =
+				SELECTCOLUMNS (
+				    Sales,
+				    Sales[Order Date],
+				    Sales[Quantity],
+				    Sales[Amount]
+				)
+
+	/// Example of a ratio with DIVIDE: average amount of one order line.
+	measure 'Average Line Amount' =
+			DIVIDE (
+			    [Total Sales],
+			    [# Order Lines]
+			)
+		formatString: #,0.00
+		displayFolder: Finance\Ratios
+
+	/// Example of time intelligence: total sales from the start of the year to the last day shown.
+	measure 'Total Sales YTD' =
+			CALCULATE (
+			    [Total Sales],
+			    DATESYTD ( 'Date'[Date] )
+			)
+		formatString: #,0.00
+		displayFolder: Finance\Time Intelligence
+
+	/// Example of time intelligence: total sales in the same period one year earlier.
+	measure 'Total Sales PY' =
+			CALCULATE (
+			    [Total Sales],
+			    SAMEPERIODLASTYEAR ( 'Date'[Date] )
+			)
+		formatString: #,0.00
+		displayFolder: Finance\Time Intelligence
+
+	/// Example of VAR and RETURN: change of total sales against the same period one year earlier.
+	measure 'Total Sales vs PY (%)' =
+			VAR CurrentSales = [Total Sales]
+			VAR PriorSales = [Total Sales PY]
+			RETURN
+			    DIVIDE (
+			        CurrentSales - PriorSales,
+			        PriorSales
+			    )
+		formatString: 0.0%
+		displayFolder: Finance\Comparisons
+
+	/// Example of USERELATIONSHIP with an inactive relationship (a role-playing date): total sales by the day the order shipped.
+	measure 'Total Sales by Ship Date' =
+			CALCULATE (
+			    [Total Sales],
+			    USERELATIONSHIP (
+			        Sales[Ship Date Key],
+			        'Date'[Date Key]
+			    )
+			)
+		formatString: #,0.00
+		displayFolder: Finance\Base
+
+	/// Sum of the sales targets of the categories shown.
+	measure 'Total Target' = SUM ( 'Sales Target'[Target Amount] )
+		formatString: #,0.00
+		displayFolder: Finance\Base
+
+	/// Example of a KPI: total sales as a share of the sales target.
+	measure 'Total Sales vs Target (%)' =
+			DIVIDE (
+			    [Total Sales],
+			    [Total Target]
+			)
+		formatString: 0.0%
+		displayFolder: Finance\Comparisons
+
+		/// Example of a KPI: on target at 100 percent or more.
+		kpi
+			targetExpression = 1
+			statusGraphic: Traffic Light - Single
+			statusExpression =
+				IF (
+				    [Total Sales vs Target (%)] >= 1,
+				    1,
+				    -1
+				)
+
+	/// Example of the selected-value measure of a numeric range (what-if) parameter: the discount chosen, 0 when none or several are chosen.
+	measure 'Discount Percentage Value' =
+			SELECTEDVALUE (
+			    'Discount Percentage'[Discount Percentage],
+			    0
+			)
+		formatString: 0%
+		displayFolder: Finance\Base
+
+	/// Example of a dynamic format string: total sales less the chosen discount, shown in K or M when large.
+	measure 'Total Sales After Discount' = [Total Sales] * ( 1 - [Discount Percentage Value] )
+		displayFolder: Finance\Base
+
+		formatStringDefinition =
+				SWITCH (
+				    TRUE (),
+				    SELECTEDMEASURE () < 1000, "#,0",
+				    SELECTEDMEASURE () < 1000000, "#,0,.0K",
+				    "#,0,,.0M"
+				)
+
+	/// Example of a measure that calls a user-defined function: total sales including tax.
+	measure 'Total Sales with Tax' = AddTax ( [Total Sales] )
+		formatString: #,0.00
+		displayFolder: Finance\Base
+
+	/// Example of a user-defined function with a measure and a column reference: share of the store in the sales of all stores.
+	measure 'Store Share of Sales (%)' =
+			ShareOfAll (
+			    [Total Sales],
+			    Store[Store Name]
+			)
+		formatString: 0.0%
+		displayFolder: Finance\Ratios
+
+	/// Example of the data category WebUrl on a measure: web address of the store page when one store is shown.
+	measure 'Store Page Link' = SELECTEDVALUE ( Store[Store Page] )
+		displayFolder: Customer\Base
+		dataCategory: WebUrl
+
+	column Placeholder
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: Placeholder
+
+	partition _Measures = m
+		mode: import
+		source =
+				let
+				    // An empty one-column table: it only holds the measures.
+				    Source = #table(type table [Placeholder = text], {})
+				in
+				    Source
+
