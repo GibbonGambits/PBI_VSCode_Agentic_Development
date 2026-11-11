@@ -23,6 +23,9 @@ TOOLTIP_FIELDS = 3                  # checklist item 65
 ALT_TEXT_LIMIT = 250                # Microsoft Learn, "Design Power BI reports for accessibility"
 DENSITY_REVIEW = 13                 # checklist item 20: 13 to 16 visuals = review
 DENSITY_LIMIT = 16                  # checklist item 20: more than 16 = justification required
+TABLE_TYPES = frozenset(("tableEx", "pivotTable"))
+BIG_TABLE_SHARE = 1.0 / 3           # checklist item 20 counts a "dominant large" table or matrix twice; this template
+                                    # reads that as one that covers a third of the page or more
 NO_DATA_TYPES = frozenset(("textbox", "shape", "basicShape", "image", "actionButton", "pageNavigator",
                            "bookmarkNavigator"))
 INTERACTIVE_TYPES = frozenset(("slicer", "advancedSlicerVisual", "listSlicer", "textSlicer", "actionButton",
@@ -179,14 +182,26 @@ def check(cp, report_dir, brief, findings):
                 add("V005", page, None, "tooltip page '%s' shows %d field(s); the checklist expects a report page "
                     "tooltip to add three or more facts beyond the value hovered over" % (title, len(used)))
         else:
-            active = [v for v, kind in types if isinstance(v["visual"].get("query"), dict) and v["data"].get("isHidden") is not True]
-            if len(active) > DENSITY_LIMIT:
-                add("V006", page, None, "page '%s' has %d visuals that show data; the checklist asks for a written "
+            active = [(v, kind) for v, kind in types
+                      if isinstance(v["visual"].get("query"), dict) and v["data"].get("isHidden") is not True]
+            count = len(active)
+            area = page["page"].get("width", 0) * page["page"].get("height", 0) if all(
+                cp._is_number(page["page"].get(k)) for k in ("width", "height")) else 0
+            big = []
+            for visual, kind in active:
+                position = visual["data"].get("position") if isinstance(visual["data"].get("position"), dict) else {}
+                if (kind in TABLE_TYPES and area and cp._is_number(position.get("width")) and cp._is_number(position.get("height"))
+                        and position["width"] * position["height"] >= area * BIG_TABLE_SHARE):
+                    big.append(shown(visual))
+            count += len(big)
+            twice = " (%s counted twice: a large table or matrix)" % ", ".join(big) if big else ""
+            if count > DENSITY_LIMIT:
+                add("V006", page, None, "page '%s' has %d visuals that show data%s; the checklist asks for a written "
                     "reason above %d. Split the page, or list the reason in section 10 of the brief"
-                    % (title, len(active), DENSITY_LIMIT), level="error")
-            elif len(active) >= DENSITY_REVIEW:
-                add("V007", page, None, "page '%s' has %d visuals that show data; the checklist asks for a review "
-                    "from %d" % (title, len(active), DENSITY_REVIEW))
+                    % (title, count, twice, DENSITY_LIMIT), level="error")
+            elif count >= DENSITY_REVIEW:
+                add("V007", page, None, "page '%s' has %d visuals that show data%s; the checklist asks for a review "
+                    "from %d" % (title, count, twice, DENSITY_REVIEW))
 
         for visual, (kind, link) in actions:
             for wanted, key, target in LINK_TARGETS:
@@ -216,7 +231,7 @@ def check(cp, report_dir, brief, findings):
                     % (shown(visual), ", ".join(sorted(found)[:6]) + (" ..." if len(found) > 6 else "")))
             has_data = isinstance(body.get("query"), dict)
             general = card(body, "general")
-            if (has_data and visual["data"].get("isHidden") is not True and "altText" not in general
+            if ((has_data or kind == "image") and visual["data"].get("isHidden") is not True and "altText" not in general
                     and not excused("A001", page, visual)):
                 no_alt.append(shown(visual))
             alt = literal(general.get("altText"))
@@ -235,7 +250,8 @@ def check(cp, report_dir, brief, findings):
 
         if no_alt:
             add("A001", page, None, "page '%s': %d visual(s) have no alt text: %s. Microsoft's accessibility checklist "
-                "asks for alt text on every visual that is not decoration: say what the visual shows (general.altText)"
+                "asks for alt text on every visual that is not decoration: say what the visual shows (general.altText). "
+                "An image that is only decoration is listed in section 10 of the brief instead"
                 % (title, len(no_alt), ", ".join(no_alt[:10]) + (" ..." if len(no_alt) > 10 else "")))
         if made_up:
             add("A003", page, None, "page '%s': %d visual(s) show a title Power BI makes up from field names: %s. "

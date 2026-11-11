@@ -147,6 +147,17 @@ class Pages(ReportCase):
             self.visual("Busy", "Busy_Card_N%d" % number, fields=[SALES], x=24 + number * 8)
         self.assertFinds("V006", False)
 
+    def test_V007_large_table_counts_as_two(self):
+        self.page("Busy")
+        for number in range(11):
+            self.visual("Busy", "Busy_Card_N%d" % number, fields=[SALES], x=24 + number * 8)
+        path = self.visual("Busy", "Busy_Table_Orders", kind="tableEx", fields=[SALES])
+        self.assertNot("V007")                                   # 12 visuals
+        data = self.read_json(path)
+        data["position"].update({"width": 800, "height": 400})   # over a third of 1280 x 720
+        self.write_json(path, data)
+        self.assertFinds("V007", "warn")                         # counted as 13
+
     def test_V006_is_excused_by_a_row_in_the_brief(self):
         self.page("Busy")
         for number in range(17):
@@ -201,6 +212,10 @@ class Accessibility(ReportCase):
         self.visual("Overview", "Overview_Card_Bare", fields=[SALES], described=False)
         self.assertFinds("A001", "warn")
         self.assertFinds("A003", "warn")
+
+    def test_A001_image_without_alt_text_warns(self):
+        self.visual("Overview", "Overview_Image_Logo", kind="image")
+        self.assertFinds("A001", "warn")
 
     def test_described_visual_passes_and_a_shape_needs_nothing(self):
         self.visual("Overview", "Overview_Card_Clear", fields=[SALES])
