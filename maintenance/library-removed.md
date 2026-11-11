@@ -14,11 +14,11 @@ The library started from 2,318 notes drawn from public SQLBI articles. Notes wer
 |---|---:|
 | 1. Outdated | 35 |
 | 2. Conflicts with the checklist | 19 |
-| 3. The repository already says it | 72 |
+| 3. The repository already says it | 81 |
 | 4. Not adopted: a higher source says otherwise | 21 |
 | 5. Duplicate in another topic | 0 |
-| Kept in the library | 1205 |
-| Not yet decided | 966 |
+| Kept in the library | 1346 |
+| Not yet decided | 816 |
 
 | Note | Group | Covered by |
 |---|---|---|
@@ -152,7 +152,16 @@ The library started from 2,318 notes drawn from public SQLBI articles. Notes wer
 | T09-A237-4 | 4 | `.github/skills/pbi-semantic-model/references/storage-and-security.md`, rule 23 |
 | T10-A279-9 | 4 | `.github/skills/pbi-report/references/report-standard.md`, rule 36 |
 | T10-A297-6 | 4 | `.github/skills/pbi-semantic-model/references/storage-and-security.md`, rule 29 |
+| T11-A159-2 | 3 | `.github/skills/pbi-semantic-model/references/model-objects.md`, section B, rule 5 (M813) |
+| T11-A210-1 | 3 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rule 7 |
+| T11-A210-2 | 3 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rule 7 |
+| T11-A248-1 | 3 | `.github/skills/pbi-report/references/report-standard.md`, rules 2 to 5 |
+| T11-A248-2 | 3 | `.github/skills/pbi-semantic-model/references/model-objects.md`, section C, rule 3 |
+| T11-A248-6 | 3 | `.github/skills/pbi-semantic-model/references/model-objects.md`, section C, rule 2 |
 | T11-A268-2 | 2 | `checklist/checklist.md`, item 12 |
+| T11-A332-1 | 3 | `.github/skills/pbi-semantic-model/references/model-objects.md`, section B, rule 6 |
+| T11-A340-4 | 3 | `.github/skills/pbi-semantic-model/references/model-objects.md`, section B, rule 6 |
+| T13-A344-3 | 3 | `.github/skills/pbi-semantic-model/references/model-objects.md`, section A, rule 5 |
 | T14-A015-1 | 1 | - |
 | T14-A015-3 | 2 | `checklist/checklist.md`, item 14 |
 | T14-A149-6 | 1 | - |
