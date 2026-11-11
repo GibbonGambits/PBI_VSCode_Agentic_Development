@@ -15,7 +15,8 @@ Updated at every commit, so that a stop loses nothing.
 | T02 DAX authoring style | Compared with the repository, rewritten, rendered |
 | T03 DAX table functions and queries | Compared with the repository, rewritten, rendered |
 | T05 Relationships and filter propagation | Compared with the repository, rewritten, rendered |
-| The other thirteen topics | Not yet done |
+| T01 DAX evaluation context | Compared with the repository, rewritten, rendered |
+| The other twelve topics | Not yet done |
 | Duplicates across topics | Not yet done |
 | Index, tests, README, notices, evals | Index started; the rest not yet done |
 | Two read-only reviews | Not yet done |
