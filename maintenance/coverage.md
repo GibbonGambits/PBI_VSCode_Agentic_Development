@@ -1,6 +1,6 @@
 # Coverage
 
-This working paper proves, row by row, how far the template covers the native practices of Power BI. It lists one row per practice from five baselines, and says where the template covers each one. Built on 11 November 2026 from the research of that day. It is a maintenance paper: Copilot does not read this folder (`.github/copilot-instructions.md`).
+This working paper proves, row by row, how far the template covers the native practices of Power BI. It lists one row per practice from five baselines, and says where the template covers each one. Built on 11 November 2026 from the research of that day, and brought up to date with the repository later that day. It is a maintenance paper: Copilot does not read this folder (`.github/copilot-instructions.md`).
 
 ## Status words
 
@@ -36,12 +36,15 @@ Follow the routine at the top of `scripts/refresh_sources.py`: run `python scrip
 | DE | `.github/skills/pbi-semantic-model/references/descriptions.md` |
 | DF | `.github/skills/pbi-semantic-model/references/data-facts.md` |
 | FX | `.github/skills/pbi-semantic-model/references/dax-functions.md` |
+| MF | `.github/skills/pbi-semantic-model/references/more-model-features.md` |
+| ML | `.github/skills/pbi-semantic-model/references/multiple-languages.md` |
 | SR | `.github/skills/pbi-report/SKILL.md` |
 | RS | `.github/skills/pbi-report/references/report-standard.md` |
 | LS | `.github/skills/pbi-report/references/layout-standard.md` |
 | PV | `.github/skills/pbi-report/references/pages-and-visuals.md` |
 | TH | `.github/skills/pbi-report/references/theme.md` |
 | DB | `.github/skills/pbi-report/references/desktop-bridge.md` |
+| VF | `.github/skills/pbi-report/references/visual-features.md` |
 | CR | `.github/skills/pbi-checklist-review/SKILL.md` |
 | NF | `.github/skills/pbi-checklist-review/references/native-features.md` |
 | LK | `.github/skills/pbi-lookup/SKILL.md` |
@@ -53,20 +56,20 @@ A number after a short name is the rule number in that file (MS 7 is rule 7 of t
 
 | Baseline | covered | out of scope | outside this template | not adopted | soft | missing | Rows |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| A. Guidance index pages | 14 | 111 | 10 | 0 | 5 | 20 | 160 |
-| A2. Practices on the in-scope pages | 150 | 5 | 27 | 0 | 14 | 20 | 216 |
-| B. DAX best-practice pages | 7 | 0 | 1 | 0 | 2 | 1 | 11 |
-| C. Best practice rules | 64 | 0 | 1 | 4 | 2 | 0 | 71 |
-| D. Other sources, topic by topic | 131 | 6 | 6 | 23 | 14 | 9 | 189 |
-| E. Mofaji/Agentic-PBIP-Template | 48 | 8 | 0 | 7 | 2 | 4 | 69 |
+| A. Guidance index pages | 36 | 111 | 10 | 0 | 3 | 0 | 160 |
+| A2. Practices on the in-scope pages | 201 | 5 | 27 | 0 | 3 | 0 | 236 |
+| B. DAX best-practice pages | 9 | 0 | 1 | 0 | 1 | 0 | 11 |
+| C. Best practice rules | 66 | 0 | 1 | 4 | 0 | 0 | 71 |
+| D. Other sources, topic by topic | 150 | 6 | 6 | 23 | 4 | 0 | 189 |
+| E. Mofaji/Agentic-PBIP-Template | 53 | 8 | 0 | 7 | 0 | 1 | 69 |
 | F. The owner's minimum list | 56 | 0 | 1 | 0 | 0 | 0 | 57 |
-| **Total** | **470** | **130** | **46** | **34** | **39** | **54** | **773** |
+| **Total** | **571** | **130** | **46** | **34** | **11** | **1** | **793** |
 
 A and B count pages; A2 counts the practices on the in-scope pages of A and on the three DAX best-practice pages outside the index, so B repeats the DAX practices page by page. Rows still open: section G.
 
 ## A. Microsoft Learn: Power BI guidance pages
 
-All 160 links of the table of contents of https://learn.microsoft.com/en-us/power-bi/guidance/ (read on 11 November 2026), in its order. The 19 pages on multiple-language reports were not read in the research; their status comes from their titles and from what the template holds.
+All 160 links of the table of contents of https://learn.microsoft.com/en-us/power-bi/guidance/ (read on 11 November 2026), in its order. The 19 pages on multiple-language reports were not read in that research; their status comes from their titles and from what the template holds. Eleven of them (rows 45, 46, 49, 51 and 56 to 62) are restated in ML, and have practice rows in A2.
 
 | # | Page | Address | Status | Where it is covered (file; codes) |
 | ---: | --- | --- | --- | --- |
@@ -76,33 +79,33 @@ All 160 links of the table of contents of https://learn.microsoft.com/en-us/powe
 | 4 | Referencing Power Query queries (Transform and shape data) | https://learn.microsoft.com/en-us/power-bi/guidance/power-query-referenced-queries | covered | SS 4; P003 |
 | 5 | Disable Power Query background refresh (Transform and shape data) | https://learn.microsoft.com/en-us/power-bi/guidance/power-query-background-refresh | outside this template | SS 11 (a Desktop option) |
 | 6 | Best practices for dataflows (Transform and shape data) | https://learn.microsoft.com/en-us/power-bi/transform-model/dataflows/dataflows-introduction-self-service | outside this template | SS 4; NF (dataflows live in the service) |
-| 7 | What is a star schema? (Data modeling) | https://learn.microsoft.com/en-us/power-bi/guidance/star-schema | missing | RD A; MS 7, 9; M412, M406, M103, M107, U006 |
-| 8 | Reduce data model size (Data modeling) | https://learn.microsoft.com/en-us/power-bi/guidance/import-modeling-data-reduction | soft | SS B; MS 8; M105, M106, M107, M201, M401 |
+| 7 | What is a star schema? (Data modeling) | https://learn.microsoft.com/en-us/power-bi/guidance/star-schema | covered | RD A (1, with junk and degenerate dimensions); MS 7, 9; M412, M406, M103, M107, M120, U006 |
+| 8 | Reduce data model size (Data modeling) | https://learn.microsoft.com/en-us/power-bi/guidance/import-modeling-data-reduction | covered | SS B, 12; MS 8; M105, M106, M107, M201, M401, P007 |
 | 9 | Design guidance for date tables (Data modeling) | https://learn.microsoft.com/en-us/power-bi/guidance/model-date-tables | covered | RD C; M402-M404 |
 | 10 | Auto date/time guidance (Data modeling) | https://learn.microsoft.com/en-us/power-bi/guidance/auto-date-time | covered | RD 29; M401 |
 | 11 | One-to-one relationships (Data modeling) | https://learn.microsoft.com/en-us/power-bi/guidance/relationships-one-to-one | covered | RD 22; M409 |
-| 12 | Many-to-many relationships (Data modeling) | https://learn.microsoft.com/en-us/power-bi/guidance/relationships-many-to-many | missing | RD 18-20; M405-M407, M102 |
+| 12 | Many-to-many relationships (Data modeling) | https://learn.microsoft.com/en-us/power-bi/guidance/relationships-many-to-many | soft | RD 9, 18-20; M405-M407, M416, M102 (Is Nullable: no shipped example) |
 | 13 | Active vs inactive relationships (Data modeling) | https://learn.microsoft.com/en-us/power-bi/guidance/relationships-active-inactive | covered | RD 7, 23, 24; M410, M414, M415, U006 |
-| 14 | Bi-directional relationships (Data modeling) | https://learn.microsoft.com/en-us/power-bi/guidance/relationships-bidirectional-filtering | missing | RD 18; M405, M408 |
-| 15 | Relationship troubleshooting (Data modeling) | https://learn.microsoft.com/en-us/power-bi/guidance/relationships-troubleshoot | missing | RD 10-27; M901, M109, M110 |
-| 16 | DirectQuery model guidance (Data modeling) | https://learn.microsoft.com/en-us/power-bi/guidance/directquery-model-guidance | missing | SS 23-24; M513, M701-M706 |
-| 17 | Composite model guidance (Data modeling) | https://learn.microsoft.com/en-us/power-bi/guidance/composite-model-guidance | missing | SS 22-25; M705, M706, U004 |
-| 18 | Row-level security (RLS) guidance (Data modeling) | https://learn.microsoft.com/en-us/power-bi/guidance/rls-guidance | missing | SS D; M601-M605, M414, M415 |
-| 19 | Power Platform modeling guidance (Data modeling) | https://learn.microsoft.com/en-us/power-bi/guidance/powerbi-modeling-guidance-for-power-platform | missing | SS 6; P004 |
+| 14 | Bi-directional relationships (Data modeling) | https://learn.microsoft.com/en-us/power-bi/guidance/relationships-bidirectional-filtering | covered | RD 18; M405, M408 |
+| 15 | Relationship troubleshooting (Data modeling) | https://learn.microsoft.com/en-us/power-bi/guidance/relationships-troubleshoot | covered | RD 10-27; SS 24, 37; M901, M109, M110, M609, U008 |
+| 16 | DirectQuery model guidance (Data modeling) | https://learn.microsoft.com/en-us/power-bi/guidance/directquery-model-guidance | soft | SS 23-24; RS 54; M513, M701-M706, U008, U104 (measure and Top N filters: no check yet) |
+| 17 | Composite model guidance (Data modeling) | https://learn.microsoft.com/en-us/power-bi/guidance/composite-model-guidance | covered | SS 22-25; RS 30; MF 8; M705, M706, U004 |
+| 18 | Row-level security (RLS) guidance (Data modeling) | https://learn.microsoft.com/en-us/power-bi/guidance/rls-guidance | covered | SS D (28-38); M601-M605, M609, M414, M415 |
+| 19 | Power Platform modeling guidance (Data modeling) | https://learn.microsoft.com/en-us/power-bi/guidance/powerbi-modeling-guidance-for-power-platform | covered | SS 6; RD 1; P004, M706 |
 | 20 | Migrate AAS models to Power BI Premium (Data modeling) | https://learn.microsoft.com/en-us/power-bi/guidance/migrate-azure-analysis-services-to-power-bi | out of scope | migration |
 | 21 | Migrate AAS models to Power BI Premium scenarios (Data modeling) | https://learn.microsoft.com/en-us/power-bi/guidance/migrate-azure-analysis-services-to-power-bi-migration-scenarios | out of scope | migration |
-| 22 | Appropriate use of error functions (DAX) | https://learn.microsoft.com/en-us/dax/best-practices/dax-error-functions | missing | DS 1; M501 |
+| 22 | Appropriate use of error functions (DAX) | https://learn.microsoft.com/en-us/dax/best-practices/dax-error-functions | soft | DS 1, 2; RD 9; M501, M502, M416 (Is Nullable: no shipped example) |
 | 23 | Avoid converting BLANKs to values (DAX) | https://learn.microsoft.com/en-us/dax/best-practices/dax-avoid-converting-blank | covered | DS 7; M506 |
 | 24 | Avoid using FILTER as a filter argument (DAX) | https://learn.microsoft.com/en-us/dax/best-practices/dax-avoid-avoid-filter-as-filter-argument | covered | DS 6; M505 |
 | 25 | Column and measure references (DAX) | https://learn.microsoft.com/en-us/dax/best-practices/dax-column-measure-references | covered | DS 10; M010, M006, M119 |
-| 26 | DIVIDE function vs divide operator (/) (DAX) | https://learn.microsoft.com/en-us/dax/best-practices/dax-divide-function-operator | soft | DS 2; M502 |
+| 26 | DIVIDE function vs divide operator (/) (DAX) | https://learn.microsoft.com/en-us/dax/best-practices/dax-divide-function-operator | covered | DS 2; M502, M518 |
 | 27 | Use COUNTROWS instead of COUNT (DAX) | https://learn.microsoft.com/en-us/dax/best-practices/dax-countrows | covered | DS 3; M503 |
 | 28 | Use SELECTEDVALUE instead of VALUES (DAX) | https://learn.microsoft.com/en-us/dax/best-practices/dax-selectedvalue | covered | DS 4, 5; M504, M517 |
 | 29 | Use variables to improve formulas (DAX) | https://learn.microsoft.com/en-us/dax/best-practices/dax-variables | covered | DS 8, 9; M507, M514 |
 | 30 | Sample model (DAX) | https://learn.microsoft.com/en-us/dax/dax-sample-model | out of scope | a sample model to download; states no practice |
-| 31 | Separate reports from models (Power BI reports) | https://learn.microsoft.com/en-us/power-bi/guidance/report-separate-from-model | soft | RS L; MS (Existing models); B001 |
-| 32 | Extend visuals with report page tooltips (Power BI reports) | https://learn.microsoft.com/en-us/power-bi/guidance/report-page-tooltips | soft | RS C; V002-V005, H002 |
-| 33 | Use report page drillthrough (Power BI reports) | https://learn.microsoft.com/en-us/power-bi/guidance/report-drillthrough | soft | RS D; V001 |
+| 31 | Separate reports from models (Power BI reports) | https://learn.microsoft.com/en-us/power-bi/guidance/report-separate-from-model | covered | RS L (65, 66); MS (Existing models); B001, V012 |
+| 32 | Extend visuals with report page tooltips (Power BI reports) | https://learn.microsoft.com/en-us/power-bi/guidance/report-page-tooltips | covered | RS C; V002-V005, V013, H002 |
+| 33 | Use report page drillthrough (Power BI reports) | https://learn.microsoft.com/en-us/power-bi/guidance/report-drillthrough | covered | RS D; V001, V013, V014 |
 | 34 | When to use paginated reports (Power BI paginated reports) | https://learn.microsoft.com/en-us/power-bi/guidance/report-paginated-or-power-bi | out of scope | migration |
 | 35 | Data retrieval guidance (Power BI paginated reports) | https://learn.microsoft.com/en-us/power-bi/guidance/report-paginated-data-retrieval | out of scope | migration |
 | 36 | Performance and scalability considerations (Power BI paginated reports) | https://learn.microsoft.com/en-us/power-bi/guidance/report-paginated-performance-scalability-considerations | out of scope | migration |
@@ -114,24 +117,24 @@ All 160 links of the table of contents of https://learn.microsoft.com/en-us/powe
 | 42 | Retire unused .rdl files (Power BI paginated reports) | https://learn.microsoft.com/en-us/power-bi/guidance/retire-unused-reports-ssrs | out of scope | migration |
 | 43 | Develop scalable multitenancy applications (Development) | https://learn.microsoft.com/en-us/power-bi/guidance/develop-scalable-multitenancy-apps-with-powerbi-embedding | out of scope | embedding in another application (another system) |
 | 44 | Plan translation for reports (Build multiple-language reports) | https://learn.microsoft.com/en-us/power-bi/guidance/multiple-language-translation | covered | MO D (Translations and cultures; this page is its source); EX cultures/nl-NL.tmdl; no check: files cannot show it (which languages are needed) |
-| 45 | Use locale values in reports (Build multiple-language reports) | https://learn.microsoft.com/en-us/power-bi/guidance/multiple-language-locale | missing | nothing on locale-aware report values (USERCULTURE is only listed in FX) |
-| 46 | Use best practices to localize reports (Build multiple-language reports) | https://learn.microsoft.com/en-us/power-bi/guidance/multiple-language-best-practice | missing | nothing on designing reports for localisation |
+| 45 | Use locale values in reports (Build multiple-language reports) | https://learn.microsoft.com/en-us/power-bi/guidance/multiple-language-locale | covered | ML A (1-6), 16; EX cultures/nl-NL.tmdl, Sales by Store Label; M524, M525, V019 |
+| 46 | Use best practices to localize reports (Build multiple-language reports) | https://learn.microsoft.com/en-us/power-bi/guidance/multiple-language-best-practice | covered | ML B (7, 11, 12); no check: a file does not show the rendered width |
 | 47 | Create reports with Translations Builder (Build multiple-language reports) | https://learn.microsoft.com/en-us/power-bi/guidance/translation-builder | outside this template | Translations Builder is a separate tool; what it writes (cultures) is covered in MO D |
 | 48 | Add a language to a report (Build multiple-language reports) | https://learn.microsoft.com/en-us/power-bi/guidance/translation-builder-add-language | outside this template | a Translations Builder step; result covered in MO D |
-| 49 | Add a Localized Labels table (Build multiple-language reports) | https://learn.microsoft.com/en-us/power-bi/guidance/translation-builder-localize-label | missing | nothing on a Localized Labels table |
+| 49 | Add a Localized Labels table (Build multiple-language reports) | https://learn.microsoft.com/en-us/power-bi/guidance/translation-builder-localize-label | covered | ML C (14-17), 8-10; EX Sales by Store Label; M525, V020 |
 | 50 | Generate machine translations (Build multiple-language reports) | https://learn.microsoft.com/en-us/power-bi/guidance/translation-builder-machine-translation | out of scope | another system (machine translation service) |
-| 51 | Multiple-language page navigation (Build multiple-language reports) | https://learn.microsoft.com/en-us/power-bi/guidance/multiple-language-page-navigation | missing | nothing on page navigation per language |
+| 51 | Multiple-language page navigation (Build multiple-language reports) | https://learn.microsoft.com/en-us/power-bi/guidance/multiple-language-page-navigation | covered | ML D (18-20); V021 |
 | 52 | Enable workflows for human translation (Build multiple-language reports) | https://learn.microsoft.com/en-us/power-bi/guidance/translation-workflow-human | outside this template | a translation workflow outside the files |
 | 53 | Export translation sheets (Build multiple-language reports) | https://learn.microsoft.com/en-us/power-bi/guidance/translation-sheet-export | outside this template | a Translations Builder export |
 | 54 | Import translation sheets (Build multiple-language reports) | https://learn.microsoft.com/en-us/power-bi/guidance/translation-sheet-import | outside this template | a Translations Builder import |
 | 55 | Manage enterprise-level translations (Build multiple-language reports) | https://learn.microsoft.com/en-us/power-bi/guidance/translation-manage-data-model-enterprise | outside this template | a translation workflow across models |
-| 56 | Implement data translation (Build multiple-language reports) | https://learn.microsoft.com/en-us/power-bi/guidance/data-translation | missing | nothing on translating data values |
-| 57 | Support data translations (Build multiple-language reports) | https://learn.microsoft.com/en-us/power-bi/guidance/data-translation-extend-schema | missing | nothing on a source schema for data translations |
-| 58 | Data translation with field parameters (Build multiple-language reports) | https://learn.microsoft.com/en-us/power-bi/guidance/data-translation-implement-field | missing | nothing on data translation with field parameters |
-| 59 | Add the languages table (Build multiple-language reports) | https://learn.microsoft.com/en-us/power-bi/guidance/data-translation-add-language-table | missing | nothing on a languages table |
-| 60 | Synchronize field parameters (Build multiple-language reports) | https://learn.microsoft.com/en-us/power-bi/guidance/data-translation-synchronize-field | missing | nothing on keeping field parameters in step per language |
-| 61 | Data translation calendar table (Build multiple-language reports) | https://learn.microsoft.com/en-us/power-bi/guidance/data-translation-calendar-table | missing | nothing on a translated calendar table |
-| 62 | Load multiple-language reports (Build multiple-language reports) | https://learn.microsoft.com/en-us/power-bi/guidance/data-translation-load-report-bookmark | missing | nothing on opening a report in the reader's language |
+| 56 | Implement data translation (Build multiple-language reports) | https://learn.microsoft.com/en-us/power-bi/guidance/data-translation | covered | ML 21; no check: the choice is the developer's |
+| 57 | Support data translations (Build multiple-language reports) | https://learn.microsoft.com/en-us/power-bi/guidance/data-translation-extend-schema | covered | ML 22; EX Sales Breakdown (field parameter over columns) |
+| 58 | Data translation with field parameters (Build multiple-language reports) | https://learn.microsoft.com/en-us/power-bi/guidance/data-translation-implement-field | covered | ML 23; EX Sales Breakdown; M822 |
+| 59 | Add the languages table (Build multiple-language reports) | https://learn.microsoft.com/en-us/power-bi/guidance/data-translation-add-language-table | covered | ML 24; no check: the files do not show for certain which column is the language column |
+| 60 | Synchronize field parameters (Build multiple-language reports) | https://learn.microsoft.com/en-us/power-bi/guidance/data-translation-synchronize-field | covered | ML 25, 12 |
+| 61 | Data translation calendar table (Build multiple-language reports) | https://learn.microsoft.com/en-us/power-bi/guidance/data-translation-calendar-table | covered | ML 26; M113 |
+| 62 | Load multiple-language reports (Build multiple-language reports) | https://learn.microsoft.com/en-us/power-bi/guidance/data-translation-load-report-bookmark | covered | ML 27; no check: the bookmark mapping is not confirmed |
 | 63 | On-premises data gateway sizing (Admin and deployment) | https://learn.microsoft.com/en-us/power-bi/guidance/gateway-onprem-sizing | out of scope | gateway sizing |
 | 64 | Monitor report performance (Admin and deployment) | https://learn.microsoft.com/en-us/power-bi/guidance/monitor-report-performance | outside this template | Desktop and service tools; CR (item 68) |
 | 65 | Troubleshoot report performance (Admin and deployment) | https://learn.microsoft.com/en-us/power-bi/guidance/report-performance-troubleshoot | outside this template | service and Desktop tools; CR (item 68) |
@@ -245,7 +248,7 @@ One row per practice of the in-scope pages, restated in new words.
 | Optimization | Totals come from measures, so every report adds up the same way | covered | MS 9 | EX _Measures.tmdl | M107 (fail), M103 (warn) |
 | Optimization | Default number and date formats set in the model | covered | MS 4, 12 | EX _Measures.tmdl, Date.tmdl | M009 (fail), M112 (warn) |
 | Optimization | Data categories on places, links and images | covered | RD 36 | EX Store.tmdl (City, WebUrl) | M114 (warn) |
-| Optimization | Consider calculation groups, field parameters, what-if parameters, grouping and binning | covered | MO B, C, D; NF (Model); grouping and binning only as an NF line | EX Time Calculation.tmdl, Sales Metric.tmdl, Discount Percentage.tmdl | U002, U003, U103 (note) |
+| Optimization | Consider calculation groups, field parameters, what-if parameters, grouping and binning | covered | MO B, C, D; NF (Model); MF 12 (groups and bins: not built, Learn shows only the Desktop dialog) | EX Time Calculation.tmdl, Sales Metric.tmdl, Discount Percentage.tmdl | U002, U003, U103 (note) |
 | Optimization | Dashboard tiles come from a cache (per user with dynamic RLS) | outside this template | NF (Outside the project files: dashboards) | - | files cannot show it |
 | Optimization | Use a dashboard as a cached landing page | outside this template | NF (Outside the project files: dashboards) | - | files cannot show it |
 | Optimization | Give a large table visual the most restrictive filter, such as Top N | covered | NF (Report pages: filter types); RS 51-52 | EX Charts_Bars_Bar_LargestStores (Top N filter) | files cannot show it (row counts are not in the files) |
@@ -279,15 +282,15 @@ One row per practice of the in-scope pages, restated in new words.
 | Star schema | Type 2 slowly changing dimensions come from the source; label the version | covered | RD 8 | - | files cannot show it |
 | Star schema | Role-playing dimensions: inactive relationships or one copy per role | covered | RD 7 | EX relationships.tmdl (ship date), measure Total Sales by Ship Date | U006 (note), M410 (warn) |
 | Star schema | Role copies get role column names and a description of what they filter | covered | RD 7 (second bullet) | - | files cannot show it; D001 (fail) for the description |
-| Star schema | Junk dimension: many small flags merged into one table with a key | missing | none | - | files cannot show it |
-| Star schema | Degenerate dimension (order number) stays on the fact table | missing | none | - | files cannot show it |
+| Star schema | Junk dimension: many small flags merged into one table with a key | covered | RD 1 (junk dimension) | - | files cannot show it |
+| Star schema | Degenerate dimension (order number) stays on the fact table | covered | RD 1 (degenerate dimension) | - | files cannot show it |
 | Star schema | Factless (bridging) table for many-to-many between dimensions | covered | RD 19 | relationship kinds shipped (EX relationships.tmdl); no bridge table | M406 (warn) |
 | Data reduction | Load only columns that reports or the model need | covered | SS 13 | - | M201 (note) for hidden ones; files cannot show it for visible ones (other reports may use them) |
 | Data reduction | Load only rows reports need: limit history, or one model per entity | covered | SS 14 | EX expressions.tmdl (Store Region parameter) | files cannot show it |
 | Data reduction | Load facts at a higher grain where detail is not needed | covered | SS 15 | - | files cannot show it |
 | Data reduction | Numbers instead of coded text; such columns do not summarise | covered | SS 16 | - | M107 (fail); files cannot show it for the text |
 | Data reduction | Power Query columns before DAX calculated columns | covered | SS 17; MS 8 | EX Sales.tmdl (Order Size with its reason) | M105 (fail), M106 (warn) |
-| Data reduction | Queries that only feed other queries are not loaded | soft | SS 12 | EX expressions.tmdl (Sales Source) | none, although a table query that names another loaded table's query is visible in the files |
+| Data reduction | Queries that only feed other queries are not loaded | covered | SS 12 | EX expressions.tmdl (Sales Source) | P007 (warn) |
 | Data reduction | Turn Auto date/time off | covered | RD 29 | - | M401 (warn) |
 | Data reduction | Very large facts in DirectQuery, with imported summaries | covered | SS 21, 22, 25 | EX storage/DirectQuery (Sales Aggregate) | U004 (note); files cannot show it (size) |
 | Date tables | A date table: unique days, no blanks, no gaps, whole years | covered | RD 31 | EX Date.tmdl (shape; sample rows) | files cannot show it (data) |
@@ -309,7 +312,7 @@ One row per practice of the in-scope pages, restated in new words.
 | One-to-one | Two facts related one-to-one is unusual | covered | RD 2, 22 | - | M409 (warn) |
 | Many-to-many | Two dimensions: a bridge table and two one-to-many relationships | covered | RD 19 | relationship kinds shipped; no bridge table | M406 (warn) |
 | Many-to-many | In that design one relationship filters both ways, or totals are wrong | covered | RD 18 (bridge exception) | - | files cannot show it for certain (which table is a bridge is a design fact); M405 (warn) |
-| Many-to-many | Turn Is Nullable off on keys that must never be blank | missing | none | - | none, although isNullable is a column property in the files |
+| Many-to-many | Turn Is Nullable off on keys that must never be blank | soft | RD 9 | none: RD 9 says the shipped examples do not carry it yet | M416 (note) |
 | Many-to-many | Hide the bridge table | covered | MS 7; RD 19 | - | files cannot show it for certain (which table is a bridge) |
 | Many-to-many | Hide ID columns; if one stays visible, keep the one side and hide the many side | covered | MS 7; RD (Where sources disagree) | EX Sales.tmdl | M102 (warn) |
 | Many-to-many | Explain results that do not add up (text box or description) | covered | DE (caveats); TH (item 37 row); header-icon tooltips not adopted (owner's rule, H001) | EX Elements_Text_PageTitle (text box) | files cannot show it |
@@ -317,7 +320,7 @@ One row per practice of the in-scope pages, restated in new words.
 | Many-to-many | Never relate two facts many-to-many directly | covered | RD 2 | - | M406 (warn) |
 | Many-to-many | A fact at a higher date grain stores the first date and relates one-to-many | covered | RD 19 | - | files cannot show it |
 | Many-to-many | A fact at a higher non-date grain: many-to-many, one direction | covered | RD 19, 20 | EX relationships.tmdl (Sales Target to Product) | M406, M407 (warn) |
-| Many-to-many | Measures over a higher-grain fact return blank below its grain (ISFILTERED); its number columns hidden | missing | hiding: MS 7 (M103, M107); the measure guard: none | - | M103 (warn), M107 (fail) for the columns; none for the guard |
+| Many-to-many | Measures over a higher-grain fact return blank below its grain (ISFILTERED); its number columns hidden | covered | RD 19 (higher grain); MS 7 | RD 19 shows a guard over Sales Target (not shipped) | M103 (warn), M107 (fail) for the columns; the guard: files cannot show it (the grain) |
 | Active vs inactive | Prefer active relationships; one copy per role when visuals filter by several roles | covered | RD 7 | EX relationships.tmdl | U006 (note) |
 | Active vs inactive | Refactor: remove inactive ones, copy the table per role, rename, describe | covered | RD 7 | - | U006 (note); D001 (fail) |
 | Active vs inactive | Inactive relationships are fine when measures turn them on | covered | RD 7, 23 | EX Total Sales by Ship Date | M410 (warn) |
@@ -326,31 +329,31 @@ One row per practice of the in-scope pages, restated in new words.
 | Both directions | Keep both-direction relationships to a minimum | covered | RD 18 | EX relationships.tmdl (Sales to Product) | M405, M408 (warn) |
 | Both directions | One-to-one is always both ways; a bridge needs one both-direction relationship | covered | RD 18, 22 | - | M405, M409 (warn) |
 | Both directions | A slicer that lists only items with data: a measure filter on the slicer | covered | RD 18; NF (Slicer row) | visual filters shipped (EX Charts_Bars visuals) | M405 (warn) on the both-direction alternative |
-| Both directions | Ask whether a slicer list that changes with data helps readers at all | missing | none | - | files cannot show it |
+| Both directions | Ask whether a slicer list that changes with data helps readers at all | covered | RD 18 | - | files cannot show it |
 | Both directions | Use CROSSFILTER inside one measure instead of a both-direction relationship | covered | RD 18 | - | M405 (warn) |
 | Troubleshooting | When a visual is wrong: data loaded, relationship, cardinality, active, direction, columns | covered | RD 10-23 (one rule per point); LK (when stuck) | EX relationships.tmdl | M901 (fail), M405, M409, M410 (warn); files cannot show it for data |
 | Troubleshooting | Related columns have the same data type | covered | RD 27; MS 10 | - | M109 (fail), M110 (warn) |
-| Troubleshooting | Symptoms: unmatched keys, Assume Referential Integrity, 'apply security filter in both directions' | missing | unmatched keys RD 17; Assume Referential Integrity SS 24; the security-filter setting: none | - | none for the security-filter setting (securityFilteringBehavior is in the files) |
+| Troubleshooting | Symptoms: unmatched keys, Assume Referential Integrity, 'apply security filter in both directions' | covered | unmatched keys RD 17; Assume Referential Integrity SS 24; the security-filter setting SS 37 | - | M609 (warn), U008 (note); files cannot show unmatched keys |
 | DirectQuery | Work with the source's database people; tuning belongs there | covered | SS 24 | - | files cannot show it |
 | DirectQuery | Source side: referential integrity, unknown row, indexes, materialised columns | covered | SS 24 | - | files cannot show it |
 | DirectQuery | One query maps to one table or view: no transformation steps | covered | SS 24 | EX storage/DirectQuery Sales.tmdl | M702 (warn) |
 | DirectQuery | No calculated columns or type changes on DirectQuery tables | covered | SS 23, 24 | - | M705 (fail), M704, M702 (warn) |
 | DirectQuery | No relative-date filter in Power Query; offset columns in the date table | covered | SS 24 | - | M703 (warn) |
-| DirectQuery | Start with simple measures; add complex CALCULATE logic while testing speed | missing | none | - | files cannot show it |
+| DirectQuery | Start with simple measures; add complex CALCULATE logic while testing speed | covered | SS 24 | - | files cannot show it |
 | DirectQuery | No relationship on a concatenated calculated column; COMBINEVALUES if needed | covered | SS 23 | - | M704 (warn) |
 | DirectQuery | No relationships on GUID columns | covered | SS 24 | - | files cannot show it (no GUID type in the files) |
 | DirectQuery | Hide the one-side key; the many-side key may stay visible | covered | SS and RD (Where sources disagree): M102 stays; exception in the brief | - | M102 (warn) |
-| DirectQuery | Assume Referential Integrity on DirectQuery relationships | soft | SS 24 (set in Desktop; TMDL spelling not confirmed) | - | none, although the relationship property is in the files |
+| DirectQuery | Assume Referential Integrity on DirectQuery relationships | covered | SS 24 (set in Desktop; TMDL spelling not confirmed) | - | U008 (note) |
 | DirectQuery | No both-direction relationship except on a bridge | covered | RD 18 | - | M405 (warn) |
 | DirectQuery | Maximum connections per data source | outside this template | a Desktop setting, not in the project files | - | files cannot show it |
-| DirectQuery | Query reduction options on from the start | soft | RS 54; NF (Query reduction) | - | none, although slowDataSourceSettings is in report.json |
+| DirectQuery | Query reduction options on from the start | covered | SS 24; RS 54; VF 10 | EX Slicers_More_Button_ApplyAll, Slicers_More_Button_ClearAll | U104 (note) |
 | DirectQuery | Add filters before fields when building a visual (1 million row limit) | outside this template | a habit when building in Desktop; files are written whole | - | files cannot show it |
 | DirectQuery | Few visuals per page; one card visual instead of many cards | covered | RS 63; NF (Card rows) | EX Cards_KPIs_Card_SalesFigures (one card, several values) | V006 (fail), V007 (warn) |
 | DirectQuery | Switch off interactions nobody needs | covered | RS 53 | EX Charts_Bars page.json (NoFilter) | files cannot show it (which ones are needed) |
-| DirectQuery | Measure filters, Top N filters and medians cost extra queries | missing | none | - | none, although visual filters are in visual.json |
-| DirectQuery | Multi-select slicers: Apply buttons | soft | RS 54 | - | none |
-| DirectQuery | Turn off totals and subtotals nobody needs | soft | NF (Totals row) | - | none (the property names are not confirmed) |
-| DirectQuery | Consider a composite model with Dual tables and aggregations | covered | SS 22-25 | EX storage/DirectQuery | M706, U004 (note) |
+| DirectQuery | Measure filters, Top N filters and medians cost extra queries | soft | SS 24 | - | none: SS 24 says the template does not read them yet, although visual filters are in visual.json |
+| DirectQuery | Multi-select slicers: Apply buttons | covered | RS 54; SS 24; VF 10 | EX Slicers_More_Button_ApplyAll | U104 (note) |
+| DirectQuery | Turn off totals and subtotals nobody needs | covered | SS 24; VF 15 | EX Tables_Features_Table_TotalsOffWidths | No check: SS 24 says Microsoft Learn does not document the file property (VF 15 takes it from Microsoft's visual catalogue) |
+| DirectQuery | Consider a composite model with Dual tables and aggregations | covered | SS 22-25 | EX storage/DirectQuery | M706 (warn), U004 (note) |
 | DirectQuery | Tell authors and readers how DirectQuery behaves | covered | SR step 6 (Info page, item 75) | - | files cannot show it |
 | Composite | Prefer Import; composite only when needed | covered | SS 22, 23 | - | files cannot show it (the reason lives in the brief) |
 | Composite | To add data to an existing model, add it at the source | covered | SS 23 (first line) | - | files cannot show it |
@@ -359,17 +362,17 @@ One row per practice of the in-scope pages, restated in new words.
 | Composite | Matching values across source groups (limited relationships drop rows) | covered | SS 23 | - | files cannot show it |
 | Composite | Aggregation tables: ten times fewer rows; none on a hybrid table | covered | SS 25 | EX Sales Aggregate.tmdl | U004 (note); files cannot show it (row counts) |
 | Composite | Relationship columns across source groups: under 50,000 distinct values | covered | SS 23 | - | files cannot show it |
-| Composite | Desktop does not fully validate relationships across source groups | soft | RD 17 (one active path) | - | none, although the relationship graph is in the files |
-| Composite | Test CALCULATE over a measure from a remote model | missing | none | - | files cannot show it |
+| Composite | Desktop does not fully validate relationships across source groups | covered | SS 23 (models on a published model) | - | files cannot show it (SS 23: none of these points a file here can show) |
+| Composite | Test CALCULATE over a measure from a remote model | covered | SS 23 | none: not built (MF 8: no file form for the remote model) | files cannot show it |
 | Composite | Calculated columns on DirectQuery tables: same-row logic only | covered | SS 23 | - | M705 (fail) |
-| Composite | Calculated objects cannot rely on a chained (remote) model | missing | none | - | none, although the remote source is in the files |
-| Composite | Test every calculation after adding calculated columns to a composite model | missing | none | - | files cannot show it |
-| Composite | Calculation groups in a remote model can surprise | missing | none | - | files cannot show it |
+| Composite | Calculated objects cannot rely on a chained (remote) model | covered | SS 23 | none: not built (MF 8) | files cannot show it (no file form for the remote model) |
+| Composite | Test every calculation after adding calculated columns to a composite model | covered | SS 23 | - | files cannot show it |
+| Composite | Calculation groups in a remote model can surprise | covered | SS 23 | - | files cannot show it |
 | Composite | Star schema; dimensions in the same source group as their facts | covered | SS 23; RD A | EX storage/DirectQuery | M706 (warn) |
-| Composite | RLS in composite models: per source group; not on a remote table | missing | aggregations: SS 25; remote tables: none | - | none |
-| Composite | Visuals from one source group; sync slicers instead of a cross-group relationship | soft | NF (Sync slicers row: across source groups, instead of a relationship) | EX RegionSync slicers | none, although each field's table and its storage mode are in the files |
+| Composite | RLS in composite models: per source group; not on a remote table | covered | SS 23 (roles per source group; remote roles not copied); SS 25 (aggregations) | none: not built (MF 8) | files cannot show it (no file form for remote tables) |
+| Composite | Visuals from one source group; sync slicers instead of a cross-group relationship | covered | RS 30 (composite models); NF (Sync slicers row) | EX RegionSync slicers | No check: the report files do not mark which source group a field comes from |
 | Composite | Do not rename models or workspaces a composite model reads | outside this template | a rename in the service; MS (Existing models) warns about other reports | - | files cannot show it |
-| Composite | Keep the one trusted enterprise model free of composite parts | missing | none | - | files cannot show it |
+| Composite | Keep the one trusted enterprise model free of composite parts | covered | SS 23 | - | files cannot show it |
 | Composite | Check lineage before publishing composite changes | outside this template | lineage view lives in the service | - | files cannot show it |
 | RLS | RLS filters rows; it cannot hide tables or columns | covered | SS 28, 35 | EX roles (Northport Stores, No Product Cost) | files cannot show it (a statement of fact) |
 | RLS | Roles add up; prefer one role per kind of reader | covered | SS 36 | - | files cannot show it (members are in the service) |
@@ -378,13 +381,13 @@ One row per practice of the in-scope pages, restated in new words.
 | RLS | Measure RLS cost with Performance Analyzer and View as | outside this template | Desktop tools; SS 34 | - | files cannot show it |
 | RLS | Map security groups, not single people | outside this template | SS 34 (members are assigned in the service) | - | files cannot show it |
 | RLS | Test each role; unexpected values return no rows | covered | SS 31, 34, 36 | EX Own Store.tmdl | M605 (warn) |
-| RLS | Share-of-all figures from a summary table RLS does not filter; totals must not leak | missing | none | - | files cannot show it |
+| RLS | Share-of-all figures from a summary table RLS does not filter; totals must not leak | covered | SS 38 | - | files cannot show it (what a total gives away) |
 | RLS | A few static rules: separate models per audience may be better | covered | SS 14 (filter by entity) | - | files cannot show it |
-| RLS | Troubleshooting: directions, 'apply security filter in both directions', several roles, aggregations | missing | roles add up and aggregations: SS 36; the security-filter setting: none | - | none for the setting |
-| RLS | A test measure that shows the signed-in user | missing | none | - | files cannot show it |
+| RLS | Troubleshooting: directions, 'apply security filter in both directions', several roles, aggregations | covered | SS 37 (the security-filter setting); SS 36 (roles add up, aggregations) | - | M609 (warn) |
+| RLS | A test measure that shows the signed-in user | covered | SS 34 (a temporary measure, removed before publishing) | - | files cannot show it |
 | RLS | Readers get Read on the model, not workspace roles | outside this template | SS 34, 36 (workspace access lives in the service) | - | files cannot show it |
 | Power Platform | Pick Import, Synapse Link or DirectQuery for Dataverse on purpose | covered | SS 22; SS 6 | - | files cannot show it |
-| Power Platform | One model per subject, not one model for everything | missing | none | - | files cannot show it |
+| Power Platform | One model per subject, not one model for everything | covered | RD 1 (one model per subject) | - | files cannot show it |
 | Power Platform | Star schema, not Dataverse's own table layout | covered | RD 1 | - | files cannot show it |
 | Power Platform | Aim for query folding | covered | SS 2 | - | files cannot show it |
 | Power Platform | Pick columns early; fetching all can run past ten minutes and fail | covered | SS 6 | - | P004 (warn) |
@@ -392,21 +395,21 @@ One row per practice of the in-scope pages, restated in new words.
 | Power Platform | CreateNavigationProperties=false unless relationship columns are expanded | covered | SS 6 | - | P004 (warn) |
 | Power Platform | Blank choice labels: publish customisations in Dataverse | out of scope | another system (Dataverse) | - | - |
 | Power Platform | Synapse Link: friendly views, snapshot tables | out of scope | another system (Synapse) | - | - |
-| Power Platform | DirectQuery to Dataverse: Dual dimensions, single sign-on, CURRENT_USER views, extra Import models | missing | Dual: SS 23 (M706); the rest: none | - | M706 (warn) for Dual only |
+| Power Platform | DirectQuery to Dataverse: Dual dimensions, single sign-on, CURRENT_USER views, extra Import models | covered | SS 6 | - | M706 (warn) for Dual; the rest: files cannot show it (set in the service or decided with the developer) |
 | DAX error functions | Avoid IFERROR and ISERROR | covered | DS 1 | - | M501 (warn) |
 | DAX error functions | Clean bad values upstream and set types in Power Query | covered | DS 1; SS 9 | - | files cannot show it |
-| DAX error functions | Is Nullable off where a blank must fail the refresh | missing | none | - | none, although isNullable is in the files |
+| DAX error functions | Is Nullable off where a blank must fail the refresh | soft | RD 9 | none: RD 9 says the shipped examples do not carry it yet | M416 (note) |
 | DAX error functions | Test the cause with IF rather than catch an error | covered | DS 1 | - | M501 (warn) |
 | DAX error functions | Use functions that tolerate errors, such as DIVIDE | covered | DS 2 | EX Average Line Amount | M502 (fail) |
 | DAX blanks | Return blank, not zero, when there is nothing to show | covered | DS 7 | EX _Measures.tmdl | M506 (warn) |
 | DAX blanks | Use 'Show items with no data' when every group must show | covered | DS 7; NF (Show items with no data) | - | files cannot show it (a visual setting the developer turns on) |
 | DAX FILTER | Filter a column (with KEEPFILTERS), not FILTER over a whole table | covered | DS 6 | - | M505 (warn) |
 | DAX FILTER | FILTER only for measure tests or complex logic, over VALUES of a column | covered | DS 6 (third bullet) | - | M505 (warn) |
-| DAX references | Columns always with their table | covered | DS 10; MS 5 | EX _Measures.tmdl | M010 (warn; measures and calculated columns only) |
+| DAX references | Columns always with their table | covered | DS 10; MS 5 | EX _Measures.tmdl | M010 (warn) |
 | DAX references | Measures never with their table | covered | DS 10 | EX _Measures.tmdl | M010 (warn) |
 | DAX references | A column never shares a name with a measure or hierarchy of its table | covered | MS 3; RD 38 | - | M006 (fail), M119 (warn) |
 | DAX DIVIDE | DIVIDE when the divisor can be zero or blank | covered | DS 2 | EX Average Line Amount | M502 (fail) |
-| DAX DIVIDE | The / operator when the divisor is a fixed number | soft | DS 2 (second bullet) | - | none, although DIVIDE by a number is visible |
+| DAX DIVIDE | The / operator when the divisor is a fixed number | covered | DS 2 (second bullet) | - | M518 (warn) |
 | DAX DIVIDE | Usually leave out DIVIDE's third argument | covered | DS 2, 7 | - | M506 (warn) for a zero; other values unchecked |
 | DAX COUNTROWS | COUNTROWS of a table, not COUNT of a column, to count rows | covered | DS 3 | EX # Order Lines | M503 (warn) |
 | DAX SELECTEDVALUE | SELECTEDVALUE instead of IF, HASONEVALUE and VALUES | covered | DS 4 | - | M504 (warn) |
@@ -420,32 +423,52 @@ One row per practice of the in-scope pages, restated in new words.
 | DAX ORDERBY | Add MATCHBY when the order columns do not identify each row | covered | DS 11 | - | files cannot show it (uniqueness is data) |
 | DAX GB18030 | Unicode character behaviour set to code points where GB18030 is required | outside this template | NF (Model: Unicode character behavior); set by an XMLA command on the published model | - | files cannot show it |
 | DAX UDFs | Functions need compatibility level 1702 | covered | MO A1, A7 | EX database.tmdl, functions.tmdl | M801 (fail) |
-| DAX UDFs | Naming rules for functions and parameters | covered | MO A6 | EX functions.tmdl | M802 (fail; function name only) |
+| DAX UDFs | Naming rules for functions and parameters | covered | MO A6 | EX functions.tmdl | M802 (fail; function name only), M807 (warn; SQLBI style) |
 | DAX UDFs | A /// description on every function | covered | MO A7 | EX functions.tmdl | M803 (warn) |
 | DAX UDFs | Type hints on parameters; reference types use expr | covered | MO A5, A7 | EX functions.tmdl (AddTax, ShareOfAll) | M804 (warn) |
 | DAX UDFs | In a calculated column a function returns one scalar type | covered | MO A8 | - | files cannot show it |
-| DAX UDFs | Write columns with their table inside a function | soft | MO A7 (last bullet) | EX functions.tmdl | none (M010 does not read functions) |
-| DAX UDFs | OLS does not reach functions: never name secured objects in a function | soft | MO A8 | - | none, although roles and functions are both in the files |
+| DAX UDFs | Write columns with their table inside a function | covered | MO A7; DS 39 | EX functions.tmdl | M010 (warn) reads functions |
+| DAX UDFs | OLS does not reach functions: never name secured objects in a function | covered | MO A7, A8; DS 39 | - | M806 (warn) |
 | DAX UDFs | No recursion, no overloading; cannot hide, fold or translate a function | covered | MO A8 | - | M805 (fail, direct calls); M005-style duplicates not checked for functions |
 | Separate reports | One file only for one report by one person; otherwise split model and report | covered | NF (Live connection); RS L; SR step 3 | EX starter (byPath) | files cannot show it (who builds what) |
 | Separate reports | After publishing a model, delete its test report | out of scope | a publishing step | - | - |
 | Separate reports | Do not break the model's interface (renames, types, home table) | covered | CI (rename rule); MS (Existing models); TI 10 | - | B001 (fail) in this project; files cannot show it for other reports |
-| Separate reports | Prefix report-level measures so model measures cannot clash | soft | RS 66 | EX reportExtensions.json (its measure has no prefix) | none, although the names are in reportExtensions.json |
+| Separate reports | Prefix report-level measures so model measures cannot clash | covered | RS 66 | EX reportExtensions.json (_Sales per Order Line) | V012 (warn) |
 | Separate reports | Find dependent reports in lineage before a breaking change | outside this template | lineage view lives in the service; MS (Existing models) says to warn | - | files cannot show it |
 | Tooltip pages | Report page tooltips for another view, more detail or help | covered | RS C; tooltips are off unless the brief lists the visual (owner's rule) | EX Tooltip_StoreSales | V002-V005 (warn), H002 (fail) |
 | Tooltip pages | No slicers or buttons on a tooltip page | covered | RS 19 | EX Tooltip_StoreSales | V004 (warn) |
 | Tooltip pages | Keep it small, near 320 x 240 | covered | RS 18 | EX Tooltip_StoreSales | V003 (warn) |
 | Tooltip pages | Design at Actual Size | outside this template | a Desktop view setting | - | files cannot show it |
 | Tooltip pages | Use the report's theme | covered | TH | - | T001 (fail) |
-| Tooltip pages | Remove design-time filter values before publishing | soft | RS C (last bullet) | - | none, although filter values on the page are in page.json |
+| Tooltip pages | Remove design-time filter values before publishing | covered | RS C (last bullet) | - | V013 (warn) |
 | Tooltip pages | Hide tooltip pages | covered | RS 18 | EX Tooltip_StoreSales | V002 (warn) |
 | Drillthrough | Plan the path: page, data point, drillthrough, analysis, back | covered | RS D | EX Drillthrough_Store | files cannot show it |
 | Drillthrough | Use the report's theme | covered | TH | - | T001 (fail) |
-| Drillthrough | Remove design-time drillthrough values before publishing | soft | RS 29 | - | none, although the values are in page.json |
+| Drillthrough | Remove design-time drillthrough values before publishing | covered | RS 29 | - | V013 (warn) |
 | Drillthrough | No visuals that show blanks or errors under the drillthrough filter | covered | RS D (Only Desktop shows) | - | files cannot show it |
-| Drillthrough | Hide drillthrough pages; a visible one gets a reset button | soft | RS 29 | EX Drillthrough_Store (hidden) | none, although page visibility is in page.json |
+| Drillthrough | Hide drillthrough pages; a visible one gets a reset button | covered | RS 29 | EX Drillthrough_Store (hidden) | V014 (warn) |
 | Drillthrough | Keep the back button | covered | RS 23 | EX Drillthrough_Store_Button_Back | V001 (fail) |
 | Drillthrough | Tell readers how to drill through (text box) | covered | RS 28; header-icon text not adopted (owner's rule) | EX Elements_Text_PageTitle (text box) | files cannot show it |
+| Locale values | Add a culture file for every culture name readers use; table and column names need an exact match | covered | ML 1 | EX cultures/nl-NL.tmdl | files cannot show it (the list of cultures is the brief's) |
+| Locale values | Dates and numbers follow the reader through format strings such as Short Date | covered | ML 2 | - | No check: no Microsoft Learn page shows that Desktop writes the named formats this way in TMDL |
+| Locale values | Use translations for the default language sparingly | covered | ML 3 | - | files cannot show it (Microsoft leaves how much to the author) |
+| Locale values | USERCULTURE gives the reader's culture in measures, not in imported calculated columns or tables | covered | ML 4 | EX Sales by Store Label | M524 (warn) |
+| Locale values | Label measures live in the model: USERCULTURE can be wrong in report-level measures | covered | ML 5 | EX Sales by Store Label | V019 (warn) |
+| Locale values | FORMAT takes a culture name; for numbers prefer a format string | covered | ML 6 | EX Total Sales After Discount (dynamic format string) | U005 (note) |
+| Localize reports | Plan a report for translation from the start | covered | ML 7 | - | files cannot show it |
+| Localize reports | Leave room for longer text, and test each language in the service | covered | ML 11, 12 | - | files cannot show it (a file does not show the rendered width) |
+| Localized Labels table | Text stored in the report layout is never translated: no typed text in text boxes, visual titles or page tabs | covered | ML 8 | EX Sales by Store Label | V020 (warn); typed text in shapes and buttons is not counted (stored form not confirmed) |
+| Localized Labels table | Visual titles generated from field names or taken from a label measure; page titles from a label measure | covered | ML 9, 10 | EX Charts_Features_ClusteredBar_DynamicSubtitle (subtitle from a measure) | A003 (warn), V018 (note) |
+| Localized Labels table | Label measures: SWITCH over USERCULTURE with the default language last; a culture file for each culture named | covered | ML 14-16 | EX Sales by Store Label | M525 (warn) |
+| Language page navigation | Hide every page but one, so no page tab shows | covered | ML 18 | - | V021 (warn) |
+| Language page navigation | Navigate with bookmark buttons whose text comes from label measures | covered | ML 19, 20 | EX Bookmarks_Button_ShowChart (bookmark buttons, without label text) | No check: the button text rule is covered by ML 8 |
+| Data translation | Translate data only when readers of several languages see the same data; weigh values, length and upkeep | covered | ML 21 | - | files cannot show it |
+| Data translation schema | One source column per language for each translated field | covered | ML 22 | - | files cannot show it |
+| Data translation field parameters | A field parameter over the language columns, with translated labels and a language value per row | covered | ML 23 | EX Sales Breakdown (field parameter over columns) | No check: the files do not show for certain that a value is a language; M822 (warn) on a visible language column |
+| Languages table | A languages table related one-to-one to each translation parameter; one single-select filter on all pages | covered | ML 24 | - | No check: the files do not show for certain which column is the language column |
+| Synchronize field parameters | Every translated field related to the same languages table, so one filter keeps them in step | covered | ML 25 | - | files cannot show it (see the row above) |
+| Translated calendar table | Month and weekday name tables per language from Power Query, sorted and related to the date table | covered | ML 26 | EX Date.tmdl (Month Name by Month Number) | M113 (warn) for month names; weekday names unchecked |
+| Load in reader's language | One bookmark per language filters the languages table; the address names it after the language parameter | covered | ML 27 | - | No check: how the bookmark options map to the file properties is not confirmed |
 | Monitor performance | Monitor slow refresh, queries and visuals | outside this template | CR (item 68: evidence people give) | - | files cannot show it |
 | Monitor performance | Query Diagnostics for Power Query | outside this template | NF (Outside the project files) | - | files cannot show it |
 | Monitor performance | Performance Analyzer per visual | outside this template | NF (Outside the project files); RS K | - | files cannot show it |
@@ -460,17 +483,17 @@ The 11 pages of the DAX reference section "Best practices" (from https://learn.m
 
 | Page | Practice | Status | Guidance | Example | Check |
 | --- | --- | --- | --- | --- | --- |
-| Appropriate use of error functions (https://learn.microsoft.com/en-us/dax/best-practices/dax-error-functions) | No IFERROR or ISERROR; clean upstream; test with IF; DIVIDE; Is Nullable off | missing | DS 1, 2 | - | M501 (warn), M502 (fail); none for Is Nullable |
+| Appropriate use of error functions (https://learn.microsoft.com/en-us/dax/best-practices/dax-error-functions) | No IFERROR or ISERROR; clean upstream; test with IF; DIVIDE; Is Nullable off | soft | DS 1, 2; RD 9 | - | M501 (warn), M502 (fail), M416 (note); Is Nullable: no shipped example |
 | Avoid converting BLANKs to values (https://learn.microsoft.com/en-us/dax/best-practices/dax-avoid-converting-blank) | Return blank; use 'Show items with no data' when all groups must show | covered | DS 7 | EX _Measures.tmdl | M506 (warn) |
 | Avoid using FILTER as a filter argument (https://learn.microsoft.com/en-us/dax/best-practices/dax-avoid-avoid-filter-as-filter-argument) | Column filters (KEEPFILTERS) in CALCULATE; FILTER only for measure tests | covered | DS 6 | - | M505 (warn) |
 | Column and measure references (https://learn.microsoft.com/en-us/dax/best-practices/dax-column-measure-references) | Columns with their table, measures without; no shared names | covered | DS 10; MS 5; RD 38 | EX _Measures.tmdl | M010 (warn), M006 (fail), M119 (warn) |
-| DIVIDE function vs divide operator (/) (https://learn.microsoft.com/en-us/dax/best-practices/dax-divide-function-operator) | DIVIDE for expressions; / for a fixed number; no third argument | soft | DS 2 | EX Average Line Amount | M502 (fail); M506 (warn); none for DIVIDE by a fixed number |
+| DIVIDE function vs divide operator (/) (https://learn.microsoft.com/en-us/dax/best-practices/dax-divide-function-operator) | DIVIDE for expressions; / for a fixed number; no third argument | covered | DS 2 | EX Average Line Amount | M502 (fail); M506 (warn); M518 (warn) for DIVIDE by a fixed number |
 | Use COUNTROWS instead of COUNT (https://learn.microsoft.com/en-us/dax/best-practices/dax-countrows) | COUNTROWS to count rows | covered | DS 3 | EX # Order Lines | M503 (warn) |
 | Use SELECTEDVALUE instead of VALUES (https://learn.microsoft.com/en-us/dax/best-practices/dax-selectedvalue) | SELECTEDVALUE; never compare VALUES with one value | covered | DS 4, 5 | - | M504, M517 (warn) |
 | Use variables to improve your DAX formulas (https://learn.microsoft.com/en-us/dax/best-practices/dax-variables) | Variables for repeats, readability, debugging; not EARLIER | covered | DS 8, 9, 31 | EX Total Sales vs PY (%) | M507, M514 (warn) |
 | Understanding ORDERBY, PARTITIONBY, and MATCHBY functions (https://learn.microsoft.com/en-us/dax/best-practices/dax-understand-orderby) | Explicit ORDERBY and PARTITIONBY; MATCHBY when rows are not unique | covered | DS 11 | - | M516 (warn); MATCHBY: files cannot show it |
 | Configure Chinese coded character set (GB18030-2022) support (https://learn.microsoft.com/en-us/dax/best-practices/dax-unicode-character-behavior) | Code-point text behaviour where the standard is required | outside this template | NF (Model) | - | files cannot show it (set by XMLA on the published model) |
-| Use DAX user-defined functions (https://learn.microsoft.com/en-us/dax/best-practices/dax-user-defined-functions) | Level 1702, naming, descriptions, types, no recursion; qualify columns; OLS limits | soft | MO A | EX functions.tmdl | M801-M805; none for columns or OLS inside functions |
+| Use DAX user-defined functions (https://learn.microsoft.com/en-us/dax/best-practices/dax-user-defined-functions) | Level 1702, naming, descriptions, types, no recursion; qualify columns; OLS limits | covered | MO A; DS 39 | EX functions.tmdl | M801-M807; M010 (warn) reads functions |
 
 ## C. Microsoft's best practice rules
 
@@ -502,7 +525,7 @@ All 71 rules of BPARules.json in microsoft/Analysis-Services (folder BestPractic
 | Reduce number of calculated columns | Performance | covered | MS 8 | M106 (warn), same limit of five |
 | Check if bi-directional and many-to-many relationships are valid | Performance | covered | RD 18, 19 | M405, M406 (warn) |
 | Check if dynamic row level security (RLS) is necessary | Performance | covered | SS 28; item 41 (review user-based roles) | files cannot show it (whether a user-based rule is needed); M603 (warn) on USERNAME |
-| Column references should be fully qualified | DAX Expressions | covered | DS 10 | M010 (warn) in measures and calculated columns; the rule also reads KPIs, role filters and calculation items |
+| Column references should be fully qualified | DAX Expressions | covered | DS 10 | M010 (warn) in measures, calculated columns, calculation items, role filters and functions; KPIs are not read |
 | Measure references should be unqualified | DAX Expressions | covered | DS 10 | M010 (warn) |
 | No two measures should have the same definition | DAX Expressions | covered | DS 12 | M508 (warn) |
 | Use the TREATAS function instead of INTERSECT for virtual relationships | DAX Expressions | covered | DS 14 | M510 (warn) |
@@ -516,7 +539,7 @@ All 71 rules of BPARules.json in microsoft/Analysis-Services (folder BestPractic
 | The EVALUATEANDLOG function should not be used in production models | DAX Expressions | covered | DS 16 | M512 (warn) |
 | Data columns must have a source column | Error Prevention | covered | RD 13 | M904 (fail) |
 | Expression-reliant objects must have an expression | Error Prevention | covered | RD 14 | M905 (fail) |
-| Avoid structured data sources with provider partitions | Error Prevention | soft | MO E (legacy data sources and query partitions are not used in a project) | none, although such a partition is visible in the table file |
+| Avoid structured data sources with provider partitions | Error Prevention | covered | SS 39 | M833 (fail) |
 | Avoid the USERELATIONSHIP function and RLS against the same table | Error Prevention | covered | RD 25 | M415 (fail) |
 | Relationship columns should be of the same data type | Error Prevention | covered | RD 27; MS 10 | M109 (fail) |
 | Avoid invalid characters in names | Error Prevention | covered | RD 15 | M906 (fail) |
@@ -525,7 +548,7 @@ All 71 rules of BPARules.json in microsoft/Analysis-Services (folder BestPractic
 | Remove unnecessary columns | Maintenance | covered | MS 15; SS 13 | M201 (note) |
 | Remove unnecessary measures | Maintenance | covered | MS 15 | M201 (note) |
 | Fix referential integrity violations | Maintenance | covered | RD 17 (fix unmatched keys at the source); RD 9 (item 14) | files cannot show it (needs an integrity annotation) |
-| Remove data sources not referenced by any partitions | Maintenance | soft | MO E (legacy data sources are not used) | none, although a dataSource object is visible in the model files |
+| Remove data sources not referenced by any partitions | Maintenance | covered | SS 39 | M832 (warn) |
 | Remove roles with no members | Maintenance | outside this template | SS 34; MO E (members are assigned in the Power BI service) | files cannot show it |
 | Ensure tables have relationships | Maintenance | covered | RD 4 | M411 (warn); measure tables, calculation groups and parameter tables left out |
 | Visible objects with no description | Maintenance | covered | DE; TI 1 | D001 (fail) |
@@ -579,7 +602,7 @@ No text of SQLBI or of the GPL repository is quoted; every practice is restated.
 | Modelling | Data categories on places | covered | RD 36; M114 (warn) |
 | Modelling | Flags as Yes/No text | covered | RD 37; M116 (warn) |
 | Modelling | Sort-by columns; sort columns stay available to MDX | covered | RD 12, 16, 35; M113 (warn), M903, M907 (fail) |
-| Modelling | More than about 30 visible columns hints at a design problem | missing | none |
+| Modelling | More than about 30 visible columns hints at a design problem | covered | RD 1 (wide tables); M120 (warn) |
 | Modelling | Few calculated columns; none with RELATED | covered | MS 8; M105 (fail), M106 (warn) |
 | Modelling | Measures spread over their own tables, not one measure table | not adopted | the owner's rule (MS 1, M001); the same skill's TMDL guide shows a _Measures table |
 | Modelling | No duplicate measures; no measure that only repeats another | covered | DS 12, 13; M508, M509 (warn) |
@@ -593,29 +616,29 @@ No text of SQLBI or of the GPL repository is quoted; every practice is restated.
 | Clean-up | Remove unused hidden objects, unused inactive relationships, empty perspectives | covered | MS 15; RD 23; MO D; M201 (note), M410, M831 (warn) |
 | Parameters | Server and database as parameters | covered | SS 8; example expressions.tmdl |
 | Pivoted data | Unpivot month columns | covered | RD 6; M417 (warn) |
-| DAX | Variables for long formulas; names start with _ | covered | DS 8; M507 (warn). The _ prefix: not adopted (Microsoft Learn's page writes plain names; DS 31). DS's own examples still use _ names (DS 8, 15, B) |
+| DAX | Variables for long formulas; names start with _ | covered | DS 8; M507 (warn). The _ prefix: not adopted (Microsoft Learn's page writes plain names; DS 31). |
 | DAX | DIVIDE by default; / inside iterators only without zero divisors | covered | DS 2; M502 (fail); the iterator case goes in the brief |
 | DAX | Column predicates or KEEPFILTERS, not FILTER over a table | covered | DS 6; M505 (warn) |
 | DAX | TREATAS rather than INTERSECT | covered | DS 14; M510 (warn) |
-| DAX | REMOVEFILTERS rather than ALL when only clearing filters | soft | DS 20 (judged in the review); no check, although ALL inside CALCULATE is visible |
+| DAX | REMOVEFILTERS rather than ALL when only clearing filters | covered | DS 20; M519 (warn) |
 | DAX | Columns with table, measures without | covered | DS 10; M010 (warn) |
-| DAX | Avoid deep CALCULATE nesting | soft | DS 8 (no check), although nested CALCULATE is visible |
+| DAX | Avoid deep CALCULATE nesting | covered | DS 8; M521 (warn) |
 | DAX | IFERROR acceptable as one guard | not adopted | Microsoft Learn (higher) says avoid it: DS 1, M501 |
 | DAX | No EVALUATEANDLOG in production | covered | DS 16; M512 (warn) |
 | DAX | No 1 - (x / y) | covered | DS 15; M511 (warn) |
-| DAX | Rolling windows: the offset equals the window length; time functions need a date context | missing | none |
+| DAX | Rolling windows: the offset equals the window length; time functions need a date context | covered | DS C (rolling windows); no check |
 | DAX | Function parameters typed; expr only when needed | covered | MO A5; M804 (warn) |
 | DAX | Rules for saved DAX queries (DEFINE, ORDER BY) | outside this template | DAX query view lives in Desktop (NF, Outside the project files) |
 | DAX performance | Tune with traces: warm-up, measured runs, no change without a yes | outside this template | tracing tools; the yes rule is in CI |
 | DAX performance | Catalogue patterns Microsoft Learn also states (filters, variables, COUNTROWS, no zeros) | covered | DS A; M503, M505, M506, M507 |
-| DAX performance | The other catalogue patterns (context transition in iterators, SUMMARIZE filters, Boolean multipliers, model patterns) | missing | not restated; model patterns partly in RD and SS (snowflake, aggregations) |
+| DAX performance | The other catalogue patterns (context transition in iterators, SUMMARIZE filters, Boolean multipliers, model patterns) | covered | DS 32, 35-38; no check: Microsoft's skill offers each as something to try and then measure |
 | DAX performance | ALLEXCEPT only when the kept column is filtered directly | covered | DS 20; files cannot show it (depends on the query) |
-| Direct Lake | Entity partitions pointing to one shared expression; no M | soft | SS 27; example storage/DirectLake; no check, although partition kinds are in the files |
+| Direct Lake | Entity partitions pointing to one shared expression; no M | covered | SS 27; MF 4; example storage/DirectLake; M711 (warn) |
 | Direct Lake | Shared expression with AzureStorage.DataLake; named DirectLake - Model | covered | SS 27; example DirectLake expressions.tmdl |
 | Direct Lake | Columns map one-to-one; no binary columns | covered | SS 27; M904 (fail); binary not checked |
 | Direct Lake | Lakehouse tuning (V-Order, row groups) | outside this template | SS 27 (outside the model) |
 | TMDL | Tabs, quotes, /// descriptions, // only in expressions, no lineageTag | covered | TI; TM; D001, D003, C001 |
-| TMDL | Measures before columns in a table | missing | none |
+| TMDL | Measures before columns in a table | covered | MS C (order inside a table file); no check: Learn says the order does not change the model |
 | TMDL | database declaration first; ref lines; powerBI_V3 for API import | covered | TM; F003, J checks; the API import is a publishing step (out of scope) |
 | TMDL | No PBI_ annotations; own annotations allowed | covered | TI 6; TM; files cannot show it (Power BI's own PBI_ annotations are legitimate) |
 | TMDL | One file per role; modelPermission; no PBI_Id on new roles | covered | TM; examples roles/*.tmdl |
@@ -627,12 +650,12 @@ No text of SQLBI or of the GPL repository is quoted; every practice is restated.
 | AI readiness | Ask how the model will be used before AI preparation | covered | MS 17 (brief switch) |
 | AI readiness | Copilot on for the tenant; Q&A on for the model | outside this template | tenant setting; starter definition.pbism |
 | AI readiness | Star schema, types, explicit measures, hierarchies first | covered | RD A, 40; MS 9, 10 |
-| AI readiness | isDefaultLabel on each dimension's name column | missing | none |
+| AI readiness | isDefaultLabel on each dimension's name column | soft | MS 17; M303 (note, when the brief turns it on); no shipped example: no column of the examples carries isDefaultLabel |
 | AI readiness | Descriptions read for 200 characters; key words first | covered | MS 17; DE; M302 (note) |
 | AI readiness | AI instructions, AI data schema, verified answers: set by a person | outside this template | Prep data for AI is set in Power BI (MS 17; NF) |
 | Report design | Chart from the question | covered | RS H |
-| Report design | Category and series caps per chart type | missing | only checklist item 54's part-to-whole review (RS 45) |
-| Report design | Anti-patterns: no 3-D, axes from zero, no dual axis, no crowded pies | soft | RS 46; no check, although axis and series settings are in visual.json |
+| Report design | Category and series caps per chart type | covered | RS 45 (Microsoft's skill's limits per chart type); no check: it needs the data |
+| Report design | Anti-patterns: no 3-D, axes from zero, no dual axis, no crowded pies | soft | RS 46; VF 24 (example Charts_Features_ClusteredColumn_AxisSettings); no check yet for the axis start or a second axis, although VF 24 names valueAxis.start; 3-D: no file property; crowded pies: it needs the data |
 | Report design | Agent mistakes: hex colours, off-grid, empty alt text, chart type as title | covered | V009, G003, A001, A003 (warn) |
 | Report design | Findings as advice in three levels | not adopted | the template's own levels (fail, warn, note) by its level rule |
 | Report design | Pre-flight: titles, sort, grid, overlap, title band | covered | RS 49, 62; LS; A003, G001-G006 |
@@ -650,15 +673,15 @@ No text of SQLBI or of the GPL repository is quoted; every practice is restated.
 | Report mechanics | Dropdown slicer with a header needs about 80 pixels | not adopted | LS (owner-approved) sets 56; DB step 4 looks for slicers too small for their text |
 | Report mechanics | A visual with its own container formatting loses theme padding | covered | TH (listed as not confirmed; developer tests) |
 | Report mechanics | A slicer's tooltip field needs tooltips on | covered | PI 5 (exception per visual); H002 |
-| Report mechanics | In a filter's Where clause refer to the From alias | soft | CI (copy a shipped filter); no check, although the clause is in visual.json |
+| Report mechanics | In a filter's Where clause refer to the From alias | covered | RS 51; VF 1; V015 (warn) |
 | Report mechanics | Bookmark files, bookmarks.json, suppressData, targets by name | covered | RS 8-11; V008, V010 (warn); examples bookmarks |
 | Report mechanics | Button actions and their targets; back button on drillthrough | covered | RS 11, 23; V001 (fail), V008 (warn); examples |
 | Report mechanics | Drillthrough page binding with boundFilter | covered | RS 24; example Drillthrough_Store; J003 (fail) |
 | Report mechanics | Conditional formatting forms; icon names only from the catalogue | covered | RS F; example Tables_Table_StoreSales; icon names not restated (guidance gap) |
-| Report mechanics | Never create multi-row card, map or filled map | soft | RS 47; no check, although visualType is in visual.json; INDEX ships legacy cards as examples |
+| Report mechanics | Never create multi-row card, map or filled map | covered | RS 47; V016 (warn) for map and filledMap, U105 (note) for multiRowCard and card; INDEX ships the legacy cards only to read old reports |
 | Report mechanics | Table and matrix sizing and presets | out of scope | a source's own styling; table versus matrix choice is in RS H |
 | Report mechanics | PBIR structure: pageOrder, unique names, schema | covered | PV; J003, N005, V011 |
-| Report mechanics | Images in RegisteredResources and registered in report.json | soft | PI 9; example Elements_Image_ExampleMark; no check for images (T001 covers the theme) |
+| Report mechanics | Images in RegisteredResources and registered in report.json | covered | RS 69; example Elements_Image_ExampleMark; V017 (warn) |
 | Report mechanics | KPI visual: indicator is a measure, trend on dates | covered | RS H; example Cards_KPIs_KPI_SalesAgainstTarget |
 | Report mechanics | definition.pbir byPath or byConnection | covered | SR step 3; J002 |
 | Report mechanics | Branch before editing; no commit without asking | covered | CI |
@@ -680,15 +703,15 @@ No text of SQLBI or of the GPL repository is quoted; every practice is restated.
 | Variables | Use variables; computed once where defined | covered | DS 8; M507 (warn) |
 | DIVIDE | DIVIDE usually; plain / in iterators after removing zeros | covered | DS 2; M502 (fail); exception in the brief |
 | IFERROR | Not recommended | covered | DS 1; M501 (warn) |
-| SUMMARIZE | SUMMARIZE only to group; ADDCOLUMNS for new columns | missing | none |
-| SUMMARIZECOLUMNS | Filters in an outer CALCULATETABLE; value filter behaviour Independent | soft | DS (Where sources disagree); no check, although its filter arguments are visible. Value filter behaviour: preview (NF), not adopted as a default |
+| SUMMARIZE | SUMMARIZE only to group; ADDCOLUMNS for new columns | covered | DS 32; M522 (warn) |
+| SUMMARIZECOLUMNS | Filters in an outer CALCULATETABLE; value filter behaviour Independent | covered | DS 33; M523 (warn). Value filter behaviour: MF 17 (preview; example preview/ValueFilter; M841 until section 11 of the brief lists it) |
 | KEEPFILTERS | When to use KEEPFILTERS | covered | DS 6 (second bullet); files cannot show it (meaning) |
 | Filter columns | Filter columns, not tables; split AND conditions | covered | DS 6; M505 (warn) |
-| Removing filters | REMOVEFILTERS, ALL, ALLSELECTED, ALLEXCEPT each for its job | soft | DS 20 (judged in the review); no check, although the calls are visible |
-| ALLSELECTED | Never call a measure with ALLSELECTED inside an iteration | missing | none |
-| COALESCE | COALESCE for readability; store the measure in a variable | missing | DS 7 flags COALESCE ( x, 0 ) only; the readability advice is not restated |
+| Removing filters | REMOVEFILTERS, ALL, ALLSELECTED, ALLEXCEPT each for its job | covered | DS 20; M519 (warn) for ALL as a filter argument; ALLSELECTED and ALLEXCEPT judged in the review (ALLEXCEPT depends on the query) |
+| ALLSELECTED | Never call a measure with ALLSELECTED inside an iteration | covered | DS 34; no check: it needs the chain of measures |
+| COALESCE | COALESCE for readability; store the measure in a variable | covered | DS 7 (second paragraph); no check |
 | BLANK | Expressions that look equal can differ with BLANK | covered | DS 7; files cannot show it |
-| Function names | PascalCase, dot prefixes, camelCase parameters | soft | MO A6 (guidance, not checked), although names are in functions.tmdl |
+| Function names | PascalCase, dot prefixes, camelCase parameters | covered | MO A6; DS 39; M807 (warn) |
 | Time names | Suffix acronyms (YTD, QTD, MTD, PY and more); % without brackets | covered | MS 3 (YTD, QTD, MTD, PY). Other acronyms and bare %: not adopted (owner's rule) |
 | Auto date/time | Off; no column-variation syntax | covered | RD 29; M401 (warn); the .[Date] syntax not checked |
 | Future dates | Hide time results after the last date with data | covered | DS (Where sources disagree: helper measure in _Measures) |
@@ -701,7 +724,7 @@ No text of SQLBI or of the GPL repository is quoted; every practice is restated.
 | Topic | Practice | Status | Where covered, or why not adopted |
 | --- | --- | --- | --- |
 | Layout | Summary top-left, detail bottom-right | not adopted | no Microsoft page states it; idea only |
-| Page title | A title text box at the top-left of every page | soft | LS (title band); no check, although a text box's position is visible |
+| Page title | A title text box at the top-left of every page | covered | RS 70; LS (title band); V018 (note) |
 | Spacing | Equal gaps and margins | covered | LS; G004, G006 (warn) |
 | Theme | A custom theme; no one-off formatting | covered | TH; T001 (fail), V009 (warn) |
 | Bindings | Every field a visual uses exists | covered | B001 (fail) |
@@ -710,10 +733,10 @@ No text of SQLBI or of the GPL repository is quoted; every practice is restated.
 | Alt text | Alt text on every data visual | covered | RS 55; A001, A004 (warn) |
 | KPIs | Prefer the KPI visual when a target exists | covered | RS H; example KPI. Colouring and rounding advice: a source's styling (out of scope) |
 | Tables | Matrix for hierarchies; formatting advice | covered | RS H for the choice; the formatting is a source's styling (out of scope) |
-| Anti-patterns | Gauge as KPI, unsorted bars, dual axis, 3-D | soft | RS 46, 62; no check |
+| Anti-patterns | Gauge as KPI, unsorted bars, dual axis, 3-D | soft | RS 46; no check yet for a second axis; the gauge and the sort are judgements; 3-D has no file property |
 | Identity | One tone, one signature element | out of scope | a source's own styling |
 | Evidence | Check callout numbers against the data | covered | SM (What the files cannot tell); DB; files cannot show it |
-| Tooltip pages | Only for another view; no page filters | covered | RS C; V002-V005; design-time filters: see A2 (soft) |
+| Tooltip pages | Only for another view; no page filters | covered | RS C; V002-V005; design-time filters: V013 (warn) |
 | Filter pane | Lock scope filters, hide clean-up filters | covered | RS 52, 54; example report filter |
 | Phone layout | Never hand-write mobile.json | covered | RS 42; PI 10 |
 | Report review | Usage, access, load times, accessibility | covered | CR (items 68, 76, 78 are people's evidence) |
@@ -740,7 +763,7 @@ No text of SQLBI or of the GPL repository is quoted; every practice is restated.
 | --- | --- | --- | --- |
 | References | Qualify columns, never measures | covered | DS 10; M010 (warn) |
 | Errors and BLANK | DIVIDE; no IFERROR; leave BLANK | covered | DS 1, 2, 7; M501, M502, M506 |
-| Nesting | One CALCULATE with several filters | soft | DS 8 (no check), although nesting is visible |
+| Nesting | One CALCULATE with several filters | covered | DS 8; M521 (warn) |
 | Layering | Base measures, then derived ones | covered | DS 21 (judged in the review); files cannot show it for certain |
 | Measure names | Period first, Count of, category prefixes | not adopted | owner's rule (MS 3; M008) |
 | DAX comments | Long comments with history in each measure | not adopted | meaning goes in /// descriptions (DE); history in commits (CI) |
@@ -751,7 +774,7 @@ No text of SQLBI or of the GPL repository is quoted; every practice is restated.
 | Running total | FILTER over the whole date table | not adopted | Microsoft Learn (higher): no FILTER over a table (DS 6, M505); DS C cumulative-total pattern |
 | RLS | Dynamic rules end in FALSE; test roles; groups | covered | SS 31, 34; M605 (warn) |
 | Report layout | 6 to 8 visuals; 8/16/24 spacing | covered | LS (spacing). 6 to 8 visuals: not adopted (item 20 numbers, V006, V007) |
-| Charts | Axes from zero; sort by value; few categories | soft | RS 46, 62; no check |
+| Charts | Axes from zero; sort by value; few categories | soft | RS 45, 46; VF 24; no check yet for axes from zero (VF 24 names valueAxis.start); the sort and the categories need a judgement or the data |
 | Gauge | Gauge as a fast KPI visual | covered | NF (Card, KPI, gauge); example gauge |
 | Text | Font sizes and families | not adopted | the owner's theme sets text classes (TH) |
 | Interaction | Tooltip size; named bookmarks; documented interactions | covered | RS B, C, 53; V003 |
@@ -776,8 +799,8 @@ One row per native topic of the repository (MIT), then its out-of-scope topics. 
 | Forbidden properties | Keys that make Desktop refuse a file | covered | J003 (fail) checks every file against Microsoft's schema; single-key claims without a source not adopted |
 | Page names | Pages keep their ids; reviews use display names | covered | PV; N001 (fail) |
 | Page order | No repeated or orphan ids in pageOrder | covered | V011 (warn) |
-| Resources registered | Every image or resource used is listed in report.json | soft | PI 9; theme only: T001 (fail); no check for images |
-| Resource files exist | Every registered item exists on disk | soft | theme only: T001 (fail); no check for other resources |
+| Resources registered | Every image or resource used is listed in report.json | covered | RS 69; V017 (warn); theme: T001 (fail) |
+| Resource files exist | Every registered item exists on disk | covered | RS 69; V017 (warn) also reports a resource whose file is not in the report folder; theme: T001 (fail) |
 | Model binding | .pbip to report to model chain | covered | SR step 3; J002 (fail) |
 | .pbi files | Local settings are not committed or written | covered | PI 9; TI 13 |
 | UTF-8 without BOM | No byte-order mark | covered | PI 8; J001 (fail) for JSON. For .tmdl: not adopted (no Microsoft source says a BOM blocks loading) |
@@ -789,9 +812,9 @@ One row per native topic of the repository (MIT), then its out-of-scope topics. 
 | Unique measure names | One name once in the model | covered | MS 3; M005 (fail) |
 | Unresolved DAX references | A Table[Column] that does not exist | covered | DS 18; M908 (fail) |
 | Filter expressions | Filter conditions use kinds the schema knows | covered | J003 (fail) against the semanticQuery schema |
-| Calculated table columns | sourceColumn matches the names SELECTCOLUMNS returns | missing | none (M904 leaves calculated tables out) |
-| Calculated objects after a file edit | A new calculated table is empty until a refresh in Desktop | missing | DB says a reload does not refresh data; nothing tells Copilot to ask for a refresh |
-| Fresh project renders empty | No data until the first refresh | missing | same gap as the row above; the repository's screen-automation route: not adopted (another tool) |
+| Calculated table columns | sourceColumn matches the names SELECTCOLUMNS returns | covered | SS 40; M910 (warn; formulas built with ROW or SELECTCOLUMNS) |
+| Calculated objects after a file edit | A new calculated table is empty until a refresh in Desktop | covered | SS 41; files cannot show it |
+| Fresh project renders empty | No data until the first refresh | covered | SS 41 (a project made from the starter shows no data until its first refresh); files cannot show it |
 | Auto date/time annotation | Do not flip the annotation by hand | covered | RD 29; M401 (warn); set in Desktop only |
 | Desktop overwrites files | Save in Desktop before outside edits | covered | CI (save first); DB |
 | report.json edited by the agent | Themes registered by editing report.json | not adopted | PI 9: the developer imports the theme; scaffold.py --register-theme only after a yes |
@@ -811,7 +834,7 @@ One row per native topic of the repository (MIT), then its out-of-scope topics. 
 | RLS and OLS | Dimension filters, USERPRINCIPALNAME, deny by default, View as | covered | SS D; M601-M608 |
 | Composite, DirectQuery, aggregations, incremental refresh | When to mix modes; Dual; aggregations; RangeStart and RangeEnd | covered | SS C; M701-M709, U004; examples |
 | Field parameters | Three-column tables; fieldParameters on visuals | covered | MO C; RS A; M821, M822; examples |
-| Image from a measure | An image visual that shows a picture a measure returns | missing | none (examples have a WebUrl measure and a registered image only) |
+| Image from a measure | An image visual that shows a picture a measure returns | missing | none: VF 21 covers picture columns from the ImageUrl data category (no example); nothing on an image visual bound to a measure |
 | SVG measures | Separate SVG measure table and drawing rules | not adopted | no Microsoft source; a separate table breaks MS 1 (M001) |
 | Sorting in a visual | sortDefinition on charts | covered | RS 62; example sort definition. 'Always descending': a source's styling |
 | Top N matches the title | A title promising N shows N | covered | RS 49; A003 (warn); files cannot show it (meaning) |
@@ -880,7 +903,7 @@ One row per native topic of the repository (MIT), then its out-of-scope topics. 
 | Performance: slow DAX patterns | covered | DS A | - | M501-M517 (warn) |
 | Performance: aggregations | covered | SS 25 | Sales Aggregate | U004 (note) |
 | Performance: incremental refresh | covered | SS 26 | Sales refresh policy; RangeStart, RangeEnd | M707, M709 (fail), M708 (warn) |
-| DirectQuery and composite models | covered | SS 22-24 (composite models on a published model: see the open rows in A2) | storage/DirectQuery (Dual, aggregation) | M513, M701-M706 |
+| DirectQuery and composite models | covered | SS 22-24 (models on a published model: SS 23) | storage/DirectQuery (Dual, aggregation) | M513, M701-M706, U008, U104 |
 | A Power Query standard | covered | SS A (1-12); DE | partitions in Examples.SemanticModel | P001 (fail), P002-P006 (warn) |
 | Query folding | covered | SS 2, 3 | - | files cannot show it; P002, M708 (warn), M701 (fail) |
 | Referencing queries | covered | SS 4 | expressions.tmdl (Sales Source) | P003 (warn) |
@@ -907,96 +930,15 @@ Every row above whose status is soft or missing, with what would close it. A pag
 
 | Section | Row | Status | What would close it |
 | --- | --- | --- | --- |
-| A | 7 What is a star schema? | missing | close the open practice rows of this page in A2 |
-| A | 8 Reduce data model size | soft | close the open practice rows of this page in A2 |
-| A | 12 Many-to-many relationships | missing | close the open practice rows of this page in A2 |
-| A | 14 Bi-directional relationships | missing | close the open practice rows of this page in A2 |
-| A | 15 Relationship troubleshooting | missing | close the open practice rows of this page in A2 |
-| A | 16 DirectQuery model guidance | missing | close the open practice rows of this page in A2 |
-| A | 17 Composite model guidance | missing | close the open practice rows of this page in A2 |
-| A | 18 Row-level security (RLS) guidance | missing | close the open practice rows of this page in A2 |
-| A | 19 Power Platform modeling guidance | missing | close the open practice rows of this page in A2 |
-| A | 22 Appropriate use of error functions | missing | close the open practice rows of this page in A2 |
-| A | 26 DIVIDE function vs divide operator (/) | soft | close the open practice rows of this page in A2 |
-| A | 31 Separate reports from models | soft | close the open practice rows of this page in A2 |
-| A | 32 Extend visuals with report page tooltips | soft | close the open practice rows of this page in A2 |
-| A | 33 Use report page drillthrough | soft | close the open practice rows of this page in A2 |
-| A | 45 Use locale values in reports | missing | a localisation section in MO and RS (labels table, data translation with field parameters and a languages table, USERCULTURE, language bookmarks), or the owner rules localisation out of scope |
-| A | 46 Use best practices to localize reports | missing | a localisation section in MO and RS (labels table, data translation with field parameters and a languages table, USERCULTURE, language bookmarks), or the owner rules localisation out of scope |
-| A | 49 Add a Localized Labels table | missing | a localisation section in MO and RS (labels table, data translation with field parameters and a languages table, USERCULTURE, language bookmarks), or the owner rules localisation out of scope |
-| A | 51 Multiple-language page navigation | missing | a localisation section in MO and RS (labels table, data translation with field parameters and a languages table, USERCULTURE, language bookmarks), or the owner rules localisation out of scope |
-| A | 56 Implement data translation | missing | a localisation section in MO and RS (labels table, data translation with field parameters and a languages table, USERCULTURE, language bookmarks), or the owner rules localisation out of scope |
-| A | 57 Support data translations | missing | a localisation section in MO and RS (labels table, data translation with field parameters and a languages table, USERCULTURE, language bookmarks), or the owner rules localisation out of scope |
-| A | 58 Data translation with field parameters | missing | a localisation section in MO and RS (labels table, data translation with field parameters and a languages table, USERCULTURE, language bookmarks), or the owner rules localisation out of scope |
-| A | 59 Add the languages table | missing | a localisation section in MO and RS (labels table, data translation with field parameters and a languages table, USERCULTURE, language bookmarks), or the owner rules localisation out of scope |
-| A | 60 Synchronize field parameters | missing | a localisation section in MO and RS (labels table, data translation with field parameters and a languages table, USERCULTURE, language bookmarks), or the owner rules localisation out of scope |
-| A | 61 Data translation calendar table | missing | a localisation section in MO and RS (labels table, data translation with field parameters and a languages table, USERCULTURE, language bookmarks), or the owner rules localisation out of scope |
-| A | 62 Load multiple-language reports | missing | a localisation section in MO and RS (labels table, data translation with field parameters and a languages table, USERCULTURE, language bookmarks), or the owner rules localisation out of scope |
-| A2 | Star schema: Junk dimension: many small flags merged into one table with a key | missing | add a rule to RD A from the star schema page (no check: the files cannot show it) |
-| A2 | Star schema: Degenerate dimension (order number) stays on the fact table | missing | add a rule to RD A from the star schema page (no check) |
-| A2 | Data reduction: Queries that only feed other queries are not loaded | soft | add a warn check: a table query that names another loaded table's query |
-| A2 | Many-to-many: Turn Is Nullable off on keys that must never be blank | missing | add a rule to RD 9 on isNullable for keys, ship it on Store[Store Key] (serializer-checked), and a note check |
-| A2 | Many-to-many: Measures over a higher-grain fact return blank below its grain (ISFILTERED); its number columns hidden | missing | add the ISFILTERED or ISINSCOPE guard to RD 19 with a shipped measure over Sales Target |
-| A2 | Both directions: Ask whether a slicer list that changes with data helps readers at all | missing | one sentence in RD 18 (no check) |
-| A2 | Troubleshooting: Symptoms: unmatched keys, Assume Referential Integrity, 'apply security filter in both directions' | missing | add the 'apply security filter in both directions' setting to SS D, with its TMDL property and a check |
-| A2 | DirectQuery: Start with simple measures; add complex CALCULATE logic while testing speed | missing | one line in SS 24 (no check) |
-| A2 | DirectQuery: Assume Referential Integrity on DirectQuery relationships | soft | confirm the TMDL property, then a note for DirectQuery relationships without it |
-| A2 | DirectQuery: Query reduction options on from the start | soft | a note when a model with DirectQuery tables has a report without query reduction settings |
-| A2 | DirectQuery: Measure filters, Top N filters and medians cost extra queries | missing | a rule in SS 24 and a note for such filters on DirectQuery visuals |
-| A2 | DirectQuery: Multi-select slicers: Apply buttons | soft | a note when a DirectQuery page has two or more slicers and no Apply button |
-| A2 | DirectQuery: Turn off totals and subtotals nobody needs | soft | confirm the property names, then a rule in RS and a note on DirectQuery tables and matrices |
-| A2 | Composite: Desktop does not fully validate relationships across source groups | soft | a check for two active paths between two tables |
-| A2 | Composite: Test CALCULATE over a measure from a remote model | missing | a section on composite models over a published model in SS C |
-| A2 | Composite: Calculated objects cannot rely on a chained (remote) model | missing | same SS C section, with a check on calculated objects over remote tables |
-| A2 | Composite: Test every calculation after adding calculated columns to a composite model | missing | same SS C section |
-| A2 | Composite: Calculation groups in a remote model can surprise | missing | same SS C section |
-| A2 | Composite: RLS in composite models: per source group; not on a remote table | missing | same SS C section, with a check for role rules on remote tables |
-| A2 | Composite: Visuals from one source group; sync slicers instead of a cross-group relationship | soft | a rule in RS E and a note for a visual whose fields come from two source groups |
-| A2 | Composite: Keep the one trusted enterprise model free of composite parts | missing | same SS C section |
-| A2 | RLS: Share-of-all figures from a summary table RLS does not filter; totals must not leak | missing | a rule in SS D (unsecured summary table; totals that leak) |
-| A2 | RLS: Troubleshooting: directions, 'apply security filter in both directions', several roles, aggregations | missing | same fix as the troubleshooting row: the security-filter setting in SS D |
-| A2 | RLS: A test measure that shows the signed-in user | missing | a rule in SS 34 (temporary test measure, removed before publishing) |
-| A2 | Power Platform: One model per subject, not one model for everything | missing | a line in RD A or SS 6 (no check) |
-| A2 | Power Platform: DirectQuery to Dataverse: Dual dimensions, single sign-on, CURRENT_USER views, extra Import models | missing | Dataverse DirectQuery points in SS 6 (no check beyond M706) |
-| A2 | DAX error functions: Is Nullable off where a blank must fail the refresh | missing | same fix as the many-to-many Is Nullable row |
-| A2 | DAX DIVIDE: The / operator when the divisor is a fixed number | soft | a note check for DIVIDE by a fixed number |
-| A2 | DAX UDFs: Write columns with their table inside a function | soft | extend M010 to functions |
-| A2 | DAX UDFs: OLS does not reach functions: never name secured objects in a function | soft | a check: a function that names an object a role secures |
-| A2 | Separate reports: Prefix report-level measures so model measures cannot clash | soft | a warn check on reportExtensions.json names, and prefix the shipped example |
-| A2 | Tooltip pages: Remove design-time filter values before publishing | soft | a warn check: filter values saved on a tooltip page |
-| A2 | Drillthrough: Remove design-time drillthrough values before publishing | soft | a warn check: values saved in a drillthrough filter |
-| A2 | Drillthrough: Hide drillthrough pages; a visible one gets a reset button | soft | a warn check: a visible drillthrough page with no reset button |
-| B | Appropriate use of error functions | missing | see the A2 rows of this page |
-| B | DIVIDE function vs divide operator (/) | soft | see the A2 rows of this page |
-| B | Use DAX user-defined functions | soft | see the A2 rows of this page |
-| C | Avoid structured data sources with provider partitions | soft | a fail check on query partitions |
-| C | Remove data sources not referenced by any partitions | soft | a check on dataSource objects |
-| D | Microsoft's skills, Modelling: More than about 30 visible columns hints at a design problem | missing | a line in RD 1 and a note check |
-| D | Microsoft's skills, DAX: REMOVEFILTERS rather than ALL when only clearing filters | soft | a note check: ALL ( table ) as a CALCULATE filter argument |
-| D | Microsoft's skills, DAX: Avoid deep CALCULATE nesting | soft | a note check: CALCULATE inside CALCULATE |
-| D | Microsoft's skills, DAX: Rolling windows: the offset equals the window length; time functions need a date context | missing | a line in DS C (no check) |
-| D | Microsoft's skills, DAX performance: The other catalogue patterns (context transition in iterators, SUMMARIZE filters, Boolean multipliers, model patterns) | missing | restate the rest of the catalogue in DS A in new words |
-| D | Microsoft's skills, Direct Lake: Entity partitions pointing to one shared expression; no M | soft | a check: a Direct Lake table with an M partition |
-| D | Microsoft's skills, TMDL: Measures before columns in a table | missing | a line in TM (and a note check) |
-| D | Microsoft's skills, AI readiness: isDefaultLabel on each dimension's name column | missing | a rule in MS 17 and an example on Store Name |
-| D | Microsoft's skills, Report design: Category and series caps per chart type | missing | decide numbers per chart type in RS H (item 54 sets only part-to-whole) |
-| D | Microsoft's skills, Report design: Anti-patterns: no 3-D, axes from zero, no dual axis, no crowded pies | soft | a warn check for a secondary axis without a title and an axis not from zero |
-| D | Microsoft's skills, Report mechanics: In a filter's Where clause refer to the From alias | soft | a check on filter Where clauses |
-| D | Microsoft's skills, Report mechanics: Never create multi-row card, map or filled map | soft | a warn check on map, filledMap, qnaVisual; a note on multiRowCard and card |
-| D | Microsoft's skills, Report mechanics: Images in RegisteredResources and registered in report.json | soft | a check that every image ItemName is registered and on disk |
-| D | SQLBI, SUMMARIZE: SUMMARIZE only to group; ADDCOLUMNS for new columns | missing | a rule in DS A (and a note check) |
-| D | SQLBI, SUMMARIZECOLUMNS: Filters in an outer CALCULATETABLE; value filter behaviour Independent | soft | a note check on SUMMARIZECOLUMNS filter arguments in measures |
-| D | SQLBI, Removing filters: REMOVEFILTERS, ALL, ALLSELECTED, ALLEXCEPT each for its job | soft | same note check as Microsoft's skill REMOVEFILTERS row |
-| D | SQLBI, ALLSELECTED: Never call a measure with ALLSELECTED inside an iteration | missing | a rule in DS A |
-| D | SQLBI, COALESCE: COALESCE for readability; store the measure in a variable | missing | a line in DS 7 |
-| D | SQLBI, Function names: PascalCase, dot prefixes, camelCase parameters | soft | a note check on function and parameter names |
-| D | data-goblin/power-bi-agentic-development, Page title: A title text box at the top-left of every page | soft | a note check: a page with no text box in the title band |
+| A | 12 Many-to-many relationships | soft | close the open practice row of this page in A2 (Is Nullable) |
+| A | 16 DirectQuery model guidance | soft | close the open practice row of this page in A2 (measure and Top N filters) |
+| A | 22 Appropriate use of error functions | soft | close the open practice row of this page in A2 (Is Nullable) |
+| A2 | Many-to-many: Turn Is Nullable off on keys that must never be blank | soft | ship `isNullable: false` on Store[Store Key], written by Microsoft's serializer, as RD 9 plans |
+| A2 | DirectQuery: Measure filters, Top N filters and medians cost extra queries | soft | a note check for measure and Top N filters on visuals of a model with DirectQuery tables (SS 24 says the template does not read them yet) |
+| A2 | DAX error functions: Is Nullable off where a blank must fail the refresh | soft | same fix as the many-to-many Is Nullable row |
+| B | Appropriate use of error functions | soft | see the A2 rows of this page |
+| D | Microsoft's skills, AI readiness: isDefaultLabel on each dimension's name column | soft | ship `isDefaultLabel` on Store[Store Name] (MS 17 names it), written by Microsoft's serializer |
+| D | Microsoft's skills, Report design: Anti-patterns: no 3-D, axes from zero, no dual axis, no crowded pies | soft | a warn check on `valueAxis.start` and on a second value axis without a title, once a Microsoft source confirms the properties (RS 46: no check yet) |
 | D | data-goblin/power-bi-agentic-development, Anti-patterns: Gauge as KPI, unsorted bars, dual axis, 3-D | soft | same as the anti-pattern row of Microsoft's skill |
-| D | github/awesome-copilot, Nesting: One CALCULATE with several filters | soft | same note check as the nesting row |
 | D | github/awesome-copilot, Charts: Axes from zero; sort by value; few categories | soft | same as the anti-pattern row of Microsoft's skill |
-| E | Resources registered: Every image or resource used is listed in report.json | soft | a check that every ItemName is registered |
-| E | Resource files exist: Every registered item exists on disk | soft | a check that every registered item is on disk |
-| E | Calculated table columns: sourceColumn matches the names SELECTCOLUMNS returns | missing | a check of calculated table columns against SELECTCOLUMNS names |
-| E | Calculated objects after a file edit: A new calculated table is empty until a refresh in Desktop | missing | one line in DB and SM (What the files cannot tell): ask for a refresh after new tables or calculated objects |
-| E | Fresh project renders empty: No data until the first refresh | missing | same line as the row above |
-| E | Image from a measure: An image visual that shows a picture a measure returns | missing | a rule and an example: image visual from an Image URL measure |
+| E | Image from a measure: An image visual that shows a picture a measure returns | missing | a rule in VF and an example: an image visual bound to a measure with the ImageUrl data category |
