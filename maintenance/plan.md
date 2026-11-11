@@ -14,7 +14,7 @@ This folder holds the template's own working papers: the plan, the coverage file
 | Step | Part | What | Where it lands |
 |---|---|---|---|
 | 1 | F | One-pass formula scanner, six states, separate rules for DAX and Power Query, hard test formulas | `scripts/formula_scanner.py`, `tests/test_scanner.py`, `scripts/check_project.py` |
-| 2 | G | Sources record and its refresh routine | `maintenance/sources.md`, `scripts/check_sources.py` |
+| 2 | G | Sources record and its refresh routine | `maintenance/sources.md`, `scripts/refresh_sources.py` |
 | 3 | A | Coverage file from the five baselines; guidance, example and check for every soft or missing row | `maintenance/coverage.md`, the skills' reference files, `scripts/check_project.py`, tests |
 | 4 | B | Feature inventory; file-format walk; Git sync and deployment pipeline confirmation | `maintenance/feature-inventory.md` |
 | 5 | C | Copilot builds it itself: shipped examples and their index, the measures table, moves and renames, Desktop Bridge, modeling server, field list of a published model, a project from nothing, the TODO list | `tests/fixtures/examples/`, new scripts, every file listed in item 17 |

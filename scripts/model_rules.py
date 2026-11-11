@@ -1025,7 +1025,7 @@ def _suggestions(context, rels, direct_query, index):
     for shape, names in sorted(shapes.items()):
         if len(names) >= 3:
             add("U001", anchor, "%d measures share one formula pattern (%s%s). A user-defined function would hold the "
-                "pattern once (a preview feature needs the developer's yes); see native-features.md"
+                "pattern once; see native-features.md"
                 % (len(names), ", ".join("[%s]" % n for n in names[:4]), " ..." if len(names) > 4 else ""),
                 level="note", keys=("model",))
             break

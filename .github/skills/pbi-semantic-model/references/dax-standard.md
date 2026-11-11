@@ -198,7 +198,7 @@ Time intelligence needs a marked date table: rule in the file `relationships-and
 ## D. Functions that repeat a pattern
 
 - When three or more measures share one formula pattern, the check gives note U001. Copilot may suggest a user-defined function that holds the pattern once (example: `tests/fixtures/examples/Examples.SemanticModel/definition/functions.tmdl`).
-- When six or more measures use time intelligence and the model has no calculation group, the check gives note U002. Copilot may suggest a calculation group (example: `tests/fixtures/examples/Examples.SemanticModel/definition/tables/Time Calculation.tmdl`).
+- When six or more measures use time intelligence and the model has no calculation group, the check gives note U002. Copilot may suggest a calculation group (example: the table 'Time Calculation' of the example model, listed in `tests/fixtures/examples/INDEX.md`).
 - Both are suggestions for the summary at the end of a task, never a question in the middle of one.
 - Details are in the file `model-objects.md` beside this one.
 

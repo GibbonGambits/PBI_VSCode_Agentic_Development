@@ -33,7 +33,7 @@ An exception counts only when section 10 of `docs/report-brief.md` lists the cod
 ## A. Field parameters
 
 1. Suggest a field parameter when 2 or more measures or fields compete for the same place on a page. Readers then switch them with one slicer, instead of meeting duplicate visuals or pages. Source: checklist item 64; https://learn.microsoft.com/en-us/power-bi/create-reports/power-bi-field-parameters (Microsoft presents field parameters as the way to let readers change the measures or dimensions a visual analyses); https://learn.microsoft.com/en-us/power-bi/guidance/power-bi-optimization (field parameters are among the features to consider). The script gives U103 when bookmarks swap two visuals of the same kind in one place.
-2. A field parameter has two halves: a table in the model, and on the page one slicer plus at least one target visual. Never leave a page with only one half. Source: microsoft/skills-for-fabric, skill powerbi-report-cli, `references/authoring/field-parameters.md`.
+2. A field parameter has two halves: a table in the model, and on the page one slicer plus at least one target visual. Never leave a page with only one half. Source: microsoft/skills-for-fabric, skill powerbi-report-cli, its file field-parameters.md.
 3. The model side is in the file model-objects.md of the skill pbi-semantic-model. The report work never edits the model. It reads the table only to recognise it: its hidden fields column carries `ParameterMetadata` with `"kind":2`. Source: the same file of Microsoft's skill.
 4. The slicer binds the parameter's visible column (the labels), never the hidden fields column or order column. Source: the same file.
 5. The target visual lists every field of the parameter as ordinary projections, in the parameter's order, in the role the parameter feeds. Beside `projections` in that role it has a `fieldParameters` entry: `parameterExpr` names the visible column, `index` is where its fields start in the role, `length` is how many there are, `sortDirection` is optional. Source: Microsoft's report schema `visualConfiguration` 2.8.0 (`ProjectionState`, `RoleFieldParameter`); the same file of Microsoft's skill.
@@ -56,10 +56,10 @@ An exception counts only when section 10 of `docs/report-brief.md` lists the cod
 ## B. Bookmarks, and buttons that switch views
 
 7. A bookmark stores a captured state: page, filters, slicers, selection, sort, drill level, what is hidden, focus or spotlight. It does not store positions. Source: https://learn.microsoft.com/en-us/power-bi/create-reports/desktop-bookmarks; Microsoft's report schema `bookmark` 2.1.0.
-8. Each bookmark is a file `definition/bookmarks/<name>.bookmark.json` with `name`, `displayName`, `explorationState` and `options`. `bookmarks.json` lists each bookmark once, in order, in `items[]`; a group is `{name, displayName, children[]}`. Source: schemas `bookmark` 2.1.0 and `bookmarksMetadata` 1.0.0; Microsoft's skill, `references/authoring/bookmark.md`.
+8. Each bookmark is a file `definition/bookmarks/<name>.bookmark.json` with `name`, `displayName`, `explorationState` and `options`. `bookmarks.json` lists each bookmark once, in order, in `items[]`; a group is `{name, displayName, children[]}`. Source: schemas `bookmark` 2.1.0 and `bookmarksMetadata` 1.0.0; Microsoft's skill, its file bookmark.md.
 9. A bookmark that only switches what is shown must keep the reader's filters: `options.suppressData` true (the Desktop "Data" box off). The `suppress*` options are the inverse of the Desktop boxes. Source: desktop-bookmarks page above; Microsoft's skill, `bookmark.md`.
-10. Saved state uses raw page, visual and filter ids, and adding a slicer to a page with bookmarks clears that slicer in them. So ask the developer to capture or update bookmarks in Desktop (Bookmarks pane, Update) and to click every bookmark both ways. Source: desktop-bookmarks page; Microsoft's skill, `bookmark.md`. A bookmark that names a page or visual that is gone gives V010.
-11. A button's action is `visual.visualContainerObjects.visualLink`. `show` must be true. `type` is one of `'Back'`, `'Bookmark'`, `'PageNavigation'`, `'Drillthrough'`, `'WebUrl'`, `'Qna'`. The target sits in `bookmark`, `navigationSection`, `drillthroughSection` or `webUrl`, and is the bookmark's or page's `name`, never its `displayName`. Source: schema `visualConfiguration` 2.8.0 (`VisualLink`; the schema does not list the `type` values); Microsoft's skill, `references/authoring/button-part-02.md`, `button-part-03.md`, `bookmark.md`. A target that does not exist gives V008.
+10. Saved state uses raw page, visual and filter ids, and adding a slicer to a page with bookmarks clears that slicer in them. A simple bookmark that shows one visual and hides another can be written from the shipped example. A bookmark that saves filters, slicer choices or drill state is captured in Desktop (Bookmarks pane, Update): list it for the developer. After any change to bookmarks, every one is clicked both ways, by you through pictures of the page or by the developer. Source: desktop-bookmarks page; Microsoft's skill, `bookmark.md`. A bookmark that names a page or visual that is gone gives V010.
+11. A button's action is `visual.visualContainerObjects.visualLink`. `show` must be true. `type` is one of `'Back'`, `'Bookmark'`, `'PageNavigation'`, `'Drillthrough'`, `'WebUrl'`, `'Qna'`. The target sits in `bookmark`, `navigationSection`, `drillthroughSection` or `webUrl`, and is the bookmark's or page's `name`, never its `displayName`. Source: schema `visualConfiguration` 2.8.0 (`VisualLink`; the schema does not list the `type` values); Microsoft's skill, its file button-part-02.md, `button-part-03.md`, `bookmark.md`. A target that does not exist gives V008.
 
 ```json
 "visualLink": [ { "properties": {
@@ -75,7 +75,7 @@ An exception counts only when section 10 of `docs/report-brief.md` lists the cod
    - The filters in place when the report is saved are the state readers return to with Reset to default. Source: https://learn.microsoft.com/en-us/power-bi/create-reports/power-bi-report-add-filter.
    - Persistent filters are on by default and can give unexpected results with bookmarks. The switch is `settings.isPersistentUserStateDisabled` in `report.json` (schema `report` 3.3.0). Source: https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-troubleshoot.
    - Write one explicit decision on persistent filters in section 6 of `docs/report-brief.md`. Source: checklist item 53.
-   - A report with real filter state has one clear reset path: Reset to default, or a reset bookmark on a button. Source: checklist item 62; Microsoft's skill, `references/design/interactivity.md`.
+   - A report with real filter state has one clear reset path: Reset to default, or a reset bookmark on a button. Source: checklist item 62; Microsoft's skill, its file interactivity.md.
 - Copilot does: buttons and their actions, checks that every target exists, and proposes bookmarks; the developer captures them in Desktop.
 - The shipped example for bookmarks and buttons is listed in the examples index, `tests/fixtures/examples/INDEX.md`.
 
@@ -94,7 +94,7 @@ An exception counts only when section 10 of `docs/report-brief.md` lists the cod
 ## D. Drillthrough
 
 23. Every drillthrough page has a back button: an `actionButton` whose `visualLink` has `type` `'Back'` and `show` true. Desktop adds one when the drillthrough field is set; keep it. Source: checklist item 63 (100% of drillthrough pages have back navigation); https://learn.microsoft.com/en-us/power-bi/guidance/report-drillthrough; Microsoft's skill, `button-part-03.md`. Code V001 (fail).
-24. The binding: `page.json` `type` `"Drillthrough"`, and `pageBinding` with `type` `"Drillthrough"`, `referenceScope` (`Default` or `CrossReport`), `acceptsFilterContext` (`Default` or `None`) and `parameters[]`. Each parameter's `boundFilter` names a page filter in the page's `filterConfig` whose `howCreated` is `"Drillthrough"`. Source: schema `page` 2.1.0 (`PageBinding`); schema `filterConfiguration` 1.3.0; Microsoft's skill, `references/authoring/authoring-workflows.md`.
+24. The binding: `page.json` `type` `"Drillthrough"`, and `pageBinding` with `type` `"Drillthrough"`, `referenceScope` (`Default` or `CrossReport`), `acceptsFilterContext` (`Default` or `None`) and `parameters[]`. Each parameter's `boundFilter` names a page filter in the page's `filterConfig` whose `howCreated` is `"Drillthrough"`. Source: schema `page` 2.1.0 (`PageBinding`); schema `filterConfiguration` 1.3.0; Microsoft's skill, its file authoring-workflows.md.
 25. The drillthrough field must also be in the source visual, not summed or counted there, or the drillthrough does not appear. A field parameter cannot be a drillthrough field. Source: https://learn.microsoft.com/en-us/power-bi/create-reports/desktop-drillthrough; field-parameters page.
 26. The source page's page filters also pass to the target, as a second kind of drillthrough filter. Readers can edit or clear it; authors cannot lock or hide it. Source: https://learn.microsoft.com/en-us/power-bi/create-reports/power-bi-report-filter-types. Whether `acceptsFilterContext` is the Desktop "Keep all filters" switch is not confirmed: ask the developer to set that switch in Desktop.
 27. Cross-report drillthrough works only in the Power BI service, between reports in the same workspace, with field names and data types that match exactly, and with the setting on in the target report: `settings.useCrossReportDrillthrough` in `report.json` (schema `report` 3.3.0), and `referenceScope` `CrossReport` on the target page. Source: desktop-drillthrough page above.
@@ -106,7 +106,7 @@ An exception counts only when section 10 of `docs/report-brief.md` lists the cod
 ## E. Sync slicers
 
 30. When the same slicer field is on 2 or more pages, sync it unless the pages need their own state. Leave no repeated slicer unsynced without a reason. Source: checklist item 61. Code U101 (note).
-31. Sync is stored on each slicer as `visual.syncGroup`: `groupName` (required), `fieldChanges` and `filterChanges` (plain true or false). Every slicer in a group has the same visual type and the same column. Source: schema `visualConfiguration` 2.8.0 (`VisualSyncGroup`, "only applies to slicer visuals"); Microsoft's skill, `references/authoring/slicers-part-02.md`.
+31. Sync is stored on each slicer as `visual.syncGroup`: `groupName` (required), `fieldChanges` and `filterChanges` (plain true or false). Every slicer in a group has the same visual type and the same column. Source: schema `visualConfiguration` 2.8.0 (`VisualSyncGroup`, "only applies to slicer visuals"); Microsoft's skill, its file slicers-part-02.md.
 
 ```json
 "syncGroup": { "groupName": "RegionSlicer", "fieldChanges": true, "filterChanges": true }
@@ -139,7 +139,7 @@ An exception counts only when section 10 of `docs/report-brief.md` lists the cod
 
 ## H. Choosing the chart type
 
-44. Pick the visual from the question it answers. Source: https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualizations-overview; https://learn.microsoft.com/en-us/power-bi/create-reports/service-dashboards-design-tips; Microsoft's skill, `references/design/chart-selection.md`.
+44. Pick the visual from the question it answers. Source: https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualizations-overview; https://learn.microsoft.com/en-us/power-bi/create-reports/service-dashboards-design-tips; Microsoft's skill, its file chart-selection.md.
 
 | Question the visual answers | Visual type |
 |---|---|
@@ -156,8 +156,8 @@ An exception counts only when section 10 of `docs/report-brief.md` lists the cod
 
 45. Review a part-to-whole visual with more than 5 categories. A trend uses a true ordered time or category axis. Source: checklist item 54.
 46. No unlabeled dual axis. Repeated comparable measures use the same display units unless justified. Avoid 3-D charts and value axes that do not start at zero. Source: checklist item 56; https://learn.microsoft.com/en-us/power-bi/create-reports/desktop-tips-and-tricks-for-creating-reports.
-47. Do not create retired or retiring visuals: the Q&A visual (scheduled for deprecation in December 2026), and the Bing map and filled map (use Azure Maps). Microsoft's skill also says `cardVisual` instead of `multiRowCard`, and `azureMap` instead of `map` and `filledMap`. Source: visualizations overview above; https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-troubleshoot; Microsoft's skill, `references/authoring-part-04.md`.
-48. Custom visuals are outside this template. `visualType` is free text in the schema: copy it from a visual of the same type in the report, or ask the developer to place one first (`pages-and-visuals.md`, beside this file).
+47. Do not create retired or retiring visuals: the Q&A visual (scheduled for deprecation in December 2026), and the Bing map and filled map (use Azure Maps). Microsoft's skill also says `cardVisual` instead of `multiRowCard`, and `azureMap` instead of `map` and `filledMap`. Source: visualizations overview above; https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-troubleshoot; Microsoft's skill, its file authoring-part-04.md.
+48. Custom visuals are outside this template. `visualType` is free text in the schema: copy it from a visual of the same type in the report, or from the shipped example of that type (`tests/fixtures/examples/INDEX.md`). Ask the developer to place one in Desktop only when the index has no example of it.
 - Only Desktop shows: whether the chart reads well with the real data.
 
 ## I. Titles, labels and filters
@@ -183,7 +183,7 @@ Microsoft's report accessibility checklist, restated. Source of rules 55 to 62 u
 56. Tab order follows reading order (left to right, top to bottom), one number per visual: `position.tabOrder` (schema `visualContainer` 2.13.0). Code A002. Copilot lists the order and proposes numbers; the developer says yes before any number changes, and never as part of a position change (`layout-standard.md`, beside this file).
 57. Titles in plain words, without jargon or acronyms (rule 49, A003).
 58. Decorative shapes and images are kept out of the tab order. The files do not show it; ask the developer to check the Selection pane.
-59. Text contrast at least 4.5 to 1 against its background (WCAG 2.1, criterion 1.4.3). Microsoft's skill adds 3 to 1 for large text and chart marks (`references/design/accessibility.md`). What the theme means for contrast is in `theme.md`, beside this file.
+59. Text contrast at least 4.5 to 1 against its background (WCAG 2.1, criterion 1.4.3). Microsoft's skill adds 3 to 1 for large text and chart marks (its file accessibility.md). What the theme means for contrast is in `theme.md`, beside this file.
 60. No meaning by colour alone (rule 37). Avoid hard pairs on one visual or page: green with red, brown, blue, grey or black; light green with yellow; blue with purple or grey.
 61. Line, area, combo, scatter and bubble charts with several series: markers on, a different marker shape per series. Labels readable, but not every label and marker switched on. Marker property names are not confirmed: ask the developer to set them in Desktop, or copy them from a visual that has them.
 62. Test bookmarks and navigation with the keyboard only. Set each visual's sort order on purpose: the accessible data table follows it.
@@ -218,7 +218,7 @@ Read on 11 November 2026. Restated in this template's own words; property names 
 
 - Microsoft Learn: every page named with its full address in the rules above.
 - Microsoft's report schemas (copies in `scripts/schemas`): `report` 3.3.0, `page` 2.1.0, `pagesMetadata` 1.1.0, `visualContainer` 2.13.0, `visualConfiguration` 2.8.0, `visualContainerMobileState` 2.8.0, `bookmark` 2.1.0, `bookmarksMetadata` 1.0.0, `filterConfiguration` 1.3.0, `formattingObjectDefinitions` 1.5.0, `semanticQuery` 1.4.0, `reportExtension` 1.0.0.
-- microsoft/skills-for-fabric (MIT), skill powerbi-report-cli: `references/authoring/field-parameters.md`, `bookmark.md`, `button-part-02.md`, `button-part-03.md`, `slicers-part-02.md`, `authoring-workflows.md`; `references/authoring-part-04.md`; `references/design/chart-selection.md`, `interactivity.md`, `accessibility.md`. The button action values come from here; the schema does not list them.
+- microsoft/skills-for-fabric (MIT), skill powerbi-report-cli: its file field-parameters.md, `bookmark.md`, `button-part-02.md`, `button-part-03.md`, `slicers-part-02.md`, `authoring-workflows.md`; its file authoring-part-04.md; its file chart-selection.md, `interactivity.md`, `accessibility.md`. The button action values come from here; the schema does not list them.
 - `checklist/checklist.md`, items 20, 51, 53 to 67 and 69.
 - Owner's rules: Header icons and Tooltips off unless section 7 of the brief lists the visual; `mobile.json` and `mobileState.json` never edited; the theme never changed and no styling on a single visual.
 
