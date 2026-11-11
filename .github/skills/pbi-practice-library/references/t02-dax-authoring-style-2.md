@@ -47,7 +47,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - When: Conditions on combinations of values across columns, such as month and year.
 
 **T02-A293-2.** For a filter argument of CALCULATE or CALCULATETABLE on a combination of columns, prefer TREATAS with a table constructor to a tuple with IN: it is slightly more efficient. In a small model the easier syntax may win. Older guidance wrapped such tests in FILTER.
-- Should. 2024. https://www.sqlbi.com/articles/using-tuple-syntax-in-dax-expressions/
+- Should. 2024. https://www.sqlbi.com/articles/using-tuple-syntax-in-dax-expressions/ ; https://www.sqlbi.com/articles/the-in-operator-in-dax/
 - When: Multi-column filter arguments of CALCULATE or CALCULATETABLE.
 - Version: A tuple with IN as a direct filter argument is the 2024 view.
 
@@ -140,7 +140,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - When: CONTAINSROW looks for a combination of values in some columns of a wider table.
 
 **T02-A242-9.** A CALCULATE filter that joins several AND-combinations of values from two or more columns with OR can be rewritten as a parenthesised group of those columns, IN, and a table constructor of the allowed combinations. An older view required an explicit FILTER around it.
-- Option. 2022. https://www.sqlbi.com/articles/understanding-the-in-operator-in-dax/
+- Option. 2022. https://www.sqlbi.com/articles/understanding-the-in-operator-in-dax/ ; https://www.sqlbi.com/articles/the-in-operator-in-dax/
 - When: Filtering on combinations of values across several columns, such as brand and colour pairs.
 - Version: Direct use as a CALCULATE filter is the 2022 view; a 2017 text required FILTER.
 

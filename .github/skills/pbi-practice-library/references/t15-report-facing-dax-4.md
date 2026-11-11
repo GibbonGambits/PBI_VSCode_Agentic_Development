@@ -77,7 +77,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - Version: Seen in 2020; check how current Power BI and Excel render KPI graphics.
 
 **T15-A322-10.** Hold conditional formatting logic in measures that return a colour as text (a hex code, a CSS colour name or RGBA) and reuse them across visuals, so one change reaches every use; static styles stay in the theme.
-- Should. 2024. https://www.sqlbi.com/articles/re-using-visual-formatting-in-and-across-power-bi-reports/
+- Should. 2024. https://www.sqlbi.com/articles/re-using-visual-formatting-in-and-across-power-bi-reports/ ; https://www.sqlbi.com/articles/highlighting-the-minimum-and-maximum-values-in-a-power-bi-matrix/
 - When: The same conditional formatting is needed in several visuals, pages or reports.
 - Version: Theme colours only; a colour code needs an exception row (V009). A 2020 view required a numeric result.
 
@@ -244,7 +244,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - Version: Names a function missing from this template's DAX function index; DAX standard rule 19 applies until the index lists it.
 
 **T15-A362-8.** When a visual calculation needs measures the visual does not show, add them to the visual as hidden fields: only fields placed in the visual are available to it.
-- Must. 2026. https://www.sqlbi.com/articles/dynamic-formatting-by-hierarchy-level-with-isinscope-and-isatlevel/
+- Must. 2026. https://www.sqlbi.com/articles/dynamic-formatting-by-hierarchy-level-with-isinscope-and-isatlevel/ ; https://www.sqlbi.com/articles/show-transaction-details-on-the-matrix-visual-in-power-bi/
 - When: A visual calculation computes from measures not otherwise shown.
 - Version: Earlier 2026 guidance said a table visual cannot hide such columns (zero width as workaround); check the current product.
 

@@ -303,7 +303,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - Version: User-context calculated columns are a preview feature (May 2026) that needs the developer's yes.
 
 **T06-A360-11.** Whether a calculated column is stored cannot be set directly: only a Standard column in an Import table is materialised; User Context columns and columns of DirectQuery or Direct Lake on OneLake tables are not. An older view held that every calculated column is stored.
-- Fact. Check. 2026. https://www.sqlbi.com/articles/introducing-user-aware-calculated-columns-in-power-bi/
+- Fact. Check. 2026. https://www.sqlbi.com/articles/introducing-user-aware-calculated-columns-in-power-bi/ ; https://www.sqlbi.com/articles/calculated-columns-and-measures-in-dax/
 - When: Judging the memory cost of a calculated column.
 - Version: Preview feature (May 2026) that needs the developer's yes; not applicable to Direct Lake on SQL tables.
 

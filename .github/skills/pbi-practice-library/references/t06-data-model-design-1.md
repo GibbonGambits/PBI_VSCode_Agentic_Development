@@ -21,7 +21,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - When: Reports plot data month by month or use a year-month-day hierarchy.
 
 **T06-A075-15.** Split a date-and-time column always, whatever the table size, and preferably in the source view rather than in a model query. An older view asked for the split only on tables of millions of rows and accepted DAX-derived columns otherwise.
-- Must. 2016. https://www.sqlbi.com/articles/data-import-best-practices-in-power-bi/
+- Must. 2016. https://www.sqlbi.com/articles/data-import-best-practices-in-power-bi/ ; https://www.sqlbi.com/articles/separate-date-and-time-in-powerpivot-and-bism-tabular/
 - When: A source column holds a date and a time together.
 
 **T06-A075-17.** Mark the date table even when its relationships use a date-typed column: the Power BI interface and other features then know the table's role.

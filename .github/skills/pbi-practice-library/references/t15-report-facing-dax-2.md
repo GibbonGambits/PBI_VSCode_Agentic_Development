@@ -264,7 +264,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - When: Excel drillthrough on measures whose definition shifts or changes the filter context.
 
 **T15-A231-8.** When users want a summarised drillthrough, as for a year-over-year difference, the detail rows expression must change the granularity and aggregate, for instance one row per date with current and prior-year values. An older alternative appends the detail rows of both periods with UNION.
-- Must. 2021. https://www.sqlbi.com/articles/controlling-drillthrough-in-excel-pivottables-connected-to-power-bi-or-analysis-services/
+- Must. 2021. https://www.sqlbi.com/articles/controlling-drillthrough-in-excel-pivottables-connected-to-power-bi-or-analysis-services/ ; https://www.sqlbi.com/articles/controlling-drillthrough-using-detail-rows-expressions-in-dax/
 - When: Business users expect an aggregated drillthrough view, not every transaction of both periods.
 
 **T15-A231-9.** Numeric columns returned by a detail rows expression have no format string that can be set, and rounding them in the expression removes the dropped digits for good. A measure format in a PivotTable only hides decimals and keeps the full number.

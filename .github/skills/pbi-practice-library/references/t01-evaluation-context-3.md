@@ -212,11 +212,11 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - When: ALLSELECTED is called with a table, which differs from the column form.
 
 **T01-A120-9.** ALLSELECTED with no argument is not a table function: it works only as a CALCULATE filter argument, restoring the latest shadow filter context on each column that has one. In nested iterators the results can look wrong; an older explanation blamed a removed context-transition filter.
-- Fact. 2018. https://www.sqlbi.com/articles/the-definitive-guide-to-allselected/
+- Fact. 2018. https://www.sqlbi.com/articles/the-definitive-guide-to-allselected/ ; https://www.sqlbi.com/articles/understanding-allselected/
 - When: ALLSELECTED without arguments in CALCULATE, above all inside nested iterators.
 
 **T01-A120-10.** As a CALCULATE filter argument, ALLSELECTED turns the shadow filter context into an explicit filter that takes precedence over the context-transition filter; it seems to remove that filter, but nothing is removed. An older explanation said it drops the latest context-transition filter.
-- Fact. 2018. https://www.sqlbi.com/articles/the-definitive-guide-to-allselected/
+- Fact. 2018. https://www.sqlbi.com/articles/the-definitive-guide-to-allselected/ ; https://www.sqlbi.com/articles/understanding-allselected/
 - When: ALLSELECTED is a CALCULATE filter argument where a context transition also occurs.
 
 **T01-A120-11.** ALLSELECTED with a column, as a CALCULATE filter argument, works much like ALL and removes filters on that column. With no shadow filter context from an iterator it applies no filter itself: a restricted list of values inside comes from cross-filtering seen by VALUES.

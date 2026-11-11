@@ -132,7 +132,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T05-A078-4.** For a many-to-many bridge, CROSSFILTER set to Both on the relationship between the bridge and the intermediate dimension, inside CALCULATE, can stand in for a both-direction relationship in the model. Every measure that crosses the bridge must then carry it.
 - Option. Check. 2016. https://www.sqlbi.com/articles/many-to-many-relationships-in-power-bi-and-excel-2016/
 - When: The model cannot hold a both-direction filter on the bridge relationship.
-- Version: CROSSFILTER came in 2016 with Excel, Analysis Services and Power BI; Excel 2016 models cannot filter both ways.
+- Version: CROSSFILTER arrived in 2016 (Excel, Analysis Services, Power BI); Excel 2016 cannot set both directions on a model relationship.
 
 **T05-A182-8.** A coarser table, such as a budget by brand and country, can be linked through a calculated table of the distinct shared values from both sides. Relate it one-to-many to the dimension and to the coarse table, and let the dimension relationship filter both ways.
 - Option. 2020. https://www.sqlbi.com/articles/relationships-in-power-bi-and-tabular-models/
@@ -269,7 +269,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 ### Blank row and limited relationships
 
 **T05-A182-3.** A limited relationship takes no part in table expansion. Every relationship with many-to-many cardinality is limited, even inside one data island, and so is one whose one-side key the engine cannot verify as unique. Older guidance required a unique column on one side.
-- Fact. 2020. https://www.sqlbi.com/articles/relationships-in-power-bi-and-tabular-models/
+- Fact. 2020. https://www.sqlbi.com/articles/relationships-in-power-bi-and-tabular-models/ ; https://www.sqlbi.com/articles/physical-and-virtual-relationships-in-dax/
 - When: Judging how a relationship behaves in DAX.
 - Version: Composite models and many-to-many cardinality relationships exist in Power BI since 2018.
 

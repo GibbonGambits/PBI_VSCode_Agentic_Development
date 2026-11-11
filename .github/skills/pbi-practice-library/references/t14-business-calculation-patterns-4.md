@@ -167,7 +167,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - When: A top N filter or measure, with or without an Others row.
 
 **T14-A213-3.** In a top N visual with an extra "Others" row, sort the rows by the ranking measure, not by the sales value: that keeps Others after the top products of each category. An older approach put a two-value group column as first matrix level.
-- Must. 2021. https://www.sqlbi.com/articles/filtering-the-top-products-alongside-the-other-products-in-power-bi/
+- Must. 2021. https://www.sqlbi.com/articles/filtering-the-top-products-alongside-the-other-products-in-power-bi/ ; https://www.sqlbi.com/articles/showing-the-top-5-products-and-others-row/
 - When: A top N per category visual with one more aggregated row for the remaining items.
 - Version: Sorting by the ranking measure dates from 2021; the group-column approach from 2019.
 

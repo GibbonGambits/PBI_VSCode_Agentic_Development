@@ -148,7 +148,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - When: Line charts over periods of the Date table; the cost is extra columns in that table.
 
 **T04-A371-2.** A continuous line-chart axis on years, quarters, months or weeks of your own Date table needs a hierarchy there: on top a year column with dataCategory Years, at the bottom the key date column with PaddedDateTableDates. Table-level dataCategory, once listed too, has no effect.
-- Must. 2026. https://www.sqlbi.com/articles/continuous-axis-for-any-date-table-in-power-bi/
+- Must. 2026. https://www.sqlbi.com/articles/continuous-axis-for-any-date-table-in-power-bi/ ; https://www.sqlbi.com/articles/creating-a-simpler-and-chart-friendly-date-table-in-power-bi/
 - When: Line charts on a date hierarchy above the day; other visuals, slicers and filters work as usual.
 - Version: PaddedDateTableDates is an undocumented property.
 
@@ -186,7 +186,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 ### Calendar-based time intelligence
 
 **T04-A345-1.** Calendar-based time intelligence takes the shape of the year from Date table columns, not from the Gregorian calendar, so it also handles a 13-month calendar. The older answer for week calendars was hand-written measures built from CALCULATE, FILTER and VALUES.
-- Option. 2025. https://www.sqlbi.com/articles/introducing-calendar-based-time-intelligence-in-dax/
+- Option. 2025. https://www.sqlbi.com/articles/introducing-calendar-based-time-intelligence-in-dax/ ; https://www.sqlbi.com/articles/week-based-time-intelligence-in-dax/
 - When: Calendars whose periods are built from weeks or otherwise differ from Gregorian months.
 - Version: Preview feature since the September 2025 release: use it only with the developer's yes.
 

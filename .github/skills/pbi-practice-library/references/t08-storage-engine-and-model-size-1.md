@@ -142,7 +142,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 
 **T08-A039-1.** One way to show when a Tabular database was last processed: a calculated column defined as NOW () and a measure returning its MAX. The column holds a single value on all rows, so it takes almost no memory at any table size.
 - Option. 2014. https://www.sqlbi.com/articles/last-process-date-in-ssas-tabular/
-- When: Reporting the last process time of an Analysis Services Tabular database in DAX or MDX queries.
+- When: Last process time shown in DAX or MDX queries; reliable only if the column's table is in every process operation.
 
 **T08-A039-2.** A NOW () calculated column that records the last process time must sit in a table that every process operation includes. When other tables are processed without it, the time shown can be wrong; a Process Full of the whole database is always right.
 - Must. 2014. https://www.sqlbi.com/articles/last-process-date-in-ssas-tabular/

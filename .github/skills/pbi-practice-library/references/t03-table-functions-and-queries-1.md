@@ -74,7 +74,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - When: Filtering or comparing text in DAX.
 - Version: Speed figure reported in 2011.
 
-**T03-A045-2.** Never assume CALCULATETABLE is always the good choice and FILTER the bad one: every CALCULATETABLE runs one or more FILTER operations internally, and speed generally depends on the granularity of each of them, although the engine might optimise further.
+**T03-A045-2.** Never treat CALCULATETABLE as automatically the better choice over FILTER. Internally it executes at least one FILTER itself, so what usually decides speed is how fine-grained those inner filters are, though the engine may optimise beyond that.
 - Must. 2014. https://www.sqlbi.com/articles/from-sql-to-dax-filtering-data/
 - When: Choosing between FILTER and CALCULATETABLE to filter a table.
 
@@ -134,7 +134,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - When: Expressions computed inside SUMMARIZE, especially ones that change the filter on the grouped columns.
 
 **T03-A048-6.** SUMMARIZE can group only by columns of its base table's expanded table: columns of tables reached through regular many-to-one relationships. It does not work across limited relationships, such as many-to-many cross-filter or cross-island ones. An older view held that it follows relationships in both directions.
-- Fact. 2021. https://www.sqlbi.com/articles/all-the-secrets-of-summarize/
+- Fact. 2021. https://www.sqlbi.com/articles/all-the-secrets-of-summarize/ ; https://www.sqlbi.com/articles/converting-mdx-to-dax-first-steps/
 - When: Grouping by columns of related tables with SUMMARIZE.
 - Version: The both-directions view dates from 2011; the expanded-table limit from 2021.
 

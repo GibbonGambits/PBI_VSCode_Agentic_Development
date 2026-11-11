@@ -274,7 +274,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 
 **T07-A275-4.** When a searched text column holds accented letters, you can add a second column with the diacritics replaced by plain letters, for example in Power Query, keep the original, and search the new column so that the index can be used.
 - Option. Check. 2023. https://www.sqlbi.com/articles/optimizing-text-search-in-dax/
-- When: A text column that non-ASCII characters keep from being indexed; check the limits of the removal method first.
+- When: Non-ASCII characters keep a text column from being indexed. Searching the plain copy can match other rows: check first.
 - Version: October 2022 onward: Azure Analysis Services and Power BI, not SQL Server Analysis Services 2022; a 2026 preview persists it.
 
 **T07-A275-5.** Be aware that searching an ASCII-converted copy of a text column can return other rows, and so other report totals, than searching the original: SEARCH and CONTAINSSTRING are accent-sensitive, so removing diacritics changes which values match.

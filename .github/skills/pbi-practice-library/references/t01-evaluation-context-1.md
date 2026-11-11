@@ -54,12 +54,12 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - Should. 2024. https://www.sqlbi.com/articles/filter-context-in-dax-explained-visually/
 - When: Designing any measure that changes the filter context with CALCULATE.
 
-**T01-A220-1.** When a CALCULATE condition involves several columns of one table, use FILTER over ALL of just those columns, wrapped in KEEPFILTERS when it replaces a whole-table FILTER. An older view accepted the whole-table FILTER as the easiest valid form, though costlier.
+**T01-A220-1.** When a CALCULATE condition involves several columns of one table, use FILTER over ALL of just those columns, wrapped in KEEPFILTERS when it replaces a whole-table FILTER and the result must not change. Filtering the whole table instead is a frequent mistake that performs worse.
 - Should. 2021. https://www.sqlbi.com/articles/specifying-multiple-filter-conditions-in-calculate/
 - When: A CALCULATE filter condition references more than one column of the same table.
 
 **T01-A220-2.** A CALCULATE filter argument can be one Boolean predicate that names several columns of a single table, with no explicit FILTER; it replaces filters already on those columns. Earlier guidance, when a predicate could name only one column, required an explicit table expression.
-- Option. 2021. https://www.sqlbi.com/articles/specifying-multiple-filter-conditions-in-calculate/
+- Option. 2021. https://www.sqlbi.com/articles/specifying-multiple-filter-conditions-in-calculate/ ; https://www.sqlbi.com/articles/filter-arguments-in-calculate/
 - When: A filter condition needs more than one column of the same table.
 - Version: Available since the March 2021 release of Power BI Desktop.
 

@@ -246,7 +246,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T07-A179-5.** If an Excel PivotTable connected to Power BI still shows the slowdown of many storage engine queries caused by the missing fusion optimization, check that Power BI Desktop is an up-to-date version.
 - Should. 2020. https://www.sqlbi.com/articles/why-reports-obtained-with-analyze-in-excel-can-be-slower/
 - When: MDX queries still run a separate storage engine query for each measure.
-- Version: Microsoft shipped the fix in October 2020, for Power BI and for Analysis Services.
+- Version: October 2020: fixed in Power BI and Azure Analysis Services; SQL Server Analysis Services up to 2019 had no fix.
 
 **T07-A179-6.** To study the query plans behind an Excel PivotTable report, you can connect Excel directly to the diagnostic port of the model open in Power BI Desktop. A report made through Analyze in Excel on the published model does not allow it.
 - Option. 2020. https://www.sqlbi.com/articles/why-reports-obtained-with-analyze-in-excel-can-be-slower/

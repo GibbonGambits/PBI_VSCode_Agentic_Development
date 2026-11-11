@@ -172,7 +172,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - Should. 2025. https://www.sqlbi.com/articles/using-ai-assistance-to-create-power-bi-custom-visuals/
 - When: Visuals with many marks and encodings.
 
-**T15-A328-9.** Before running an AI-made specification you can format it and check for misspelled or wrong field names, surplus code unusual for Deneb, hard-coded values, transformations, filters or encodings nobody expected, flagged errors and warnings, and unasked changes from the previous version.
+**T15-A328-9.** Before running an AI-made specification you can format it and check for misspelled or wrong field names, surplus code unusual for Deneb, unexpected transformations, filters or encodings, hard-coded values, flagged errors and warnings, and unasked changes from the previous version.
 - Option. 2025. https://www.sqlbi.com/articles/using-ai-assistance-to-create-power-bi-custom-visuals/
 - When: A specification comes back from an AI assistant.
 - Version: Deneb is a custom visual from AppSource, outside this template's standards.

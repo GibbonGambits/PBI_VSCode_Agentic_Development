@@ -85,7 +85,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - When: A slicer on a Date column such as Day of Week together with a measure that shifts dates.
 
 **T04-A329-4.** To keep a weekday filter through a DATEADD shift: clear the Date filters with ALLEXCEPT keeping the weekday columns, and wrap the shifted dates, worked out with the weekday filter removed, in KEEPFILTERS. An older view drops time intelligence functions for custom filter logic.
-- Option. Check. 2025. https://www.sqlbi.com/articles/filtering-weekdays-in-dax/
+- Option. Check. 2025. https://www.sqlbi.com/articles/filtering-weekdays-in-dax/ ; https://www.sqlbi.com/articles/year-to-date-filtering-weekdays-in-dax/
 - When: Measures such as previous month that must keep a Day of Week selection; every part of the pattern matters.
 - Version: Stated in 2025 for the classic functions; check current behaviour.
 

@@ -8,7 +8,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 
 ### Filters, counts and emptiness tests
 
-**T07-A040-2.** Keep the number of items that filter arguments iterate low: give each needed column its own filter over its distinct values, not one filter scanning every row of the table. In one test this ran about ten times faster.
+**T07-A040-2.** Keep the number of items that filter arguments iterate low: give each needed column its own filter over its distinct values, not one filter scanning every row of the table. In one example this made iterating the filter conditions roughly ten times faster.
 - Should. 2014. https://www.sqlbi.com/articles/filter-vs-calculatetable-optimization-using-cardinality-estimation/
 - When: Most CALCULATE or CALCULATETABLE filters; possible exception: several context-dependent filters evaluated together with a distinct count.
 
@@ -285,7 +285,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - Version: DAX Studio 2.17 shows the Batch subclass in Server Timings by default.
 
 **T07-A260-1.** Horizontal fusion computes in one storage engine query, grouped by a column, several similar calculations that differ only in the single value filtered on that column; aggregations need only fit one scan, as MIN and AVERAGE do. Earlier, differently filtered aggregations each ran separately.
-- Fact. 2022. https://www.sqlbi.com/articles/introducing-horizontal-fusion-in-dax/
+- Fact. 2022. https://www.sqlbi.com/articles/introducing-horizontal-fusion-in-dax/ ; https://www.sqlbi.com/articles/optimizing-dax-expressions-involving-multiple-measures/
 - When: Calculations that are subexpressions of the same measure or expression, under different single-value filters on one column.
 - Version: Power BI has it from its September 2022 release.
 
