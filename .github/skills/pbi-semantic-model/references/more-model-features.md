@@ -74,10 +74,10 @@ A preview feature is used only after the developer's yes, recorded in section 11
 **9. Dynamic M query parameter.**
 - When: in a DirectQuery model, a reader's pick in a slicer must reach the source query at a set place.
 - Status: no preview label.
-- Limits: one parameter per column and one column per parameter; no aggregations; no row-level security; the parameter name has no spaces and is no DAX reserved word; the column's type matches the parameter's; many filter kinds do not pass the value on.
+- Limits: one parameter per column and one column per parameter; no aggregations; no row-level security; the parameter name has no spaces and is no DAX reserved word; a table name has no spaces or special characters; the column's type matches the parameter's; many filter kinds do not pass the value on.
 - Microsoft warns that joining the value into query text opens the source to injection: filter with a step that folds instead. P002 warns on a native query made by joining text.
 - Stored: `parameterValuesColumn: '<Table>'.'<Column>'` under the parameter `expression`, plus a table of values with no relationship.
-- Example: `storage/DynamicParameter.SemanticModel` (RegionParameter, table 'Region Choice', Sales). The table of values gives M411 (warn) on purpose; list it in section 9 of the brief with its reason.
+- Example: `storage/DynamicParameter.SemanticModel` (RegionParameter, table RegionChoice, Sales). The table of values gives M411 (warn) on purpose, and its one-word name gives M118 (warn) because of Microsoft's limit on table names: list both in section 9 of the brief with their reasons.
 - Multi-select and Select all are switched on in Desktop; their stored form is not given.
 - Source: https://learn.microsoft.com/en-us/power-bi/connect-data/desktop-dynamic-m-query-parameters ; https://learn.microsoft.com/en-us/dotnet/api/microsoft.analysisservices.tabular.namedexpression.parametervaluescolumn
 

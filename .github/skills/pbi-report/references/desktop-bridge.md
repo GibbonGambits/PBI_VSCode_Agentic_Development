@@ -7,7 +7,7 @@ Everything in the template works without it. It is an optional step.
 ## Before you use it
 
 - It is treated as a preview feature. Microsoft's release notes of September 2026 list it without a preview label; Microsoft's page on editing project files still calls it a preview. So use it only after the developer's yes, and record that yes in section 11 of `docs/report-brief.md`.
-- It needs Windows, Power BI Desktop of June 2026 (2.155.756.0) or later, and the Desktop option "Enable external tool access to Power BI Desktop through secure local APIs" (File > Options and settings > Options > Security). Microsoft says that option is on by default, and that an administrator can switch it off.
+- It needs Windows and the Desktop option "Enable external tool access to Power BI Desktop through secure local APIs" (File > Options and settings > Options > Security). Microsoft says that option is on by default, and that an administrator can switch it off. Microsoft names no minimum version of Power BI Desktop; its release notes first list the Desktop Bridge in June 2026 (version 2.155.756.0), so expect it from that version on.
 - It needs two command-line tools that Microsoft publishes on npm: `@microsoft/powerbi-desktop-bridge-cli` and `@microsoft/powerbi-report-authoring-cli` (the second is a public preview). The developer installs them. Never install them yourself.
 - The developer opens the project in Power BI Desktop. The script never starts Desktop.
 

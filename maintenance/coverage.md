@@ -704,7 +704,7 @@ No text of SQLBI or of the GPL repository is quoted; every practice is restated.
 | DIVIDE | DIVIDE usually; plain / in iterators after removing zeros | covered | DS 2; M502 (fail); exception in the brief |
 | IFERROR | Not recommended | covered | DS 1; M501 (warn) |
 | SUMMARIZE | SUMMARIZE only to group; ADDCOLUMNS for new columns | covered | DS 32; M522 (warn) |
-| SUMMARIZECOLUMNS | Filters in an outer CALCULATETABLE; value filter behaviour Independent | covered | DS 33; M523 (warn). Value filter behaviour: MF 17 (preview; example preview/ValueFilter; M841 until section 11 of the brief lists it) |
+| SUMMARIZECOLUMNS | Filters in an outer CALCULATETABLE; value filter behaviour Independent | covered | DS 33; M523 (note). Value filter behaviour: MF 17 (preview; example preview/ValueFilter; M841 until section 11 of the brief lists it) |
 | KEEPFILTERS | When to use KEEPFILTERS | covered | DS 6 (second bullet); files cannot show it (meaning) |
 | Filter columns | Filter columns, not tables; split AND conditions | covered | DS 6; M505 (warn) |
 | Removing filters | REMOVEFILTERS, ALL, ALLSELECTED, ALLEXCEPT each for its job | covered | DS 20; M519 (warn) for ALL as a filter argument; ALLSELECTED and ALLEXCEPT judged in the review (ALLEXCEPT depends on the query) |

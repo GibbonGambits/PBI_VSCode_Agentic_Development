@@ -102,7 +102,7 @@ Finding codes (errors unless marked warn or note; only errors change the exit co
     M903  sort column the table does not have
     M904  data column without sourceColumn
     M905  measure, calculated column or calculation item with an empty expression
-    M906  control character in a name or a description
+    M906  control character, other than white space, in a name or a description
     M907  isAvailableInMdx off on a column used for sorting or in a hierarchy
 
   DAX (.github/skills/pbi-semantic-model/references/dax-standard.md):
@@ -127,7 +127,7 @@ Finding codes (errors unless marked warn or note; only errors change the exit co
     M520  (warn) formulas that do not follow the DAX style (one finding for each table file)
     M521  (warn) CALCULATE written directly inside CALCULATE
     M522  (warn) SUMMARIZE that adds a new column
-    M523  (warn) SUMMARIZECOLUMNS with a filter argument inside a measure
+    M523  (note) SUMMARIZECOLUMNS with a filter argument inside a measure
     M524  (warn) USERCULTURE in an imported calculated column or calculated table
     M525  (warn) SWITCH over USERCULTURE with no default value, or naming a culture that has no culture file
     M908  DAX names a Table[Column] the model does not have

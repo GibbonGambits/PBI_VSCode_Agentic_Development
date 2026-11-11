@@ -68,6 +68,9 @@ The three cases in which the work would have stopped to ask did not arise: no so
 41. **The example report measure got the prefix** (`_Sales per Order Line`), so the shipped example follows V012 instead of being excused from it.
 42. **Checkpoint commits.** Two commits on the branch hold examples that a helper was still writing; the commits after them complete the work. The branch is squashed or kept as the owner prefers.
 
+43. **What the source review changed.** M523 became a note: Microsoft's skill passes filters to SUMMARIZECOLUMNS as arguments in its general guidelines, and only SQLBI and one performance pattern place them outside. M906 now fails only on control characters that are not white space, as Microsoft's rule defines them; a tab in a visible name is reported by M118. M904 stays a fail and now cites the rule that says processing gives an error. M821, M903 and M908 stay fails and now cite the Microsoft pages that say a missing name gives an error. The guidance on functions and object-level security, on tooltips and accessibility, on USERNAME, on the Desktop Bridge version, on the modeling server's operating systems and on visual calculations (generally available since May 2026) was reworded to what the pages say. The example table for a dynamic query parameter was renamed to one word, a limit Microsoft states.
+44. **Existing fail checks the review questioned.** M001, M002 and P001 fail although no source says the thing breaks; they are owner's rules from earlier rounds, and this round was told not to change the level of an existing check.
+
 ## Could not be verified
 
 - Anything that needs Power BI Desktop: every example, the starter project, the Desktop Bridge script.

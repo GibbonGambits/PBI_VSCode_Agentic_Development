@@ -1,4 +1,4 @@
-/// Example of a dynamic M query parameter: the region that the DirectQuery Sales query asks for. The column Region Choice[Region Pick] sets it.
+/// Example of a dynamic M query parameter: the region that the DirectQuery Sales query asks for. The column RegionChoice[Region Pick] sets it.
 expression RegionParameter = "North" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
-	parameterValuesColumn: 'Region Choice'.'Region Pick'
+	parameterValuesColumn: RegionChoice.'Region Pick'
 

@@ -189,7 +189,7 @@ A smaller model refreshes faster, answers faster and fits its capacity. Each tec
 
 Roles live in `definition/roles/`, one file per role. Who may see what is recorded in section 4 of the brief (items 39, 40, 41); ask the developer when it is empty.
 
-**28. Row-level security.** A role filters the rows of a table; it cannot hide a table or column. A fixed rule names a value: `Store[City] = "Northport"` (role `'Northport Stores'`). A user-based rule compares a column with the signed-in user, through USERPRINCIPALNAME, never USERNAME: USERNAME gives a different form of name in Power BI Desktop and in the service. Check: M603 (warn). Item 41: when two or more audiences share the model with identity-based filtering, review a user-based role that compares the signed-in user with a mapping column or table. Shipped example, the role `'Own Store'` in `tests/fixtures/examples/Examples.SemanticModel/definition/roles`:
+**28. Row-level security.** A role filters the rows of a table; it cannot hide a table or column. A fixed rule names a value: `Store[City] = "Northport"` (role `'Northport Stores'`). A user-based rule compares a column with the signed-in user, through USERPRINCIPALNAME. Microsoft's pages also show USERNAME, and say that it gives DOMAIN\user in Power BI Desktop and the user principal name in the service; this template prefers the function that gives one form in both places, so the check warns and does not fail. Check: M603 (warn). Item 41: when two or more audiences share the model with identity-based filtering, review a user-based role that compares the signed-in user with a mapping column or table. Shipped example, the role `'Own Store'` in `tests/fixtures/examples/Examples.SemanticModel/definition/roles`:
 
 ```
 role 'Own Store'

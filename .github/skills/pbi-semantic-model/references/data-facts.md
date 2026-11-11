@@ -10,7 +10,7 @@ Everything in the template works without the server. The template never installs
 ## What it is
 
 - Microsoft's Power BI Authoring MCP Server, the local one (repository `microsoft/powerbi-modeling-mcp`). Microsoft Learn lists the local server as generally available and the hosted one as preview. This template uses only the local one. Source: https://learn.microsoft.com/power-bi/developer/mcp/power-bi-authoring-mcp
-- It runs on Windows and Linux, not on macOS. Reading from a model that is open in Power BI Desktop needs Windows.
+- Microsoft says the local server does not support macOS. It states nothing else about the operating system; Power BI Desktop itself runs on Windows only.
 - The developer installs it (the VS Code extension "Power BI Authoring MCP") and accepts Microsoft's licence terms for it. Never accept them yourself: do not call the tool `accept_eula`, and do not start the server with a flag that accepts them.
 - Ask the developer to run it with `--readonly`. Microsoft describes that flag as a safe mode that prevents every write to the model.
 - Query results pass through the chat. Microsoft says model metadata and query results may be sent to the AI service behind it. If the data is sensitive, the developer may prefer route 1.

@@ -130,7 +130,7 @@ How to read a block:
     - Stored: categories go in the `Rows` role of `cardVisual` (Microsoft's visual catalogue). Images, callout layout and fixed card sizes have no shown form, or are styling: set them in Power BI Desktop.
     - Copy: `Cards_KPIs_Card_SalesByChannel` on page folder `Cards_KPIs`.
 30. **ORDERBY in a visual calculation**. Source: https://learn.microsoft.com/en-us/power-bi/transform-model/desktop-visual-calculations-overview
-    - Stored: it is DAX text inside `NativeVisualCalculation.Expression`; the file form does not change (rule 67 of `report-standard.md`, beside this file). Status: preview; needs the developer's yes.
+    - Stored: it is DAX text inside `NativeVisualCalculation.Expression`; the file form does not change (rule 67 of `report-standard.md`, beside this file). Status: no preview label on the page; the July 2025 release notes listed it as a preview, before visual calculations became generally available in May 2026.
 
 ## G. Bookmarks and pages
 

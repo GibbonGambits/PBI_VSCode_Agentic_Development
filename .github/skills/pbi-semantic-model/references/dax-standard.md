@@ -102,7 +102,7 @@ Source: rule AVOID_USING_'1-(X/Y)'_SYNTAX in the best practice rules; Microsoft'
 
 **17. Time intelligence in a DirectQuery model.** When any table is DirectQuery, time intelligence functions can be slow. If visuals are slow, use columns in the date table or prior-period values prepared at the source, with plain filters. Check: M513 (warn; a measure or calculation item calls a function from the time intelligence group of the function index). Source: rule MEASURES_USING_TIME_INTELLIGENCE_AND_MODEL_IS_USING_DIRECT_QUERY in the best practice rules
 
-**18. Names the model does not have.** Every `Table[Name]` must be a column of that table or a measure. Why: otherwise the formula returns an error. Read the table's file before you write a name. The check only sees names written with a table that exists; check bare `[Name]` references yourself. Check: M908 (fail). Source: https://learn.microsoft.com/en-us/dax/dax-syntax-reference
+**18. Names the model does not have.** Every `Table[Name]` must be a column of that table or a measure. Why: Microsoft says that a formula naming a column or table that cannot be found returns an error. Read the table's file before you write a name. The check only sees names written with a table that exists; check bare `[Name]` references yourself. Check: M908 (fail). Source: https://learn.microsoft.com/dax/dax-overview (Context; Troubleshooting) ; https://learn.microsoft.com/en-us/dax/dax-syntax-reference
 
 **19. Functions that do not exist.** Call only functions in the file `dax-functions.md` beside this one, or a user-defined function of this model. Look up a function before you use it for the first time (skill `pbi-lookup`); never invent one. Check: M909 (warn). Source: https://learn.microsoft.com/en-us/dax/dax-function-reference ; the index is built from https://learn.microsoft.com/en-us/dax/toc.json
 
@@ -110,8 +110,8 @@ Source: rule AVOID_USING_'1-(X/Y)'_SYNTAX in the best practice rules; Microsoft'
 
 - Use REMOVEFILTERS when the aim is only to clear filters inside CALCULATE (Microsoft's skill). M519 (warn) reports ALL ( ... ) written directly as a filter argument of CALCULATE or CALCULATETABLE; ALL stays where a table is needed, such as the table an iterator walks.
 - Use ALL when a table is needed, and ALLSELECTED for totals of what the visual shows (SQLBI).
-- Use ALLEXCEPT only when the kept column is filtered directly; otherwise REMOVEFILTERS plus VALUES (Microsoft's skill and SQLBI).
-- Source: checklist item 32; Microsoft's skill (address in rule 8); https://www.sqlbi.com/articles/all-vs-allselected-vs-allexcept-vs-removefilters/
+- Use ALLEXCEPT only when the kept column is filtered directly; otherwise REMOVEFILTERS plus VALUES (Microsoft's skill, pattern DAX012, and SQLBI).
+- Source: checklist item 32; Microsoft's skill (address in rule 8; pattern DAX012: https://github.com/microsoft/skills-for-fabric/blob/main/plugins/powerbi-authoring/skills/semantic-model-authoring/references/dax-perf-patterns.md); https://www.sqlbi.com/articles/all-vs-allselected-vs-allexcept-vs-removefilters/
 
 **21. Base and presentation measures.** A base measure holds the core logic once (`Total Sales`). Ratios, KPIs and time variants call it (`Total Sales YTD` uses `[Total Sales]`) and never repeat `SUM ( Sales[Amount] )`. Two or more variants of one metric is a review point. Judged in the review. Source: checklist item 35, which points to https://learn.microsoft.com/en-us/power-bi/guidance/power-bi-optimization
 
@@ -120,11 +120,11 @@ Source: rule AVOID_USING_'1-(X/Y)'_SYNTAX in the best practice rules; Microsoft'
 The style is SQLBI's formatting rules, restated in new words; no SQLBI text, code or image is copied. M520 (warn) reads measures, calculated columns, calculation items, functions and role filters. It gives one warning per table file, names the formulas, and quotes each rule broken; its text starts with the words given below. An exception is listed per object, with M520.
 
 22. Write CALCULATE in full, never `[Total Sales] ( Store[City] = "Utrecht" )`. M520: "write CALCULATE in full".
-23. Put one space between a function name and `(`, and one before `)`: `SUM ( Sales[Amount] )`. An empty pair stays together: `SELECTEDMEASURE ()`. M520: "put a space between a function name and '('", "put a space before ')'".
+23. Put one space between a function name and `(`, and one before `)`: `SUM ( Sales[Amount] )`. An empty pair stays together, `SELECTEDMEASURE ()` (this template's own addition; SQLBI's article does not cover it). M520: "put a space between a function name and '('", "put a space before ')'".
 24. Keep `(` on the line of its function name. M520: "keep '(' on the line of its function name".
 25. Put each comma directly after its argument, and a space after it when the next argument is on the same line. M520: "put each comma directly after its argument", "put a space after a comma".
 26. Put a space on both sides of an operator: `+ - * / & = < > <= >= <> && ||`. M520: "put a space on both sides of an operator".
-27. When an expression goes on to the next line, start that line with the operator. The only operator that may end a line is the `=` of `VAR Name =`. M520: "start a continued line with the operator".
+27. When an expression goes on to the next line, start that line with the operator. The only operator that may end a line is the `=` of `VAR Name =` (this template's own addition; SQLBI's article is older than variables). M520: "start a continued line with the operator".
 28. Write a column right after its table, with no space: `Sales[Amount]`. M520: "write a column directly after its table".
 29. A call with two or more arguments, or with another call inside it, puts each argument on its own line. A call with one plain argument stays on one line. M520: "put each argument on its own line".
 30. A column that a formula makes with ADDCOLUMNS or SELECTCOLUMNS gets a name that starts with `@`: `"@Store Sales"`. Why: it cannot be mistaken for a measure. M520 checks this in measures, calculation items and functions: "start the name of a column the formula makes with @".
@@ -213,7 +213,7 @@ Time intelligence needs a marked date table: rule in the file `relationships-and
 
 ## D. Functions that repeat a pattern
 
-- When three or more measures share one formula pattern, the check gives note U001. Copilot may suggest a user-defined function that holds the pattern once (example: `tests/fixtures/examples/Examples.SemanticModel/definition/functions.tmdl`).
+- When three or more measures share one formula pattern, the check gives note U001 (the numbers three, six and 12 tokens in this section are this template's own thresholds, not a source's). Copilot may suggest a user-defined function that holds the pattern once (example: `tests/fixtures/examples/Examples.SemanticModel/definition/functions.tmdl`).
 - When six or more measures use time intelligence and the model has no calculation group, the check gives note U002. Copilot may suggest a calculation group (example: the table 'Time Calculation' of the example model, listed in `tests/fixtures/examples/INDEX.md`).
 - Both are suggestions for the summary at the end of a task, never a question in the middle of one.
 - Details are in the file `model-objects.md` beside this one.
@@ -234,7 +234,7 @@ ADDCOLUMNS (
 
 Source: https://www.sqlbi.com/articles/best-practices-using-summarize-and-addcolumns/ ; Microsoft's skill, patterns DAX002 and DAX005 in https://github.com/microsoft/skills-for-fabric/blob/main/plugins/powerbi-authoring/skills/semantic-model-authoring/references/dax-perf-patterns.md
 
-**33. SUMMARIZECOLUMNS takes its filters from outside.** Inside a measure, give SUMMARIZECOLUMNS no filter argument (FILTER, TREATAS or KEEPFILTERS among its arguments). Wrap it in CALCULATETABLE and put the filters there. Why: Microsoft's skill and SQLBI both place them outside; inside, they can change which rows come back and add work. Check: M523 (warn).
+**33. SUMMARIZECOLUMNS takes its filters from outside.** Inside a measure, give SUMMARIZECOLUMNS no filter argument (FILTER, TREATAS or KEEPFILTERS among its arguments). Wrap it in CALCULATETABLE and put the filters there. Why: SQLBI places them outside, and so does one performance pattern of Microsoft's skill (DAX009); inside, they can change which rows come back and add work. Microsoft's skill passes filters as arguments in its general guidelines, so this is a suggestion and not a rule. Check: M523 (note).
 
 ```dax
 CALCULATETABLE (
@@ -277,7 +277,7 @@ The model setting for how SUMMARIZECOLUMNS treats filters on values is in the fi
 **39. Inside user-defined functions.** How functions are written and named is in the file `model-objects.md` beside this one. Three DAX rules apply inside them:
 
 - Write every column with its table. Inside a function, Microsoft reads a bare name as a measure, so renames and dependency tracking can miss the column. Check: M010 (warn; rule 10). Source: https://learn.microsoft.com/en-us/dax/best-practices/dax-user-defined-functions
-- Never name a table or column that a role hides with object-level security. That security does not reach into a function. Check: M806 (warn). Source: the same page.
+- Object-level security does not carry over to functions: for a person without access, a function that refers to a hidden object behaves as if the object did not exist. Microsoft's advice is to keep hidden objects out of function names and descriptions. Check: M806 (warn; a function whose body names a table or column that a role hides, so that it is tested for that role). Source: the same page.
 - Names, following SQLBI: a function name starts with a capital and holds no underscore, with dots to group related functions (such as `Local.` for a function tied to this model); a parameter name starts with a lower-case letter (`amount`, `taxRate`). Check: M807 (warn). Source: https://www.sqlbi.com/articles/model-dependent-and-model-independent-user-defined-functions-in-dax/ ; https://www.sqlbi.com/articles/understanding-parameter-types-in-dax-user-defined-functions-udf/
 
 ## Sources
@@ -301,7 +301,7 @@ Where sources disagree, and what was decided. Order of trust: the owner's checkl
 - M010: Microsoft Learn says a measure written with its table breaks. The check only warns, because a text scanner cannot be certain (the level rule at the top of `scripts/model_rules.py`). Treat the rule as a must.
 - Table quotes: SQLBI quotes only when needed; Microsoft's skill always quotes. SQLBI's rule is not adopted; no check.
 - Variable names: Microsoft's skill starts them with `_`; Microsoft Learn's page on variables (https://learn.microsoft.com/dax/best-practices/dax-variables) and SQLBI write plain names. Microsoft Learn is the higher source, so the `_` prefix is not adopted (rule 31).
-- SUMMARIZECOLUMNS inside a measure: Microsoft's skill uses it by default; SQLBI keeps it for advanced cases. Microsoft's skill wins. Both put its filters in an outer CALCULATETABLE: M523 (rule 33).
+- SUMMARIZECOLUMNS inside a measure: Microsoft's skill uses it by default; SQLBI keeps it for advanced cases. Microsoft's skill wins. Where its filters go: SQLBI and pattern DAX009 of Microsoft's skill put them in an outer CALCULATETABLE; the skill's general guidelines pass them as arguments. So M523 is a note (rule 33).
 - Grouping with values: Microsoft's skill prefers SUMMARIZECOLUMNS; SQLBI writes ADDCOLUMNS around SUMMARIZE. Both pass; M522 reports only a column computed inside SUMMARIZE (rule 32).
 - Multiplying by a test (rule 36): Microsoft's skill uses it for speed; it returns 0, which rule 7 (Microsoft Learn) avoids. Learn wins: the form is kept only for a measured gain.
 - Function names: Microsoft Learn allows underscores; SQLBI's style has none and starts parameters in lower case. The style is adopted as a warning (M807); a function that keeps another style goes in section 9 with M807.

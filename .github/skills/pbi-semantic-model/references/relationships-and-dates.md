@@ -61,13 +61,13 @@ The next seven rules catch files that Power BI refuses to load, or that break a 
 
 **11. Hierarchy levels exist.** Each level of a hierarchy names a column of the same table. Check: M902 (fail). Source: https://learn.microsoft.com/en-us/analysis-services/tabular-models/hierarchies-ssas-tabular ; Microsoft's skill, modeling-guidelines.md (address in rule 2)
 
-**12. Sort columns exist.** The column named in `sortByColumn` is in the same table. Check: M903 (fail). Source: Microsoft's skill, modeling-guidelines.md (address in rule 2)
+**12. Sort columns exist.** The column named in `sortByColumn` is in the same table. Check: M903 (fail: a reference by name that cannot be resolved stops the model from loading). Source: Microsoft's skill, modeling-guidelines.md (address in rule 2); https://learn.microsoft.com/dotnet/api/microsoft.analysisservices.tabular.tmdl.tmdldeserializationwithreferenceerrorsexception
 
-**13. Data columns name their source.** Every column that is not calculated has `sourceColumn`, with the column name the table's query returns. Columns of calculated tables and calculation groups are left out. Check: M904 (fail). Source: Microsoft's skill, modeling-guidelines.md (address in rule 2)
+**13. Data columns name their source.** Every column that is not calculated has `sourceColumn`, with the column name the table's query returns. Columns of calculated tables and calculation groups are left out. Check: M904 (fail: Microsoft's best practice rule says a data column without a source column gives an error when the model is processed). Source: Microsoft's best practice rule 'Data columns must have a source column', https://github.com/microsoft/Analysis-Services/blob/master/BestPracticeRules/BPARules.json ; Microsoft's skill, modeling-guidelines.md (address in rule 2)
 
 **14. No empty formula.** A measure, calculated column or calculation item has a formula. Check: M905 (fail). Source: https://learn.microsoft.com/en-us/analysis-services/tmdl/tmdl-how-to
 
-**15. No control characters.** Names hold no tab, line break or other control character. The check also reads descriptions. Check: M906 (fail). Source: Microsoft's best practice rules 'Avoid invalid characters in names' and 'Object names must not contain special characters', https://github.com/microsoft/Analysis-Services/blob/master/BestPracticeRules/BPARules.json
+**15. No control characters.** Names and descriptions hold no control character: Microsoft's rules say the model then cannot be deployed. Check: M906 (fail; control characters that are not white space, as those rules define them). A tab or a line break in a name is a naming matter, without such a statement: M118 (warn) reports a tab in a visible name. Source: Microsoft's best practice rules 'Avoid invalid characters in names', 'Avoid invalid characters in descriptions' and 'Object names must not contain special characters', https://github.com/microsoft/Analysis-Services/blob/master/BestPracticeRules/BPARules.json
 
 **16. Columns with a job stay available.** A column that sorts another, is sorted by another, or is a hierarchy level never has `isAvailableInMdx: false`. Check: M907 (fail). Source: Microsoft's best practice rule 'Set IsAvailableInMdx to true on necessary columns', https://github.com/microsoft/Analysis-Services/blob/master/BestPracticeRules/BPARules.json
 
@@ -218,6 +218,5 @@ Not confirmed from Microsoft:
 - That each case of rules 10 to 14 stops a model from loading. Microsoft documents that TMDL breaking the model's rules is refused, not each case.
 - The prefixes tbl and vw in M118: no source names them.
 - The TMDL spelling `isNullable`: it follows the Tabular Object Model property IsNullable; the Learn pages give only the Desktop label Is Nullable.
-- M906 on descriptions: the best practice rules cover names only.
 
 Checklist items: 7, 10-15, 18, 24, 26, 31, 59

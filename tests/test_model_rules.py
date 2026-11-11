@@ -762,9 +762,9 @@ class ClosingTheCoverage(StarCase):
                      'ADDCOLUMNS ( SUMMARIZE ( Sales, Store[City] ), "@Sales", [Total Sales] )')
         self.assertNot("M522")
 
-    def test_M523_summarizecolumns_with_a_filter_argument_in_a_measure_warns(self):
+    def test_M523_summarizecolumns_with_a_filter_argument_in_a_measure_is_a_note(self):
         self.measure("Cities With Sales", 'COUNTROWS ( SUMMARIZECOLUMNS ( Store[City], TREATAS ( { "Utrecht" }, Store[City] ) ) )')
-        self.assertFinds("M523", "warn")
+        self.assertFinds("M523", "note")
         self.replace(MEASURES, 'SUMMARIZECOLUMNS ( Store[City], TREATAS ( { "Utrecht" }, Store[City] ) )',
                      'CALCULATETABLE ( SUMMARIZECOLUMNS ( Store[City] ), TREATAS ( { "Utrecht" }, Store[City] ) )')
         self.assertNot("M523")

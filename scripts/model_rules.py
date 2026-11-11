@@ -196,7 +196,7 @@ def _integrity(context, rels, column_at, measure_names, function_names, index):
             if (not column.get("calculated") and not column["props"].get("sourcecolumn")
                     and not table["calculated"] and not table.get("calculation_group")):
                 add("M904", column, "column %s has no sourceColumn; a data column needs the name of the source "
-                    "column it reads" % key, keys=(key,))
+                    "column it reads; Microsoft's rule says processing the model then gives an error" % key, keys=(key,))
             if column["props"].get("isavailableinmdx", "").lower() == "false":
                 used = [what for what, hit in (
                     ("sorts another column", any(_reference(c["props"].get("sortbycolumn", "")) == (column["name"], None)
@@ -211,7 +211,7 @@ def _integrity(context, rels, column_at, measure_names, function_names, index):
         if obj["translation"] or obj["kind"] not in ("table", "column", "measure", "hierarchy", "level", "role",
                                                       "calculationitem", "perspective", "partition", "function"):
             continue
-        if any(ord(ch) < 32 for ch in obj["name"] + obj["description"]):
+        if any(ord(ch) < 32 and ch not in "\t\n\r" for ch in obj["name"] + obj["description"]):
             add("M906", obj, "%s '%s' has a control character in its name or description; remove it"
                 % (obj["kind"], obj["name"].encode("unicode_escape").decode("ascii")), keys=(obj["name"],))
     for owner, parsed in context["expressions"]:
@@ -427,6 +427,8 @@ def _table_column_name(name, brief):
     own = brief["own_spelling"]
     if name != name.strip():
         problems.append("it starts or ends with a space")
+    if "\t" in name:
+        problems.append("it holds a tab")
     stripped = name.strip()
     if stripped[:1].isalpha() and stripped[:1].islower() and stripped.split()[0] not in own:
         problems.append("it does not start with a capital")
@@ -1194,8 +1196,8 @@ def _more(context, rels, column_at, permissions, functions, direct_query):
         if owner["kind"] == "measure":
             for call in _calls(parsed, "SUMMARIZECOLUMNS"):
                 if any(_whole_call(parsed, span, *SUMMARIZECOLUMNS_FILTERS) for span in call.args):
-                    add("M523", owner, "measure %s gives SUMMARIZECOLUMNS a filter argument. Inside a measure, put the "
-                        "filter in a CALCULATETABLE around SUMMARIZECOLUMNS instead" % label, level="warn", keys=keys)
+                    add("M523", owner, "measure %s gives SUMMARIZECOLUMNS a filter argument. Inside a measure, consider "
+                        "putting the filter in a CALCULATETABLE around SUMMARIZECOLUMNS instead" % label, level="note", keys=keys)
                     break
 
     # ---- reports in more than one language
@@ -1255,8 +1257,9 @@ def _more(context, rels, column_at, permissions, functions, direct_query):
                            and t.value.lower() in hidden_tables and t.value in tables})
         if secret:
             add("M806", function, "function %s names %s, which a role hides with object-level security. Microsoft "
-                "says object-level security does not reach functions: the function's text can show the hidden name. "
-                "Pass the object in as a parameter instead" % (name, ", ".join(secret)), level="warn", keys=(name,))
+                "says object-level security does not carry over to functions: for a member of that role the function "
+                "behaves as if the object did not exist. Test the function for that role, and keep hidden names out of "
+                "function names and descriptions" % (name, ", ".join(secret)), level="warn", keys=(name,))
         problems = []
         if "_" in name or any(part[:1].isalpha() and not part[:1].isupper() for part in name.split(".")):
             problems.append("write each part of the name with a capital first letter and no underscores (AddTax, "

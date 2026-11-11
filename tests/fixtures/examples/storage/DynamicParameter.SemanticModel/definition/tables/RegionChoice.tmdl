@@ -1,5 +1,5 @@
 /// Example of the table of values for a dynamic M query parameter: readers pick a region here, and the pick goes to RegionParameter.
-table 'Region Choice'
+table RegionChoice
 
 	/// The region to show. Bound to the parameter RegionParameter.
 	column 'Region Pick'
@@ -7,7 +7,7 @@ table 'Region Choice'
 		summarizeBy: none
 		sourceColumn: [Region Pick]
 
-	partition 'Region Choice' = calculated
+	partition RegionChoice = calculated
 		mode: import
 		source =
 				DATATABLE (

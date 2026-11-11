@@ -13,7 +13,7 @@ This file covers measures, folders, hiding, calculated objects, summarising, dat
 **1. Home.** Every measure lives in one table named `_Measures`. The table is visible. It has exactly one column, and that column is hidden. Item: beyond. Checks: M001, M002 (fail).
 
 - Copilot makes the table itself: `python scripts/scaffold.py measures-table .`. The script copies the shipped example and picks the form from the model's storage modes.
-- Import model: an imported table with one hidden text column and no rows, read by a one-step Power Query query. This is the files' form of what Microsoft Learn describes for Power BI Desktop (Enter data, one column, load it, hide the column and not the table). Microsoft Learn gives the table no name; the name `_Measures` is the owner's choice and is also the name used in GitHub's modeling skill and in an example of Microsoft's skill.
+- Import model: an imported table with one hidden text column and no rows, read by a one-step Power Query query. This is the files' form of what Microsoft Learn describes for Power BI Desktop (Enter data, one column, load it, hide the column and not the table: https://learn.microsoft.com/en-us/power-bi/transform-model/desktop-measures). Microsoft Learn gives the table no name; the name `_Measures` is the owner's choice and is also the name used in GitHub's modeling skill and in an example of Microsoft's skill.
 - Direct Lake model: an imported table would make the model composite. There `_Measures` is a calculated table whose formula names no other table (Microsoft's skill shows a one-row table made with ROW). It carries its reason line (rule 8); the script writes the standard's own reason.
 - DirectQuery model: the same calculated form, for the same reason. This is the template's default; if the developer wants an imported table instead, they say so and section 4 of the brief records it.
 - A report on a published model has no model here: its measures live in the published model.
@@ -70,7 +70,7 @@ This file covers measures, folders, hiding, calculated objects, summarising, dat
 
 **13. Hierarchies** exist for natural drill paths, such as year, quarter, month, date. Item 59. Judged in the review.
 
-**14. Large tables** use incremental refresh or partitions; section 4 of the brief records the row counts and the decision. Microsoft's best practice rule draws the line at more than 25 million rows in a table with one partition. The files do not hold row counts: ask the developer. Beyond the checklist (item 17 is about aggregations, a different matter). Judged in the review.
+**14. Large tables** use incremental refresh or partitions; section 4 of the brief records the row counts and the decision. Microsoft's best practice rule 'Large tables should be partitioned' draws the line at more than 25 million rows in a table with one partition (https://github.com/microsoft/Analysis-Services/blob/master/BestPracticeRules/BPARules.json). The files do not hold row counts: ask the developer. Beyond the checklist (item 17 is about aggregations, a different matter). Judged in the review.
 
 **15. Unused hidden objects.** A hidden column or hidden measure that nothing refers to is listed. Items 5 and 25. Note M201.
 
@@ -82,7 +82,7 @@ Order inside a table file: write measures before columns. Microsoft's skill asks
 
 **17. Copilot in Power BI.** With "Power BI Copilot check on: yes":
 
-- Microsoft states that Copilot reads the model's fields, the synonyms in the model's linguistic schema, and only the first 200 characters of a description. So put the key words of a description first. Note M302 lists longer descriptions.
+- Microsoft states that Copilot reads the model's fields, the synonyms in the model's linguistic schema, and only the first 200 characters of a description (https://learn.microsoft.com/en-us/power-bi/create-reports/copilot-evaluate-data). So put the key words of a description first. Note M302 lists longer descriptions.
 - Synonyms are part of the model's linguistic setup, which a person edits in Power BI (the Q&A setup, or "Prep data for AI"). Microsoft's skill says an agent must not write their stored form, so do not write them into files. You may hand the developer a list of candidates: the different terms that departments already use for the same field. The developer decides and enters them.
 - Mark the column that names each member of a dimension with `isDefaultLabel`, for example `Store[Store Name]`, so Copilot knows which column labels the table. Note M303 lists dimension tables with no column marked, when the brief turns the Copilot check on. The shipped `Store[Store Name]` carries it. Item: beyond. Source: Microsoft's skill, https://github.com/microsoft/skills-for-fabric/blob/main/plugins/powerbi-authoring/skills/semantic-model-authoring/references/semantic-model-ai-readiness.md
 

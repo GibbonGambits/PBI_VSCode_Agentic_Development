@@ -5,6 +5,6 @@ model Model
 
 ref table Date
 ref table Sales
-ref table 'Region Choice'
+ref table RegionChoice
 ref table _Measures
 
