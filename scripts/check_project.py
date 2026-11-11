@@ -88,6 +88,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import formula_scanner as fs  # noqa: E402
 import json_schema  # noqa: E402
+import model_rules  # noqa: E402
 
 NAME_OK = re.compile(r"[A-Za-z0-9_-]+\Z")           # Microsoft Learn: PBIR naming convention
 NAME_MAX = 50                                        # Microsoft schemas: page 2.1.0, visualContainer 2.13.0
@@ -145,9 +146,14 @@ PROP_EQ_RE = re.compile(r"^([A-Za-z_]\w*)\s*=\s*(.*)$")
 PROP_COLON_RE = re.compile(r"^([A-Za-z_]\w*)\s*:")
 OBJECT_KEYWORDS = frozenset((
     "table", "column", "measure", "expression", "partition", "hierarchy", "level",
-    "calculationgroup", "calculationitem", "function", "role", "tablepermission",
-    "relationship", "perspective", "culture", "cultureinfo", "datasource", "model", "database",
-    "annotation", "extendedproperty", "querygroup", "variation", "kpi"))
+    "calculationgroup", "calculationitem", "function", "role", "tablepermission", "columnpermission",
+    "relationship", "perspective", "perspectivetable", "perspectivecolumn", "perspectivemeasure",
+    "perspectivehierarchy", "culture", "cultureinfo", "datasource", "model", "database",
+    "annotation", "extendedproperty", "querygroup", "variation", "kpi", "calendar"))
+# Objects written as one bare word, with their properties below (the spelling Microsoft's TMDL serializer writes).
+NAMELESS_OBJECTS = frozenset(("calculationgroup", "kpi", "refreshpolicy", "alternateof", "relatedcolumndetails",
+                              "translations"))
+M_PROPERTIES = frozenset(("sourceexpression", "pollingexpression"))    # Power Query held by a refresh policy
 VALUE_ONLY = frozenset(("annotation", "extendedproperty"))       # 'name = value' lines, not real objects
 PLAIN_VALUE_KEYS = frozenset(("changedproperty",))               # 'key = value' where the value is not an expression
 FREE_TEXT_KEYS = frozenset(("sourcecolumn", "formatstring", "displayfolder", "sortbycolumn",
@@ -348,6 +354,10 @@ def check_tmdl_lines(path, lines, findings):
         decl = DECL_RE.match(stripped)
         keyword = decl.group(1).lower() if decl else ""
         is_object = bool(decl) and keyword in OBJECT_KEYWORDS
+        nameless = stripped.lower() in NAMELESS_OBJECTS
+        if nameless:
+            keyword = stripped.lower()
+            is_object = True
         opens_block = False
         fenced = False
         is_m = False
@@ -355,8 +365,8 @@ def check_tmdl_lines(path, lines, findings):
         steps_deeper = 1      # tab levels between this line and the first line of its expression
 
         if is_object:
-            raw_name = decl.group(2)
-            rest = decl.group(3).strip()
+            raw_name = "" if nameless else decl.group(2)
+            rest = "" if nameless else decl.group(3).strip()
             if not raw_name.startswith("'") and "//" in raw_name:
                 comment(number)                       # a comment glued to the name: 'column A// note'
                 raw_name = raw_name.split("//")[0]
@@ -384,6 +394,8 @@ def check_tmdl_lines(path, lines, findings):
                     parent["annotations"][name] = tail or ""
                     parent["annotation_lines"][name] = number
                     target = ("annotation", parent, name)
+                elif keyword == "extendedproperty" and parent is not None:
+                    parent.setdefault("extended", {})[name] = tail or ""
             else:
                 if keyword == "cultureinfo":
                     translations = True
@@ -425,7 +437,7 @@ def check_tmdl_lines(path, lines, findings):
                     fenced = True
                 elif key in PLAIN_VALUE_KEYS and _has_comment(" " + tail):
                     comment(number)
-                is_m = key == "source" and partition_is_m
+                is_m = (key == "source" and partition_is_m) or key in M_PROPERTIES
                 if is_m and re.match(r"let\b", tail):
                     findings.add("P001", path, number,
                                  "this query is written on one line; put 'let' and each step on its own line with a '//' description above each step")
@@ -993,10 +1005,12 @@ def build_model(objects):
         if kind == "table" and obj["top"]:
             table = tables.setdefault(obj["name"], {"name": obj["name"], "objects": [], "columns": [], "measures": [],
                                                     "hierarchies": [], "partitions": [], "hidden": False,
-                                                    "annotations": {}})
+                                                    "annotations": {}, "props": {}, "calculation_group": None,
+                                                    "refresh_policy": None})
             table["objects"].append(obj)
             table["hidden"] = table["hidden"] or obj["hidden"]
             table["annotations"].update(obj["annotations"])
+            table["props"].update(obj["props"])
     for obj in objects:
         if obj["translation"]:
             continue
@@ -1016,9 +1030,15 @@ def build_model(objects):
                 obj["levels"] = []
             elif kind == "partition":
                 table["partitions"].append(obj)
+            elif kind == "calculationgroup":
+                table["calculation_group"] = obj
+            elif kind == "refreshpolicy":
+                table["refresh_policy"] = obj
         elif kind == "level" and obj["parent"] is not None and obj["parent"]["kind"] == "hierarchy":
             obj["parent"].setdefault("levels", []).append(_unquote(obj["props"].get("column", "")))
-        if obj["has_expr"] and kind in ("measure", "column", "tablepermission", "calculationitem"):
+        elif kind == "alternateof" and obj["parent"] is not None and obj["parent"]["kind"] == "column":
+            obj["parent"]["alternate_of"] = obj
+        if obj["has_expr"] and kind in ("measure", "column", "tablepermission", "calculationitem", "function"):
             expressions.append((obj, obj["expr"] or ""))
         if kind == "partition" and (obj["expr"] or "").split("//")[0].strip().lower() == "calculated":
             expressions.append((obj, obj["props"].get("source", "")))
@@ -1028,6 +1048,13 @@ def build_model(objects):
     for table in tables.values():
         table["calculated"] = any((p["expr"] or "").split("//")[0].strip().lower() == "calculated"
                                   for p in table["partitions"])
+        # A field parameter: Power BI marks its fields column with the extended property ParameterMetadata.
+        table["field_parameter"] = any("parametermetadata" in {k.lower() for k in c.get("extended", {})}
+                                       for c in table["columns"])
+        # A numeric range ("what-if") parameter: a calculated table made with GENERATESERIES.
+        table["parameter_table"] = table["calculated"] and any(
+            call.name == "GENERATESERIES" for p in table["partitions"]
+            for call in fs.calls(fs.tokens(p["props"].get("source", ""), fs.DAX)))
     return {"tables": tables, "relationships": relationships, "expressions": expressions}
 
 
@@ -1379,6 +1406,19 @@ def check_standards(model_dir, objects, usage, brief, findings):
                              "%s '%s': its description has %d characters; Copilot in Power BI reads the first %d, so "
                              "put the key words first" % (obj["kind"], obj["name"], len(obj["description"]),
                                                           COPILOT_DESCRIPTION_LIMIT), level="note")
+
+    # ---- the rules added in round 3 (scripts/model_rules.py)
+    model_object = next((o for o in objects if o["kind"] == "model" and o["top"] and not o["translation"]), None)
+    database = next((o for o in objects if o["kind"] == "database" and o["top"]), None)
+    level = (database or {}).get("props", {}).get("compatibilitylevel", "") if database else ""
+    model_rules.check({
+        "model": model, "tables": tables, "own_tables": own_tables, "automatic": automatic,
+        "auto_prefixes": AUTO_DATE_PREFIXES, "measure_tables": measure_tables, "all_measures": all_measures,
+        "all_columns": all_columns, "expressions": code_by_owner, "objects": objects, "brief": brief,
+        "usage": usage, "add": add, "parse": _dax, "model_object": model_object,
+        "model_anchor": model_object or (own_tables[0]["objects"][0] if own_tables else None),
+        "compatibility_level": int(level) if level.isdigit() else None,
+        "table_names_upper": {name.upper() for name in tables}})
     return model
 
 

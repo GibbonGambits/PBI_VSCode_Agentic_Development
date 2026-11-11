@@ -158,11 +158,11 @@ class GoodProject(Case):
 
 class BadProject(Case):
     FIXTURE = "bad"
-    ERRORS = ("M001", "M002", "M003", "M004", "M005", "M006", "M007", "M009", "M105", "M107", "M109",
-              "G001", "G002", "B001", "H001", "H002", "N003", "D001")
-    WARNINGS = ("M008", "M010", "M101", "M102", "M103", "M104", "M106", "M108", "M110", "M111", "M112",
-                "G003", "G004", "G005", "G006", "G007")
-    NOTES = ("M201", "M301", "M302", "G008")
+    ERRORS = ("B001", "D001", "G001", "G002", "H001", "H002", "M001", "M002", "M003", "M004", "M005", "M006",
+              "M007", "M009", "M105", "M107", "M109", "M402", "N003")
+    WARNINGS = ("G003", "G004", "G005", "G006", "G007", "M008", "M010", "M101", "M102", "M103", "M104", "M106",
+                "M108", "M110", "M111", "M112", "M114", "M118", "M404", "M411", "M413", "M508")
+    NOTES = ("G008", "M201", "M301", "M302")
 
     def test_every_breach_is_caught(self):
         items = self.found()
@@ -577,13 +577,13 @@ class ColumnsAndTables(Case):
         column = ("\t/// When the order was placed.\n\tcolumn 'Ordered At'\n\t\tdataType: dateTime\n%s"
                   "\t\tsummarizeBy: none\n\t\tsourceColumn: OrderedAt\n")
         self.add_measure(column % "\t\tformatString: General Date\n", SALES)
-        self.assertEqual(self.codes("warn"), ["M111"])
+        self.assertEqual(self.codes("warn"), ["M111", "M403"])     # M403: a date column, and no date table
         self.replace(SALES, "\t\tformatString: General Date\n", "\t\tformatString: Short Date\n")
-        self.assertEqual(self.codes("warn"), [])
+        self.assertEqual(self.codes("warn"), ["M403"])
         self.replace(SALES, "\t\tformatString: Short Date\n", "\t\tformatString: dd/MM/yyyy hh:mm\n")
-        self.assertEqual(self.codes("warn"), ["M111"])
+        self.assertEqual(self.codes("warn"), ["M111", "M403"])
         self.replace(SALES, "\t\tformatString: dd/MM/yyyy hh:mm\n", "")
-        self.assertEqual(sorted(self.codes("warn")), ["M111", "M112"])
+        self.assertEqual(sorted(self.codes("warn")), ["M111", "M112", "M403"])
 
     def test_visible_number_without_format_warns(self):
         self.add_measure("\t/// Number of items on the line.\n\tcolumn Items\n\t\tdataType: int64\n"
@@ -1218,7 +1218,8 @@ class ReviewedEdgeCases(Case):
                          "\t\tsummarizeBy: none\n\t\tsourceColumn: OrderDate\n", SALES)
         self.write(RELATIONSHIPS, "relationship r1\n\tjoinOnDateBehavior: datePartOnly\n\tfromColumn: Sales.'Order Date'\n"
                                   "\ttoColumn: LocalDateTable_0a1b.Date\n")
-        self.assertEqual(self.codes(), ["I001"])                   # no M105, M106, M010, M102, M110 or M201 for Power BI's own table
+        # no M105, M106, M010, M102, M110 or M201 for Power BI's own table; M401 says Auto date/time is on
+        self.assertEqual(self.codes(), ["I001", "M401", "M403"])
         findings, _, _ = cp.run(self.root)
         self.assertEqual(findings.fixes, [])                       # and no proposal to hide the user's date column
 

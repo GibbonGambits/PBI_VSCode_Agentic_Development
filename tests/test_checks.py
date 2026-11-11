@@ -972,7 +972,7 @@ class MoreTmdlEdgeCases(ProjectCase):
         self.write(os.path.join(base, "relationships.tmdl"),
                    "relationship r1\n\tfromColumn: 'Sales // archive'.'Order = Date'\n\ttoColumn: Sales.OrderId\n")
         self.write(os.path.join(base, "model.tmdl"), "model Model\n\tculture: en-US\n\nref table 'Sales // archive'\nref table Sales\n")
-        self.assertClean()
+        self.assertEqual(self.codes(), ["M901"])     # no C001; the made-up table is not in the model, which M901 reports
 
     def test_expression_whose_first_line_is_indented_deeper_is_kept_whole(self):
         self.replace(SALES, "\tannotation SampleSource",
