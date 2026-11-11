@@ -1,0 +1,49 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
+  "name": "4f0c9d2a7b1e8a6c3d5f",
+  "position": {
+    "x": 24,
+    "y": 168,
+    "z": 1,
+    "width": 612,
+    "height": 400,
+    "tabOrder": 1
+  },
+  "visual": {
+    "visualType": "barChart",
+    "visualContainerObjects": {
+      "visualHeader": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "visualTooltip": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "annotations": [
+    {
+      "name": "VisualLabel",
+      "value": "Overview_Bar_SalesByMonth"
+    }
+  ]
+}
