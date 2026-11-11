@@ -208,6 +208,14 @@ class Accessibility(ReportCase):
         self.assertNot("A001")
         self.assertNot("A003")
 
+    def test_A004_alt_text_over_250_characters_warns(self):
+        path = self.visual("Overview", "Overview_Card_Long", fields=[SALES])
+        self.assertNot("A004")
+        data = self.read_json(path)
+        data["visual"]["visualContainerObjects"]["general"] = [{"properties": {"altText": lit("'%s'" % ("word " * 60))}}]
+        self.write_json(path, data)
+        self.assertFinds("A004", "warn")
+
     def test_A002_shared_tab_order_number_warns(self):
         first = self.visual("Overview", "Overview_Card_One", fields=[SALES])
         second = self.visual("Overview", "Overview_Card_Two", fields=[SALES], x=400)

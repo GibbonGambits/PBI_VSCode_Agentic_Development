@@ -1,0 +1,17 @@
+/// Holds every measure of the model. It has one hidden column and no data.
+table _Measures
+
+	column Placeholder
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: Placeholder
+
+	partition _Measures = m
+		mode: import
+		source =
+				let
+				    // An empty one-column table: it only holds the measures.
+				    Source = #table(type table [Placeholder = text], {})
+				in
+				    Source

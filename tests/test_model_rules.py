@@ -168,6 +168,12 @@ class Dates(StarCase):
         self.write(os.path.join(TABLES, "LocalDateTable_0a1b.tmdl"), self.AUTO)
         self.assertFinds("M401", "warn")
 
+    def test_M401_annotation_that_desktop_writes_warns(self):
+        self.write(MODEL, self.read(MODEL) + "\nannotation __PBI_TimeIntelligenceEnabled = 1\n")
+        self.assertFinds("M401", "warn")
+        self.replace(MODEL, "__PBI_TimeIntelligenceEnabled = 1", "__PBI_TimeIntelligenceEnabled = 0")
+        self.assertNot("M401")
+
     def test_M402_time_intelligence_without_a_date_table_fails(self):
         self.replace(DATE, "\tdataCategory: Time\n", "")
         self.assertFinds("M402", False)
@@ -434,6 +440,26 @@ class Security(StarCase):
         self.assertFinds("M606", "warn")
 
 
+class ObjectSecurity(StarCase):
+    def test_M607_row_rules_and_object_rules_in_different_roles_warn(self):
+        self.role("Store", 'Store[City] = "Utrecht"')
+        self.assertNot("M607")
+        self.write(os.path.join(DEFINITION, "roles", "No Amounts.tmdl"),
+                   "role 'No Amounts'\n\tmodelPermission: read\n\n\ttablePermission Sales\n\n\t\tcolumnPermission Amount = none\n")
+        self.assertFinds("M607", "warn")
+
+    def test_M608_hidden_table_in_the_middle_of_a_chain_fails(self):
+        self.table("Region", KEY_COLUMN % ("Region Key", "Region Key"))
+        self.replace(os.path.join(TABLES, "Region.tmdl"), "\t\tisHidden\n", "\t\tisHidden\n\t\tisKey\n")
+        self.replace(STORE, "\t/// Name of the store.", KEY_COLUMN % ("Region Key", "Region Key") + "\t/// Name of the store.")
+        self.write(RELATIONSHIPS, self.read(RELATIONSHIPS) + "\nrelationship StoreToRegion\n\tfromColumn: Store.'Region Key'\n"
+                   "\ttoColumn: Region.'Region Key'\n")
+        self.write(ROLE, "role Readers\n\tmodelPermission: read\n\n\ttablePermission Store\n\t\tmetadataPermission: none\n")
+        self.assertFinds("M608", False)
+        self.write(ROLE, "role Readers\n\tmodelPermission: read\n\n\ttablePermission Region\n\t\tmetadataPermission: none\n")
+        self.assertNot("M608")
+
+
 class Storage(StarCase):
     def test_M701_directquery_native_query_with_a_cte_fails(self):
         self.direct_query()
@@ -475,6 +501,20 @@ class Storage(StarCase):
         self.assertFinds("M707", False)
         self.write(EXPRESSIONS, self.PARAMETERS)
         self.assertNot("M707")
+
+    def test_M707_parameter_that_is_not_a_date_time_fails(self):
+        self.write(EXPRESSIONS, self.PARAMETERS.replace('#datetime(2024, 1, 1, 0, 0, 0) meta [IsParameterQuery=true, Type="DateTime"',
+                                                        '20240101 meta [IsParameterQuery=true, Type="Number"'))
+        self.replace(SALES, "\tcolumn 'Date Key'", self.POLICY % 'Sql.Database("server", "db")' + "\tcolumn 'Date Key'")
+        self.assertFinds("M707", False)
+
+    def test_M709_both_ends_of_the_window_included_fails(self):
+        self.write(EXPRESSIONS, self.PARAMETERS)
+        both = 'Table.SelectRows(Sql.Database("server", "db"), each [OrderDate] >= RangeStart and [OrderDate] <= RangeEnd)'
+        self.replace(SALES, "\tcolumn 'Date Key'", self.POLICY % both + "\tcolumn 'Date Key'")
+        self.assertFinds("M709", False)
+        self.replace(SALES, "[OrderDate] <= RangeEnd", "[OrderDate] < RangeEnd")
+        self.assertNot("M709")
 
     def test_M708_refresh_policy_on_a_native_query_warns(self):
         self.write(EXPRESSIONS, self.PARAMETERS)

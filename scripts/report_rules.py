@@ -20,6 +20,7 @@ import re
 
 TOOLTIP_SIZE = (320, 240)           # the built-in Tooltip page size (Microsoft Learn, "Extend visuals with report page tooltips")
 TOOLTIP_FIELDS = 3                  # checklist item 65
+ALT_TEXT_LIMIT = 250                # Microsoft Learn, "Design Power BI reports for accessibility"
 DENSITY_REVIEW = 13                 # checklist item 20: 13 to 16 visuals = review
 DENSITY_LIMIT = 16                  # checklist item 20: more than 16 = justification required
 NO_DATA_TYPES = frozenset(("textbox", "shape", "basicShape", "image", "actionButton", "pageNavigator",
@@ -218,6 +219,10 @@ def check(cp, report_dir, brief, findings):
             if (has_data and visual["data"].get("isHidden") is not True and "altText" not in general
                     and not excused("A001", page, visual)):
                 no_alt.append(shown(visual))
+            alt = literal(general.get("altText"))
+            if alt is not None and len(alt) > ALT_TEXT_LIMIT and not excused("A004", page, visual):
+                add("A004", page, visual, "the alt text of '%s' has %d characters; Power BI's alt text box takes %d"
+                    % (shown(visual), len(alt), ALT_TEXT_LIMIT))
             title_card = card(body, "title")
             if (has_data and kind not in SLICER_TYPES and literal(title_card.get("show")) != "false"
                     and "text" not in title_card and page["kind"] != "Tooltip" and not excused("A003", page, visual)):

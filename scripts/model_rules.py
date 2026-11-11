@@ -22,6 +22,7 @@ import formula_scanner as fs
 HERE = os.path.dirname(os.path.abspath(__file__))
 DAX_INDEX = os.path.join(os.path.dirname(HERE), ".github", "skills", "pbi-semantic-model", "references",
                          "dax-functions.md")
+AUTO_DATE_ANNOTATION = "__PBI_TimeIntelligenceEnabled"     # seen in projects Power BI Desktop saved; not documented
 UDF_LEVEL = 1702                    # Microsoft Learn, "DAX user-defined functions": compatibility level 1702 or higher
 MANY_TO_MANY_SHARE = 0.3            # Microsoft's best practice rule on excessive both-direction or many-to-many relationships
 REPEAT_TOKENS = 6                   # a call this long, written twice in one formula, belongs in a variable
@@ -242,11 +243,13 @@ def _dates(context, index):
     tables, add = context["tables"], context["add"]
     automatic = sorted(context["automatic"])
     model_object = context["model_object"]
-    if automatic and model_object is not None:
-        add("M401", model_object, "Auto date/time is on: the model holds %d hidden date table(s) Power BI made "
-            "(%s%s). Turn it off in Power BI Desktop (Options, Current File, Time intelligence) and use one date table"
-            % (len(automatic), ", ".join(automatic[:3]), " ..." if len(automatic) > 3 else ""), level="warn",
-            keys=("model",))
+    switched_on = model_object is not None and model_object["annotations"].get(AUTO_DATE_ANNOTATION, "").strip() == "1"
+    if (automatic or switched_on) and model_object is not None:
+        what = ("the model holds %d hidden date table(s) Power BI made (%s%s)"
+                % (len(automatic), ", ".join(automatic[:3]), " ..." if len(automatic) > 3 else "")) if automatic \
+            else "model.tmdl carries the annotation %s = 1" % AUTO_DATE_ANNOTATION
+        add("M401", model_object, "Auto date/time is on: %s. Turn it off in Power BI Desktop (Options, Current File, "
+            "Time intelligence) and use one date table" % what, level="warn", keys=("model",))
     marked = [t for t in context["own_tables"] if t["props"].get("datacategory", "").lower() == "time"]
     has_calendar = any(o["kind"] == "calendar" for o in context["objects"])
     time_users = sorted({_label(owner) for owner, parsed in context["expressions"]
@@ -692,7 +695,7 @@ def _security(context, rels, permissions, secured):
                 "Microsoft's rule says this performs poorly" % permission["name"], level="warn", keys=keys)
         hidden_columns = [o["name"] for o in context["objects"]
                           if o["kind"] == "columnpermission" and o["parent"] is permission
-                          and (o["expr"] or "").strip().lower() == "none"]
+                          and "none" in ((o["expr"] or "").strip().lower(), o["props"].get("metadatapermission", "").lower())]
         whole_table = permission["props"].get("metadatapermission", "").lower() == "none"
         broken = sorted({"%s[%s]" % (e, p) for e, p in used_fields
                          if e == permission["name"] and (whole_table or p in hidden_columns)})
@@ -701,6 +704,25 @@ def _security(context, rels, permissions, secured):
                 "people in that role those visuals fail" % (role, "table '%s'" % permission["name"] if whole_table
                                                             else "column(s) %s" % ", ".join(hidden_columns),
                                                             ", ".join(broken[:6])), level="warn", keys=keys)
+    by_role = {}
+    for permission in permissions:
+        role = permission["parent"]["name"] if permission["parent"] else "?"
+        kinds = by_role.setdefault(role, {"rows": False, "objects": False, "first": permission})
+        kinds["rows"] = kinds["rows"] or bool((permission["expr"] or "").strip())
+        kinds["objects"] = kinds["objects"] or permission["props"].get("metadatapermission", "").lower() == "none" or any(
+            o["kind"] == "columnpermission" and o["parent"] is permission for o in context["objects"])
+        if permission["props"].get("metadatapermission", "").lower() == "none" \
+                and permission["name"] in many_side and permission["name"] in one_side:
+            add("M608", permission, "role '%s' hides table '%s' with object-level security, and that table sits "
+                "between two other tables in a chain of relationships. Microsoft says this gives an error at design "
+                "time: secure the columns instead, or change the design" % (role, permission["name"]),
+                keys=("%s/%s" % (role, permission["name"]),))
+    rows_only = sorted(r for r, k in by_role.items() if k["rows"] and not k["objects"])
+    objects_only = sorted(r for r, k in by_role.items() if k["objects"] and not k["rows"])
+    if rows_only and objects_only:
+        add("M607", by_role[objects_only[0]]["first"], "role(s) %s filter rows and role(s) %s hide objects. A person "
+            "in one of each gets an error at query time: Microsoft asks for row-level and object-level security in the "
+            "same role" % (", ".join(rows_only), ", ".join(objects_only)), level="warn", keys=("model",))
     del tables
 
 
@@ -736,6 +758,30 @@ def _storage(context, rels, column_at, direct_query):
                 add("M707", policy, "table '%s' has an incremental refresh policy but the model has no parameter "
                     "named %s. Microsoft requires both RangeStart and RangeEnd, spelled this way, of type Date/Time"
                     % (table["name"], " and ".join(missing)), keys=(table["name"],))
+            wrong = []
+            for obj in context["objects"]:
+                if obj["kind"] == "expression" and obj["top"] and obj["name"] in ("RangeStart", "RangeEnd"):
+                    stream = fs.tokens(obj["expr"] or "", fs.M)
+                    if not any((t.kind == fs.TEXT and t.value == "DateTime") or (t.kind == "word" and t.value == "#datetime")
+                               for t in stream):
+                        wrong.append(obj["name"])
+            if wrong:
+                add("M707", policy, "table '%s' has an incremental refresh policy, and parameter %s is not of type "
+                    "Date/Time. Microsoft requires that type, also when the source column is a number"
+                    % (table["name"], " and ".join(wrong)), keys=(table["name"],))
+            stream = fs.tokens(policy["props"].get("sourceexpression", "") or next(
+                (p["props"].get("source", "") for p in table["partitions"]), ""), fs.M)
+            closed = {"RangeStart": False, "RangeEnd": False}
+            for position, token in enumerate(stream):
+                if token.kind == "word" and token.value in closed:
+                    before = stream[position - 1] if position else None
+                    after = stream[position + 1] if position + 1 < len(stream) else None
+                    if any(t is not None and t.kind == "symbol" and t.value in ("<=", ">=") for t in (before, after)):
+                        closed[token.value] = True
+            if all(closed.values()):
+                add("M709", policy, "the query of table '%s' compares with RangeStart and with RangeEnd and includes "
+                    "both ends (>= and <=). Microsoft says a row on a boundary can then be loaded twice: include one "
+                    "end only (>= RangeStart and < RangeEnd)" % table["name"], keys=(table["name"],))
     for r in rels:
         if r["from"][0] in direct_query and r["from_many"] and not r["to_many"]:
             other = tables.get(r["to"][0])

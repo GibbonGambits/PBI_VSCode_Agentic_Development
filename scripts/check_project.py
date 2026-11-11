@@ -391,6 +391,9 @@ def check_tmdl_lines(path, lines, findings):
             if keyword in VALUE_ONLY:
                 if had_pending:
                     findings.add("D003", path, pending_line, "'///' description is not directly above an object")
+                if keyword == "annotation" and parent is None:
+                    # model.tmdl writes the model's own annotations at the left margin, below the model's properties
+                    parent = next((o for o in objects if o["kind"] == "model" and o["top"] and not o["translation"]), None)
                 if keyword == "annotation" and parent is not None:
                     parent["annotations"][name] = tail or ""
                     parent["annotation_lines"][name] = number

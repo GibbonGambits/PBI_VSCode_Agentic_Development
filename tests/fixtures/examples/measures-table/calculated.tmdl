@@ -1,0 +1,13 @@
+/// Holds every measure of the model. It is a calculated table that names no other table.
+table _Measures
+
+	column Placeholder
+		isHidden
+		isNameInferred
+		sourceColumn: [Placeholder]
+
+	partition _Measures = calculated
+		mode: import
+		source = ROW ( "Placeholder", BLANK () )
+
+	annotation CalculatedReason = The model reads its data in Direct Lake or DirectQuery mode. An entered table would add an imported table, so the measures table is a calculated table that names no other table (model standard, rule 1).
