@@ -103,7 +103,6 @@ LAYOUT = {
     "G007": ("Write the page size in the brief; or resize the page in Power BI Desktop", "A resized page changes every position"),
     "V001": ("Add a back button to the drillthrough page (copy the shipped example) at the top-left of the page",
              "The page gains a visual; other visuals may have to move"),
-    "V003": ("Set the tooltip page to the built-in tooltip size, 320 x 240, and fit its visuals", "The tooltip looks different"),
     "A002": ("Give each visual its own tab order number, in reading order: left to right, top to bottom",
              "Keyboard users reach the visuals in a new order"),
 }
@@ -231,12 +230,13 @@ PERSON = {
     "P004": "Set the Dataverse options; the query's columns may change",
     "P005": "Move the file to a shared location, or record the gateway in the brief",
     "P006": "Decide whether the reshaping moves to the source or a dataflow",
+    "V003": "The developer gives the tooltip page the built-in tooltip size in Power BI Desktop and fits its visuals",
     "V004": "Take the slicer or button off the tooltip page, or make it a drillthrough page",
     "V005": "Decide which facts the tooltip page adds",
     "V006": "Split the page, or give the reason in section 10 of the brief",
     "V007": "Review the number of visuals on the page",
     "V008": "Say where the button should go",
-    "V010": "The developer captures the bookmark again in Power BI Desktop",
+    "V010": "Say what the bookmark should show; a simple one is written again from the shipped example, another the developer captures again in Power BI Desktop",
 }
 PERSON_ITEMS = frozenset((3, 11, 14, 17, 18, 21, 31, 39, 40, 41, 42, 43, 44, 45, 67, 68, 76, 77, 78, 79))
 

@@ -1,10 +1,10 @@
 # Report brief
 
-Brief for the shipped model examples in this folder. The models hold one working example of every semantic model object kind, with made-up data for a small shop. They are not a report. The project check reads section 9 of this file when it runs on this folder.
+Brief for the shipped examples in this folder: the example models and the example report, with made-up data for a small shop. Together they hold one working example of every object kind listed in `INDEX.md`. They are examples to copy from, not a report for readers. The project check reads sections 7, 9, 10 and 11 of this file when it runs on this folder.
 
 ## 1. Purpose and audience
 
-- Report name: none; model examples only.
+- Report name: Examples (one page for each group of examples; not a report for readers).
 - Who uses it, and which decision or action it supports: Developers and the coding assistant of this template, who copy an example when a project has none of its own.
 - How they see it: laptop, meeting-room screen, phone, print or export (52, 67, 77): not applicable.
 
@@ -12,7 +12,7 @@ Brief for the shipped model examples in this folder. The models hold one working
 
 | Tab name | The question this page answers | Notes |
 |---|---|---|
-| | | No pages: these examples hold models only. |
+| (every page of Examples.Report) | None: each page shows examples of one kind, as `INDEX.md` lists them | Not a report for readers |
 
 - Page size in pixels, width x height (52):
 - Outer margin in pixels (49):
@@ -21,7 +21,7 @@ Brief for the shipped model examples in this folder. The models hold one working
 
 ## 3. Data
 
-- Semantic model: four example models in this folder: Examples.SemanticModel (import), storage/DirectQuery.SemanticModel (composite: DirectQuery, Dual and an imported aggregation table), storage/DirectLake.SemanticModel (Direct Lake), preview/Calendar.SemanticModel (a preview feature).
+- Semantic model: the example models in this folder: Examples.SemanticModel (import), the models under `storage/` (one for each storage form: DirectQuery with Dual and an aggregation table, Direct Lake in both forms, a hybrid table, a dynamic query parameter, model options) and the models under `preview/` (preview features). `INDEX.md` lists them all.
 - Sources, and the environments they exist in, such as development, test, production (1, 2): made-up data written in the queries, or made-up source names.
 - Import, DirectQuery or both, and why (16): one example model for each storage mode.
 - How often the data must refresh (45): not applicable.
@@ -31,7 +31,7 @@ Brief for the shipped model examples in this folder. The models hold one working
 - Naming standard for tables, columns and measures (7, 28): the model standard of this template.
 - Measure folder subjects (22):
 - Acronyms and words with their own spelling (7, 28):
-- Measure table: `_Measures`, made in Power BI Desktop with Enter data; for a Direct Lake model a calculated table. Write here if this model differs, and why: the DirectQuery example also uses a calculated table, so that the measure table adds no import table.
+- Measure table: `_Measures`: an imported one-column table, or a calculated table when the model reads its data in Direct Lake or DirectQuery mode. Every example follows this; none was made in Power BI Desktop.
 - Large tables: row counts, and the decision on incremental refresh or partitions: the table Sales of the import example carries an incremental refresh policy as an example.
 - Excel check on (yes or no): no
 - Power BI Copilot check on (yes or no): no

@@ -22,7 +22,7 @@ The three cases in which the work would have stopped to ask did not arise: no so
 11. **"Remove roles with no members": outside this template.** Members are assigned in the Power BI service, not in project files.
 12. **One measures table stays** (owner's rule) although Microsoft's skill advises spreading measures over tables.
 13. **Header icons and tooltips stay off** (owner's rule) although Microsoft recommends report page tooltips and header icon text. Exceptions are per visual, in section 7 of the brief. The shipped tooltip example carries its exception.
-14. **`mobile.json` stays untouched** (existing rule) although its schema is public. Phone layout is laid out in Power BI Desktop.
+14. **`mobile.json` stays untouched** (existing rule) although its schema is public; the one existing exception is `scripts/set_visual_defaults.py`, which turns Header icons and Tooltips off there. Phone layout is laid out in Power BI Desktop.
 15. **Names of tables and columns: a default.** Business words with spaces, a capital first letter, no underscores, no words run together, no Dim, Fact or Stg prefix (Microsoft's skill and two best practice rules). M118 reads only names that report authors see: hidden keys keep their source names. That limit is this template's choice.
 16. **Tables exempt from "no relationship" (M411):** the measures table, calculation groups, field parameters, numeric range parameters, and tables the brief lists. This template's choice.
 

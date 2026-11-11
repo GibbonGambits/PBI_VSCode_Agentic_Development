@@ -29,7 +29,7 @@ A preview feature is used only after the developer's yes, recorded in section 11
 - Status: no preview label; compatibility level 1603 or higher.
 - Limits: fixed values only, never `TODAY ()` and the like; a dimension reached through RELATED must be Dual; a wrong definition gives wrong numbers, so compare results with and without it; refresh after each change; a hybrid policy drops the definition when it remakes its DirectQuery partition.
 - Stored: under the DirectQuery partition, after its source: `dataCoverageDefinition = RELATED ( 'Date'[Year] ) IN { 2022, 2023 }`.
-- Example: the partition 'Sales History Older' in `storage/Hybrid.SemanticModel/definition/tables/Sales History.tmdl`. It has no `///` line: the check reads one there as a description above no object (D003).
+- Example: the partition 'Sales History Older' in `storage/Hybrid.SemanticModel/definition/tables/Sales History.tmdl`. A `///` line may sit directly above `dataCoverageDefinition`: Microsoft's serializer writes descriptions there, and the check accepts one.
 - Source: https://learn.microsoft.com/en-us/analysis-services/tom/table-partitions ; https://learn.microsoft.com/en-us/dotnet/api/microsoft.analysisservices.tabular.datacoveragedefinition
 
 **4. Direct Lake on SQL or on OneLake.**
@@ -44,7 +44,7 @@ A preview feature is used only after the developer's yes, recorded in section 11
 
 **5. Direct Lake on OneLake plus Import tables.**
 - When: large facts stay in OneLake while a small table comes from any other source.
-- Status: the Learn pages read carry no preview label; this template's inventory recorded it as preview, so the example sits under `preview/`.
+- Status: the Learn pages read carry no preview label; an earlier reading recorded it as preview, so the example sits under `preview/`, beside the two preview features it also shows.
 - Limits: Direct Lake on SQL cannot mix; import tables are added in web modeling, not in Desktop; relationships between the two kinds are regular ones.
 - Stored: an ordinary import table (`partition ... = m`, `mode: import`) beside entity partitions.
 - Example: `preview/DirectLakeComposite.SemanticModel` (Date imported; Sales and Store in Direct Lake). No check.
@@ -106,7 +106,7 @@ A preview feature is used only after the developer's yes, recorded in section 11
 - The model property `selectionExpressionBehavior` (`automatic`, `nonVisual`, `visual`) sets what happens when they are missing; `automatic` acts as `nonVisual` today.
 - Status: no preview label; level 1605 for the expressions, 1609 for the property.
 - Stored: inside `calculationGroup`, below `precedence`.
-- Example: `Examples.SemanticModel/definition/tables/Time Calculation.tmdl` (blank for several picks, the plain measure for none) and `selectionExpressionBehavior: nonVisual` in `Examples.SemanticModel/definition/model.tmdl`. The expressions carry no `///` line (D003, as in rule 3).
+- Example: `Examples.SemanticModel/definition/tables/Time Calculation.tmdl` (blank for several picks, the plain measure for none) and `selectionExpressionBehavior: nonVisual` in `Examples.SemanticModel/definition/model.tmdl`. A `///` line may sit directly above each expression, as in rule 3.
 - Check: none on the expressions.
 - Source: https://learn.microsoft.com/en-us/analysis-services/tabular-models/calculation-groups ("Selection expressions")
 

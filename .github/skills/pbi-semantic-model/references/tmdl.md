@@ -66,7 +66,7 @@ The partition holds the table's Power Query query. Its layout (`partition <name>
 
 ## Shipped examples
 
-`tests/fixtures/examples/INDEX.md` lists one working example of every object kind: relationships of each kind, roles, a calculation group, field parameters, user-defined functions, hierarchies, a marked date table, each storage mode, incremental refresh, an aggregation table, perspectives, translations and more. Every model file there was written by Microsoft's own TMDL serializer. When this model has no object of the kind you need, copy the example, change its names, and run the checks. A multi-line DAX formula sits two tab levels below the object's properties, as the examples show.
+`tests/fixtures/examples/INDEX.md` lists one working example of every object kind: relationships of each kind, roles, a calculation group, field parameters, user-defined functions, hierarchies, a marked date table, each storage mode, incremental refresh, an aggregation table, perspectives, translations and more. Every model file there was written by Microsoft's own TMDL serializer. When this model has no object of the kind you need, copy the example, change its names, and run the checks. A multi-line DAX formula sits one tab level deeper than the object's properties, as the examples show.
 
 ## Read only
 

@@ -51,7 +51,7 @@ A value in the brief always wins. The theme sets no page size and no spacing.
 | Phone layout | Each visual's phone position is its own `mobile.json`. `mobileState.json` must not be edited outside Desktop | Leave both alone. Ask the developer to look at the phone layout |
 | Tooltip pages | Own small canvas | Never re-lay them out |
 | Drillthrough pages | A normal canvas; nothing in the schema ties its back button or filters to positions | Same rules as other pages |
-| Tab order and stacking order | Microsoft asks that tab order follows the reading order | After visuals move, set `tabOrder` again in reading order: left to right, top to bottom, each number used once (A002). Do not change `z` |
+| Tab order and stacking order | Microsoft asks that tab order follows the reading order | A move leaves `tabOrder` and `z` alone, and so does `scripts/set_positions.py`. When a move changed the reading order, say so at the end of the task: the tab order numbers change only after the developer's yes (rule 56 of `report-standard.md`, beside this file) |
 | Rotated visuals | Their real bounds are not known from the numbers | Leave alone and say so |
 
 ## How to change positions

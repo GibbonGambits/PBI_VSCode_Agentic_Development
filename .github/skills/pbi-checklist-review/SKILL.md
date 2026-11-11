@@ -59,7 +59,7 @@ More rules:
 | M401 | Item 18 |
 | M113 | Item 24 |
 | M114 | Item 26 |
-| M811, M813, M814, M815 | Item 30 |
+| M811, M812, M813, M814, M815 | Item 30 (M812 also counts for item 23) |
 | M402, M403, M404 | Item 31 |
 | M505 | Item 32 |
 | M502 | Item 33 (Fail: the item asks for DIVIDE in every division that is not trivial) |
@@ -88,7 +88,7 @@ A warning or a note from the script is evidence, not a verdict: read the item an
 
 Notes whose codes start with U are suggestions: a native feature may do a job better. List them in their own section, "Suggestions", with the feature, what it would replace and its release status (`references/native-features.md`). A suggestion never makes an item Fail, and nothing is built from one without the developer's yes.
 
-Some rules have no script. Judge them from the files and the brief: hierarchies for natural drill paths (item 59); the decision on incremental refresh or partitions for large tables (section 4 of the brief; ask for row counts; report it under "Template rules"); abbreviations in names (item 7); and overlaps on a page that has groups, which the script compares only inside each group (item 49: ask the developer to look).
+Some rules have no script. Judge them from the files and the brief: hierarchies for natural drill paths beyond the three column pairs that note U007 knows (item 59); the decision on incremental refresh or partitions for large tables (section 4 of the brief; ask for row counts; report it under "Template rules"); abbreviations in names (item 7); and overlaps on a page that has groups, which the script compares only inside each group (item 49: ask the developer to look).
 
 ## Evidence only people can give
 

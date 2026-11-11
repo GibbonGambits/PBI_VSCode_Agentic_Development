@@ -23,10 +23,10 @@ Read the file that fits the work before you write. `python scripts/check_project
 | For | Read | Codes |
 |---|---|---|
 | Where measures live, folders, measure names, hiding, calculated objects, summarising, data types, formats | `references/model-standard.md` | M0xx, M1xx to M112, M2xx, M3xx |
-| Star schema, relationships, role-playing and slowly changing dimensions, keys, the date table, sort columns, names of tables and columns | `references/relationships-and-dates.md` | M4xx, M113 to M119, M9xx |
+| Star schema, relationships, role-playing and slowly changing dimensions, keys, the date table, sort columns, names of tables and columns | `references/relationships-and-dates.md` | M4xx, M113 to M120, M901 to M907 |
 | DAX rules, DAX style, DAX patterns, time intelligence | `references/dax-standard.md` | M5xx, M908, M909, M010 |
-| Power Query, query folding, data reduction, storage modes, DirectQuery and composite models, aggregations, incremental refresh, security roles | `references/storage-and-security.md` | P0xx, M6xx, M7xx |
-| User-defined functions, calculation groups, field parameters, perspectives, translations and the other object kinds | `references/model-objects.md` | M8xx |
+| Power Query, query folding, data reduction, storage modes, DirectQuery and composite models, aggregations, incremental refresh, security roles | `references/storage-and-security.md` | P0xx, M6xx, M7xx, M832, M833, M910 |
+| User-defined functions, calculation groups, field parameters, perspectives, translations and the other object kinds | `references/model-objects.md` | M801 to M831, M841 |
 | Hybrid tables, Direct Lake variants, dynamic query parameters, selection expressions, model options, value filter behavior, the other folders of a model item | `references/more-model-features.md` | M841 |
 | One report for readers in several languages: locale, label measures, page navigation, translated data | `references/multiple-languages.md` | M524, M525, V019 to V021 |
 | The names of all DAX functions, with their Microsoft Learn addresses | `references/dax-functions.md` | M909 |
@@ -62,7 +62,7 @@ The check prints notes with codes that start with U when a native feature may do
 ## What the files cannot tell
 
 - Auto date/time (item 18) is an option of Power BI Desktop: File > Options and settings > Options, the Current File page, Time intelligence. The check reports it when it is on (M401). Tell the developer once, and note it in section 6 of the brief. Do not set it in files.
-- Facts about the data: whether a step folds (item 3), whether keys are unique (items 11, 14), row counts (item 17), distinct values, gaps in the date table (item 31). Read them yourself when the developer has set up Microsoft's modeling server (`references/data-facts.md`). Otherwise ask the developer once, in one message, and record the answers in section 4 of the brief.
+- Facts about the data: whether keys are unique (items 11, 14), row counts (item 17), distinct values, gaps in the date table (item 31). Read them yourself when the developer has set up Microsoft's modeling server (`references/data-facts.md`). Otherwise ask the developer once, in one message, and record the answers in section 4 of the brief. Whether a step folds (item 3) is always in that one message: the server is not known to tell.
 - Whether the model loads and the numbers are right. Reload through `python scripts/desktop_bridge.py reload . --with-model` where the developer has agreed to the Desktop Bridge; otherwise ask the developer to reload and look.
 
 ## When you are stuck

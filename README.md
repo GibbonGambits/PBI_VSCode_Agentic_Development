@@ -86,7 +86,7 @@ The second command confirms that the theme copy Desktop registered has the same 
 
 For a report on a published model, connect a blank report to that model in Power BI Desktop and save it as a project in the root of your clone. Such a project has no `.SemanticModel` folder. Connecting to a workspace is your decision; Copilot never does it.
 
-**Copilot has something to follow from the start.** `tests/fixtures/examples/` holds one working example of every native object kind: every visual type, every kind of relationship, roles, a calculation group, field parameters, user-defined functions, a date table, each storage mode, a hybrid table, filters of every kind, drilling, small multiples, a label measure for a second language and more. `tests/fixtures/examples/INDEX.md` lists them. When your project has no object of a kind, Copilot copies the example, changes its names and fields, and runs the checks. You do not need to make a first one in Desktop. The examples parse, pass Microsoft's schemas and pass the project check; none has been opened in Power BI Desktop by the template's builder, so look at the first use of each kind.
+**Copilot has something to follow from the start.** `tests/fixtures/examples/` holds one working example of every native object kind that Microsoft's sources give a file form for: the visual types (the index names the few that are not built, and why), every kind of relationship, roles, a calculation group, field parameters, user-defined functions, a date table, each storage mode, a hybrid table, filters of every kind, drilling, small multiples, a label measure for a second language and more. `tests/fixtures/examples/INDEX.md` lists them. When your project has no object of a kind, Copilot copies the example, changes its names and fields, and runs the checks. You do not need to make a first one in Desktop. The examples parse, pass Microsoft's schemas and pass the project check; none has been opened in Power BI Desktop by the template's builder, so look at the first use of each kind.
 
 Visuals you make in Desktop yourself count as existing visuals: run steps 4 and 5 of Route B on them, now and whenever you add a visual in Desktop later.
 
@@ -149,7 +149,7 @@ Fill in `docs/report-brief.md` first. Then ask Copilot in agent mode.
 What Copilot asks you, and when:
 
 - **Meaning.** What a column or measure means comes from the brief or from you. When neither says it, Copilot writes `/// TODO(owner): <question>` above the object and carries on. At the end of the task it asks about all of them in one message. `python scripts/list_todos.py .` prints the list.
-- **Facts about the data.** Row counts, unique keys, whether a step folds. Copilot asks once, or reads them itself when you have set up Microsoft's modeling server.
+- **Facts about the data.** Row counts, unique keys, whether a step folds. Copilot asks once. When you have set up Microsoft's modeling server it reads the counts and the keys itself; whether a step folds stays a question for you.
 - **A yes.** For a rename, a move or a deletion; for a preview feature; for a suggested native feature; for a change to a template file.
 - **A look.** Files that pass the checks can still look wrong on screen. Copilot asks you to reload and look, or does it itself through Microsoft's Desktop Bridge when you have agreed to that.
 
@@ -213,7 +213,7 @@ One request, such as "Evaluate and improve this report", runs these steps in ord
 
 1. **Safety first.** Save in Power BI Desktop and commit. `python scripts/improve.py start` stops unless everything is committed and no earlier flow left its files behind. It makes a new branch, and copies the project unchanged into the folder `_before/`, so you can open before and after side by side. Git ignores that folder and the checks skip it.
 2. **Evaluate.** The checklist review writes `docs/checklist-review.md`.
-3. **Fix plan.** `docs/fix-plan.md` lists every finding and every failed item as Mechanical (descriptions, format strings, folders, hiding, header icons and tooltips, alt text and titles, the DAX style, styling the theme should do), Layout (positions and sizes by the numbers of the layout standard, a back button, tab order) or Needs a person (a decision, a number to check or a yes: renames and moves, data types, summarisation, formulas whose result changes, relationships, security roles, access, user testing, export tests, performance runs, and anything a file cannot settle). Each row says what will change, which files, and what could break. Suggestions (notes whose codes start with U) are listed apart and are never fix rows.
+3. **Fix plan.** `docs/fix-plan.md` lists every finding and every failed item as Mechanical (descriptions, format strings, folders, hiding, header icons and tooltips, alt text and titles, the DAX style, two rewrites that cannot change a result, styling the theme should do), Layout (positions and sizes by the numbers of the layout standard, a back button, tab order) or Needs a person (a decision, a number to check or a yes: renames and moves, data types, summarisation, formulas whose result changes, relationships, security roles, access, user testing, export tests, performance runs, and anything a file cannot settle). Each row says what will change, which files, and what could break. Suggestions (notes whose codes start with U) are listed apart and are never fix rows.
 4. **Stop.** You approve all of it, one kind, or single rows. Nothing changes before that, and only a plain yes counts: Copilot writes yes or no in every row, and the script will not go on while a row has no answer or a doubtful one.
 5. **Mechanical fixes**, then the checks, then one commit. **Layout fixes**, then the checks, then a second commit. Each commit can be undone alone.
 6. **Evaluate again.** `python scripts/improve.py compare` prints Pass, Fail and Not applicable before and after, the pages to look at, and the rows that need a person.
@@ -227,7 +227,7 @@ To try the flow end to end, see `evals/first-test.md`.
 
 ## The rules the checks enforce
 
-`scripts/check_project.py` enforces these. Errors change its exit code; warnings and notes do not. It cannot tell a new visual from an existing one, or check that a header or tooltip exception is listed in the brief; people and the review do that. The full list of codes is at the top of the script, and every code is named in the checklist-review skill and in the fix-plan tables.
+`scripts/check_project.py` enforces these. Errors change its exit code; warnings and notes do not. It cannot tell a new visual from an existing one, or check that a header or tooltip exception is listed in the brief; people and the review do that. The full list of codes is at the top of the script, and every code is named in the checklist-review skill. The fix plan sorts every error and warning of the standards; a file or syntax error (codes such as F001, J001, N001, S001, T001) is listed there to decide with you, and notes are listed for information.
 
 - Every visible table, column and measure has a `///` description directly above it; so does every shared query and parameter. Unknown meaning becomes `/// TODO(owner): question`, which the check lists.
 - `//` comments appear only inside Power Query (M) or DAX expressions.
@@ -406,7 +406,7 @@ The standards follow, in this order of trust: the owner's checklist; Microsoft L
 
 - SQLBI's DAX formatting rules and DAX patterns are restated in the template's own words, with their addresses. No SQLBI text, code or image is copied.
 - Some working practices were informed by Kurt Buhler's public writing and repository on agentic Power BI development (`data-goblin/power-bi-agentic-development`, GPL-3.0) and by the Tabular Editor blog: short always-loaded guidance, detail loaded on demand, hard rules enforced by scripts, a written brief before building; and several ideas in the standards (a measures table, the order of a measure name, column folders, what to hide, a recorded reason for calculated objects, equal margins and gaps). These are ideas only. No text, code or files were taken from it, and the `pbir` command-line tool (authors: Kurt Buhler, Maxim Anatsko) is not used.
-- GitHub's `awesome-copilot` modeling skill (MIT) was read for naming and folder guidance.
+- GitHub's `awesome-copilot` repository (MIT): its modeling skill was read for naming and folder guidance, and two of its instruction files for DAX practice and report design.
 - `Mofaji/Agentic-PBIP-Template` (MIT) was read in full: for the topics it covers and for how Microsoft's Desktop Bridge tools are called. None of its code is used.
 
 ## Licence

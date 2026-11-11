@@ -48,9 +48,9 @@ Take `$schema` from a file of the same kind already in this report. If the repor
 {
   "$schema": "<copied as described above>",
   "name": "Overview_Card_TotalSales",
-  "position": { "x": 24, "y": 24, "z": 0, "width": 300, "height": 120, "tabOrder": 0 },
+  "position": { "x": 24, "y": 24, "z": 0, "width": 296, "height": 120, "tabOrder": 0 },
   "visual": {
-    "visualType": "card",
+    "visualType": "cardVisual",
     "visualContainerObjects": {
       "visualHeader": [ { "properties": { "show": { "expr": { "Literal": { "Value": "false" } } } } } ],
       "visualTooltip": [ { "properties": { "show": { "expr": { "Literal": { "Value": "false" } } } } } ]
@@ -93,6 +93,6 @@ A visual listed in section 7 of the brief keeps what the brief names switched on
 
 ## Read only
 
-Microsoft says these are not to be edited outside Power BI Desktop: `definition.pbir`, `mobileState.json`, `semanticModelDiagramLayout.json`, and a `report.json` beside `definition.pbir` (the older report format). This template also leaves alone everything under `StaticResources`, the `.platform` file, `.pbi` folders and every `mobile.json`.
+Microsoft says these are not to be edited outside Power BI Desktop: `definition.pbir`, `mobileState.json`, `semanticModelDiagramLayout.json`, and a `report.json` beside `definition.pbir` (the older report format). This template also leaves alone the `.platform` file, `.pbi` folders, every file already under `StaticResources` and every `mobile.json`. Two exceptions, and no other: an image file may be added to `StaticResources/RegisteredResources` and registered (rule 69 of `report-standard.md`, beside this file), and `scripts/set_visual_defaults.py` turns Header icons and Tooltips off in a `mobile.json` that has them on.
 
 Checklist items: 20, 49, 52, 73

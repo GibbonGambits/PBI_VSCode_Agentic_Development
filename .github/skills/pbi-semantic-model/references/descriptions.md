@@ -4,7 +4,7 @@
 
 - Tables, columns and measures: `///` lines directly above the object, with no blank line between. Several `///` lines are allowed. (Microsoft Learn, "TMDL overview".)
 - Do not use a `description` property. (Microsoft's `semantic-model-authoring` skill.)
-- `scripts/check_project.py` fails when a visible table, column or measure has no description. Hierarchy levels and calculation groups are not checked by the script; describe them too (checklist items 23 and 30).
+- `scripts/check_project.py` fails when a visible table, column or measure has no description. A calculation group's table is checked like any table (D001), and a calculation item without a description gives M812 (warn). Hierarchy levels are not checked by the script; describe them too (checklist items 23 and 30).
 
 ## What to write
 

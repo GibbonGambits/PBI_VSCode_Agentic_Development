@@ -66,7 +66,7 @@ SOFTWARE.
 
 ## GitHub awesome-copilot
 
-The model standard also follows naming and folder guidance from the skill `powerbi-modeling` in GitHub's `awesome-copilot` repository (https://github.com/github/awesome-copilot), which is under the MIT licence ("Copyright GitHub, Inc."; the licence text is the MIT text shown above). The guidance is restated in this template's own words: the name `_Measures`, Title Case, the word "vs" in comparisons, and how columns and measures are written in DAX.
+The model standard also follows naming and folder guidance from the skill `powerbi-modeling` in GitHub's `awesome-copilot` repository (https://github.com/github/awesome-copilot), which is under the MIT licence ("Copyright GitHub, Inc."; the licence text is the MIT text shown above). The guidance is restated in this template's own words: the name `_Measures`, Title Case, the word "vs" in comparisons, and how columns and measures are written in DAX. In round 3 two of its instruction files were also read, for DAX practice (`power-bi-dax-best-practices.instructions.md`) and for report design (`power-bi-report-design-best-practices.instructions.md`); the DAX standard and the report standard name them at the rules they support, restated in new words.
 
 ## Mofaji Agentic-PBIP-Template
 
@@ -82,7 +82,7 @@ Rules marked with a Microsoft Learn address restate Microsoft's public documenta
 
 ## Read for ideas or evidence only
 
-- Kurt Buhler's `power-bi-agentic-development` repository is under GPL-3.0. It was read for ideas, again in round 3. No text, code or file from it is in this template.
+- Kurt Buhler's `power-bi-agentic-development` repository is under GPL-3.0. It was read for ideas, again in round 3. No text, code or file from it is in this template. The Tabular Editor blog was read the same way, for working practices only.
 - Microsoft's `powerbi-modeling-mcp` repository (MIT; the server itself is under Microsoft's own licence terms) was read to write the optional guidance on facts about the data. Nothing from it is in this template, and the template never installs it.
 - Microsoft's Tabular Object Model library (NuGet package `Microsoft.AnalysisServices`) and Microsoft's report authoring command-line tool were used while building, to write and to check the shipped examples. Neither is shipped.
 - Microsoft's `BCApps` repository (MIT) holds Power BI project files. They were read as evidence of what a saved project contains. Nothing from them is in this template.

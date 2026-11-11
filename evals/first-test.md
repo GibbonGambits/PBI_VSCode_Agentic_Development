@@ -36,7 +36,7 @@ python scripts/improve.py next
 | What | Where to find it |
 |---|---|
 | The AI model and the date | Copilot Chat |
-| Errors, warnings and notes at the start | last line of `before.txt` |
+| Errors, warnings and notes at the start | the line of `before.txt` that starts with "Checked" (the last line, or the one before it when there are errors) |
 | Pass, Fail, Not applicable before and after | `python scripts/improve.py compare` |
 | Rows in the plan by kind, and how many you approved | `python scripts/improve.py check-plan` |
 | Did Copilot stop before changing anything | `git log` on the new branch: no fix commit before your answer |

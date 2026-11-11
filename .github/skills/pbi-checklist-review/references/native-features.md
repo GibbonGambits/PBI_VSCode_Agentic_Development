@@ -23,6 +23,10 @@
 | U101 | A slicer on one field placed on two or more pages and not synced on all of them (tooltip and drillthrough pages are not counted) | Sync slicers |
 | U102 | A page with three or more buttons, shapes or images whose switched-on action goes to a page | Page navigator |
 | U103 | Two data visuals of the same type in the same place, which bookmarks show one at a time | Field parameter |
+| U008 | A relationship between two DirectQuery tables without `relyOnReferentialIntegrity` | Assume referential integrity |
+| U104 | A page with two or more slicers, on a model with DirectQuery tables, in a report with no Apply button for slicers | Query reduction: Apply buttons |
+| U105 | A legacy card or a multi-row card | The new card visual |
+| U106 | A Top N filter or a filter on a measure, on a visual of a report whose model has DirectQuery tables | Fewer such filters (each sends extra queries) |
 
 ## The list
 
@@ -57,11 +61,11 @@
 | Perspectives | Personalize visuals or Explore should offer a smaller field list (not security). https://learn.microsoft.com/en-us/power-bi/create-reports/power-bi-personalize-visuals | - | GA | `model-objects.md` (pbi-semantic-model); M831; example |
 | Translations (cultures) | No Microsoft guidance on when: not suggested by itself | - | GA | `model-objects.md` (pbi-semantic-model); example |
 | KPIs and detail rows (model objects) | No Microsoft guidance on when: not suggested by itself | - | KPIs GA; detail rows: no status stated by Microsoft | `model-objects.md` (pbi-semantic-model); example |
-| Grouping and binning | No Microsoft guidance on when: not suggested by itself | - | GA | `model-standard.md` (pbi-semantic-model) |
-| Value filter behavior (Coalesced, Independent) | No Microsoft guidance on when: not suggested by itself | - | Preview (needs the developer's yes) | - |
+| Grouping and binning | No Microsoft guidance on when: not suggested by itself | - | GA | `more-model-features.md` (pbi-semantic-model); not built: made in Power BI Desktop |
+| Value filter behavior (Coalesced, Independent) | No Microsoft guidance on when: not suggested by itself | - | Preview (needs the developer's yes) | `more-model-features.md` (pbi-semantic-model); M841; example |
 | Prep data for AI (AI data schema, AI instructions, verified answers) | No Microsoft guidance on when: not suggested by itself | - | Preview (needs the developer's yes) | `model-standard.md` (pbi-semantic-model), rule 17 |
 | Linguistic schema and synonyms for Q&A | Never: goes with Q&A | - | Deprecated (Q&A ends December 2026 or February 2027; Learn pages differ): do not suggest; say it is retiring when you find one in a report | `model-standard.md` (pbi-semantic-model); example |
-| Unicode character behavior (GB18030-2022) | The organization must comply with GB18030-2022. https://learn.microsoft.com/en-us/dax/best-practices/dax-unicode-character-behavior | - | GA | - |
+| Unicode character behavior (GB18030-2022) | The organization must comply with GB18030-2022. https://learn.microsoft.com/en-us/dax/best-practices/dax-unicode-character-behavior | - | GA | `more-model-features.md` (pbi-semantic-model); example |
 
 ### DAX
 
@@ -71,7 +75,7 @@
 | Calculated columns (user-context-aware ones too) | Only when the formula needs measures or DAX-only functions. https://learn.microsoft.com/en-us/power-bi/guidance/import-modeling-data-reduction | - | GA; user-context-aware columns preview (needs the developer's yes) | `model-standard.md`, `storage-and-security.md` (pbi-semantic-model); M105, M106; example |
 | Calculated tables | A date table from CALENDAR or CALENDARAUTO, or a copy of a dimension for a role. https://learn.microsoft.com/en-us/power-bi/guidance/model-date-tables | - | GA | `relationships-and-dates.md` (pbi-semantic-model); M105; example |
 | User-defined functions | Many measures or columns repeat one formula. https://learn.microsoft.com/en-us/power-bi/transform-model/desktop-user-defined-functions-overview | The same formula copied into each measure | GA | `dax-standard.md`, `model-objects.md` (pbi-semantic-model); U001, M801-M805; example |
-| Dynamic format strings | A measure turns its number into text to format it. https://learn.microsoft.com/en-us/power-bi/create-reports/desktop-dynamic-format-strings | FORMAT, which returns text that no longer sorts or charts | GA | `dax-standard.md` (pbi-semantic-model); U005; example |
+| Dynamic format strings | A measure turns its number into text to format it. https://learn.microsoft.com/en-us/power-bi/create-reports/desktop-dynamic-format-strings | FORMAT, which returns text that no longer sorts or charts | GA | `model-objects.md` (pbi-semantic-model); U005; example |
 | Visual calculations | Running sums, moving averages, percent of parent or previous-item comparisons inside one visual. https://learn.microsoft.com/en-us/power-bi/transform-model/desktop-visual-calculations-overview | An equivalent model measure (Microsoft: often slower) | GA; ORDERBY parameter preview (needs the developer's yes) | `report-standard.md` (pbi-report), section L; example |
 | Functions Microsoft prefers: DIVIDE, COUNTROWS, SELECTEDVALUE, VAR, KEEPFILTERS | A formula divides with `/` by an expression, counts a column to count rows, tests HASONEVALUE then VALUES, repeats an expression, or filters a whole table. https://learn.microsoft.com/en-us/dax/best-practices/dax-divide-function-operator and its sibling pages | `/`, COUNT, IF with VALUES, repeated code, FILTER over a table | GA | `dax-standard.md` (pbi-semantic-model); M501-M507, M517 |
 | Classic time intelligence functions | No Microsoft guidance on when: not suggested by itself (they need a marked date table) | - | GA | `dax-standard.md` (pbi-semantic-model); M402, M513; example |
@@ -90,7 +94,7 @@
 | Composite models (also on a published model; option to discourage DirectQuery to this one) | A DirectQuery model would gain from Dual tables and aggregations. https://learn.microsoft.com/en-us/power-bi/guidance/directquery-model-guidance | - | GA | `storage-and-security.md` (pbi-semantic-model), rule 23 |
 | Live connection to a published model | Modelers and report authors differ, or one model feeds several reports. https://learn.microsoft.com/en-us/power-bi/guidance/report-separate-from-model | A model copied into each report file | GA | `report-standard.md` (pbi-report), section L |
 | Direct Lake (on OneLake, on SQL; also from Fabric SQL and mirrored databases) | Data already in Fabric Delta tables is too large to import. https://learn.microsoft.com/en-us/fabric/fundamentals/direct-lake-overview | Copying the data by import | GA | `storage-and-security.md` (pbi-semantic-model), rule 27; example |
-| Direct Lake with Import tables, calculated columns or calculated tables | No Microsoft guidance on when: not suggested by itself | - | Preview (needs the developer's yes) | `storage-and-security.md` (pbi-semantic-model) |
+| Direct Lake with Import tables, calculated columns or calculated tables | No Microsoft guidance on when: not suggested by itself | - | Import tables: no preview label on Microsoft Learn. Calculated tables over Direct Lake data and user-context calculated columns: preview (need the developer's yes) | `more-model-features.md` (pbi-semantic-model); M841; examples |
 | User-defined aggregations | A very large DirectQuery fact table answers summary queries slowly. https://learn.microsoft.com/en-us/power-bi/transform-model/aggregations-advanced | - | GA | `storage-and-security.md` (pbi-semantic-model), rule 25; U004; item 17; example |
 | Incremental refresh | A large fact table keeps growing. https://learn.microsoft.com/en-us/power-bi/connect-data/incremental-refresh-overview | - | GA | `model-standard.md` rule 14, `storage-and-security.md` rule 26 (pbi-semantic-model); M707-M709; example |
 | Hybrid tables (real-time DirectQuery partition) | The newest rows of an incrementally refreshed table must be real time. https://learn.microsoft.com/en-us/power-bi/connect-data/incremental-refresh-overview | Frequent refreshes | GA | `storage-and-security.md` (pbi-semantic-model), rule 26 |
@@ -123,7 +127,7 @@
 | Report-level measures | The report sits on a live connection and needs a measure of its own. https://learn.microsoft.com/en-us/power-bi/connect-data/desktop-report-lifecycle-datasets | - | GA | `report-standard.md` (pbi-report), section L; example |
 | Themes (with style presets) | Visuals need the same title and text styles. https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-customize-title-background-and-legend | Formatting each visual by hand | GA; organizational themes preview | `theme.md` (pbi-report); T001, V009 |
 | Drill mode, multi-select, lasso, groups, spotlight | No Microsoft guidance on when: not suggested by itself | - | GA | `layout-standard.md` (pbi-report); example (group) |
-| Translytical task flows (data function buttons) | No Microsoft guidance on when: not suggested by itself (needs Fabric user data functions) | - | GA | - |
+| Translytical task flows (data function buttons) | No Microsoft guidance on when: not suggested by itself (needs Fabric user data functions) | - | GA | `visual-features.md` (pbi-report); example |
 
 ### Visuals
 
@@ -138,12 +142,12 @@
 | Azure Maps | A report has a map or filled map. https://learn.microsoft.com/en-us/azure/azure-maps/power-bi-visual-conversion | Map and filled map (Bing) | GA | example |
 | Shape map | No Microsoft guidance on when: not suggested by itself | - | GA by the June 2026 release notes; some Learn pages still say preview | example |
 | Card (new), KPI, gauge | One key number; progress to a goal; status against a goal. https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualizations-overview | - | GA | example |
-| Card (legacy), multi-row card | Many single-number cards on a DirectQuery page: one multi-row card. https://learn.microsoft.com/en-us/power-bi/guidance/directquery-model-guidance | Many cards | Legacy card GA; multi-row card: no status stated | example |
+| Card (legacy), multi-row card | Never: the new card visual replaces both (it can show several values, which also serves Microsoft's advice for many single-number cards on a DirectQuery page: https://learn.microsoft.com/en-us/power-bi/guidance/directquery-model-guidance) | - | Legacy card GA; multi-row card: no status stated; Microsoft's skill treats both as replaced | `report-standard.md` (pbi-report); U105; examples, to recognise them in old reports |
 | Slicer (list, dropdown, between, relative date, date picker, hierarchy), button slicer, input slicer | A slicer should list only items with data: filter it with a measure. https://learn.microsoft.com/en-us/power-bi/guidance/relationships-bidirectional-filtering | A both-direction relationship | GA | `report-standard.md` (pbi-report); example |
 | List slicer | No Microsoft guidance on when: not suggested by itself | - | Preview (needs the developer's yes) | example |
 | Table and matrix | Exact values; a matrix for several dimensions and drill. https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualizations-overview | - | GA | example |
-| Totals, subtotals, custom totals | On DirectQuery, switch off totals nobody needs. https://learn.microsoft.com/en-us/power-bi/guidance/directquery-model-guidance | - | GA | - |
-| Small multiples | The same chart is copied once per category. https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualizations-overview | Several copies of one chart | GA; on the new card preview | - |
+| Totals, subtotals, custom totals | On DirectQuery, switch off totals nobody needs. https://learn.microsoft.com/en-us/power-bi/guidance/directquery-model-guidance | - | GA | `visual-features.md` (pbi-report); examples |
+| Small multiples | The same chart is copied once per category. https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualizations-overview | Several copies of one chart | GA; on the new card preview | `visual-features.md` (pbi-report); example |
 | Conditional formatting (tables, chart lines, legends, plot area) | Colours should come from one measure, consistent across visuals. https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-conditional-formatting | Many rules in the dialog | GA | `report-standard.md` (pbi-report), section F; example |
 | Titles from a measure | A title must follow the selection or the reader's language. https://learn.microsoft.com/en-us/power-bi/create-reports/desktop-conditional-format-visual-titles | - | GA | `report-standard.md` (pbi-report), section I; A003 |
 | Show items with no data | Every group must show even without a value. https://learn.microsoft.com/en-us/dax/best-practices/dax-avoid-converting-blank | A measure that turns blank into zero | GA | `dax-standard.md` (pbi-semantic-model); M506 |
@@ -151,12 +155,12 @@
 | Accessibility: alt text, tab order, Selection pane | Always, before publishing. https://learn.microsoft.com/en-us/power-bi/create-reports/desktop-accessibility-creating-reports | - | GA | `report-standard.md` (pbi-report), section J; A001-A004 |
 | Decomposition tree, key influencers, narrative visual (smart narrative, Copilot mode) | No Microsoft guidance on when: not suggested by itself | - | GA | example |
 | Paginated report visual, Power Apps and Power Automate visuals | No Microsoft guidance on when: not suggested by itself | - | GA | example (paginated); the other two not built |
-| Metrics (scorecard) visual, Gantt (core visual) | No Microsoft guidance on when: not suggested by itself | - | Metrics GA; Gantt preview (needs the developer's yes) | not built |
-| Analytics pane, show value as, high-density sampling, sparklines | No Microsoft guidance on when: not suggested by itself | - | GA (sparklines: some Learn pages still say preview) | - |
+| Metrics (scorecard) visual, Gantt (core visual) | No Microsoft guidance on when: not suggested by itself | - | Metrics GA; Gantt preview (needs the developer's yes) | `visual-features.md` (pbi-report); Gantt: example and V022; Metrics: not built |
+| Analytics pane, show value as, high-density sampling, sparklines | No Microsoft guidance on when: not suggested by itself | - | GA (sparklines: some Learn pages still say preview) | `visual-features.md` (pbi-report); examples of a constant line, sampling and sparklines; the rest is set in Power BI Desktop |
 | Format pane and axis options | No Microsoft guidance on when: not suggested by itself | - | GA | `theme.md` (pbi-report); V009 |
 | Visual tooltips, help tooltips, visual header icons | No Microsoft guidance on when: not suggested by itself | - | GA | `theme.md` (pbi-report): off unless the brief lists an exception; H001, H002 |
 | Links and images in tables and matrices | No Microsoft guidance on when: not suggested by itself | - | GA | example (web URL category) |
-| Visual-level format strings | No Microsoft guidance on when: not suggested by itself | - | Preview at the last release note (needs the developer's yes) | - |
+| Visual-level format strings | No Microsoft guidance on when: not suggested by itself | - | Preview at the last release note (needs the developer's yes) | `visual-features.md` (pbi-report); V022; example |
 | Retiring visuals: Q&A visual, map, filled map, R and Python visuals | Never | Azure Maps for the two maps | Retiring (Q&A December 2026 or February 2027; maps without a date; R and Python May 2027): do not suggest; say it is retiring when you find one in a report | not built, except R and Python (empty) |
 
 ### Tooling Copilot can use
@@ -211,7 +215,7 @@ These live in Power BI Desktop options, the Power BI service or Fabric, not in t
 | Desktop options: gridlines, on-object formatting, Design ribbon, parallel loading | How Desktop looks and loads | GA; on-object preview |
 | Optimize ribbon, report templates (.pbit), external tools ribbon, notebooks with semantic link | Authoring aids around the model | GA |
 
-The full inventory of native features, with versions and limits, is kept in the template's maintenance papers.
+The full inventory of native features, with versions and limits, is kept by the template's maintainer; nothing in it is needed to build or review a report.
 
 ## Sources
 
