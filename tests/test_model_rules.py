@@ -175,7 +175,7 @@ class Dates(StarCase):
 
     def test_M403_date_columns_without_a_date_table_warn(self):
         self.replace(DATE, "\tdataCategory: Time\n", "")
-        self.replace(MEASURES, "CALCULATE ( [Total Sales], DATESYTD ( 'Date'[Date] ) )", "[Total Sales] * 2")
+        self.replace(MEASURES, "DATESYTD ( 'Date'[Date] )", "Store[City] = \"Utrecht\"")
         self.assertFinds("M403", "warn")
         self.assertNot("M402")
 
@@ -276,6 +276,43 @@ class Columns(StarCase):
     def test_M119_column_named_like_a_hierarchy_warns(self):
         self.replace(DATE, "\thierarchy Calendar\n", "\thierarchy Year\n")
         self.assertFinds("M119", "warn")
+
+
+class DaxStyle(StarCase):
+    def style(self, formula):
+        self.measure("Test Measure", formula)
+        return " ".join(f[3] for f in self.found() if f[0] == "M520")
+
+    def test_M520_is_a_warning_and_names_the_formula(self):
+        self.measure("Test Measure", "SUM(Sales[Amount]) * 2")
+        self.assertFinds("M520", "warn")
+        self.assertIn("[Test Measure]", self.style("1"))
+
+    def test_M520_each_rule(self):
+        for formula, words in (("SUM(Sales[Amount]) * 2", "space between a function name"),
+                               ("SUM ( Sales[Amount]) * 2", "space before ')'"),
+                               ("[Total Sales]*2", "both sides of an operator"),
+                               ("[Total Sales] ( Store[City] = \"Utrecht\" )", "CALCULATE in full"),
+                               ("SUM ( Sales [Amount] ) * 2", "directly after its table"),
+                               ("DIVIDE ( [Total Sales], 2 ) * 2", "each argument on its own line"),
+                               ("COUNTROWS ( VALUES ( Store[City] ) ) * 2", "holds another function"),
+                               ("COUNTROWS ( ADDCOLUMNS ( Store, \"Sales\", [Total Sales] ) )", "with @")):
+            with self.subTest(formula=formula):
+                self.setUp()
+                self.assertIn(words, self.style(formula))
+
+    def test_formula_in_the_style_passes(self):
+        self.replace(MEASURES, "\tcolumn Placeholder", "\t/// Made-up measure for a test.\n\tmeasure 'Sales Share' =\n"
+                     "\t\t\tVAR Total =\n\t\t\t    CALCULATE (\n\t\t\t        [Total Sales],\n\t\t\t        REMOVEFILTERS ( Store )\n"
+                     "\t\t\t    )\n\t\t\tRETURN\n\t\t\t    DIVIDE (\n\t\t\t        [Total Sales] - 1,\n\t\t\t        Total\n\t\t\t    )\n"
+                     "\t\tformatString: 0.0%\n\t\tdisplayFolder: Finance\\Ratios\n\n\tcolumn Placeholder")
+        self.assertEqual(self.codes(), [])
+
+    def test_M520_is_excused_by_a_row_in_the_brief(self):
+        self.measure("Test Measure", "SUM(Sales[Amount]) * 2")
+        self.write(os.path.join("docs", "report-brief.md"), "## 9. Exceptions to the model standard\n\n| Code | Object | Reason |\n"
+                   "|---|---|---|\n| M520 | [Test Measure] | Pasted from the finance team, kept as they wrote it |\n")
+        self.assertNot("M520")
 
 
 class Dax(StarCase):
@@ -447,7 +484,7 @@ class Storage(StarCase):
 
 
 class Objects(StarCase):
-    FUNCTION = "/// Adds tax to an amount.\nfunction AddTax = (amount : NUMERIC, rate : NUMERIC) => amount * ( 1 + rate )\n"
+    FUNCTION = "/// Adds tax to an amount.\nfunction AddTax = ( amount : NUMERIC, rate : NUMERIC ) => amount * ( 1 + rate )\n"
 
     def test_good_function_passes(self):
         self.write(FUNCTIONS, self.FUNCTION)
@@ -476,7 +513,8 @@ class Objects(StarCase):
              "\t\tsortByColumn: Ordinal\n\n\tcolumn Ordinal\n\t\tdataType: int64\n\t\tisHidden\n\t\tsummarizeBy: none\n"
              "\t\tsourceColumn: Ordinal\n")
     ITEMS = ("\t\t/// The measure as it is.\n\t\tcalculationItem Current = SELECTEDMEASURE ()\n\n"
-             "\t\t/// From the start of the year.\n\t\tcalculationItem YTD = CALCULATE ( SELECTEDMEASURE (), DATESYTD ( 'Date'[Date] ) )\n\n")
+             "\t\t/// From the start of the year.\n\t\tcalculationItem YTD =\n\t\t\t\tCALCULATE (\n"
+             "\t\t\t\t    SELECTEDMEASURE (),\n\t\t\t\t    DATESYTD ( 'Date'[Date] )\n\t\t\t\t)\n\n")
 
     def group(self, name="Time Calculation", precedence="10", items=None):
         text = self.GROUP % (precedence, self.ITEMS if items is None else items)

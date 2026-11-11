@@ -7,7 +7,11 @@ table _Measures
 		displayFolder: Finance\Base
 
 	/// Total sales from the start of the year to the last day shown.
-	measure 'Total Sales YTD' = CALCULATE ( [Total Sales], DATESYTD ( 'Date'[Date] ) )
+	measure 'Total Sales YTD' =
+			CALCULATE (
+			    [Total Sales],
+			    DATESYTD ( 'Date'[Date] )
+			)
 		formatString: #,0.00
 		displayFolder: Finance\Time Intelligence
 

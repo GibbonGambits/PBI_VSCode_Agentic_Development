@@ -162,7 +162,7 @@ class BadProject(Case):
               "M007", "M009", "M105", "M107", "M109", "M402", "N003")
     WARNINGS = ("A001", "A002", "A003", "G003", "G004", "G005", "G006", "G007", "M008", "M010", "M101", "M102",
                 "M103", "M104", "M106", "M108", "M110", "M111", "M112", "M114", "M118", "M404", "M411", "M413",
-                "M508", "V002", "V005")
+                "M508", "M520", "V002", "V005")
     NOTES = ("G008", "M201", "M301", "M302", "U103")
 
     def test_every_breach_is_caught(self):
@@ -334,12 +334,12 @@ class BadProject(Case):
 
 class MeasureHome(Case):
     def test_measure_outside_the_measure_table_fails(self):
-        self.add_measure("\t/// Units.\n\tmeasure 'Total Units' = COUNTROWS(Sales)\n\t\tformatString: #,0\n"
+        self.add_measure("\t/// Units.\n\tmeasure 'Total Units' = COUNTROWS ( Sales )\n\t\tformatString: #,0\n"
                          "\t\tdisplayFolder: Finance\\Base\n", SALES)
         self.assertEqual(self.codes(False), ["M001"])
 
     def test_second_measure_table_passes_when_the_brief_lists_it(self):
-        self.add_measure("\t/// Units.\n\tmeasure 'Total Units' = COUNTROWS(Sales)\n\t\tformatString: #,0\n"
+        self.add_measure("\t/// Units.\n\tmeasure 'Total Units' = COUNTROWS ( Sales )\n\t\tformatString: #,0\n"
                          "\t\tdisplayFolder: Finance\\Base\n", SALES)
         self.brief(model="| M001 | Sales | Finance keeps its measures apart |")
         codes = self.codes(False)
@@ -416,7 +416,7 @@ class MeasureFolders(Case):
 
 class MeasureNames(Case):
     def named(self, name, folder="Finance\\Base"):
-        self.add_measure("\t/// Made-up measure.\n\tmeasure %s = COUNTROWS(Sales)\n\t\tformatString: #,0\n"
+        self.add_measure("\t/// Made-up measure.\n\tmeasure %s = COUNTROWS ( Sales )\n\t\tformatString: #,0\n"
                          "\t\tdisplayFolder: %s\n" % ("'%s'" % name.replace("'", "''"), folder))
         items = self.found()
         return [f[0] for f in items if f[4] is False], " ".join(f[3] for f in items if f[0] == "M008")
@@ -491,7 +491,7 @@ class MeasureNames(Case):
 
 class DaxReferences(Case):
     def test_unqualified_column_warns(self):
-        self.replace(MEASURES, "SUM(Sales[Amount])", "SUM([Amount])")
+        self.replace(MEASURES, "SUM ( Sales[Amount] )", "SUM ( [Amount] )")
         self.assertWarns("M010")
         self.assertIn("[Amount]", self.messages("M010")[0])
 
@@ -631,7 +631,7 @@ class ColumnsAndTables(Case):
         self.assertNot("M101")
 
     def test_hidden_column_nothing_uses_is_a_note(self):
-        self.replace(MEASURES, "DISTINCTCOUNT(Sales[OrderId])", "COUNTROWS(Sales)")
+        self.replace(MEASURES, "DISTINCTCOUNT ( Sales[OrderId] )", "COUNTROWS ( Sales )")
         self.assertEqual(sorted(self.codes("note")), ["I001", "M201"])
         self.assertEqual(self.codes(False), [])
 
@@ -784,13 +784,13 @@ class SetModelProperties(Case):
 
     def test_existing_value_is_replaced_in_place(self):
         self.assertEqual(self.run_set("[Total Sales].formatString=#,0.00")[0], 0)
-        self.assertIn("SUM(Sales[Amount]) // one-line DAX comment is allowed here\n\t\tformatString: #,0.00\n"
+        self.assertIn("SUM ( Sales[Amount] ) // one-line DAX comment is allowed here\n\t\tformatString: #,0.00\n"
                       "\t\tdisplayFolder: Finance\\Base\n", self.read(MEASURES))
 
     def test_property_goes_after_a_multi_line_expression(self):
         self.replace(MEASURES, "\t\tformatString: 0.0%\n", "")
         self.assertEqual(self.run_set("[Return Rate].formatString=0.0%")[0], 0)
-        self.assertIn("\t\t\t\tCOUNTROWS(Sales)\n\t\t\t)\n\t\tformatString: 0.0%\n", self.read(MEASURES))
+        self.assertIn("\t\t\t    COUNTROWS ( Sales )\n\t\t\t)\n\t\tformatString: 0.0%\n", self.read(MEASURES))
         self.assertEqual(self.codes(), ["I001"])
 
     def test_same_value_is_no_change(self):

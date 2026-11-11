@@ -149,6 +149,7 @@ def check(context):
     _relationships(context, rels, column_at, roles, secured)
     _columns(context, rels, column_at)
     _dax(context, measure_names, direct_query, index)
+    _style(context)
     _security(context, rels, permissions, secured)
     _storage(context, rels, column_at, direct_query)
     _objects(context, functions, function_names)
@@ -570,6 +571,80 @@ def _dax(context, measure_names, direct_query, index):
             names = ", ".join("[%s]" % o["name"] for o in owners)
             add("M508", owners[1], "measures %s have the same formula; keep one and use it everywhere" % names,
                 level="warn", keys=tuple("[%s]" % o["name"] for o in owners))
+
+
+OPERATORS = frozenset(("+", "-", "*", "/", "&", "=", "<", ">", "<=", ">=", "<>", "&&", "||"))
+TEMPORARY_COLUMN_FUNCTIONS = ("ADDCOLUMNS", "SELECTCOLUMNS")
+
+
+def style_problems(parsed, temporary_columns):
+    """Which rules of the DAX style one formula breaks (short texts). The style follows SQLBI's formatting rules."""
+    stream = parsed["tokens"]
+    problems = set()
+    tables = {position - 1 for table, _, position in parsed["references"] if table is not None}
+    for position, token in enumerate(stream):
+        before = stream[position - 1] if position else None
+        after = stream[position + 1] if position + 1 < len(stream) else None
+        if token.kind == "symbol":
+            if token.value == "(":
+                if before is not None and before.kind == fs.BRACKET_NAME:
+                    problems.add("write CALCULATE in full, not [Measure] ( filter )")
+                elif before is not None and before.kind == "word" and before.end == token.start:
+                    problems.add("put a space between a function name and '('")
+                if before is not None and before.line != token.line:
+                    problems.add("keep '(' on the line of its function name")
+            elif token.value == ")":
+                if before is not None and before.end == token.start and not fs.is_symbol(before, "("):
+                    problems.add("put a space before ')'")
+            elif token.value == ",":
+                if before is not None and (before.line != token.line or before.end != token.start):
+                    problems.add("put each comma directly after its argument")
+                if after is not None and after.line == token.line and after.start == token.end:
+                    problems.add("put a space after a comma")
+            elif token.value in OPERATORS:
+                unary = token.value in "+-" and (before is None or (before.kind == "symbol" and before.value not in ")"))
+                if not unary:
+                    if (before is not None and before.end == token.start) or (after is not None and after.start == token.end):
+                        problems.add("put a space on both sides of an operator")
+                    declares = (token.value == "=" and position >= 2 and stream[position - 2].kind == "word"
+                                and stream[position - 2].value.upper() == "VAR")
+                    if after is not None and after.line != token.line and not declares:
+                        problems.add("start a continued line with the operator, do not end the line before with it")
+        elif position in tables and after is not None and after.start != token.end:
+            problems.add("write a column directly after its table, with no space: Table[Column]")
+    for call in parsed["calls"]:
+        if call.close >= len(stream):
+            continue
+        one_line = stream[call.at].line == stream[call.close].line
+        nested = any(other.at > call.open and other.close < call.close for other in parsed["calls"])
+        if one_line and (len(call.args) >= 2 or nested):
+            problems.add("put each argument on its own line when a function has two or more arguments, or holds "
+                         "another function")
+        if temporary_columns and call.name in TEMPORARY_COLUMN_FUNCTIONS:
+            for span in call.args[1:]:
+                if span[1] - span[0] == 1 and stream[span[0]].kind == fs.TEXT and not stream[span[0]].value.startswith("@"):
+                    problems.add("start the name of a column the formula makes with @")
+    return sorted(problems)
+
+
+def _style(context):
+    """M520: one finding for each table file, listing the formulas that break the DAX style."""
+    by_file = {}
+    for owner, parsed in context["expressions"]:
+        if owner["kind"] not in ("measure", "column", "calculationitem", "function", "tablepermission"):
+            continue
+        problems = style_problems(parsed, owner["kind"] in ("measure", "calculationitem", "function"))
+        if problems:
+            by_file.setdefault(owner["file"], []).append((owner, problems))
+    for path in sorted(by_file):
+        kept = [(owner, problems) for owner, problems in by_file[path]
+                if not context["excused"]("M520", _label(owner))]
+        if not kept:
+            continue
+        rules = sorted({p for _, problems in kept for p in problems})
+        names = ", ".join(_label(owner) for owner, _ in kept[:8]) + (" ..." if len(kept) > 8 else "")
+        context["findings"].add("M520", path, kept[0][0]["line"], "%d formula(s) in this file do not follow the DAX "
+                                "style (%s): %s" % (len(kept), names, "; ".join(rules)), level="warn")
 
 
 def float_or_none(text):

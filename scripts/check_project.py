@@ -1420,7 +1420,8 @@ def check_standards(model_dir, objects, usage, brief, findings):
         "model": model, "tables": tables, "own_tables": own_tables, "automatic": automatic,
         "auto_prefixes": AUTO_DATE_PREFIXES, "measure_tables": measure_tables, "all_measures": all_measures,
         "all_columns": all_columns, "expressions": code_by_owner, "objects": objects, "brief": brief,
-        "usage": usage, "add": add, "parse": _dax, "model_object": model_object,
+        "usage": usage, "add": add, "parse": _dax, "model_object": model_object, "findings": findings,
+        "excused": lambda code, *keys: model_excused(brief, code, *keys),
         "model_anchor": model_object or (own_tables[0]["objects"][0] if own_tables else None),
         "compatibility_level": int(level) if level.isdigit() else None,
         "table_names_upper": {name.upper() for name in tables}})

@@ -2,22 +2,25 @@
 table _Measures
 
 	/// Total order amount in US dollars. Adds up the Amount column.
-	measure 'Total Sales' = SUM(Sales[Amount]) // one-line DAX comment is allowed here
+	measure 'Total Sales' = SUM ( Sales[Amount] ) // one-line DAX comment is allowed here
 		formatString: #,0
 		displayFolder: Finance\Base
 
 	/// Share of order lines that were returned. Returned lines divided by all lines.
 	measure 'Return Rate' =
 			// Count the returned lines, then divide by all lines.
-			DIVIDE(
-				COUNTROWS(FILTER(Sales, Sales[Returned] = TRUE())),
-				COUNTROWS(Sales)
+			DIVIDE (
+			    CALCULATE (
+			        COUNTROWS ( Sales ),
+			        Sales[Returned] = TRUE ()
+			    ),
+			    COUNTROWS ( Sales )
 			)
 		formatString: 0.0%
 		displayFolder: Customer\Ratios
 
 	/// Number of different orders.
-	measure '# Orders' = DISTINCTCOUNT(Sales[OrderId])
+	measure '# Orders' = DISTINCTCOUNT ( Sales[OrderId] )
 		formatString: #,0
 		displayFolder: Customer\Counts
 
