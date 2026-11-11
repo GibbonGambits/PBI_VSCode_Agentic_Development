@@ -13,8 +13,8 @@ Updated at every commit, so that a stop loses nothing.
 | 7. DAX function index (Part E) | Done: 464 functions |
 | 8. Flow tables, review skill, one chat per task, lessons guard (Part F) | Done |
 | 9. README, notices, evals, template check | Done |
-| 10. Two read-only reviews, fixes, pull request | To do |
+| 10. Two read-only reviews, fixes, pull request | Done: both reviews ran to the end and their findings are fixed; the pull request is open |
 
 ## Where to pick up
 
-The open rows were closed with 32 more checks, guidance in the standard files, three new guidance files (`visual-features.md`, `more-model-features.md`, `multiple-languages.md`) and more shipped examples. `coverage.md` and `feature-inventory.md` are being re-rated against the repository. Next: the two read-only reviews, their fixes, the pull request.
+Nothing is open. `coverage.md` and `feature-inventory.md` list no soft, missing or uncovered row. The next work is the owner's: open the examples and a scaffolded project once in Power BI Desktop (the README lists what to look at), and run the test prompts in `evals/`.
