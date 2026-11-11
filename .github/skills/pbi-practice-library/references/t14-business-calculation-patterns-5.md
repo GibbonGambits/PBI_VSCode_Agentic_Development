@@ -212,10 +212,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - When: Boundaries come from the first and last transaction dates, computed with all report filters removed.
 - Version: Any zero-for-blank logic needs the brief's request and an exception to the blank rule (M506).
 
-**T14-A369-10.** Removing filters with REMOVEFILTERS does not bypass row-level security: boundaries computed that way reflect only the data the current security context can see.
-- Fact. 2026. https://www.sqlbi.com/articles/the-hidden-complexity-of-a-daily-average-in-dax/
-- When: Observation boundaries are computed by removing all report filters.
-
 **T14-A369-11.** When several measures need the same per-day average logic, one option is a user-defined function that takes the amount expression and the two boundary dates, and leaves it to the caller where the boundaries come from. It is bound to the model's Date table.
 - Option. 2026. https://www.sqlbi.com/articles/the-hidden-complexity-of-a-daily-average-in-dax/
 - When: Per-day average logic shared by several measures, in a model that has a Date table.

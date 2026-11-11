@@ -124,10 +124,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - When: Calculation groups exist in the local or the remote model.
 - Version: Described in 2022; check current behaviour.
 
-**T09-A238-2.** RELATED cannot fetch a column across a limited relationship; it works only across regular relationships.
-- Fact. 2022. https://www.sqlbi.com/articles/understanding-the-interactions-between-composite-models-and-calculation-groups/
-- When: For example between a remote-model table and a new local table of a composite model.
-
 **T09-A238-3.** A composite-model measure that combines a remote measure with a local value can iterate the local table and call the remote measure, so the remote part runs wholesale and only the final arithmetic is local, instead of iterating the remote fact table with LOOKUPVALUE.
 - Option. Check. 2022. https://www.sqlbi.com/articles/understanding-the-interactions-between-composite-models-and-calculation-groups/
 - When: A local table is reached through a limited relationship; complex code can still end up partly retail.

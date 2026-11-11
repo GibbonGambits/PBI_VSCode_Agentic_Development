@@ -1,6 +1,6 @@
 # Storage engine, model size and memory
 
-Part 1 of 1 of this topic. Covers: Reducing column cardinality; Calculated column and table storage; Measuring model size; Analysis Services processing.
+Part 1 of 1 of this topic. Covers: Reducing column cardinality; Measuring model size; Analysis Services processing; Calculated column and table storage.
 
 Practice notes drawn from public SQLBI articles, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail.
 
@@ -88,40 +88,9 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - Should. 2012. https://www.sqlbi.com/articles/optimizing-high-cardinality-columns-in-vertipaq/
 - When: A many-valued text column must stay in the model; the split is made before import.
 
-**T08-A016-12.** One option when a date-time is split into a date and a time column: cut the time down to whole seconds in the source query, so the time column can never pass 86,400 distinct values.
-- Option. 2012. https://www.sqlbi.com/articles/optimizing-high-cardinality-columns-in-vertipaq/
-- When: An event timestamp is split into date and time columns before import.
-
 **T08-A030-7.** A column with too many distinct values that cannot go, such as a fact table's transaction ID kept for drillthrough, is worth considering for a split into several parts: each part has few distinct values and together they use less memory.
 - Consider. 2013. https://www.sqlbi.com/articles/checklist-for-memory-optimizations-in-powerpivot-and-tabular-models/
 - When: A many-valued column has to stay in the model.
-
-### Calculated column and table storage
-
-**T08-A030-3.** Take care with calculated columns in a fact table that use CALCULATE, or refer to a measure: as soon as a second one is defined, a circular reference error appears. A fact table seldom needs such columns.
-- Consider. 2013. https://www.sqlbi.com/articles/checklist-for-memory-optimizations-in-powerpivot-and-tabular-models/
-- When: Adding calculated columns to a fact table.
-
-**T08-A108-1.** Why a calculated column can compress worse: the engine leaves it out when it searches for the row order that compresses best, so it inherits the order picked for the native columns. The weaker compression can also slow queries that scan the column.
-- Fact. 2017. https://www.sqlbi.com/articles/storage-differences-between-calculated-columns-and-calculated-tables/
-- When: Calculated columns in imported tables, except those tied one-to-one to a native column.
-
-**T08-A108-2.** A calculated column tied one-to-one to a native column, at the same cardinality, such as a key brought in with RELATED or LOOKUPVALUE, reuses that column's sort order and may compress as well. One that changes cardinality, such as MONTH of a date, may not.
-- Fact. 2017. https://www.sqlbi.com/articles/storage-differences-between-calculated-columns-and-calculated-tables/
-- When: Comparing a calculated column with native columns of the same table.
-
-**T08-A108-3.** Calculated columns can lengthen processing against native columns for this reason: their DAX expressions are evaluated one after another, and several calculated columns may not be worked out fully in parallel.
-- Fact. 2017. https://www.sqlbi.com/articles/storage-differences-between-calculated-columns-and-calculated-tables/
-- When: Judging the refresh cost of calculated columns.
-
-**T08-A108-4.** Every column a calculated table's expression returns is compressed like a native column, as in a table loaded from a source or a Power Query query. Calculated columns added on top of a calculated table still behave as calculated columns.
-- Fact. 2017. https://www.sqlbi.com/articles/storage-differences-between-calculated-columns-and-calculated-tables/
-- When: Judging the compression of calculated tables.
-- Version: Calculated tables: Analysis Services 2016 and Power BI; not in Power Pivot as of August 2017.
-
-**T08-A108-5.** Processing a calculated table with very many rows may first hold the whole table uncompressed in memory. The need depends on the row count and the query plan: CROSSJOIN materialises only its two arguments, while ALL may materialise every existing combination of its columns.
-- Fact. 2017. https://www.sqlbi.com/articles/storage-differences-between-calculated-columns-and-calculated-tables/
-- When: Calculated tables with very many rows; tens of thousands of rows or fewer are rarely an issue.
 
 ### Measuring model size
 
@@ -168,3 +137,22 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T08-A107-7.** Dictionaries on an always-on Analysis Services server can exceed the size needed. Process Full (database or table) and Process Data (table) always build new dictionaries for hash-encoded columns; other processing adds overhead only to columns receiving values new to their dictionary.
 - Consider. 2017. https://www.sqlbi.com/articles/measuring-the-dictionary-size-of-a-column-correctly/
 - When: Reading dictionary sizes on a server running all day; partial refresh leaves a mix of column states.
+
+### Calculated column and table storage
+
+**T08-A108-1.** Why a calculated column can compress worse: the engine leaves it out when it searches for the row order that compresses best, so it inherits the order picked for the native columns. The weaker compression can also slow queries that scan the column.
+- Fact. 2017. https://www.sqlbi.com/articles/storage-differences-between-calculated-columns-and-calculated-tables/
+- When: Calculated columns in imported tables, except those tied one-to-one to a native column.
+
+**T08-A108-2.** A calculated column tied one-to-one to a native column, at the same cardinality, such as a key brought in with RELATED or LOOKUPVALUE, reuses that column's sort order and may compress as well. One that changes cardinality, such as MONTH of a date, may not.
+- Fact. 2017. https://www.sqlbi.com/articles/storage-differences-between-calculated-columns-and-calculated-tables/
+- When: Comparing a calculated column with native columns of the same table.
+
+**T08-A108-4.** Every column a calculated table's expression returns is compressed like a native column, as in a table loaded from a source or a Power Query query. Calculated columns added on top of a calculated table still behave as calculated columns.
+- Fact. 2017. https://www.sqlbi.com/articles/storage-differences-between-calculated-columns-and-calculated-tables/
+- When: Judging the compression of calculated tables.
+- Version: Calculated tables: Analysis Services 2016 and Power BI; not in Power Pivot as of August 2017.
+
+**T08-A108-5.** Processing a calculated table with very many rows may first hold the whole table uncompressed in memory. The need depends on the row count and the query plan: CROSSJOIN materialises only its two arguments, while ALL may materialise every existing combination of its columns.
+- Fact. 2017. https://www.sqlbi.com/articles/storage-differences-between-calculated-columns-and-calculated-tables/
+- When: Calculated tables with very many rows; tens of thousands of rows or fewer are rarely an issue.

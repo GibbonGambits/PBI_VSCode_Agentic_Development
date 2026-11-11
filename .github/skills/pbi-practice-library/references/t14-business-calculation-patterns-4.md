@@ -49,11 +49,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - When: Any ranking measure built on RANKX.
 - Version: Described in 2022.
 
-**T14-A257-4.** A ranking measure meant to rank items one by one in a matrix should wrap RANKX in an ISINSCOPE test on the ranked column, so no rank shows at the grand total. Untested, the grand total, far larger than any item, always gets rank 1.
-- Should. Check. 2022. https://www.sqlbi.com/articles/introducing-rankx-in-dax/
-- When: RANKX evaluated item by item in a matrix that also shows a grand total.
-- Version: Described in 2022.
-
 **T14-A257-6.** When ranked values can tie, the fifth argument of RANKX decides the result. SKIP, the default, keeps duplicate values in the lookup list; DENSE removes them, so equal values count as one. The ranks that follow a tie differ between the two.
 - Option. Check. 2022. https://www.sqlbi.com/articles/introducing-rankx-in-dax/
 - When: Duplicate values can appear in the lookup list, for example after rounding the measure.
@@ -175,10 +170,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - Option. 2021. https://www.sqlbi.com/articles/filtering-the-top-products-alongside-the-other-products-in-power-bi/
 - When: A report shows the top N items in detail and one dynamic row for all the rest.
 
-**T14-A213-5.** When building the calculated table of product names plus "Others" that will be related back to Product, take the names with ALLNOBLANKROW: it avoids circular dependency problems when the relationship is created.
-- Should. 2021. https://www.sqlbi.com/articles/filtering-the-top-products-alongside-the-other-products-in-power-bi/
-- When: A calculated names table is related to the Product table on the product name.
-
 **T14-A213-6.** Relate the calculated table of product names plus "Others" to Product on the product name as one-to-many, names table on the one side, filtering one way towards Product. Check it: by default Power BI tends to suggest a one-to-one relationship filtering both ways.
 - Must. Check. 2019. https://www.sqlbi.com/articles/showing-the-top-5-products-and-others-row/ ; https://www.sqlbi.com/articles/filtering-the-top-products-alongside-the-other-products-in-power-bi/
 - When: The top N plus Others technique built on a calculated table of names related to Product.
@@ -251,7 +242,3 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T14-A346-7.** To compute a ranking list that ignores the filters of the visual's cells, you can evaluate the table variables that build it under ALLSELECTED. That alone does not stop the list, used as CALCULATE filter, from overriding a report filter on the same key column.
 - Option. 2025. https://www.sqlbi.com/articles/find-the-products-in-the-top-10-every-year-with-dax/
 - When: Measures that work out a set of best items, shown in a visual that filters those items.
-
-**T14-A346-10.** In a user-defined function, an expression parameter used as the ranking expression of TOPN can be wrapped in CALCULATE, so the function behaves correctly whatever argument it receives.
-- Option. 2025. https://www.sqlbi.com/articles/find-the-products-in-the-top-10-every-year-with-dax/
-- When: User-defined functions that pass an expression parameter to TOPN as its ranking expression.

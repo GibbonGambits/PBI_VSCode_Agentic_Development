@@ -146,11 +146,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - When: GENERATESERIES cannot be used; the result can feed a parameter table where calculated tables exist.
 - Version: GENERATESERIES is missing in Analysis Services 2016 and Power Pivot for Excel; Power Pivot cannot create calculated tables.
 
-**T03-A109-4.** To read the value chosen in a parameter table where SELECTEDVALUE is missing, one option is IF with HASONEVALUE, returning VALUES of the column only when a single value is selected.
-- Option. Check. 2017. https://www.sqlbi.com/articles/generating-a-series-of-numbers-in-dax/
-- When: Reading the selected value of a parameter table in an environment without SELECTEDVALUE.
-- Version: Analysis Services 2016 does not have SELECTEDVALUE.
-
 **T03-A109-5.** GENERATESERIES returns a single-column table, with the column named Value, running from a start value to an end value. The optional step defaults to 1 and may be any positive number, decimals included.
 - Option. 2017. https://www.sqlbi.com/articles/generating-a-series-of-numbers-in-dax/
 - When: Building a table that lists a series of numbers, such as a calculated table feeding a parameter slicer.
@@ -306,16 +301,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T03-A198-8.** Test performance thoroughly before replacing LOOKUPVALUE with a hand-written CALCULATE version, or the reverse, and decide on the measured results: depending on data distribution and the columns searched, the rewrite can be slower as well as faster.
 - Must. 2020. https://www.sqlbi.com/articles/understanding-lookupvalue/
 - When: Choosing between LOOKUPVALUE and an equivalent CALCULATE formula for optimisation.
-
-**T03-A226-2.** For a virtual relationship, TREATAS over the key values taken from the filter context is also preferred to a FILTER iterator that calls CONTAINS. The CONTAINS version returns the right numbers, but with the worst performance of the available alternatives.
-- Should. Check. 2021. https://www.sqlbi.com/articles/using-contains-in-dax/
-- When: A filter must pass between two tables that have no physical relationship.
-- Version: CONTAINS was the best practice in 2012; TREATAS arrived in 2017, absent from Analysis Services 2016 and Power Pivot.
-
-**T03-A226-3.** Where TREATAS is not available for a virtual relationship, a filter based on INTERSECT is an alternative: weaker than the TREATAS version, but still better than one based on CONTAINS.
-- Option. Check. 2021. https://www.sqlbi.com/articles/using-contains-in-dax/
-- When: The product offers no TREATAS and a filter must pass between tables without a relationship.
-- Version: TREATAS dates from 2017; Analysis Services 2016 and Power Pivot for Excel lack it.
 
 ### Set functions
 

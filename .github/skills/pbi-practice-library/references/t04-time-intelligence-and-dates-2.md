@@ -61,10 +61,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - Must. 2024. https://www.sqlbi.com/articles/using-weekly-calendars-in-power-bi/
 - When: Any model with two or more date columns.
 
-**T04-A321-5.** Relate the one Date table one-to-many to every date column that users may want to aggregate by, not just to one date column of each fact table.
-- Should. 2024. https://www.sqlbi.com/articles/blank-in-date-columns-and-dax-time-intelligence-functions/
-- When: Several date columns, such as an order date and a delivery date, with all but one relationship inactive.
-
 ## Special-case techniques and facts
 
 ### Incomplete periods and future dates

@@ -22,10 +22,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - Should. 2017. https://www.sqlbi.com/articles/duplicated-names-in-dax/
 - When: Columns enter a model by a calculated column, a source query change or a calculated table change.
 
-**T02-A100-8.** One possible convention: give the column that a measure aggregates a name unlike the measure's, such as a descriptive variant, or a leading underscore that marks it as a column to hide.
-- Option. 2017. https://www.sqlbi.com/articles/duplicated-names-in-dax/
-- When: A measure aggregates a column that would naturally take the same name.
-
 **T02-A100-9.** Columns that hold the same content in different tables should have the same name; in particular, the two columns of a relationship should share one name.
 - Should. 2017. https://www.sqlbi.com/articles/duplicated-names-in-dax/
 - When: Naming columns that carry the same content across tables, including relationship keys.
@@ -35,18 +31,10 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - When: Reading or reviewing DAX where a name could be a measure or a column.
 - Version: In 2017 the Power BI formula editor showed measure references in purple.
 
-**T02-A143-2.** When a measure needs the row-by-row product of two columns of one table, compute it with an iterator such as SUMX over that table. Do not follow the error hint and SUM each column: the product of two sums is another result.
-- Should. 2019. https://www.sqlbi.com/articles/dax-error-messages-in-power-bi/
-- When: A measure multiplies column references directly and raises the single-value error.
-
 **T02-A143-3.** Do not check a column's spelling when the error says a single value for it cannot be determined: the message confirms the column exists. The cause is a missing row context for its table.
 - Must. Check. 2019. https://www.sqlbi.com/articles/dax-error-messages-in-power-bi/
 - When: Also when an iterator gives a row context, but over a different table.
 - Version: Message wording as described in 2019.
-
-**T02-A143-4.** Inside an iterator over one table, a column of another table that is part of the iterated table's expanded table can be read with RELATED. The error hint to add an aggregation does not apply here.
-- Option. 2019. https://www.sqlbi.com/articles/dax-error-messages-in-power-bi/
-- When: The single-value error names a column of a related table referenced inside an iterator.
 
 **T02-A143-5.** When the error reports that a column is not found or is not usable in the expression, look for the right column name: the reference may be misspelled, since this message means the column exists nowhere in the model.
 - Should. Check. 2019. https://www.sqlbi.com/articles/dax-error-messages-in-power-bi/
@@ -115,11 +103,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T02-A255-6.** A variable may hold a table, not only a scalar value: for example the result of TOPN, which a later step iterates.
 - Option. 2022. https://www.sqlbi.com/articles/variables-in-dax/
 - When: An expression computes an intermediate table that a later step iterates.
-
-**T02-A255-8.** To debug a complex measure, return a variable's value temporarily to inspect an intermediate result, or examine the variables in a DAX debugger.
-- Option. 2022. https://www.sqlbi.com/articles/variables-in-dax/
-- When: Complex measures built with variables.
-- Version: In 2022 the Tabular Editor 3 debugger could inspect variable values.
 
 **T02-A313-1.** End an expression that uses variables by assigning the final computation to a variable named Result and returning only that variable: while debugging, any intermediate variable can be returned and the original restored by returning Result again.
 - Should. 2024. https://www.sqlbi.com/articles/when-are-variables-evaluated-in-dax/
@@ -220,11 +203,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - Fact. 2017. https://www.sqlbi.com/articles/duplicated-names-in-dax/
 - When: Adding measures or columns to a model.
 - Version: In Power BI a column cannot be added to the table that holds a measure of that name.
-
-**T02-A143-1.** The error that a single value for a column cannot be determined means the column is referenced without a row context. It does not mean too many rows are visible: it appears even for a one-row table.
-- Fact. Check. 2019. https://www.sqlbi.com/articles/dax-error-messages-in-power-bi/
-- When: A measure references a column directly, outside any iterator.
-- Version: Message wording as described in 2019.
 
 **T02-A154-3.** A table stored in a variable is not a new table with its own columns: a column reference that uses the variable name as table name fails with a cannot-find-table error. A reference must name a model column or a column a table function created.
 - Fact. 2019. https://www.sqlbi.com/articles/table-and-column-references-using-dax-variables/
@@ -333,10 +311,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T02-A243-3.** An IF inside a measure can be costly when its condition evaluates differently from one evaluation to the next, for instance once per customer; an arithmetic version built on DIVIDE follows the same execution path every time.
 - Fact. 2022. https://www.sqlbi.com/articles/how-to-return-blank-instead-of-zero/
 - When: A measure with IF is evaluated many times with a varying condition.
-
-**T02-A335-2.** With a column reference, VALUES can return one extra blank row that DISTINCT never returns: when the column is on the one-side of an invalid regular relationship, the filter context keeps that blank row, and the filtered values hold no blank already.
-- Fact. 2025. https://www.sqlbi.com/articles/choosing-between-distinct-and-values-in-dax/
-- When: Regular relationships only; a limited relationship never adds the blank row.
 
 **T02-A335-4.** For statistical iterators such as MINX, MAXX, AVERAGEX or percentiles, consider iterating DISTINCT instead of VALUES, so that unmatched rows are left out: through VALUES they would form one large blank member that biases the statistic.
 - Consider. 2025. https://www.sqlbi.com/articles/choosing-between-distinct-and-values-in-dax/

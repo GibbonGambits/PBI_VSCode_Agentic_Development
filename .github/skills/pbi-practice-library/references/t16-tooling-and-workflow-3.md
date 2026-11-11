@@ -42,10 +42,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - Option. 2024. https://www.sqlbi.com/articles/using-atomic-design-in-report-and-model-development/
 - When: A page template is adapted for specific users instead of being used unchanged.
 
-**T16-A331-2.** Create the theme file at the start of report work and reuse its formatting across visuals and reports: this ranks among the highest-impact tasks. Theme files are complex and slow to write by hand; a dedicated design tool can help.
-- Should. 2025. https://www.sqlbi.com/articles/tools-in-power-bi/
-- When: Starting work on a report or a set of reports.
-
 **T16-A366-4.** Move shared logic into a user-defined function also when just two measures repeat it and differ only in the last step: for example both build the same table variable, then one counts its rows and the other uses it as a CALCULATE filter.
 - Should. 2026. https://www.sqlbi.com/articles/creating-dax-functions-with-ai-to-remove-duplicated-code/
 - When: Measures compute the same intermediate result and use it differently at the end; AI-generated code sometimes needs this.

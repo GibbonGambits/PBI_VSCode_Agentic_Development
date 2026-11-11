@@ -34,11 +34,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - Must. 2023. https://www.sqlbi.com/articles/filtering-calculation-items-in-a-slicer/
 - When: Reducing slicer items for specific users where a security requirement also exists.
 
-**T11-A280-6.** A measure meant to act as a filter in the Filters pane must return a whole number, not TRUE or FALSE: the pane does not accept a Boolean measure as a filter.
-- Must. Check. 2023. https://www.sqlbi.com/articles/filtering-calculation-items-in-a-slicer/
-- When: A measure is used as a visual filter, for example to filter the items of a slicer.
-- Version: Observed in 2023; check current behaviour.
-
 ### Field parameters
 
 **T11-A286-3.** Never read the selected entry of a field parameter's display column with SELECTEDVALUE. That column has group-by columns, where VALUES, which SELECTEDVALUE relies on, does not work. Read it with an aggregation such as MAX and handle multiple selections separately.

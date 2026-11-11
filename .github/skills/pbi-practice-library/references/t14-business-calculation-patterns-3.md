@@ -61,17 +61,9 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - Option. 2017. https://www.sqlbi.com/articles/computing-same-product-sales-in-dax/
 - When: Writing and debugging a measure whose steps include a table variable.
 
-**T14-A323-11.** Benchmark the candidate implementations against your own requirements. When their timings are close, choose the simplest one.
-- Should. 2025. https://www.sqlbi.com/articles/optimizing-incremental-inventory-calculations-in-dax/
-- When: Choosing among alternative optimisations of a calculation.
-
 **T14-A326-8.** When facing a new business requirement, consider breaking it down into a series of smaller steps, each solvable with an existing generic modelling or DAX pattern. Reusing well-known, optimised patterns lowers effort and the risk of errors, and brings their known performance gains.
 - Consider. 2025. https://www.sqlbi.com/articles/account-receivable-aging-in-power-bi/
 - When: Any new business requirement.
-
-**T14-A346-3.** To group a table held in a variable, as opposed to a model table, use GROUPBY.
-- Should. 2025. https://www.sqlbi.com/articles/find-the-products-in-the-top-10-every-year-with-dax/
-- When: Grouping intermediate tables stored in DAX variables.
 
 **T14-A346-4.** Inside GROUPBY, COUNTROWS cannot be the aggregation. To count the rows of each group, iterate CURRENTGROUP with SUMX over the constant 1: GROUPBY requires CURRENTGROUP to walk the rows of the group being aggregated.
 - Must. 2025. https://www.sqlbi.com/articles/find-the-products-in-the-top-10-every-year-with-dax/
@@ -84,10 +76,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T14-A369-13.** When defining a calculation, always check how it behaves in border cases: at the start or end of a time period, at subtotal and total level, under different selections, and with blank values in columns or partial results.
 - Must. 2026. https://www.sqlbi.com/articles/the-hidden-complexity-of-a-daily-average-in-dax/
 - When: Any calculation, even one that looks simple, such as an average.
-
-**T14-A369-14.** One way to validate a measure: have test cases proposed that might disprove it, for example by an AI assistant, then state each expected result independently before running the test. A test only helps when its expected outcome is known apart from the code.
-- Option. 2026. https://www.sqlbi.com/articles/the-hidden-complexity-of-a-daily-average-in-dax/
-- When: Validating a measure before relying on it.
 
 **T14-A369-15.** When DAX code comes from an AI assistant, the person responsible has to state the business requirements, question the proposed code and check its results. Code that runs is no proof that it returns the number the business needs.
 - Must. 2026. https://www.sqlbi.com/articles/the-hidden-complexity-of-a-daily-average-in-dax/
@@ -203,10 +191,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T14-A323-9.** When an amount is a quantity measure multiplied by a product attribute such as unit cost, one way to cut the iterations is to iterate the distinct values of that attribute, not every product.
 - Option. 2025. https://www.sqlbi.com/articles/optimizing-incremental-inventory-calculations-in-dax/
 - When: Valuing a quantity measure at product cost; a plain column sum computed without calling the measure is faster still.
-
-**T14-A323-12.** When a calculated snapshot table computes balances with CALCULATE over the transaction tables, the date condition can be written as an explicit FILTER over ALLNOBLANKROW of the date column: that avoids a circular dependency with the model's relationships.
-- Option. 2025. https://www.sqlbi.com/articles/optimizing-incremental-inventory-calculations-in-dax/
-- When: Snapshot tables built as DAX calculated tables, such as a month-end stock snapshot.
 
 ### Building and testing calculations
 

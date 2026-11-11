@@ -69,10 +69,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 
 ### Translations and renaming objects
 
-**T16-A050-1.** Load each table from a source view that already carries the final table and column names, so that users get clear, meaningful and complete names: the model shows its physical names directly in the user interface.
-- Should. 2014. https://www.sqlbi.com/articles/frictionless-renaming-in-tabular-models-with-analysis-services/
-- When: Defining the tables of a model that reads from a relational source.
-
 **T16-A050-2.** Weigh a rename against clients outside the project too: an Excel PivotTable connected to the model drops the measures and columns renamed since its last refresh.
 - Consider. Check. 2014. https://www.sqlbi.com/articles/frictionless-renaming-in-tabular-models-with-analysis-services/
 - When: Renaming a table, column or measure of a model that Excel workbooks already use.

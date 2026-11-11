@@ -50,10 +50,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - Must. 2024. https://www.sqlbi.com/articles/blank-in-date-columns-and-dax-time-intelligence-functions/
 - When: Filters comparing Date table columns when the table can hold a blank row, as in cumulative totals.
 
-**T04-A321-12.** Keep in mind when iterating the Date table: a plain table reference skips the blank row that an invalid relationship adds, while VALUES of the table includes it. Amounts on blank dates can so go missing without notice.
-- Consider. 2024. https://www.sqlbi.com/articles/blank-in-date-columns-and-dax-time-intelligence-functions/
-- When: Iterators over a Date table that may hold a blank row because a related fact table has blank dates.
-
 ### Calendar-based time intelligence
 
 **T04-A345-3.** In a calendar, give a category to every Date table column used for hierarchical navigation, even though the calendar-based functions also work when some categories have no column.
@@ -142,10 +138,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T04-A204-9.** A between slicer on a Year or Year Month column of datetime type lists every possible date although the real grain is the year or month. It still selects whole periods whose stored date falls in the range, but the view can mislead.
 - Fact. Check. 2020. https://www.sqlbi.com/articles/creating-a-simpler-and-chart-friendly-date-table-in-power-bi/
 - When: Year or Year Month columns stored as datetime values in a Date table, used in a between slicer.
-
-**T04-A204-11.** For a continuous X axis over Date table periods, one option is to add columns holding the first or last day of each period and put those on the axis: every point fits without a scrollbar and label density adapts.
-- Option. 2020. https://www.sqlbi.com/articles/creating-a-simpler-and-chart-friendly-date-table-in-power-bi/
-- When: Line charts over periods of the Date table; the cost is extra columns in that table.
 
 **T04-A371-2.** A continuous line-chart axis on years, quarters, months or weeks of your own Date table needs a hierarchy there: on top a year column with dataCategory Years, at the bottom the key date column with PaddedDateTableDates. Table-level dataCategory, once listed too, has no effect.
 - Must. 2026. https://www.sqlbi.com/articles/continuous-axis-for-any-date-table-in-power-bi/ ; https://www.sqlbi.com/articles/creating-a-simpler-and-chart-friendly-date-table-in-power-bi/

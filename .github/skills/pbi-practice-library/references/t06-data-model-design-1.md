@@ -24,11 +24,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - Must. 2016. https://www.sqlbi.com/articles/data-import-best-practices-in-power-bi/ ; https://www.sqlbi.com/articles/separate-date-and-time-in-powerpivot-and-bism-tabular/
 - When: A source column holds a date and a time together.
 
-**T06-A075-17.** Mark the date table even when its relationships use a date-typed column: the Power BI interface and other features then know the table's role.
-- Should. Check. 2016. https://www.sqlbi.com/articles/data-import-best-practices-in-power-bi/
-- When: Any model with a date table.
-- Version: Power BI gained Mark as Date Table in February 2018; apply it to models built earlier.
-
 **T06-A192-1.** The match between a label and its sort key must be one to one: a month name that includes the year needs a separate key value for each month of each year.
 - Must. 2020. https://www.sqlbi.com/articles/sorting-duplicated-names-in-a-level-of-a-hierarchy-with-dax/
 - When: Any column sorted by another column.
@@ -178,10 +173,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - Fact. 2011. https://www.sqlbi.com/articles/sorting-dates-columns-in-powerpivot-v2-and-bism-tabular/
 - When: Setting Sort by Column on a combined label such as month and year.
 
-**T06-A035-1.** Avoid standing in for a missing or unknown date in the Date table with an arbitrary real date such as 1 January 1900: users would read it as a genuine date with values attached.
-- Should. 2013. https://www.sqlbi.com/articles/handling-wrong-or-missing-dates-in-tabular/
-- When: A Date dimension from a star schema carries a dummy row for unknown, missing or wrong dates.
-
 **T06-A035-2.** Because a marked date table accepts no blank date, a classic Date dimension that keeps a dummy row for unknown dates (blank date, year and month number 0, an Unknown label) cannot be loaded as it is: its design has to change.
 - Fact. 2013. https://www.sqlbi.com/articles/handling-wrong-or-missing-dates-in-tabular/
 - When: A Date dimension with a dummy unknown-date row is imported and marked as a date table.
@@ -256,10 +247,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - Consider. 2016. https://www.sqlbi.com/articles/data-import-best-practices-in-power-bi/
 - When: Columns meant to be hidden; not where users need the column for transformations or joins with other sources.
 
-**T06-A075-10.** The engine itself rejects a measure that is given the same name as an existing column, because of the name conflict.
-- Fact. 2016. https://www.sqlbi.com/articles/data-import-best-practices-in-power-bi/
-- When: Naming a new measure after a column that already exists.
-
 **T06-A075-12.** If the raw number columns are to stay visible, besides turning summarisation off give them names that follow the convention, and add an explicit measure for the row-by-row result, for example one that iterates the table with SUMX.
 - Option. 2016. https://www.sqlbi.com/articles/data-import-best-practices-in-power-bi/
 - When: The detail number columns must remain visible in the model.
@@ -316,10 +303,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T06-A218-7.** VertiPaq run-length encoding compresses columns whose values change often far less well, so they are larger and slower. Flattening a fine-grained dimension such as time of day into the fact table creates many such columns.
 - Fact. 2021. https://www.sqlbi.com/articles/power-bi-star-schema-or-single-table/
 - When: Denormalising attributes of a dimension whose key changes often into the fact table.
-
-**T06-A233-3.** The speed of a query that crosses a relationship depends strongly on the relationship's size: one on a key with many distinct values, such as an order number, is very expensive, and the cost is paid each time a query crosses it.
-- Fact. 2021. https://www.sqlbi.com/articles/header-detail-vs-star-schema-models-in-tabular-and-power-bi/
-- When: Relationships on keys with many distinct values, such as header to detail.
 
 **T06-A233-4.** A separate header table can be kept to speed up specific calculations, such as a distinct count of customers sliced by dimensions linked to the header (about five times faster in one test). Slicing by detail-side dimensions needs a both-direction relationship, which removes the gain.
 - Option. 2021. https://www.sqlbi.com/articles/header-detail-vs-star-schema-models-in-tabular-and-power-bi/

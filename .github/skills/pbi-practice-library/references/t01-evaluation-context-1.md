@@ -1,6 +1,6 @@
 # DAX evaluation context
 
-Part 1 of 3 of this topic. Covers: KEEPFILTERS and arbitrary filters; CALCULATE filter arguments; Visual queries and auto-exist.
+Part 1 of 2 of this topic. Covers: KEEPFILTERS and arbitrary filters; CALCULATE filter arguments; Visual queries and auto-exist; Reading the selected value; Row context and iterators.
 
 Practice notes drawn from public SQLBI articles, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail.
 
@@ -94,9 +94,49 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - Must. 2018. https://www.sqlbi.com/articles/side-effects-in-dax-of-the-sort-by-column-setting/
 - When: Writing any DAX query whose row order matters.
 
-**T01-A135-2.** If a single-table model gives wrong results because of auto-exist when users slice by several of its columns, the simplest fix is a proper star schema: auto-exist then acts only on dimension tables. Slicers and ALL removals in measures must then reference the dimension columns.
-- Should. Check. 2018. https://www.sqlbi.com/articles/understanding-dax-auto-exist/
-- When: Simple one-table models with an unusual distribution of values.
+### Reading the selected value
+
+**T01-A105-2.** Where a row context exists, read the column directly, through RELATED when it lives in a lookup table, not with SELECTEDVALUE or VALUES: those look at the filter context, not at the current row.
+- Should. 2017. https://www.sqlbi.com/articles/using-the-selectedvalue-function-in-dax/
+- When: The expression runs in a row context.
+
+**T01-A105-10.** Use SELECTEDVALUE, or the equivalent HASONEVALUE with VALUES, only in top-level calculations, not in measures evaluated many times inside large iterations: they work like DISTINCT internally and can multiply storage engine requests when filters flow through limited relationships.
+- Should. 2017. https://www.sqlbi.com/articles/using-the-selectedvalue-function-in-dax/
+- When: A measure that reads a selection would be called for many cells or rows.
+
+**T01-A193-2.** Use ISINSCOPE when the check is about the visual itself, such as which hierarchy level is browsed or special behaviour at the grand total: it tells the visual's grouping from a slicer filter. When it is TRUE the column can still have zero values.
+- Should. 2020. https://www.sqlbi.com/articles/distinguishing-hasonevalue-from-isinscope/
+- When: A measure must react to the grouping of the visual, not to slicer selections.
+
+**T01-A193-3.** Use HASONEVALUE when a measure makes sense only with one selected value, whether that value comes from the visual's grouping or from a slicer, such as a year-to-date figure for one year. It is slower than ISINSCOPE, because it counts the visible values.
+- Should. 2020. https://www.sqlbi.com/articles/distinguishing-hasonevalue-from-isinscope/
+- When: A measure is meaningful only if exactly one value of a column is visible.
+
+**T01-A193-4.** When it matters whether a grouped column has no value or one, guard the calculation with HASONEVALUE, not ISINSCOPE, although ISINSCOPE is faster: ISINSCOPE can be TRUE with no visible value. This does not make HASONEVALUE the better choice in general.
+- Should. Check. 2020. https://www.sqlbi.com/articles/distinguishing-hasonevalue-from-isinscope/
+- When: A visual groups by columns of different tables and many combinations have no rows.
+
+### Row context and iterators
+
+**T01-A063-1.** A measure must aggregate a column, for instance with SUM, and not reference the column's value on its own: with no row context a bare column reference raises an error.
+- Must. 2015. https://www.sqlbi.com/articles/row-context-and-filter-context-in-dax/
+- When: Measure expressions outside any iteration; a row context exists only in iterators and calculated columns.
+
+**T01-A244-2.** To aggregate a row-by-row expression such as quantity times price, you must use an iterator such as SUMX over the table that holds every column the expression uses. Never multiply separate SUM results: a product of sums is a wrong number.
+- Must. 2022. https://www.sqlbi.com/articles/row-context-in-dax/
+- When: A measure aggregates a calculation over several columns of each row.
+
+**T01-A310-2.** Compute an expression that does not depend on the row context, such as reading a slicer selection, before the iterator and not inside the iterated expression. This makes plain that it does not depend on the current row.
+- Should. 2024. https://www.sqlbi.com/articles/row-context-in-dax-explained-visually/
+- When: An expression inside an iterator does not use the row context.
+
+**T01-A336-3.** Do not wrap every iterated table in VALUES by habit. Decide for each calculation whether the blank row produced by an invalid relationship should take part in the iteration.
+- Should. 2025. https://www.sqlbi.com/articles/using-values-in-iterators/
+- When: Writing or reviewing an iterator over a table reference.
+
+**T01-A336-4.** An existing SUMX over a bare table reference may stay without VALUES when the expression uses only column references, performs no context transition, or no column of the table is the one-side end of a regular relationship: both forms then return the same values.
+- Option. 2025. https://www.sqlbi.com/articles/using-values-in-iterators/
+- When: Reviewing existing SUMX iterations; a needless VALUES costs nothing if the meaning stays right.
 
 ## Special-case techniques and facts
 
@@ -208,10 +248,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - Fact. 2022. https://www.sqlbi.com/articles/solving-errors-in-calculate-filter-arguments/
 - When: Writing a predicate as a CALCULATE or CALCULATETABLE filter argument.
 
-**T01-A263-6.** Avoid LASTDATE where a single value is required, such as one side of a comparison in a filter predicate. Use MAX there and keep LASTDATE for table arguments only: it is meant as a table function.
-- Should. 2022. https://www.sqlbi.com/articles/solving-errors-in-calculate-filter-arguments/
-- When: Cumulative or to-date filters on a date column inside CALCULATE.
-
 ### Visual queries and auto-exist
 
 **T01-A047-1.** By default auto-exist removes non-existing combinations only among columns of one table. For columns of different tables the engine evaluates every combination and the PivotTable just hides blank ones, so normalized and denormalized models can show the same report yet compute it differently.
@@ -246,3 +282,87 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T01-A135-5.** When a query really needs every combination of values, including those absent from the data, a table function such as CROSSJOIN can produce them; grouping under auto-exist returns existing combinations only.
 - Option. 2018. https://www.sqlbi.com/articles/understanding-dax-auto-exist/
 - When: The rare case where non-existing combinations of column values must be returned.
+
+### Reading the selected value
+
+**T01-A058-1.** To give a measure parameter values, one option is a hidden table per parameter holding every value needed: call the measure in CALCULATE with a filter that sets the column to the wanted value, and let the measure read it with VALUES.
+- Option. Check. 2015. https://www.sqlbi.com/articles/parameters-in-dax-measures/
+- When: Complex expressions compute a measure with different argument values; simple cases can keep the condition in inner measures.
+- Version: Written in 2015, when DAX had no way to pass arguments to a measure.
+
+**T01-A058-2.** Hide measures that read their parameter values from hidden parameter tables, so users never call them directly: with several values selected in a parameter table such a measure fails with an error.
+- Should. 2015. https://www.sqlbi.com/articles/parameters-in-dax-measures/
+- When: Measures receive parameter values through hidden parameter tables and CALCULATE filter arguments.
+
+**T01-A105-4.** Where the DAX engine has no SELECTEDVALUE, the same patterns can be written with the equivalent IF combined with HASONEVALUE and VALUES.
+- Option. Check. 2017. https://www.sqlbi.com/articles/using-the-selectedvalue-function-in-dax/
+- When: The engine in use does not offer SELECTEDVALUE.
+- Version: SELECTEDVALUE arrived in July 2017 in Power BI Desktop and Analysis Services; Power Pivot for Excel lacks it.
+
+**T01-A105-5.** A measure that shows a dimension attribute with SELECTEDVALUE should also test that another measure returns data, when the attribute must appear only beside data; without the test it also shows values for items with no sales.
+- Should. Check. 2017. https://www.sqlbi.com/articles/using-the-selectedvalue-function-in-dax/
+- When: The attribute measure sits in a matrix, pivot table or table visual next to other measures.
+- Version: As of March 2024 the Table visual behaves this way too; older Power BI versions did not.
+
+**T01-A105-6.** To read a snowflaked lookup table's attribute from the filter context, wrap SELECTEDVALUE in CALCULATE with CROSSFILTER set to both directions on the relationships to cross; prefer this to passing the expanded base table as a filter, which may have side effects in complex models.
+- Should. 2017. https://www.sqlbi.com/articles/using-the-selectedvalue-function-in-dax/
+- When: The attribute is several relationships away, such as category from product, and is shown in a matrix.
+
+**T01-A105-8.** When a parameter must not accept several selections, ERROR can be passed as the alternate result of SELECTEDVALUE so that the visual shows an error message; the message mentions MdxScript, which may look meaningless in Power BI Desktop.
+- Option. 2017. https://www.sqlbi.com/articles/using-the-selectedvalue-function-in-dax/
+- When: A calculation needs one selected value and must reject multiple selections.
+
+**T01-A105-9.** Do not read a field parameter's slicer selection with SELECTEDVALUE: it cannot return a column grouped by other columns. Group the parameter table by its display and fields columns, for example with SUMMARIZE, and return the display column when that result has rows.
+- Must. Check. 2017. https://www.sqlbi.com/articles/using-the-selectedvalue-function-in-dax/
+- When: The value to read is the visible column of a table made by the field parameters feature.
+- Version: Guidance added in June 2022.
+
+**T01-A193-1.** HASONEVALUE and ISINSCOPE are not interchangeable. HASONEVALUE is TRUE when exactly one value of the column is visible, even because of a slicer; ISINSCOPE is TRUE only when the column is grouped by, as on a visual's rows. At the grand total both are FALSE.
+- Fact. 2020. https://www.sqlbi.com/articles/distinguishing-hasonevalue-from-isinscope/
+- When: A measure tests the hierarchy level or the selection with either function.
+
+### Row context and iterators
+
+**T01-A244-3.** A row context gives access only to the columns of the iterated table and does not follow relationships: reach the matching row of the parent table with RELATED, and iterate the related many-side rows with RELATEDTABLE.
+- Fact. 2015. https://www.sqlbi.com/articles/row-context-and-filter-context-in-dax/ ; https://www.sqlbi.com/articles/row-context-in-dax/
+- When: A calculated column or iterator needs data from a table related to the iterated one.
+
+**T01-A244-4.** A row context does not filter its table: in a calculated column, SUM, AVERAGE, MIN or MAX without CALCULATE, or SUMX over the column's own table, scans the whole table (or related table), so every row gets the same value, the grand total for SUM.
+- Fact. 2015. https://www.sqlbi.com/articles/understanding-context-transition/ ; https://www.sqlbi.com/articles/row-context-in-dax/
+- When: Calculated columns aggregate without CALCULATE and expect a per-row value.
+
+**T01-A247-3.** Iterating a column or table creates a row context, which does not filter the current value. Unless CALCULATE performs a context transition the iterated column carries no filter: filters come only from the filter context.
+- Fact. 2022. https://www.sqlbi.com/articles/understanding-context-transition-in-dax/
+- When: Code iterates a column, such as customer keys, and expects it to be filtered to the current row.
+
+**T01-A124-1.** RELATED works only with an active row context. In a calculated column, wrapping RELATED in CALCULATE raises an error, because the context transition performed by CALCULATE removes the row context.
+- Fact. 2018. https://www.sqlbi.com/articles/expanded-tables-in-dax/
+- When: A calculated column evaluates RELATED inside CALCULATE.
+
+**T01-A310-1.** A column reference needs a row context to return a value. A measure has none, so a bare column reference in a measure raises an error that a single value cannot be determined. Iterating a table with an iterator function provides a row context.
+- Fact. 2022. https://www.sqlbi.com/articles/row-context-in-dax/ ; https://www.sqlbi.com/articles/row-context-in-dax-explained-visually/
+- When: A measure references a column without an aggregation or an iterator.
+
+**T01-A310-3.** Inside an iterator, the expression evaluated for each row sees both that row's row context and the filter context active outside the iterator.
+- Fact. 2024. https://www.sqlbi.com/articles/row-context-in-dax-explained-visually/
+- When: The iterated expression calls functions that read the filter context, such as a slicer selection.
+
+**T01-A310-4.** An iterator runs once per row of the table expression it receives, so that expression sets the cardinality and the result. SELECTCOLUMNS removes columns but keeps the row count; SUMMARIZE groups, may return fewer rows and can change the total.
+- Fact. 2024. https://www.sqlbi.com/articles/row-context-in-dax-explained-visually/
+- When: Choosing or changing the table expression an iterator such as SUMX walks.
+
+**T01-A310-5.** When every row of a SUMX iteration is divided by the same value that does not depend on the current row, put the division outside SUMX. Inside the iteration it hides that the divisor is independent of the row.
+- Should. 2024. https://www.sqlbi.com/articles/row-context-in-dax-explained-visually/
+- When: The divisor does not use the row context, such as a factor read from a slicer.
+
+**T01-A245-1.** A cell of a matrix is computed under a filter context, not a row context; a row context exists only during an iteration. A matrix row for one brand is a filter on that brand and can aggregate many underlying rows.
+- Fact. 2022. https://www.sqlbi.com/articles/filter-context-in-dax/
+- When: Reasoning about how a measure is evaluated in the rows and cells of a matrix.
+
+**T01-A336-1.** When an iterator such as SUMX over a table reference has to include the blank row added by an invalid relationship, iterate VALUES of that table: a bare table reference ignores that extra row.
+- Should. 2025. https://www.sqlbi.com/articles/using-values-in-iterators/
+- When: The iterated table can receive a blank row from an invalid relationship and the calculation must cover it.
+
+**T01-A336-2.** With AVERAGEX, MINX, MAXX and similar iterators, such as the maximum sales per customer, you must iterate the bare table reference, not VALUES of the table. VALUES adds the blank row that gathers all unknown customers, and its combined amount inflates the result.
+- Must. 2025. https://www.sqlbi.com/articles/using-values-in-iterators/
+- When: The iterated table can receive a blank row from an invalid relationship.

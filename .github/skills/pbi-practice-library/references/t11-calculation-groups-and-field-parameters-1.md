@@ -195,10 +195,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - Option. 2020. https://www.sqlbi.com/articles/controlling-format-strings-in-calculation-groups/
 - When: An item reformats only some measures, such as a currency conversion that skips non-currency measures.
 
-**T11-A184-3.** A currency conversion calculation item should convert, and give a currency format to, only the measures that hold monetary amounts. Quantities, percentages and the like stay untouched; the item can decide which measures to skip by their names.
-- Should. 2020. https://www.sqlbi.com/articles/controlling-format-strings-in-calculation-groups/
-- When: A model with monetary and other measures; one currency must be selected for the conversion to run.
-
 **T11-A184-6.** Some Power BI visuals do not fully support custom format strings, which matters for formats set through calculation groups. Custom visuals are affected, and the problem reaches other visuals too.
 - Fact. Check. 2020. https://www.sqlbi.com/articles/controlling-format-strings-in-calculation-groups/
 - When: Reports that show measures whose format a calculation item controls.

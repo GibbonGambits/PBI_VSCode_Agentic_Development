@@ -27,10 +27,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - When: A filter moves between tables by equal column values, inside CALCULATE or CALCULATETABLE.
 - Version: TREATAS exists in Power BI and in Analysis Services from 2017.
 
-**T05-A182-12.** One recommended editor for Power BI and Analysis Services Tabular models is Tabular Editor; the modelling concepts are the same whichever tool is used.
-- Should. 2020. https://www.sqlbi.com/articles/relationships-in-power-bi-and-tabular-models/
-- When: A person edits the objects of a Power BI or Analysis Services Tabular model outside this template's files.
-
 **T05-A095-1.** To pass a filter between tables, use a physical relationship whenever one is possible, and a virtual one with TREATAS only otherwise. The FILTER pattern is the last resort, for a DAX version that has neither TREATAS nor INTERSECT.
 - Should. Check. 2020. https://www.sqlbi.com/articles/propagate-filters-using-treatas-in-dax/
 - When: Choosing how a filter travels between two tables; virtual is acceptable when few values are passed.
@@ -209,10 +205,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - Fact. 2017. https://www.sqlbi.com/articles/filtering-tables/
 - When: A measure removes filters with ALL in CALCULATE while a dimension column is filtered.
 
-**T05-A099-2.** ALL over a whole fact table in CALCULATE clears the filters on every column of the expanded fact table, columns of related one-side dimensions included. ALL that lists only the fact's own columns leaves those dimension filters in place.
-- Fact. 2017. https://www.sqlbi.com/articles/filtering-tables/
-- When: A measure uses ALL in CALCULATE while columns of a related dimension are filtered.
-
 **T05-A099-3.** To ignore a filter that reaches a fact through a bridge table with a both-direction relationship, apply ALL to the bridge table. ALL on the fact or on the intermediate dimension leaves it: such a filter is injected directly, not through table expansion.
 - Must. 2017. https://www.sqlbi.com/articles/filtering-tables/
 - When: A many-to-many bridge filters both ways and a measure must ignore the far dimension's selection.
@@ -262,10 +254,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - Fact. 2025. https://www.sqlbi.com/articles/understanding-the-cant-determine-relationship-between-the-fields-error-in-power-bi/
 - When: A visual groups by columns that come from more than one table.
 
-**T05-A333-4.** A combination of columns of one table that does not exist in the table is removed by auto-exists and can never be shown. A combination dropped only because every measure is blank can be brought back with Show items with no data.
-- Fact. 2025. https://www.sqlbi.com/articles/understanding-the-cant-determine-relationship-between-the-fields-error-in-power-bi/
-- When: A visual groups by several columns of one table, such as category and subcategory.
-
 ### Blank row and limited relationships
 
 **T05-A182-3.** A limited relationship takes no part in table expansion. Every relationship with many-to-many cardinality is limited, even inside one data island, and so is one whose one-side key the engine cannot verify as unique. Older guidance required a unique column on one side.
@@ -273,17 +261,9 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - When: Judging how a relationship behaves in DAX.
 - Version: Composite models and many-to-many cardinality relationships exist in Power BI since 2018.
 
-**T05-A236-6.** Limited relationships are slow, because the engine does not materialize them.
-- Fact. 2021. https://www.sqlbi.com/articles/different-options-to-model-many-to-many-relationships-in-power-bi-and-tabular/
-- When: Any limited relationship in a model.
-
 **T05-A165-2.** VALUES returns the blank row that an invalid relationship adds to the one-side table. DISTINCT never does: it returns only rows stored in the table. Counts built on the two functions therefore differ when a relationship is invalid.
 - Fact. 2019. https://www.sqlbi.com/articles/blank-row-in-dax/
 - When: Some many-side keys have no matching one-side row; otherwise both functions agree.
-
-**T05-A165-3.** When a row count must include the blank row of an invalid relationship, use `COUNTROWS ( VALUES ( Product ) )`. A bare table reference never returns the blank row, so the blank item gets no count.
-- Must. 2019. https://www.sqlbi.com/articles/blank-row-in-dax/
-- When: The blank row must count as a row of a one-side table.
 
 **T05-A165-4.** When a ratio of a filtered row count to the count of all rows does not total 100%, let both parts treat the blank row alike: VALUES of the table in the numerator, or ALLNOBLANKROW in place of ALL in the denominator.
 - Option. 2019. https://www.sqlbi.com/articles/blank-row-in-dax/
@@ -315,10 +295,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T05-A036-2.** In a row context, CALCULATE with only USERELATIONSHIP returns the value of the default relationship. Context transition happens before the modifier applies and follows the default relationship; USERELATIONSHIP changes which relationship is active and filters nothing.
 - Fact. 2021. https://www.sqlbi.com/articles/userelationship-in-calculated-columns/
 - When: A calculated column or iteration where CALCULATE has no other filter argument.
-
-**T05-A036-3.** RELATED cannot be called inside CALCULATE in a calculated column: CALCULATE removes the row context that RELATED needs, so the formula returns an error.
-- Fact. 2021. https://www.sqlbi.com/articles/userelationship-in-calculated-columns/
-- When: A calculated column that combines CALCULATE and RELATED.
 
 **T05-A258-3.** A second date table beside the shared one can also be right when visuals based on different dates must cross-highlight each other, such as an order-date chart and a delivery-date chart. Keep the shared Date table, so measures can still share one axis.
 - Option. 2022. https://www.sqlbi.com/articles/using-cross-highlight-with-order-and-delivery-dates-in-power-bi/

@@ -139,10 +139,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - Option. 2020. https://www.sqlbi.com/articles/optimizing-lastnonblank-and-lastnonblankvalue-calculations/
 - When: Only when having fact rows is enough to count an item as non-blank.
 
-**T07-A181-7.** LASTNONBLANK and LASTNONBLANKVALUE are not limited to date columns: their first argument can be a column of any data type, text included.
-- Fact. 2020. https://www.sqlbi.com/articles/optimizing-lastnonblank-and-lastnonblankvalue-calculations/
-- When: Finding the last non-blank item over a non-date column, such as an order number.
-
 **T07-A287-2.** A function the storage engine cannot run, such as ROUND, placed in the expression of an iterator brings in the formula engine through callbacks. On a large table this can multiply the storage engine CPU cost by a very large factor.
 - Fact. 2023. https://www.sqlbi.com/articles/optimizing-callbacks-in-a-sumx-iterator/
 - When: Iterating large tables with a per-row expression the storage engine cannot execute.
@@ -195,10 +191,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - Fact. 2025. https://www.sqlbi.com/articles/understanding-how-dax-evaluates-if-statements/
 - When: IF as a top-level function of a measure; inside an iteration behaviour may differ.
 
-**T07-A334-2.** The total of a measure built on IF is not produced by adding up the values the measure returns for each group. Assuming that it is leads to confusion about totals.
-- Fact. 2025. https://www.sqlbi.com/articles/understanding-how-dax-evaluates-if-statements/
-- When: Reports that slice an IF-based measure by a column and show a total.
-
 **T07-A334-3.** For a top-level IF whose condition and both branches use one measure, you can assign it to a variable before the IF: the engine computes it for all groups in one storage engine query. Not always better: measure complexity, model size and grouping-column cardinality decide.
 - Option. 2025. https://www.sqlbi.com/articles/understanding-how-dax-evaluates-if-statements/
 - When: A measure whose top-level IF reuses one measure in its condition and branches.
@@ -231,10 +223,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T07-A251-2.** Keep in mind that a SWITCH testing a column only cross-filtered through another column can cost extra formula engine work: not knowing one value remains, the engine prepares every branch. Overhead grows with branches and their measures; storage engine requests stay optimized.
 - Consider. 2022. https://www.sqlbi.com/articles/understanding-the-optimization-of-switch/
 - When: For example a SWITCH over a hidden sort index while the slicer filters the name column.
-
-**T07-A251-4.** When Group By Columns stores the slicer selection through an index column, read the selected name with SUMMARIZE over both the name and the index column: SELECTEDVALUE can no longer read the name column's selection.
-- Should. 2022. https://www.sqlbi.com/articles/understanding-the-optimization-of-switch/
-- When: A name column set with Group By Columns on an index column, as in a selector table.
 
 **T07-A251-5.** A SWITCH over SELECTEDVALUE of a column loses its formula engine optimization when that column gets two filters in one visual, such as a page filter and a slicer, even if one value remains: the engine then evaluates branches that return nothing.
 - Fact. Check. 2022. https://www.sqlbi.com/articles/understanding-the-optimization-of-switch/

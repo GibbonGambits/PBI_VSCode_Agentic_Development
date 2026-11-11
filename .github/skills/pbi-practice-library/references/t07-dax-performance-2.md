@@ -20,10 +20,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - Consider. 2014. https://www.sqlbi.com/whitepapers/using-tabular-models-in-a-large-scale-commercial-solution/
 - When: Reducing the memory size of a Tabular model.
 
-**T07-W378-9.** Check the precision analysis really needs for a column and round to it, for example durations in tenths or hundredths of a second, not milliseconds: fewer distinct values and less memory, in one case without harming the accuracy of results.
-- Consider. 2014. https://www.sqlbi.com/whitepapers/using-tabular-models-in-a-large-scale-commercial-solution/
-- When: The source stores values at a finer granularity than the analysis needs.
-
 **T07-W378-11.** When tuning query speed, consider whether parts of the calculation can be computed in advance during ETL: work done before the query runs makes the query faster.
 - Consider. 2014. https://www.sqlbi.com/whitepapers/using-tabular-models-in-a-large-scale-commercial-solution/
 - When: Tuning the query speed of a Tabular model.
@@ -138,10 +134,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T07-W378-16.** For a small dimension, such as one holding only a code and a description, weigh dropping it and copying the description into the fact table to save a join. Test it first: denormalizing is not always faster, and filtering the dimension was sometimes much faster.
 - Consider. 2014. https://www.sqlbi.com/whitepapers/using-tabular-models-in-a-large-scale-commercial-solution/
 - When: A dimension with very few columns; the outcome depends on table sizes and compression.
-
-**T07-A061-1.** Filter propagation through model relationships gives more efficient storage engine queries than DAX expressions that emulate a relationship, such as code written to handle data at different granularities. Relationships still carry a cost of their own.
-- Fact. 2015. https://www.sqlbi.com/articles/costs-of-relationships-in-dax/
-- When: Choosing between a physical relationship and DAX code that simulates one.
 
 **T07-A061-5.** When the lookup table on the one side of a relationship is large, consider denormalizing it into the many-side table, or moving its often-queried low-cardinality columns into a separate table with fewer rows. In one header and detail example, merging saved 61% of query time.
 - Consider. Check. 2015. https://www.sqlbi.com/articles/costs-of-relationships-in-dax/

@@ -133,10 +133,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - Option. 2018. https://www.sqlbi.com/articles/using-or-conditions-between-slicers-in-dax/
 - When: The table the measure aggregates is known; slicers with hundreds or more distinct values.
 
-**T15-A125-5.** One multi-column filter given to CALCULATE for the OR between two slicers replaces any filter already on those two columns in the filter context.
-- Fact. 2018. https://www.sqlbi.com/articles/using-or-conditions-between-slicers-in-dax/
-- When: Either OR pattern, the crossjoin one or the fact-scan one.
-
 **T15-A125-7.** OR between slicers cannot be written once for every slicer of a report: it goes into measures for specific reports, where the slicers to combine are known in advance.
 - Fact. 2018. https://www.sqlbi.com/articles/using-or-conditions-between-slicers-in-dax/
 - When: Planning OR logic between slicers.

@@ -54,11 +54,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - When: Building a pure DirectQuery model.
 - Version: Analysis Services 2016 Tabular, where a DirectQuery model takes one data source; 2017 white paper.
 
-**T09-W380-13.** Feed a Tabular model, DirectQuery ones included, from views created in the SQL source, not from the physical tables: views keep the model independent of the physical structure of the database.
-- Should. 2017. https://www.sqlbi.com/whitepapers/directquery-in-analysis-services-2016/
-- When: Choosing what the tables of a model read from a SQL database.
-- Version: Analysis Services 2016 Tabular; 2017 white paper.
-
 **T09-W380-14.** Keep the SQL behind a DirectQuery table simple too, with no complex joins or convoluted code: it runs again inside every query that fetches a slice of data, where an in-memory model runs it once.
 - Should. 2017. https://www.sqlbi.com/whitepapers/directquery-in-analysis-services-2016/
 - When: Writing the SQL statement or view that a DirectQuery table reads.

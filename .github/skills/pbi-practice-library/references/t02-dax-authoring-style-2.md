@@ -12,11 +12,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - Should. 2017. https://www.sqlbi.com/articles/the-in-operator-in-dax/
 - When: Writing NOT in front of an IN condition.
 
-**T02-A096-6.** When FILTER wraps a multi-column IN test inside CALCULATE, iterate only the columns the test uses, for example ALL over those columns: the whole table would remove filters on all its columns and may slow the query.
-- Should. Check. 2017. https://www.sqlbi.com/articles/the-in-operator-in-dax/
-- When: A CALCULATE filter uses FILTER around an IN condition over two or more columns.
-- Version: Advice from 2017.
-
 **T02-A096-8.** In a table constructor with one column, the parentheses of a row constructor around each value can be left out. Row constructors are normally kept for lists with two or more columns.
 - Option. 2017. https://www.sqlbi.com/articles/the-in-operator-in-dax/
 - When: Writing a table constructor, or the left side of IN, with only one column.

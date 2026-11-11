@@ -12,10 +12,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - Consider. 2018. https://www.sqlbi.com/articles/capturing-power-bi-queries-using-dax-studio/
 - When: Analysing a page's captured queries in DAX Studio, whose Duration column gives milliseconds per query.
 
-**T16-A123-4.** Clear the cache before re-running a captured slow query in DAX Studio for performance optimisation.
-- Should. 2018. https://www.sqlbi.com/articles/capturing-power-bi-queries-using-dax-studio/
-- When: Tuning a long-running query copied from the All Queries list into the DAX Studio editor.
-
 **T16-A123-7.** Report performance can be improved step by step by repeating one cycle: trace the page's queries, fix the measure behind the slowest query, then trace again.
 - Option. 2018. https://www.sqlbi.com/articles/capturing-power-bi-queries-using-dax-studio/
 - When: Optimising the DAX measures of a report page with DAX Studio traces.

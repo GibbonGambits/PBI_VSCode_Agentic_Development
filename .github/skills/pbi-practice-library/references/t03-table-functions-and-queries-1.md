@@ -90,20 +90,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - Should. 2014. https://www.sqlbi.com/articles/from-sql-to-dax-grouping-data/
 - When: Choosing between a filter argument and FILTER over a computed result.
 
-**T03-A053-1.** To test whether a column equals one of several values, prefer the IN operator to a chain of OR function calls or logical-or operator comparisons. With a long list of values, the OR-based form makes the query text grow until it is unmanageable.
-- Should. 2015. https://www.sqlbi.com/articles/from-sql-to-dax-in-and-exists/
-- When: Filtering a column on a list of values, above all a long one.
-- Version: The IN operator was introduced in DAX in 2016; nested OR functions were needed before.
-
-**T03-A053-3.** To check that at least one related row exists, negate ISEMPTY on the filtered table with NOT instead of testing whether COUNTROWS is greater than zero. COUNTROWS is slower because it has to compute the exact number of qualifying rows.
-- Should. 2015. https://www.sqlbi.com/articles/from-sql-to-dax-in-and-exists/
-- When: Writing the equivalent of SQL EXISTS, such as keeping lookup values that have related rows.
-- Version: ISEMPTY needs SQL Server 2012 SP1 CU4 (Analysis Services build 11.0.3368) or later; missing in Excel 2013.
-
-**T03-A053-6.** Do not take the relative speed of equivalent DAX formulations for granted: compare the query plans of the candidates. Plans can change with the engine version, and the best syntax depends on the volume and distribution of the data.
-- Should. 2015. https://www.sqlbi.com/articles/from-sql-to-dax-in-and-exists/
-- When: Choosing among DAX syntaxes that return the same result, such as ways to test that related rows exist.
-
 **T03-A070-4.** Avoid filtering a column on a list of values by testing membership in an inline DATATABLE: its query plan is much slower than the same condition written with the OR operator.
 - Should. Check. 2016. https://www.sqlbi.com/articles/create-static-tables-in-dax-using-the-datatable-function/
 - When: Filtering on a list of values; the DATATABLE form is shorter only for a very long list.
@@ -290,10 +276,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - Option. Check. 2017. https://www.sqlbi.com/articles/querying-raw-data-to-tabular/
 - When: A reporting environment where you control how queries are generated, or a custom data-browsing tool.
 - Version: Rests on TOPNSKIP, described in 2017 as undocumented; the function is missing from this template's function index (DAX standard rule 19).
-
-**T03-A115-8.** To see which queries Power BI sends to its model, for example while a table is browsed in Data view, one way is to switch on the All Queries trace in DAX Studio. A captured query can then be run again in DAX Studio.
-- Option. Check. 2017. https://www.sqlbi.com/articles/querying-raw-data-to-tabular/
-- When: Inspecting the queries Power BI generates against its model.
 
 **T03-A214-2.** Avoid defining a query column with DEFINE COLUMN only to shorten a query, for example to replace an inline filter condition. Query columns are evaluated with different semantics from inline expressions or ADDCOLUMNS columns, so the shorter query can return very different numbers.
 - Should. Check. 2021. https://www.sqlbi.com/articles/introducing-define-column-in-dax-queries/

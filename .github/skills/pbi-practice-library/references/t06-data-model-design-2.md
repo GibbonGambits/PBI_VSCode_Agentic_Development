@@ -12,10 +12,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - Must. 2019. https://www.sqlbi.com/articles/the-importance-of-star-schemas-in-power-bi/
 - When: Testing a new formula; experts may depart only when they understand the consequences.
 
-**T06-A290-8.** If making a measure faster would make its code far harder to follow, and the gain is small, prefer the simpler version: it is easier to understand and debug, which gives more trust in how it behaves.
-- Should. 2023. https://www.sqlbi.com/articles/preparing-a-data-model-for-sankey-charts-in-power-bi/
-- When: Weighing an optimisation of a measure against its readability.
-
 **T06-A368-1.** Evaluate a business rule at the lowest level of detail where each of its inputs has one unambiguous value, and aggregate the results only afterwards.
 - Should. 2026. https://www.sqlbi.com/articles/writing-dax-at-the-correct-granularity/
 - When: A measure applies a rule, such as a rate or threshold, to data.
@@ -100,10 +96,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 ## Special-case techniques and facts
 
 ### Business-rule grain and testing
-
-**T06-A368-5.** Power BI does not compute a total by adding up the visible rows: every cell, the total included, runs the measure by itself, and the total cell evaluates it over everything that cell covers.
-- Fact. 2026. https://www.sqlbi.com/articles/writing-dax-at-the-correct-granularity/
-- When: Reading or checking the total of a measure in a visual.
 
 **T06-A368-7.** The alternative to returning blank below the grain is an explicit allocation rule that produces the detail. The developer must make that choice and never leave it to AVERAGE or a matrix total: repeating the higher-level value on each row is duplication, not allocation.
 - Must. 2026. https://www.sqlbi.com/articles/writing-dax-at-the-correct-granularity/

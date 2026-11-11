@@ -149,10 +149,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - When: Writing the measure behind row banding by document number.
 - Version: Stated in 2020; check current behaviour.
 
-**T15-A188-5.** A ranking measure for document banding can return its rank only when HASONEVALUE finds exactly one document in the filter context, so nothing is computed for the total or for subtotals that group several documents.
-- Option. 2020. https://www.sqlbi.com/articles/applying-color-banding-by-document-number-in-power-bi/
-- When: The banding measure runs in a visual that has total or subtotal rows.
-
 **T15-A189-1.** To highlight the largest and smallest cells of a matrix, drive background conditional formatting with a measure that rebuilds every cell in a temporary table under ALLSELECTED, takes MINX and MAXX, and returns one code for the minimum, another for the maximum, blank otherwise.
 - Option. 2020. https://www.sqlbi.com/articles/highlighting-the-minimum-and-maximum-values-in-a-power-bi-matrix/
 - When: A matrix full of numbers should point out its best and worst combinations.
@@ -259,11 +255,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T15-A362-11.** Detect the level in a visual calculation with ISATLEVEL when you cannot, or prefer not to, change the semantic model, as with a shared model another team owns: the calculation stays in the report and needs no extra rights.
 - Should. 2026. https://www.sqlbi.com/articles/dynamic-formatting-by-hierarchy-level-with-isinscope-and-isatlevel/
 - When: No rights to add measures; not when the logic needs data absent from the visual.
-- Version: Names a function missing from this template's DAX function index; DAX standard rule 19 applies until the index lists it.
-
-**T15-A362-12.** Even as owner of the semantic model, consider a visual calculation (with ISATLEVEL) for per-level logic that is pure presentation, such as a colouring expression: the model then holds no measure that means nothing outside one visual.
-- Consider. 2026. https://www.sqlbi.com/articles/dynamic-formatting-by-hierarchy-level-with-isinscope-and-isatlevel/
-- When: Presentation-only formatting logic tied to one visual.
 - Version: Names a function missing from this template's DAX function index; DAX standard rule 19 applies until the index lists it.
 
 **T15-A362-13.** For speed, prefer a visual calculation to a model measure for per-level formatting logic as the usual choice: it works on the few rows that fill the visual, while a measure may trigger extra internal queries.

@@ -8,10 +8,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 
 ### Totals and hierarchy levels
 
-**T14-A150-2.** When a measure iterates a granularity column to add detail results into the total, wrap the iterated values in KEEPFILTERS as a guard against arbitrarily shaped filters. It is usually unnecessary when the column has the correct granularity, such as one holding year and month.
-- Should. 2019. https://www.sqlbi.com/articles/summing-values-for-the-total/
-- When: SUMX over VALUES of a granularity column, used to make the total add up.
-
 **T14-A186-2.** When a measure's total must equal the sum of its values at a detail level, build that level into the formula: iterate its items in the current context, for example SUMX over the year-month column, evaluate the logic per item and add up the results.
 - Must. Check. 2019. https://www.sqlbi.com/articles/summing-values-for-the-total/ ; https://www.sqlbi.com/articles/obtaining-accurate-totals-in-dax/
 - When: A total recomputed in its own filter context is wrong; below the iterated level values stay counterintuitive.
@@ -94,10 +90,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T14-A150-3.** Adding a condition to a measure, such as returning blank when sales are zero, does not correct its total. The total evaluates the condition once in its own filter context, where it is met, so rows hidden at detail level are still counted.
 - Fact. 2019. https://www.sqlbi.com/articles/summing-values-for-the-total/
 - When: Measures such as a working-day count that should include only periods with sales.
-
-**T14-A186-1.** A measure is worked out on its own for every cell, totals and subtotals included. A total row evaluates the formula over its whole period, so it may differ from the sum of the rows shown; for the formula as written, it is correct.
-- Fact. 2020. https://www.sqlbi.com/articles/obtaining-accurate-totals-in-dax/
-- When: Measures with non-trivial logic, such as returning 1 above a threshold, shown with totals or subtotals.
 
 **T14-A186-4.** A measure built to iterate at one grain, such as month, still returns values when a report drills below that grain, for example to days. Those values go against intuition: the formula runs at a grain it was not designed for.
 - Fact. 2020. https://www.sqlbi.com/articles/obtaining-accurate-totals-in-dax/

@@ -20,10 +20,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - Should. 2026. https://www.sqlbi.com/articles/show-transaction-details-on-the-matrix-visual-in-power-bi/
 - When: Detail attributes are wanted beside the rows of a matrix.
 
-**T15-A351-12.** Leave out a possible optimisation that makes DAX longer or harder to read and maintain, unless the gain measured in a real environment justifies it.
-- Should. 2026. https://www.sqlbi.com/articles/show-transaction-details-on-the-matrix-visual-in-power-bi/
-- When: Any performance rewrite of a formula.
-
 ### Model support for reports
 
 **T15-A072-4.** Power BI Desktop stores the full file path inside each import query. One dedicated query that holds the path, referenced by every table query, lets a developer on another machine change it in one place.
@@ -278,11 +274,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T15-A231-11.** Where detailed data tables are a key need, Excel drillthrough with custom detail rows expressions can serve them efficiently: it runs as one DAX query and can return tens of thousands of rows in seconds, while a PivotTable with many attributes on rows is slow.
 - Option. 2021. https://www.sqlbi.com/articles/controlling-drillthrough-in-excel-pivottables-connected-to-power-bi-or-analysis-services/
 - When: Users need detail-level extracts from a tabular model in Excel.
-
-**T15-A231-13.** A table expression needed in several places can be stored as the detail rows expression of a hidden measure and called with DETAILROWS, which gives a library of table functions. Those host measures are not meant to be seen or used by report users.
-- Option. Check. 2021. https://www.sqlbi.com/articles/controlling-drillthrough-in-excel-pivottables-connected-to-power-bi-or-analysis-services/
-- When: The same table expression is reused across a tabular model.
-- Version: Older than user-defined functions, which this template suggests for logic held once; check current behaviour.
 
 **T15-A231-14.** To try Analyze in Excel on a model open in Power BI Desktop without publishing it, one option is the external tool Analyze In Excel for Power BI Desktop, started from its button on the External Tools ribbon.
 - Option. Check. 2021. https://www.sqlbi.com/articles/controlling-drillthrough-in-excel-pivottables-connected-to-power-bi-or-analysis-services/

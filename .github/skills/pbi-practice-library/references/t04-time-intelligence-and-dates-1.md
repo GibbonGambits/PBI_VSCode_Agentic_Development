@@ -72,10 +72,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - Option. 2019. https://www.sqlbi.com/articles/counting-working-days-in-dax/
 - When: A day count must skip weekends and holidays, and the date table flags working days.
 
-**T04-A147-2.** Put the working-day flag column in the model's existing Date table; a separate, purpose-built date table is needed only when that is not done.
-- Should. 2019. https://www.sqlbi.com/articles/counting-working-days-in-dax/
-- When: Working days between two dates are counted in DAX with a working-day flag.
-
 **T04-A147-3.** A simple way to fill the working-day flag of a date table is to mark a date as non-working when WEEKDAY places it on a Saturday or a Sunday.
 - Option. 2019. https://www.sqlbi.com/articles/counting-working-days-in-dax/
 - When: A date table needs a working-day flag for working-day calculations.
