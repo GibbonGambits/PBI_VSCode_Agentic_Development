@@ -15,7 +15,8 @@ What it checks:
     T  theme/theme.json is byte-for-byte the owner's theme (hash); a theme registered in any report
        folder of the template has the same content
     S  every skill has a valid name and description; always-loaded files stay small;
-       no file pins an AI model; no file calls an excluded command-line tool
+       no file pins an AI model; no file calls an excluded command-line tool;
+       docs/report-brief.md still holds every label and table the project check reads
     L  every relative link and every repository path written in a Markdown file exists
     C  every skill and instruction file cites checklist items, all between 1 and 79 (or says 'none'),
        and together they cover all 79
@@ -49,7 +50,8 @@ LINE_BUDGET = {"copilot-instructions.md": 40, ".instructions.md": 40, "SKILL.md"
 SKILL_NAME = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")           # agentskills.io specification
 MODEL_WORDS = re.compile(r"\b(gpt-?[0-9o]|claude|sonnet|opus|haiku|gemini|llama|mistral|deepseek|grok)\b", re.I)
 TOOL_CALLS = re.compile(r"(?<![.\w/-])pbir\s+[a-z]|powerbi-report-author|AskUserQuestion|CLAUDE_PLUGIN_ROOT")
-CREATED_LATER = {"docs/checklist-review.md"}       # written by a review, not part of the template
+CREATED_LATER = {"docs/checklist-review.md",        # written by a review, not part of the template
+                 "docs/checklist-review-before.md", "docs/fix-plan.md"}      # written by the evaluate-and-improve flow
 NS = {"m": "http://schemas.openxmlformats.org/spreadsheetml/2006/main",
       "r": "http://schemas.openxmlformats.org/officeDocument/2006/relationships",
       "p": "http://schemas.openxmlformats.org/package/2006/relationships"}
@@ -313,6 +315,18 @@ def check_guidance():
                 error("S007", "%s:%d" % (rel(path), number), "calls a command-line tool or feature the template must not depend on")
 
 
+def check_brief():
+    """The project check reads numbers, lists and exceptions from the brief by these labels."""
+    path = os.path.join(ROOT, cp.BRIEF)
+    if not os.path.isfile(path):
+        error("S008", "docs/report-brief.md", "the report brief is missing")
+        return
+    text = read_text(path).lower()
+    for label in list(cp.BRIEF_LABELS.values()) + [cp.MODEL_EXCEPTIONS, cp.LAYOUT_EXCEPTIONS]:
+        if label.lower() not in text:
+            error("S008", "docs/report-brief.md", "the label '%s' is gone; scripts/check_project.py reads it" % label)
+
+
 REPO_PATH = re.compile(r"(?<![\w/.-])((?:\.github|scripts|docs|checklist|theme|tests|evals)/[\w./-]*[\w/-])")
 
 
@@ -425,6 +439,7 @@ def main(argv):
     check_checklist(xlsx)
     check_theme()
     check_guidance()
+    check_brief()
     check_links()
     check_citations()
     check_lessons()

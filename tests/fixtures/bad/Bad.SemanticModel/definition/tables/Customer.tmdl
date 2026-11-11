@@ -1,0 +1,44 @@
+/// One row per customer. Made-up rows.
+table Customer
+
+	column CustomerKey
+		dataType: int64
+		isHidden
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: CustomerKey
+
+	/// Name of the customer.
+	column Name
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Name
+
+	column Country
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: Country
+
+	/// City of the customer.
+	column City
+		dataType: string
+		summarizeBy: none
+		sourceColumn: City
+
+	hierarchy Geography
+
+		level Country
+			column: Country
+
+		level City
+			column: City
+
+	partition Customer = m
+		mode: import
+		source =
+				let
+				    // Build an empty in-line table so the sample needs no outside data source.
+				    #"Created Rows" = #table({"A"}, {})
+				in
+				    #"Created Rows"

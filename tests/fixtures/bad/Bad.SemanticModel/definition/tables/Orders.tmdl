@@ -1,0 +1,146 @@
+/// One row per order line. Made-up rows for the template's tests. This description is longer than two hundred characters on purpose, so that the optional check for Copilot in Power BI has something to report when the brief turns it on.
+table Orders
+
+	measure total_sales = SUM(Orders[Amount])
+
+	/// Total order amount.
+	measure 'Total Sales' = SUM([Amount])
+		formatString: #,0
+		displayFolder: Finance/Base
+
+	/// Number of order lines.
+	measure 'Order Count' = COUNTROWS(Orders)
+		formatString: #,0
+		displayFolder: Finance\Counts
+
+	/// Sales from the start of the year.
+	measure 'ytd Sales' = TOTALYTD(Orders[Total Sales], Orders[Order Date])
+		formatString: #,0
+		displayFolder: Finance\Time Intelligence\Year
+
+	/// Margin as a share of sales.
+	measure 'Margin %' = DIVIDE([Total Sales] - SUM(Orders[Cost]), [Total Sales])
+		formatString: 0.0%
+		displayFolder: Finance\Extras
+
+	/// Identifier of the order.
+	column OrderId
+		dataType: int64
+		summarizeBy: sum
+		sourceColumn: OrderId
+
+	/// Key of the customer who placed the order.
+	column CustomerKey
+		dataType: int64
+		formatString: 0
+		summarizeBy: count
+		sourceColumn: CustomerKey
+
+	/// Order amount in US dollars.
+	column Amount
+		dataType: double
+		formatString: #,0.00
+		summarizeBy: sum
+		sourceColumn: Amount
+
+	/// Cost of the order line in US dollars.
+	column Cost
+		dataType: decimal
+		formatString: #,0.00
+		summarizeBy: none
+		sourceColumn: Cost
+
+	column Quantity
+		dataType: int64
+		isHidden
+		formatString: 0
+		summarizeBy: sum
+		sourceColumn: Quantity
+
+	column 'Legacy Code'
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: LegacyCode
+
+	/// Day and time the order was placed.
+	column 'Order Date'
+		dataType: dateTime
+		formatString: General Date
+		summarizeBy: none
+		sourceColumn: OrderDate
+
+	/// Day the order was shipped.
+	column 'Ship Date'
+		dataType: dateTime
+		summarizeBy: none
+		sourceColumn: ShipDate
+
+	/// Name of the month of the order.
+	column 'Month Name'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: MonthName
+		sortByColumn: 'Month Number'
+
+	/// Number of the month of the order, 1 to 12.
+	column 'Month Number'
+		dataType: int64
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: MonthNumber
+
+	/// Code of the store that took the order.
+	column 'Store Code'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: StoreCode
+
+	/// Code of the product on the order line.
+	column 'Product Code'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: ProductCode
+
+	/// Amount with a flat ten percent tax.
+	column 'Amount With Tax' = Orders[Amount] * 1.1
+		dataType: decimal
+		formatString: #,0.00
+		summarizeBy: none
+
+	/// Name of the customer, copied from the Customer table.
+	column 'Customer Name' = RELATED(Customer[Name])
+		dataType: string
+		summarizeBy: none
+
+	/// Year of the order.
+	column 'Order Year' = YEAR(Orders[Order Date])
+		dataType: int64
+		formatString: 0
+		summarizeBy: none
+
+	/// True when the amount is over 100.
+	column 'Large Order' = Orders[Amount] > 100
+		dataType: boolean
+		summarizeBy: none
+
+	/// Amount minus cost.
+	column 'Line Margin' = Orders[Amount] - Orders[Cost]
+		dataType: decimal
+		formatString: #,0.00
+		summarizeBy: none
+
+	/// Days between order and shipping.
+	column 'Days To Ship' = DATEDIFF(Orders[Order Date], Orders[Ship Date], DAY)
+		dataType: int64
+		formatString: 0
+		summarizeBy: none
+
+	partition Orders = m
+		mode: import
+		source =
+				let
+				    // Build an empty in-line table so the sample needs no outside data source.
+				    #"Created Rows" = #table({"A"}, {})
+				in
+				    #"Created Rows"

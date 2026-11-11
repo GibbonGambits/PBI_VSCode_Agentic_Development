@@ -1,0 +1,24 @@
+/// One row per store. Made-up rows.
+table Store
+
+	column StoreId
+		dataType: int64
+		isHidden
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: StoreId
+
+	/// Name of the store.
+	column 'Store Name'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: StoreName
+
+	partition Store = m
+		mode: import
+		source =
+				let
+				    // Build an empty in-line table so the sample needs no outside data source.
+				    #"Created Rows" = #table({"A"}, {})
+				in
+				    #"Created Rows"

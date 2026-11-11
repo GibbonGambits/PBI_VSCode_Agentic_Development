@@ -1,0 +1,13 @@
+/// One row per day. Made-up calculated table.
+table Calendar
+
+	/// The day.
+	column Date
+		dataType: dateTime
+		formatString: Short Date
+		summarizeBy: none
+		sourceColumn: [Date]
+
+	partition Calendar = calculated
+		mode: import
+		source = CALENDAR(DATE(2026, 1, 1), DATE(2026, 12, 31))

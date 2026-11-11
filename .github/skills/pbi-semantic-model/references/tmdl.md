@@ -14,11 +14,6 @@ Sources: Microsoft Learn "TMDL overview"; the Column, Measure and Table classes 
 /// One row per shipment.
 table Shipments
 
-	/// Weight of all shipments, in kilograms.
-	measure 'Shipped Weight' = SUM(Shipments[WeightKg])
-		formatString: #,0
-		displayFolder: Weight
-
 	/// Carrier that moved the shipment.
 	column Carrier
 		dataType: string
@@ -40,6 +35,15 @@ table Shipments
 				    #"Created Shipments"
 ```
 
+A measure goes in the table `_Measures` (model standard, rule 1), in that table's file:
+
+```
+	/// Weight of all shipments, in kilograms.
+	measure 'Shipped Weight' = SUM(Shipments[WeightKg])
+		formatString: #,0
+		displayFolder: Work Management\Base
+```
+
 The partition holds the table's Power Query query. Its layout (`partition <name> = m`, `mode: import`, `source =`, then the query) is the one shown in Microsoft's TMDL overview. For any other kind of source or storage mode, follow a partition already in this model.
 
 ## Properties the checklist asks about
@@ -51,10 +55,13 @@ The partition holds the table's Power Query query. Its layout (`partition <name>
 | Order labels by another column | `sortByColumn` | column | 24 |
 | Mark a URL, image, place and so on | `dataCategory` | column, measure, table | 26 |
 | Number or date format | `formatString` | column, measure | 36, 71, 72 |
-| Default totalling of a column | `summarizeBy` | column | - |
+| Default totalling of a column | `summarizeBy` | column | 29 |
+| Why a column or table is calculated in the model | `annotation CalculatedReason = <one line>` | calculated column, calculated table | 27, 38 |
 | Mark the key column | `isKey` | column | - |
 
-- Values such as a data category or a nested display folder must match what Power BI Desktop writes. Copy the value from an object in this model that already has one. If there is none, ask the developer to set one in Desktop and read the file. Do not guess the spelling or the folder separator.
+- A nested display folder is written with one backslash and no quotes: `displayFolder: Finance\Base`. Microsoft Learn names the backslash, and Microsoft's own saved projects hold it in this form. A forward slash does not nest.
+- A value such as a data category must match what Power BI Desktop writes. Copy it from an object in this model that already has one. If there is none, ask the developer to set one in Desktop and read the file. Do not guess the spelling.
+- A calculated column is declared with its formula, `column 'Name' = <DAX>`; a calculated table has `partition <name> = calculated`. Each needs the `CalculatedReason` annotation, one level below the column or the table.
 - Use one format string for the same kind of number everywhere in the model (item 71). Take date formats from the brief (item 72).
 
 ## Annotations

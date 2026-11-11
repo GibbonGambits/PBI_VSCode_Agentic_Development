@@ -1,24 +1,6 @@
 /// One row per order line. Made-up sample rows used only by the template's tests.
 table Sales
 
-	/// Total order amount in US dollars. Adds up the Amount column.
-	measure 'Total Sales' = SUM(Sales[Amount]) // one-line DAX comment is allowed here
-		formatString: #,0
-		displayFolder: Sales
-
-	/// Share of order lines that were returned. Returned lines divided by all lines.
-	measure 'Return Rate' =
-			// Count the returned lines, then divide by all lines.
-			DIVIDE(
-				COUNTROWS(FILTER(Sales, Sales[Returned] = TRUE())),
-				COUNTROWS(Sales)
-			)
-		formatString: 0.0%
-		displayFolder: Sales
-
-	/// Label for a link. The text "http://" inside a one-line expression is not a comment.
-	measure 'Help Link' = "http://example.com/help"
-
 	column OrderId
 		dataType: int64
 		isHidden
@@ -27,10 +9,17 @@ table Sales
 
 	/// Order amount in US dollars for one order line.
 	column Amount
-		dataType: double
+		dataType: decimal
+		isHidden
 		formatString: #,0.00
 		summarizeBy: sum
 		sourceColumn: Amount
+
+	/// Sales channel of the order line: Web or Store.
+	column Channel
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Channel
 
 	/// TODO(owner): What counts as a returned order: any return, or full returns only?
 	column Returned
@@ -43,7 +32,7 @@ table Sales
 		source =
 				let
 				    // Build a small in-line table so the sample needs no outside data source.
-				    #"Created Sample Rows" = #table(type table [OrderId = Int64.Type, Amount = number, Returned = logical], {{1, 120.5, false}, {2, 80, true}}),
+				    #"Created Sample Rows" = #table(type table [OrderId = Int64.Type, Amount = Currency.Type, Channel = text, Returned = logical], {{1, 120.5, "Web", false}, {2, 80, "Store", true}}),
 				    /* Keep only order lines at or above the MinimumAmount parameter. */
 				    #"Kept Qualifying Amounts" = Table.SelectRows(#"Created Sample Rows", each [Amount] >= MinimumAmount)
 				in

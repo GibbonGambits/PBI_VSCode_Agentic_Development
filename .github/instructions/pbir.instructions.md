@@ -5,7 +5,7 @@ applyTo: "**/*.Report/**"
 ---
 # Rules for report files
 
-`python scripts/check_project.py .` enforces rules 1 to 4 and the annotation format of rule 5. How-to detail is in the skill `pbi-report`.
+`python scripts/check_project.py .` enforces rules 1 to 4, the annotation format of rule 5, and rule 10. How-to detail is in the skill `pbi-report`.
 
 1. Page and visual names, and their folder names, use only letters, digits, underscore and hyphen. A page or visual `name` is at most 50 characters. If a name breaks the character rule, Power BI Desktop ignores that file or folder.
 2. A new visual gets one label, `Page_Type_Subject`, as both its `name` and its folder name. Example: `Overview_Card_TotalSales`.
@@ -16,5 +16,6 @@ applyTo: "**/*.Report/**"
 7. Take `$schema` from a page or visual file already in the report. Never type one from memory.
 8. Read JSON, change it, and write it back as JSON, saved as UTF-8 without a byte-order mark. No find-and-replace on raw text.
 9. Do not edit by hand: `definition.pbir`, anything under `StaticResources`, `.platform`, `.pbi` folders, `mobileState.json`, `semanticModelDiagramLayout.json`. The theme is imported by the developer in Power BI Desktop, never registered by hand.
+10. No visual reaches outside its page, and no two visuals that show data overlap. Positions follow the layout standard (skill `pbi-report`). Never move or resize a group or a visual inside a group, and never edit `mobile.json`.
 
-Checklist items: 50, 59, 65, 73
+Checklist items: 49, 50, 59, 65, 73

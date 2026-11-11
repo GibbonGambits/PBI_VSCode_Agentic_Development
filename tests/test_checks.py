@@ -29,6 +29,7 @@ import list_visuals               # noqa: E402
 import set_visual_defaults        # noqa: E402
 
 SALES = os.path.join("Sample.SemanticModel", "definition", "tables", "Sales.tmdl")
+MEASURES = os.path.join("Sample.SemanticModel", "definition", "tables", "_Measures.tmdl")
 EXPRESSIONS = os.path.join("Sample.SemanticModel", "definition", "expressions.tmdl")
 PAGE = os.path.join("Sample.Report", "definition", "pages", "Overview")
 CARD = os.path.join(PAGE, "visuals", "Overview_Card_TotalSales", "visual.json")
@@ -83,6 +84,11 @@ class ProjectCase(unittest.TestCase):
     def assertClean(self):
         self.assertEqual(self.codes(), [])
 
+    def assertCleanFiles(self):
+        """No error from the file checks. For tests that add an object only to try the file reader:
+        the model standard and the layout standard (codes M, G and B) have their own tests in test_standards.py."""
+        self.assertEqual([code for code in self.codes() if code[0] not in "MGB"], [])
+
 
 class GoodProject(ProjectCase):
     def test_good_project_has_no_errors(self):
@@ -96,7 +102,7 @@ class GoodProject(ProjectCase):
         code, out = quiet(cp.main, ["check_project.py", self.root])
         self.assertEqual(code, 0)
         self.assertNotIn("record one lesson", out)
-        self.replace(SALES, "\t/// Order amount in US dollars for one order line.\n", "")
+        self.replace(SALES, "\t/// Sales channel of the order line: Web or Store.\n", "")
         code, out = quiet(cp.main, ["check_project.py", self.root])
         self.assertEqual(code, 1)
         self.assertIn("record one lesson for each code (D001)", out)       # the reminder that starts the improvement loop
@@ -112,11 +118,11 @@ class Descriptions(ProjectCase):
         self.assertFails("D001")
 
     def test_measure_without_description_fails(self):
-        self.replace(SALES, "\t/// Total order amount in US dollars. Adds up the Amount column.\n", "")
+        self.replace(MEASURES, "\t/// Total order amount in US dollars. Adds up the Amount column.\n", "")
         self.assertFails("D001")
 
     def test_column_without_description_fails(self):
-        self.replace(SALES, "\t/// Order amount in US dollars for one order line.\n", "")
+        self.replace(SALES, "\t/// Sales channel of the order line: Web or Store.\n", "")
         self.assertFails("D001")
 
     def test_hidden_column_needs_no_description(self):
@@ -128,13 +134,13 @@ class Descriptions(ProjectCase):
         self.assertFails("D001")
 
     def test_hidden_table_needs_no_descriptions(self):
-        text = self.read(SALES).replace("\t/// Order amount in US dollars for one order line.\n", "")
+        text = self.read(SALES).replace("\t/// Sales channel of the order line: Web or Store.\n", "")
         self.write(SALES, text.replace("table Sales\n", "table Sales\n\tisHidden\n", 1))
         self.assertClean()
 
     def test_blank_line_between_description_and_object_fails(self):
-        self.replace(SALES, "\t/// Order amount in US dollars for one order line.\n",
-                     "\t/// Order amount in US dollars for one order line.\n\n")
+        self.replace(SALES, "\t/// Sales channel of the order line: Web or Store.\n",
+                     "\t/// Sales channel of the order line: Web or Store.\n\n")
         codes = self.codes()
         self.assertIn("D003", codes)
         self.assertIn("D001", codes)
@@ -158,7 +164,7 @@ class Comments(ProjectCase):
         self.assertFails("C001")
 
     def test_comments_inside_m_and_dax_are_allowed(self):
-        text = self.read(SALES)
+        text = self.read(SALES) + self.read(MEASURES)
         self.assertIn("// Count the returned lines", text)         # inside a multi-line DAX block
         self.assertIn("// one-line DAX comment", text)            # after a one-line DAX expression
         self.assertIn("// Build a small in-line table", text)     # inside a Power Query block
@@ -167,7 +173,7 @@ class Comments(ProjectCase):
         self.assertClean()
 
     def test_comment_inside_backtick_block_is_allowed(self):
-        self.replace(SALES, "\tmeasure 'Help Link' = \"http://example.com/help\"\n",
+        self.replace(MEASURES, "\tmeasure 'Help Link' = \"http://example.com/help\"\n",
                      "\tmeasure 'Help Link' = ```\n\t\t\t// plain text link\n\t\t\t\"http://example.com/help\"\n\t\t\t```\n")
         self.assertClean()
 
@@ -410,8 +416,8 @@ class ListVisuals(ProjectCase):
         self.assertEqual(code, 0)
         lines = [" ".join(line.split()) for line in out.splitlines()]
         self.assertIn("label type x y width height folder", lines)
-        self.assertIn("Overview_Card_TotalSales card 24 24 300 120 Overview_Card_TotalSales", lines)
-        self.assertIn("Overview_Bar_SalesByMonth barChart 24 168 612 400 4f0c9d2a7b1e8a6c3d5f", lines)   # label from the annotation
+        self.assertIn("Overview_Card_TotalSales card 24 24 608 120 Overview_Card_TotalSales", lines)
+        self.assertIn("Overview_Bar_SalesByMonth barChart 24 160 1232 536 4f0c9d2a7b1e8a6c3d5f", lines)   # label from the annotation
         self.assertIn("Overview_Group_Header group 0 0 1280 20 Overview_Group_Header", lines)
 
     def test_page_can_be_chosen_by_tab_name_or_folder(self):
@@ -758,7 +764,7 @@ class TmdlEdgeCases(ProjectCase):
         self.assertFails("C001")
 
     def test_comment_without_a_space_before_it_fails(self):
-        self.replace(SALES, "\t\tdataType: double\n", "\t\tdataType: double//money\n")
+        self.replace(SALES, "\t\tdataType: decimal\n", "\t\tdataType: decimal//money\n")
         self.assertFails("C001")
 
     def test_quoted_name_with_equals_sign_keeps_its_expression_block(self):
@@ -768,7 +774,7 @@ class TmdlEdgeCases(ProjectCase):
                      "\t\t\t// only returned lines\n"
                      "\t\t\tCALCULATE(SUM(Sales[Amount]), Sales[Returned] = TRUE())\n"
                      "\t\tformatString: #,0\n\n\tannotation SampleSource")
-        self.assertClean()
+        self.assertCleanFiles()
 
     def test_name_and_source_column_holding_two_slashes_are_not_comments(self):
         self.replace(SALES, "\tannotation SampleSource",
@@ -777,13 +783,13 @@ class TmdlEdgeCases(ProjectCase):
         self.assertClean()
 
     def test_empty_description_line_does_not_count(self):
-        self.replace(SALES, "\t/// Order amount in US dollars for one order line.\n", "\t///\n")
+        self.replace(SALES, "\t/// Sales channel of the order line: Web or Store.\n", "\t///\n")
         self.assertFails("D001")
         self.write(SALES, self.read(SALES).replace("\t///\n", "\t///   \n"))
         self.assertFails("D001")
 
     def test_description_above_a_property_fails(self):
-        self.replace(SALES, "\t\tdataType: double\n", "\t\t/// the type\n\t\tdataType: double\n")
+        self.replace(SALES, "\t\tdataType: decimal\n", "\t\t/// the type\n\t\tdataType: decimal\n")
         self.assertFails("D003")
 
     def test_unquoted_two_word_name_is_still_checked(self):
@@ -824,11 +830,11 @@ class TmdlEdgeCases(ProjectCase):
                    "\t\t\t  \"Help\": \"http://example.com//x\"\n\t\t\t}\n\t\tcontentType: json\n")
         self.replace(SALES, "\tannotation SampleSource",
                      "\t/// Amount with tax. Calculated column.\n\tcolumn 'Amount With Tax' = Sales[Amount] * 1.1 // flat rate\n"
-                     "\t\tdataType: double\n\t\tformatString: #,0.00\n\n"
+                     "\t\tdataType: decimal\n\t\tformatString: #,0.00\n\n"
                      "\t/// Dynamic format example.\n\tmeasure 'Sales Dynamic' = SUM(Sales[Amount])\n"
                      "\t\tformatStringDefinition =\n\t\t\t\t// pick a format by size\n\t\t\t\tIF([Total Sales] > 1000, \"#,0\", \"0.00\")\n\n"
                      "\tannotation PBI_Example = {\"url\": \"https://example.com//a\"}\n\n\tannotation SampleSource")
-        self.assertClean()
+        self.assertCleanFiles()
 
 
 class JsonEdgeCases(ProjectCase):
@@ -920,7 +926,7 @@ class NumbersStayAsWritten(ProjectCase):
             d["visual"].pop("visualContainerObjects")
         self.edit_json(CARD, odd)
         self.replace(CARD, '"x": 24', '"x": 427.63636363636363')
-        self.replace(CARD, '"width": 300', '"width": 3E+2')
+        self.replace(CARD, '"width": 608', '"width": 3E+2')
         quiet(set_visual_defaults.main, ["set_visual_defaults.py", self.root])
         text = self.read(CARD)
         self.assertIn('"x": 427.63636363636363', text)
@@ -972,7 +978,7 @@ class MoreTmdlEdgeCases(ProjectCase):
         self.replace(SALES, "\tannotation SampleSource",
                      "\t/// Example with a deeper first line.\n\tmeasure Deeper =\n\t\t\t    VAR a = 1\n"
                      "\t\t\t// explain the result\n\t\t\tRETURN a\n\t\tformatString: 0\n\n\tannotation SampleSource")
-        self.assertClean()
+        self.assertCleanFiles()
 
     def test_lines_after_an_empty_expression_are_still_checked(self):
         self.replace(SALES, "\tannotation SampleSource",
