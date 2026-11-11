@@ -106,15 +106,15 @@ All 160 links of the table of contents of https://learn.microsoft.com/en-us/powe
 | 31 | Separate reports from models (Power BI reports) | https://learn.microsoft.com/en-us/power-bi/guidance/report-separate-from-model | covered | RS L (65, 66); MS (Existing models); B001, V012 |
 | 32 | Extend visuals with report page tooltips (Power BI reports) | https://learn.microsoft.com/en-us/power-bi/guidance/report-page-tooltips | covered | RS C; V002-V005, V013, H002 |
 | 33 | Use report page drillthrough (Power BI reports) | https://learn.microsoft.com/en-us/power-bi/guidance/report-drillthrough | covered | RS D; V001, V013, V014 |
-| 34 | When to use paginated reports (Power BI paginated reports) | https://learn.microsoft.com/en-us/power-bi/guidance/report-paginated-or-power-bi | out of scope | migration |
-| 35 | Data retrieval guidance (Power BI paginated reports) | https://learn.microsoft.com/en-us/power-bi/guidance/report-paginated-data-retrieval | out of scope | migration |
-| 36 | Performance and scalability considerations (Power BI paginated reports) | https://learn.microsoft.com/en-us/power-bi/guidance/report-paginated-performance-scalability-considerations | out of scope | migration |
-| 37 | Image use guidance (Power BI paginated reports) | https://learn.microsoft.com/en-us/power-bi/guidance/report-paginated-image | out of scope | migration |
-| 38 | Use cascading parameters (Power BI paginated reports) | https://learn.microsoft.com/en-us/power-bi/guidance/paginated-report-cascading-parameter | out of scope | migration |
-| 39 | Avoid blank pages when printing (Power BI paginated reports) | https://learn.microsoft.com/en-us/power-bi/guidance/report-paginated-blank-page | out of scope | migration |
-| 40 | Migrate .rdl reports to Power BI (Power BI paginated reports) | https://learn.microsoft.com/en-us/power-bi/guidance/migrate-ssrs-reports-to-power-bi | out of scope | migration |
-| 41 | Publish .rdl files to Power BI (Power BI paginated reports) | https://learn.microsoft.com/en-us/power-bi/guidance/publish-reporting-services-power-bi-service | out of scope | migration |
-| 42 | Retire unused .rdl files (Power BI paginated reports) | https://learn.microsoft.com/en-us/power-bi/guidance/retire-unused-reports-ssrs | out of scope | migration |
+| 34 | When to use paginated reports (Power BI paginated reports) | https://learn.microsoft.com/en-us/power-bi/guidance/report-paginated-or-power-bi | out of scope | paginated reports |
+| 35 | Data retrieval guidance (Power BI paginated reports) | https://learn.microsoft.com/en-us/power-bi/guidance/report-paginated-data-retrieval | out of scope | paginated reports |
+| 36 | Performance and scalability considerations (Power BI paginated reports) | https://learn.microsoft.com/en-us/power-bi/guidance/report-paginated-performance-scalability-considerations | out of scope | paginated reports |
+| 37 | Image use guidance (Power BI paginated reports) | https://learn.microsoft.com/en-us/power-bi/guidance/report-paginated-image | out of scope | paginated reports |
+| 38 | Use cascading parameters (Power BI paginated reports) | https://learn.microsoft.com/en-us/power-bi/guidance/paginated-report-cascading-parameter | out of scope | paginated reports |
+| 39 | Avoid blank pages when printing (Power BI paginated reports) | https://learn.microsoft.com/en-us/power-bi/guidance/report-paginated-blank-page | out of scope | paginated reports |
+| 40 | Migrate .rdl reports to Power BI (Power BI paginated reports) | https://learn.microsoft.com/en-us/power-bi/guidance/migrate-ssrs-reports-to-power-bi | out of scope | paginated reports |
+| 41 | Publish .rdl files to Power BI (Power BI paginated reports) | https://learn.microsoft.com/en-us/power-bi/guidance/publish-reporting-services-power-bi-service | out of scope | paginated reports |
+| 42 | Retire unused .rdl files (Power BI paginated reports) | https://learn.microsoft.com/en-us/power-bi/guidance/retire-unused-reports-ssrs | out of scope | paginated reports |
 | 43 | Develop scalable multitenancy applications (Development) | https://learn.microsoft.com/en-us/power-bi/guidance/develop-scalable-multitenancy-apps-with-powerbi-embedding | out of scope | embedding in another application (another system) |
 | 44 | Plan translation for reports (Build multiple-language reports) | https://learn.microsoft.com/en-us/power-bi/guidance/multiple-language-translation | covered | MO D (Translations and cultures; this page is its source); EX cultures/nl-NL.tmdl; no check: files cannot show it (which languages are needed) |
 | 45 | Use locale values in reports (Build multiple-language reports) | https://learn.microsoft.com/en-us/power-bi/guidance/multiple-language-locale | covered | ML A (1-6), 16; EX cultures/nl-NL.tmdl, Sales by Store Label; M524, M525, V019 |
