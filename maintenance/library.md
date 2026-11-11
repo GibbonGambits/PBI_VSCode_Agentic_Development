@@ -17,7 +17,8 @@ Updated at every commit, so that a stop loses nothing.
 | T05 Relationships and filter propagation | Compared with the repository, rewritten, rendered |
 | T01 DAX evaluation context | Compared with the repository, rewritten, rendered |
 | T04 Time intelligence and date tables | Compared with the repository, rewritten, rendered |
-| The other eleven topics | Not yet done |
+| T06 Data model design | Compared with the repository, rewritten, rendered |
+| The other ten topics | Not yet done |
 | Duplicates across topics | Not yet done |
 | Index, tests, README, notices, evals | Index started; the rest not yet done |
 | Two read-only reviews | Not yet done |

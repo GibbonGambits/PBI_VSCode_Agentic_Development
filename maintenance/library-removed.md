@@ -14,11 +14,11 @@ The library started from 2,318 notes drawn from public SQLBI articles. Notes wer
 |---|---:|
 | 1. Outdated | 35 |
 | 2. Conflicts with the checklist | 19 |
-| 3. The repository already says it | 55 |
-| 4. Not adopted: a higher source says otherwise | 13 |
+| 3. The repository already says it | 63 |
+| 4. Not adopted: a higher source says otherwise | 16 |
 | 5. Duplicate in another topic | 0 |
-| Kept in the library | 791 |
-| Not yet decided | 1405 |
+| Kept in the library | 927 |
+| Not yet decided | 1258 |
 
 | Note | Group | Covered by |
 |---|---|---|
@@ -113,8 +113,19 @@ The library started from 2,318 notes drawn from public SQLBI articles. Notes wer
 | T05-A095-4 | 2 | `checklist/checklist.md`, item 14 |
 | T05-A236-2 | 2 | `checklist/checklist.md`, item 12 |
 | T05-A267-3 | 3 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rule 17 |
+| T06-A009-1 | 3 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rule 35 |
 | T06-A035-4 | 2 | `checklist/checklist.md`, item 31 |
+| T06-A062-11 | 4 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, section B, SQLBI rules the template does not check |
+| T06-A062-9 | 3 | `.github/skills/pbi-semantic-model/references/storage-and-security.md`, rule 17 |
+| T06-A075-13 | 3 | `checklist/checklist.md`, Item 29 |
+| T06-A075-16 | 3 | `.github/skills/pbi-semantic-model/references/storage-and-security.md`, rule 20 |
+| T06-A075-18 | 4 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rule 30 |
+| T06-A075-3 | 3 | `.github/skills/pbi-semantic-model/references/storage-and-security.md`, rule 5 (and rule 2) |
+| T06-A130-1 | 3 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rules 1 to 3 |
 | T06-A173-2 | 2 | `checklist/checklist.md`, item 25 |
+| T06-A173-3 | 3 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rule 1 |
+| T06-A218-1 | 3 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rule 1 |
+| T06-A224-2 | 4 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rule 27 |
 | T06-A290-10 | 2 | `checklist/checklist.md`, item 38 |
 | T07-W378-27 | 1 | - |
 | T07-W378-40 | 1 | - |
