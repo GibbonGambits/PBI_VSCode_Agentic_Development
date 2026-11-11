@@ -14,11 +14,11 @@ The library started from 2,318 notes drawn from public SQLBI articles. Notes wer
 |---|---:|
 | 1. Outdated | 35 |
 | 2. Conflicts with the checklist | 19 |
-| 3. The repository already says it | 67 |
+| 3. The repository already says it | 71 |
 | 4. Not adopted: a higher source says otherwise | 16 |
 | 5. Duplicate in another topic | 0 |
-| Kept in the library | 963 |
-| Not yet decided | 1218 |
+| Kept in the library | 1056 |
+| Not yet decided | 1121 |
 
 | Note | Group | Covered by |
 |---|---|---|
@@ -134,6 +134,10 @@ The library started from 2,318 notes drawn from public SQLBI articles. Notes wer
 | T07-A119-3 | 3 | `checklist/checklist.md`, Item 34 |
 | T07-A156-2 | 2 | `checklist/checklist.md`, item 68 |
 | T07-A179-2 | 1 | - |
+| T07-A272-3 | 3 | `.github/skills/pbi-semantic-model/references/model-objects.md`, section C rule 1 (note U003) |
+| T07-A287-7 | 3 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, rule 32 |
+| T07-A350-1 | 3 | `checklist/checklist.md`, Item 11 |
+| T07-A372-1 | 3 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, rule 37 |
 | T08-A016-1 | 3 | `.github/skills/pbi-semantic-model/references/storage-and-security.md`, rule 20 |
 | T08-A016-6 | 3 | `.github/skills/pbi-semantic-model/references/storage-and-security.md`, rule 18 |
 | T08-A030-1 | 3 | `checklist/checklist.md`, Item 5 |
