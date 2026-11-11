@@ -83,6 +83,9 @@ import os
 import re
 import sys
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import formula_scanner as fs  # noqa: E402
+
 NAME_OK = re.compile(r"[A-Za-z0-9_-]+\Z")           # Microsoft Learn: PBIR naming convention
 NAME_MAX = 50                                        # Microsoft schemas: page 2.1.0, visualContainer 2.13.0
 LABEL_ANNOTATION = "VisualLabel"                     # template convention
@@ -134,7 +137,6 @@ ITEM_COUNT = 79
 FAILED = object()                                    # returned by load_json when a file cannot be parsed
 
 DESCRIBED_KINDS = ("table", "column", "measure")
-STEP_RE = re.compile(r'^(#"(?:[^"]|"")+"|[^\W\d][\w.]*)\s*=(?![=>])')
 DECL_RE = re.compile(r"^([A-Za-z]+)\s+('(?:[^']|'')*'|[^\s=:]+)\s*(.*)$")
 PROP_EQ_RE = re.compile(r"^([A-Za-z_]\w*)\s*=\s*(.*)$")
 PROP_COLON_RE = re.compile(r"^([A-Za-z_]\w*)\s*:")
@@ -217,93 +219,24 @@ def _has_comment(text):
     return re.search(r"(?<![:/])//(?!/)", QUOTED.sub("''", text)) is not None
 
 
-def _m_code(text):
-    """A line of Power Query with text values and a trailing '//' comment removed."""
-    text = re.sub(r'#?"(?:[^"]|"")*"', '""', text)
-    return text.split("//")[0]
-
-
 def check_m_steps(block, path, owner, findings):
     """block: list of (line_number, text) of one Power Query expression.
 
-    Finds the first 'let', then looks at every step of that 'let' (lines that start a 'name = ...'
-    outside any bracket) and reports a step with no comment line directly above it.
+    The formula scanner finds the steps of the query's outer 'let'. A step with no comment line directly
+    above it is reported.
     """
-    start = None
-    in_block_comment = False
-    for idx, (n, t) in enumerate(block):
-        s = t.strip()
-        if in_block_comment:
-            in_block_comment = "*/" not in s
-            continue
-        if s.startswith("/*") and "*/" not in s:
-            in_block_comment = True
-            continue
-        code = _m_code(re.sub(r"/\*.*?\*/", " ", s)).strip()
-        if not code:
-            continue
-        m = re.search(r"(?:^|[\s)>])let(?:\s+(.*))?$", code)
-        if m:
-            start = idx
-            break
-    if start is None:
+    steps, found = fs.m_steps("\n".join(text for _, text in block))
+    if not found:
         return
-
-    depth = 0
-    nested = []           # bracket depth at which each inner 'let' opened
-    in_block_comment = False
-    previous_is_comment = False
-    first = True
-    for n, t in block[start:]:
-        s = t.strip()
-        if first:
-            first = False
-            code = _m_code(s)
-            m = re.search(r"(?:^|[\s)>])let(?:\s+(.*))?$", code.strip())
-            rest = (m.group(1) or "").strip() if m else ""
-            if rest and STEP_RE.match(rest):
-                findings.add("P001", path, n,
-                             "Power Query step %s in %s starts on the 'let' line; put it on its own line with a '//' description above"
-                             % (STEP_RE.match(rest).group(1), owner))
-            for ch in rest:
-                depth += ch in "([{"
-                depth -= ch in ")]}"
-            continue
-        if not s:
-            previous_is_comment = False       # the description must sit directly above its step
-            continue
-        if in_block_comment:
-            if "*/" in s:
-                in_block_comment = False
-                previous_is_comment = s.endswith("*/")
-            continue
-        if s.startswith("/*") and "*/" not in s:
-            in_block_comment = True
-            continue
-        if s.startswith("//"):
-            previous_is_comment = bool(s[2:].strip())
-            continue
-        if s.startswith("/*") and s.endswith("*/"):
-            previous_is_comment = bool(s[2:-2].strip())
-            continue
-        code = _m_code(s).strip()
-        if code == "in" or code.startswith("in "):
-            if nested and nested[-1] == depth:
-                nested.pop()
-            elif depth == 0 and not nested:
-                break
-        elif depth == 0 and not nested:
-            m = STEP_RE.match(s.lstrip(", "))
-            if m and not previous_is_comment:
-                findings.add("P001", path, n,
-                             "Power Query step %s in %s has no '//' description line directly above it" % (m.group(1), owner))
-        for ch in code:
-            depth += ch in "([{"
-            depth -= ch in ")]}"
-        depth = max(depth, 0)
-        if re.search(r"(?:^|[\s=(,>])let$", code):
-            nested.append(depth)
-        previous_is_comment = False
+    for step in steps:
+        number = block[min(step["line"], len(block)) - 1][0]
+        if step["on_let_line"]:
+            findings.add("P001", path, number,
+                         "Power Query step %s in %s starts on the 'let' line; put it on its own line with a '//' description above"
+                         % (step["name"], owner))
+        elif not step["described"]:
+            findings.add("P001", path, number,
+                         "Power Query step %s in %s has no '//' description line directly above it" % (step["name"], owner))
 
 
 def check_tmdl_file(path, findings):
@@ -1011,19 +944,15 @@ def page_numbers(brief, width):
 
 # ---------------------------------------------------------------- model standard
 
-def _dax_code(text):
-    """DAX with text values and comments removed, so a name inside them is not read as a reference."""
-    text = re.sub(r'"(?:[^"]|"")*"', '""', text or "")
-    text = re.sub(r"/\*.*?\*/", " ", text, flags=re.S)
-    return re.sub(r"(//|--)[^\n]*", " ", text)
+def _dax(text):
+    """One DAX expression, read once by the formula scanner: its tokens, its [Name] references and its calls."""
+    stream = fs.tokens(text or "", fs.DAX)
+    return {"tokens": stream, "references": fs.dax_references(stream), "calls": fs.calls(stream)}
 
 
-def _dax_text_only(text):
-    """DAX with comments removed and text values kept: used to see that a measure is one text value and no more."""
-    kept = []
-    for part in re.split(r'("(?:[^"]|"")*")', text):
-        kept.append(part if part.startswith('"') else re.sub(r"(//|--)[^\n]*", " ", re.sub(r"/\*.*?\*/", " ", part, flags=re.S)))
-    return "".join(kept)
+def _only_text(stream):
+    """True when a DAX expression is one text value and nothing else."""
+    return len(stream) == 1 and stream[0].kind == fs.TEXT
 
 
 def _split_reference(text):
@@ -1158,8 +1087,9 @@ def check_standards(model_dir, objects, usage, brief, findings):
     for table, column in all_columns:
         column_names.setdefault(column["name"].lower(), "%s[%s]" % (table["name"], column["name"]))
     measure_names = {m["name"].lower() for _, m in all_measures}
-    code_by_owner = [(owner, _dax_code(text)) for owner, text in model["expressions"]
+    code_by_owner = [(owner, _dax(text)) for owner, text in model["expressions"]
                      if owner["table"] is None or owner["table"]["name"] not in automatic]
+    parsed_by_id = {id(owner): parsed for owner, parsed in code_by_owner}
     used_fields = {(entity, prop) for _, entity, prop in usage if isinstance(prop, str)}
 
     def add(code, obj, message, level="error", keys=()):
@@ -1210,7 +1140,8 @@ def check_standards(model_dir, objects, usage, brief, findings):
             warnings.append("its name points to the folder type '%s', not '%s'" % (expected, levels[1]))
         if warnings:
             add("M008", measure, "measure name %s: %s" % (key, "; ".join(warnings)), level="warn", keys=(key,))
-        only_text = re.match(r'\s*"(?:[^"]|"")*"\s*\Z', _dax_text_only(measure["expr"] or ""))
+        only_text = _only_text(parsed_by_id[id(measure)]["tokens"] if id(measure) in parsed_by_id
+                               else fs.tokens(measure["expr"] or "", fs.DAX))
         if (not _is_hidden(table, measure) and not measure["props"].get("formatstring")
                 and "formatstringdefinition" not in measure["props"] and not only_text):
             add("M009", measure, "visible measure %s has no format string" % key, keys=(key,))
@@ -1231,21 +1162,16 @@ def check_standards(model_dir, objects, usage, brief, findings):
             add("M002", first, "measure table '%s': %s" % (name, "; ".join(problems)), keys=(name,))
 
     # ---- rule 5: references in DAX (a text check, not a parser)
-    for owner, code in code_by_owner:
+    for owner, parsed in code_by_owner:
         if owner["kind"] not in ("measure", "column"):
             continue
         loose = set()
-        for match in re.finditer(r"(?<![\w'\]])\s*\[([^\]]+)\]", code):
-            before = code[:match.start()].rstrip()
-            if before[-1:] in ("'",) or re.search(r"\w\Z", before):
-                continue
-            name = match.group(1)
-            if name.lower() in column_names and name.lower() not in measure_names:
-                loose.add("[%s]" % name)
         tied = set()
-        for match in re.finditer(r"(?:'((?:[^']|'')+)'|([A-Za-z_]\w*))\s*\[([^\]]+)\]", code):
-            table_name = (match.group(1) or match.group(2)).replace("''", "'")
-            name = match.group(3)
+        for table_name, name, _ in parsed["references"]:
+            if table_name is None:
+                if name.lower() in column_names and name.lower() not in measure_names:
+                    loose.add("[%s]" % name)
+                continue
             table = tables.get(table_name)
             if (name.lower() in measure_names and table is not None
                     and name.lower() not in {c["name"].lower() for c in table["columns"]}):
@@ -1279,12 +1205,16 @@ def check_standards(model_dir, objects, usage, brief, findings):
                          for level in h.get("levels", [])}
     with_variation = {id(o["parent"]) for o in objects if o["kind"] == "variation" and o["parent"] is not None}
     totalled = {}
-    for owner, code in code_by_owner:
+    for owner, parsed in code_by_owner:
         if owner["kind"] != "measure":
             continue
-        for match in re.finditer(r"(?i)\b(%s)\s*\(\s*(?:'((?:[^']|'')+)'|([A-Za-z_]\w*))\s*\[([^\]]+)\]\s*\)"
-                                 % "|".join(TOTAL_FUNCTIONS), code):
-            totalled.setdefault(((match.group(2) or match.group(3)).replace("''", "'"), match.group(4)), owner["name"])
+        stream = parsed["tokens"]
+        for call in parsed["calls"]:
+            if call.name not in TOTAL_FUNCTIONS or len(call.args) != 1 or call.args[0][1] - call.args[0][0] != 2:
+                continue
+            first, second = stream[call.args[0][0]], stream[call.args[0][0] + 1]
+            if first.kind in ("word", fs.QUOTED_NAME) and second.kind == fs.BRACKET_NAME:
+                totalled.setdefault((first.value, second.value), owner["name"])
 
     calculated_columns = []
     for table, column in all_columns:
@@ -1325,7 +1255,7 @@ def check_standards(model_dir, objects, usage, brief, findings):
                 add("M105", column, "calculated column %s has no '%s' annotation. Ask the developer what makes a DAX "
                     "calculation necessary here and what stops Power Query or the source from supplying the value"
                     % (key, REASON_ANNOTATION), keys=(key,))
-            if re.search(r"(?i)\bRELATED\s*\(", _dax_code(column["expr"] or "")):
+            if any(call.name == "RELATED" for call in _dax(column["expr"] or "")["calls"]):
                 add("M106", column, "calculated column %s uses RELATED; consider bringing the value in at the source"
                     % key, level="warn", keys=(key,))
         if visible and kind in NUMERIC_TYPES and props.get("summarizeby", "").lower() != "none":
@@ -1384,23 +1314,25 @@ def check_standards(model_dir, objects, usage, brief, findings):
                 % (label, " and ".join(sorted({k for k in kinds if k}))), level="warn", keys=(label,))
 
     # ---- C. assess only
-    everything = "\n".join(code for _, code in code_by_owner)
+    named = {}                          # lower-case [name] -> the owners whose DAX holds it
+    for owner, parsed in code_by_owner:
+        for _, name, _ in parsed["references"]:
+            named.setdefault(name.lower(), []).append(owner)
     for table, column in all_columns:
         place = (table["name"], column["name"])
         if not _is_hidden(table, column) or table["name"] in measure_tables:
             continue
         if (place in foreign or place in sort_keys or place in hierarchy_columns or place in used_fields
                 or any(place in (start, end) for _, start, end in relationship_ends)
-                or column["props"].get("sortbycolumn") or "[%s]" % column["name"].lower() in everything.lower()):
+                or column["props"].get("sortbycolumn") or column["name"].lower() in named):
             continue
         add("M201", column, "hidden column %s[%s]: nothing in the model or the report refers to it"
             % place, level="note", keys=("%s[%s]" % place,))
     for table, measure in all_measures:
         if not _is_hidden(table, measure):
             continue
-        marker = "[%s]" % measure["name"].lower()
-        others = "\n".join(code for owner, code in code_by_owner if owner is not measure).lower()
-        if marker in others or any(prop == measure["name"] for _, _, prop in usage):
+        if (any(owner is not measure for owner in named.get(measure["name"].lower(), []))
+                or any(prop == measure["name"] for _, _, prop in usage)):
             continue
         add("M201", measure, "hidden measure [%s]: nothing in the model or the report refers to it" % measure["name"],
             level="note", keys=("[%s]" % measure["name"],))
