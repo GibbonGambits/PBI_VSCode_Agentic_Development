@@ -35,6 +35,7 @@ Not for a business meaning (that comes from the brief or the developer), and not
 - A note is no reason for an exception in the brief, and no reason to skip a check. The developer decides exceptions.
 - A note that describes a preview feature does not make it agreed: the rule on preview features in the project instructions holds.
 - Some notes name tools or custom visuals that this template does not use (for example DAX Studio or Tabular Editor). They are information for a developer who already uses one or asks about it. You never install or call such a tool, and you do not suggest one by yourself: the rule on suggestions in `.github/skills/pbi-checklist-review/references/native-features.md` holds.
+- A note may name a website outside the four look-up sites (a formatting service, a library of functions). That is information too: the look-up skill still decides what you may open.
 - For the detail behind a note, read its article through the skill `pbi-lookup`. Never copy SQLBI text, code or images into the project or into this template: write the formula for this model, in the style of the DAX standard.
 
 ## The improvement loop
