@@ -840,5 +840,43 @@ class ClosingTheCoverage(StarCase):
         self.assertNot("U008")
 
 
+    SECTION_11 = ("## 11. Preview features and optional tools the developer agreed to\n\n"
+                  "| Feature or tool | Agreed by | Date | Notes |\n|---|---|---|---|\n| %s | A. Developer | 2026-11-11 | made-up |\n")
+
+    def test_M841_value_filter_behavior_needs_the_developers_yes(self):
+        self.replace(MODEL, "\tdiscourageImplicitMeasures\n", "\tdiscourageImplicitMeasures\n\tvalueFilterBehavior: independent\n")
+        self.assertFinds("M841", "warn")
+        self.write(os.path.join("docs", "report-brief.md"), self.SECTION_11 % "value filter behavior")
+        self.assertNot("M841")
+
+    def test_M841_user_context_column_needs_the_developers_yes(self):
+        self.replace(STORE, "\tpartition Store = m", "\t/// Store name for the reader.\n\tcolumn 'Store Name Local' = Store[Store Name]\n"
+                     "\t\tdataType: string\n\t\tsummarizeBy: none\n\t\texpressionContext: userContext\n\n"
+                     "\t\tannotation CalculatedReason = Made-up reason for a test.\n\n\tpartition Store = m")
+        self.assertFinds("M841", "warn")
+        self.write(os.path.join("docs", "report-brief.md"), self.SECTION_11 % "user-context calculated columns")
+        self.assertNot("M841")
+
+    def test_M841_calculated_table_over_direct_lake_needs_the_developers_yes(self):
+        self.write(os.path.join(TABLES, "City.tmdl"), self.CITY_TABLE % "City Name")
+        self.write(MODEL, self.read(MODEL) + "ref table City\n")
+        self.assertNot("M841")
+        text = self.read(STORE)
+        self.write(STORE, text[:text.index("\tpartition Store = m")] + "\tpartition Store = entity\n\t\tmode: directLake\n"
+                   "\t\tsource\n\t\t\tentityName: store\n\t\t\tschemaName: dbo\n\t\t\texpressionSource: Lake\n")
+        self.assertFinds("M841", "warn")
+        self.write(os.path.join("docs", "report-brief.md"), self.SECTION_11 % "calculated tables over Direct Lake")
+        self.assertNot("M841")
+
+    def test_D003_description_above_a_selection_expression_passes(self):
+        self.write(os.path.join(TABLES, "Time Calculation.tmdl"),
+                   "/// Switches a measure between periods.\ntable 'Time Calculation'\n\n\tcalculationGroup\n\t\tprecedence: 10\n\n"
+                   "\t\t/// What a measure shows when no item is picked.\n\t\tnoSelectionExpression = SELECTEDMEASURE ()\n\n"
+                   "\t\t/// The measure as it is.\n\t\tcalculationItem Current = SELECTEDMEASURE ()\n\n"
+                   "\t/// The period to show.\n\tcolumn Period\n\t\tdataType: string\n\t\tsummarizeBy: none\n\t\tsourceColumn: Name\n")
+        self.write(MODEL, self.read(MODEL) + "ref table 'Time Calculation'\n")
+        self.assertNot("D003")
+
+
 if __name__ == "__main__":
     unittest.main()

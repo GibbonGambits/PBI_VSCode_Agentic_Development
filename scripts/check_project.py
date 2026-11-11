@@ -176,7 +176,8 @@ Finding codes (errors unless marked warn or note; only errors change the exit co
     M821  field parameter names a field the model does not have
     M822  (warn) field parameter not wired the way Power BI Desktop writes it
     M831  (warn) perspective with no objects
-    M841  (warn) the model uses a preview feature that section 11 of the brief does not list
+    M841  (warn) the model uses a preview feature that section 11 of the brief does not list (calendars, value
+          filter behavior, user-context calculated columns, calculated tables over Direct Lake data)
 
   Report standard (.github/skills/pbi-report/references/report-standard.md):
     V001  drillthrough page without a back button
@@ -298,6 +299,7 @@ ITEM_COUNT = 79
 FAILED = object()                                    # returned by load_json when a file cannot be parsed
 
 DESCRIBED_KINDS = ("table", "column", "measure")
+DESCRIBED_PROPERTIES = ("multipleoremptyselectionexpression", "noselectionexpression", "datacoveragedefinition")
 DECL_RE = re.compile(r"^([A-Za-z]+)\s+('(?:[^']|'')*'|[^\s=:]+)\s*(.*)$")
 PROP_EQ_RE = re.compile(r"^([A-Za-z_]\w*)\s*=\s*(.*)$")
 PROP_COLON_RE = re.compile(r"^([A-Za-z_]\w*)\s*:")
@@ -589,7 +591,9 @@ def check_tmdl_lines(path, lines, findings):
         else:
             prop = PROP_EQ_RE.match(stripped)
             colon = PROP_COLON_RE.match(stripped)
-            if had_pending and (prop or colon or stripped.replace(" ", "").lower() in HIDING_FLAGS):
+            if had_pending and prop and prop.group(1).lower() in DESCRIBED_PROPERTIES:
+                pass                                  # child objects that Microsoft's serializer writes with a description
+            elif had_pending and (prop or colon or stripped.replace(" ", "").lower() in HIDING_FLAGS):
                 findings.add("D003", path, pending_line, "'///' description is not directly above an object")
             if prop:
                 key = prop.group(1).lower()

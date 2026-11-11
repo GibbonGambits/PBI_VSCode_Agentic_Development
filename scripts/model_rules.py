@@ -900,11 +900,33 @@ def _objects(context, functions, function_names):
         if problems:
             add("M822", table["objects"][0], "field parameter '%s' is not wired the way Power BI Desktop writes it: %s"
                 % (table["name"], "; ".join(problems)), level="warn", keys=(table["name"],))
+    preview = []                        # (words that find the row in section 11, the object, what the model uses)
     calendars = [o for o in context["objects"] if o["kind"] == "calendar" and not o["translation"]]
-    if calendars and not any("calendar" in name for name in context["brief"].get("agreed", [])):
-        add("M841", calendars[0], "the model uses calendar-based time intelligence (calendar '%s'), which Microsoft "
-            "still lists as a preview feature. A preview feature is used only after the developer's yes: add its row "
-            "to section 11 of the brief" % calendars[0]["name"], level="warn", keys=("model",))
+    if calendars:
+        preview.append((("calendar",), calendars[0], "calendar-based time intelligence (calendar '%s')" % calendars[0]["name"]))
+    if model_object is not None and model_object["props"].get("valuefilterbehavior"):
+        preview.append((("value filter",), model_object, "value filter behavior (valueFilterBehavior in model.tmdl)"))
+    lake = {t["name"].lower() for t in context["own_tables"] if "directlake" in table_modes(t)}
+    for table in context["own_tables"]:
+        for column in table["columns"]:
+            if column["props"].get("expressioncontext", "").lower() == "usercontext":
+                preview.append((("user-context", "user context"), column, "a user-context calculated column (%s[%s])"
+                                % (table["name"], column["name"])))
+                break
+        if lake and table["calculated"] and not table.get("field_parameter") and not table.get("parameter_table"):
+            source = next((p["props"].get("source", "") for p in table["partitions"]), "")
+            parsed = context["parse"](source)
+            if any(t.kind in ("word", fs.QUOTED_NAME) and t.value.lower() in lake for t in parsed["tokens"]):
+                preview.append((("direct lake",), table["objects"][0], "a calculated table over Direct Lake data ('%s')"
+                                % table["name"]))
+    reported = set()
+    for words, anchor, what in preview:
+        if words in reported or any(word in name for word in words for name in context["brief"].get("agreed", [])):
+            continue
+        reported.add(words)
+        add("M841", anchor, "the model uses %s, which Microsoft still lists as a preview feature. A preview feature is "
+            "used only after the developer's yes: add its row to section 11 of the brief (name it '%s')"
+            % (what, words[0]), level="warn", keys=("model",))
     for perspective in [o for o in context["objects"] if o["kind"] == "perspective" and o["top"] and not o["translation"]]:
         if not any(o["kind"] == "perspectivetable" and o["parent"] is perspective for o in context["objects"]):
             add("M831", perspective, "perspective '%s' holds no objects" % perspective["name"], level="warn",

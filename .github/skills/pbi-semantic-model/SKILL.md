@@ -27,6 +27,7 @@ Read the file that fits the work before you write. `python scripts/check_project
 | DAX rules, DAX style, DAX patterns, time intelligence | `references/dax-standard.md` | M5xx, M908, M909, M010 |
 | Power Query, query folding, data reduction, storage modes, DirectQuery and composite models, aggregations, incremental refresh, security roles | `references/storage-and-security.md` | P0xx, M6xx, M7xx |
 | User-defined functions, calculation groups, field parameters, perspectives, translations and the other object kinds | `references/model-objects.md` | M8xx |
+| Hybrid tables, Direct Lake variants, dynamic query parameters, selection expressions, model options, value filter behavior, the other folders of a model item | `references/more-model-features.md` | M841 |
 | The names of all DAX functions, with their Microsoft Learn addresses | `references/dax-functions.md` | M909 |
 | File syntax, and the shipped examples | `references/tmdl.md` | J001, C001, D00x |
 
