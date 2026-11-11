@@ -14,11 +14,11 @@ The library started from 2,318 notes drawn from public SQLBI articles. Notes wer
 |---|---:|
 | 1. Outdated | 35 |
 | 2. Conflicts with the checklist | 19 |
-| 3. The repository already says it | 71 |
-| 4. Not adopted: a higher source says otherwise | 16 |
+| 3. The repository already says it | 72 |
+| 4. Not adopted: a higher source says otherwise | 21 |
 | 5. Duplicate in another topic | 0 |
-| Kept in the library | 1056 |
-| Not yet decided | 1121 |
+| Kept in the library | 1205 |
+| Not yet decided | 966 |
 
 | Note | Group | Covered by |
 |---|---|---|
@@ -142,10 +142,16 @@ The library started from 2,318 notes drawn from public SQLBI articles. Notes wer
 | T08-A016-6 | 3 | `.github/skills/pbi-semantic-model/references/storage-and-security.md`, rule 18 |
 | T08-A030-1 | 3 | `checklist/checklist.md`, Item 5 |
 | T08-A030-8 | 3 | `.github/skills/pbi-semantic-model/references/storage-and-security.md`, rule 18 |
+| T09-W380-12 | 3 | `.github/skills/pbi-semantic-model/references/storage-and-security.md`, rule 3 (M701) |
+| T09-W380-15 | 4 | `.github/skills/pbi-semantic-model/references/model-standard.md`, rule 1 |
 | T09-W380-2 | 2 | `checklist/checklist.md`, item 68 |
 | T09-W380-32 | 1 | - |
 | T09-A227-1 | 1 | - |
 | T09-A234-2 | 1 | - |
+| T09-A237-3 | 4 | `.github/skills/pbi-semantic-model/references/storage-and-security.md`, rule 23 |
+| T09-A237-4 | 4 | `.github/skills/pbi-semantic-model/references/storage-and-security.md`, rule 23 |
+| T10-A279-9 | 4 | `.github/skills/pbi-report/references/report-standard.md`, rule 36 |
+| T10-A297-6 | 4 | `.github/skills/pbi-semantic-model/references/storage-and-security.md`, rule 29 |
 | T11-A268-2 | 2 | `checklist/checklist.md`, item 12 |
 | T14-A015-1 | 1 | - |
 | T14-A015-3 | 2 | `checklist/checklist.md`, item 14 |

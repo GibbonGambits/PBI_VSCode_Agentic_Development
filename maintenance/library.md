@@ -20,7 +20,8 @@ Updated at every commit, so that a stop loses nothing.
 | T06 Data model design | Compared with the repository, rewritten, rendered |
 | T08 Storage engine, model size and memory | Compared with the repository, rewritten, rendered |
 | T07 DAX performance and optimization | Compared with the repository, rewritten, rendered |
-| The other eight topics | Not yet done |
+| T10 Security | Compared with the repository, rewritten, rendered |
+| The other seven topics | Not yet done |
 | Duplicates across topics | Not yet done |
 | Index, tests, README, notices, evals | Index started; the rest not yet done |
 | Two read-only reviews | Not yet done |
