@@ -261,6 +261,16 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - Fact. 2017. https://www.sqlbi.com/articles/defining-variables-in-dax-queries/
 - When: Writing a DAX query batch with DEFINE and EVALUATE.
 
+**T03-A115-1.** To fetch a page of raw rows quickly, a DAX query can wrap the table in TOPNSKIP (rows to return, rows to skip, an optional sort column) inside SELECTCOLUMNS that lists every column.
+- Option. Check. 2017. https://www.sqlbi.com/articles/querying-raw-data-to-tabular/
+- When: Reading raw table rows in blocks, as Power BI does when a table is browsed in Data view.
+- Version: Described in 2017 as undocumented and open to change. Microsoft Learn now has a TOPNSKIP page; this template's function index lacks it (DAX standard rule 19).
+
+**T03-A115-3.** A TOPNSKIP raw-data query can be limited to some rows by wrapping it in CALCULATETABLE with the filter condition.
+- Option. Check. 2017. https://www.sqlbi.com/articles/querying-raw-data-to-tabular/
+- When: Raw-data DAX queries that page through a table with TOPNSKIP and need a filter.
+- Version: In October 2017 Power BI accepted the syntax but did not support this filtering. TOPNSKIP is missing from this template's function index (DAX standard rule 19).
+
 **T03-A115-4.** When sending SQL-syntax queries to a Tabular model, add SqlQueryMode=DataKeys; to the connection string. DAX Studio takes it under Advanced Options when you connect.
 - Should. Check. 2017. https://www.sqlbi.com/articles/querying-raw-data-to-tabular/
 - When: Querying raw Tabular data with the SQL syntax used by SSDT and Power Pivot.
@@ -275,6 +285,11 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - Must. Check. 2017. https://www.sqlbi.com/articles/querying-raw-data-to-tabular/
 - When: Raw-data SQL queries to Tabular that use * instead of a column list; the column is unreachable from DAX.
 - Version: Found by analysing tool queries; undocumented by Microsoft, may change and might be unsupported.
+
+**T03-A115-7.** Raw-data queries that page, sort and filter on a column are one way to build drillthrough over a large table, or a tool that browses model data quickly.
+- Option. Check. 2017. https://www.sqlbi.com/articles/querying-raw-data-to-tabular/
+- When: A reporting environment where you control how queries are generated, or a custom data-browsing tool.
+- Version: Rests on TOPNSKIP, described in 2017 as undocumented; the function is missing from this template's function index (DAX standard rule 19).
 
 **T03-A115-8.** To see which queries Power BI sends to its model, for example while a table is browsed in Data view, one way is to switch on the All Queries trace in DAX Studio. A captured query can then be run again in DAX Studio.
 - Option. Check. 2017. https://www.sqlbi.com/articles/querying-raw-data-to-tabular/
