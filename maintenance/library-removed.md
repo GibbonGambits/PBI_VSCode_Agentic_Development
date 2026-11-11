@@ -14,11 +14,11 @@ The library started from 2,318 notes drawn from public SQLBI articles. Notes wer
 |---|---:|
 | 1. Outdated | 35 |
 | 2. Conflicts with the checklist | 19 |
-| 3. The repository already says it | 27 |
-| 4. Not adopted: a higher source says otherwise | 11 |
+| 3. The repository already says it | 51 |
+| 4. Not adopted: a higher source says otherwise | 13 |
 | 5. Duplicate in another topic | 0 |
-| Kept in the library | 368 |
-| Not yet decided | 1858 |
+| Kept in the library | 606 |
+| Not yet decided | 1594 |
 
 | Note | Group | Covered by |
 |---|---|---|
@@ -35,6 +35,17 @@ The library started from 2,318 notes drawn from public SQLBI articles. Notes wer
 | T01-A120-4 | 3 | `checklist/checklist.md`, Item 34 |
 | T01-A085-5 | 3 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, rule 20 |
 | T01-A135-3 | 3 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rule 1 |
+| T01-A220-4 | 3 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, rule 6 |
+| T01-A254-5 | 3 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, rule 34 |
+| T01-A338-1 | 3 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, rule 34 |
+| T01-A361-6 | 3 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, rule 20 |
+| T01-A305-1 | 3 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, rule 6 |
+| T01-A305-3 | 3 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, rule 6 |
+| T01-A309-4 | 3 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, rule 6 |
+| T01-A361-1 | 3 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, rule 20 |
+| T01-A338-2 | 3 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, rule 34 |
+| T01-A361-2 | 3 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, rule 20 |
+| T01-A361-7 | 3 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, rule 34 |
 | T02-A054-3 | 3 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, rule 9 |
 | T02-A054-4 | 3 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, rule 8 |
 | T02-A096-5 | 1 | - |
@@ -79,12 +90,27 @@ The library started from 2,318 notes drawn from public SQLBI articles. Notes wer
 | T03-A291-8 | 2 | `checklist/checklist.md`, item 14 |
 | T03-A341-10 | 3 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, rule 33 |
 | T03-A341-2 | 4 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, rule 32; Where sources disagree (SUMMARIZECOLUMNS inside a measure) |
+| T04-A152-1 | 3 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rule 29 |
+| T04-A153-1 | 3 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rule 32 |
+| T04-A153-2 | 3 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rules 30 and 31 |
+| T04-A199-1 | 3 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rule 30 |
+| T04-A175-1 | 3 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rule 35 |
+| T04-A199-6 | 4 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rule 30 |
+| T04-A204-4 | 3 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rule 35 |
 | T04-A043-4 | 1 | - |
 | T05-A078-3 | 2 | `checklist/checklist.md`, item 12 |
 | T05-A080-2 | 1 | - |
+| T05-A141-3 | 3 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rule 18 |
+| T05-A158-1 | 3 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rule 18 |
+| T05-A158-2 | 3 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rule 18 (check M405) |
+| T05-A158-6 | 4 | `.github/skills/pbi-semantic-model/references/model-standard.md`, rule 1 |
+| T05-A182-6 | 3 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rule 19 |
+| T05-A182-9 | 3 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rule 20 (check M407) |
+| T05-A194-1 | 3 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rule 7 |
 | T05-A095-3 | 2 | `checklist/checklist.md`, item 14 |
 | T05-A095-4 | 2 | `checklist/checklist.md`, item 14 |
 | T05-A236-2 | 2 | `checklist/checklist.md`, item 12 |
+| T05-A267-3 | 3 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rule 17 |
 | T06-A035-4 | 2 | `checklist/checklist.md`, item 31 |
 | T06-A173-2 | 2 | `checklist/checklist.md`, item 25 |
 | T06-A290-10 | 2 | `checklist/checklist.md`, item 38 |
