@@ -1,0 +1,91 @@
+{
+  "name": "VisualizationScheme",
+  "dataColors": [
+    "#00A5DF",
+    "#70A489",
+    "#A3A86B",
+    "#CAB575",
+    "#FFA100",
+    "#007FA3",
+    "#FF6633",
+    "#3599B8",
+    "#DFBFBF",
+    "#4AC5BB",
+    "#5F6B6D",
+    "#FB8281",
+    "#F4D25A",
+    "#7F898A",
+    "#A4DDEE",
+    "#FDAB89",
+    "#B687AC",
+    "#28738A",
+    "#A78F8F",
+    "#168980",
+    "#293537",
+    "#BB4A4A",
+    "#B59525",
+    "#475052",
+    "#6A9FB0",
+    "#BD7150",
+    "#7B4F71",
+    "#1B4D5C",
+    "#706060",
+    "#0F5C55",
+    "#1C2325",
+    "#FFFFFF"
+  ],
+  "background": "#ffffff",
+  "foreground": "#333333",
+  "tableAccent": "#333333",
+  "maximum": "#008001",
+  "minimum": "#D2222D",
+  "null": "#94A3B8",
+  "textClasses": {
+    "label": {
+      "fontFace": "'Segoe UI', wf_segoe-ui_normal, helvetica, arial, sans-serif",
+      "color": "#000000",
+      "fontSize": 10
+    },
+    "callout": {
+      "fontFace": "'Segoe UI', wf_segoe-ui_normal, helvetica, arial, sans-serif",
+      "color": "#777777",
+      "fontSize": 28
+    },
+    "title": {
+      "fontFace": "'Segoe UI Semibold', wf_segoe-ui_semibold, helvetica, arial, sans-serif",
+      "color": "#585858",
+      "fontSize": 11
+    },
+    "header": {
+      "fontFace": "'Segoe UI', wf_segoe-ui_normal, helvetica, arial, sans-serif",
+      "color": "#777777"
+    }
+  },
+  "visualStyles": {
+    "*": {
+      "*": {
+        "outspacePane": [
+          {
+            "titleSize": 10,
+            "headerSize": 10
+          }
+        ],
+        "visualHeader": [
+          {
+            "show": false,
+            "foreground": {
+              "solid": {
+                "color": "#FFFFFF"
+              }
+            }
+          }
+        ],
+        "visualTooltip": [
+          {
+            "show": false
+          }
+        ]
+      }
+    }
+  }
+}

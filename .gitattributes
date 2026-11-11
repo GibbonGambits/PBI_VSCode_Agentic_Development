@@ -1,0 +1,4 @@
+# Keep these two files byte-for-byte as committed (no line-ending conversion),
+# so the integrity check in scripts/check_template.py gives the same result on every machine.
+theme/theme.json -text
+checklist/checklist.md -text
