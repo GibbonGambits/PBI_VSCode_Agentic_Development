@@ -1,8 +1,8 @@
 # Business calculation patterns
 
-Part 5 of 5 of this topic. Covers: Events, durations and sequences; Averages, working days and trends.
+Part 5 of 5 of this topic. Covers: Events, durations and sequences; Building and testing calculations; Averages, working days and trends.
 
-Practice notes drawn from public SQLBI articles, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail.
+Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail. A note may name a tool, a website or a custom visual that this template does not use, or describe publishing, deploying or changing a deployed model: that is information for the developer. You do not install, call or suggest such a tool, and nothing is published or deployed from this template.
 
 ## General practice
 
@@ -12,10 +12,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - Should. 2016. https://www.sqlbi.com/articles/numbering-sequence-of-events-in-dax/
 - When: A model that splits date and time and still has to order events.
 
-**T14-A088-2.** With the inactive relationship switched on inside the measure, the one Date table slices correctly by both dates and stays the only date dimension of the model; in this view, reporting by the second date needs no second date table.
-- Should. 2016. https://www.sqlbi.com/articles/analyzing-events-with-a-duration-in-dax/
-- When: A fact table with two date columns related to one Date table, one relationship inactive.
-
 **T14-A088-11.** Model an event that lasts over time, such as a contract or an order from order date to ship date, with two date or time columns on its row, one for the start and one for the end, not one point in time.
 - Should. 2016. https://www.sqlbi.com/articles/analyzing-events-with-a-duration-in-dax/
 - When: Events with a start and an end, analysed for what happens between the two dates.
@@ -24,11 +20,46 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - Must. 2016. https://www.sqlbi.com/articles/analyzing-events-with-a-duration-in-dax/
 - When: Models of events with a start and an end, lasting minutes (orders) or years (insurance contracts).
 
+### Building and testing calculations
+
+**T14-A088-10.** Give the data model careful attention, even in a small report file, and do not settle for a naive design: with the right model formulas become simpler and faster, while a naive one leads to slower and more complex DAX.
+- Should. 2016. https://www.sqlbi.com/articles/analyzing-events-with-a-duration-in-dax/
+- When: Any model, small ones included.
+
+**T14-A117-5.** Build a complex formula one step at a time: store each step in a variable and return that variable for a moment to check the partial result before moving on. A variable known to be right lets you work on the harder parts with confidence.
+- Should. 2017. https://www.sqlbi.com/articles/computing-same-product-sales-in-dax/
+- When: Writing complex formulas.
+
+**T14-A117-6.** When an intermediate step of a measure produces a table, it can be tested by returning the row count of that table variable for a moment and checking the number in a report.
+- Option. 2017. https://www.sqlbi.com/articles/computing-same-product-sales-in-dax/
+- When: Writing and debugging a measure whose steps include a table variable.
+
+**T14-A326-8.** When facing a new business requirement, consider breaking it down into a series of smaller steps, each solvable with an existing generic modelling or DAX pattern. Reusing well-known, optimised patterns lowers effort and the risk of errors, and brings their known performance gains.
+- Consider. 2025. https://www.sqlbi.com/articles/account-receivable-aging-in-power-bi/
+- When: Any new business requirement.
+
+**T14-A346-4.** Inside GROUPBY, COUNTROWS cannot be the aggregation. To count the rows of each group, iterate CURRENTGROUP with SUMX over the constant 1: GROUPBY requires CURRENTGROUP to walk the rows of the group being aggregated.
+- Must. 2025. https://www.sqlbi.com/articles/find-the-products-in-the-top-10-every-year-with-dax/
+- When: Counting rows per group with GROUPBY.
+
+**T14-A346-5.** When a measure has to manipulate tables, first write and debug its logic as a DAX query, checking the partial results. Only then move it into a measure and fix the problems the outer filter context causes.
+- Should. 2025. https://www.sqlbi.com/articles/find-the-products-in-the-top-10-every-year-with-dax/
+- When: Non-trivial measures that build and manipulate intermediate tables.
+
+**T14-A369-13.** When defining a calculation, always check how it behaves in border cases: at the start or end of a time period, at subtotal and total level, under different selections, and with blank values in columns or partial results.
+- Must. 2026. https://www.sqlbi.com/articles/the-hidden-complexity-of-a-daily-average-in-dax/
+- When: Any calculation, even one that looks simple, such as an average.
+
+**T14-A369-15.** When DAX code comes from an AI assistant, the person responsible has to state the business requirements, question the proposed code and check its results. Code that runs is no proof that it returns the number the business needs.
+- Must. 2026. https://www.sqlbi.com/articles/the-hidden-complexity-of-a-daily-average-in-dax/
+- When: Measures, functions or queries generated by an AI assistant.
+
 ### Averages, working days and trends
 
 **T14-A252-3.** Keep the working-day information as a true-or-false column of the Date table: working days hold TRUE and rest days hold FALSE.
 - Should. 2022. https://www.sqlbi.com/articles/rolling-average-with-working-days-in-dax/
 - When: Calculations must tell working days from rest days.
+- Version: A visible flag column shows Yes and No in this template (M116); a true-or-false column fits when hidden.
 
 **T14-A304-11.** Before choosing the aggregation an item is compared with, such as an average, look at how the data is distributed. Outliers or diverging distributions may be better served by another measure of central tendency.
 - Should. 2024. https://www.sqlbi.com/articles/comparing-cumulative-values-for-events-in-different-periods/
@@ -151,6 +182,16 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - When: A line chart shows a selected item's measure beside an average, with a slicer on the item.
 - Version: Described in 2024.
 
+### Building and testing calculations
+
+**T14-A326-14.** Before relying on an accounts receivable aging calculation in your own scenario, you can check that it is correct on a small sample model, editing the movements data to exercise the corner cases you care about.
+- Option. 2025. https://www.sqlbi.com/articles/account-receivable-aging-in-power-bi/
+- When: Adopting an aging model and its measures for a specific scenario.
+
+**T14-A346-6.** Table logic that is right in a query with no outer filters can return wrong results once moved into a measure: the visual's filter context changes the table variables, and TOPN ranks by a measure evaluated in that current filter context.
+- Fact. 2025. https://www.sqlbi.com/articles/find-the-products-in-the-top-10-every-year-with-dax/
+- When: Moving query code that builds ranking tables into a measure shown in a visual such as a matrix.
+
 ### Averages, working days and trends
 
 **T14-A252-1.** The standard DAX time intelligence functions know nothing of working days and rest days. A calculation that must count working days only cannot be built on them.
@@ -165,6 +206,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T14-A252-4.** For a rolling calculation over N working days, give the Date table a calculated column with a running working-day number, growing by one per working day and repeating the previous number on rest days. Ranking working days by ascending date with RANKX builds it well.
 - Should. 2022. https://www.sqlbi.com/articles/rolling-average-with-working-days-in-dax/
 - When: A rolling average or similar calculation over a number of working days.
+- Version: A calculated column needs its reason line; the standard prefers the source or Power Query (M105, M106).
 
 **T14-A252-5.** In a working-day rolling average, bound the end of the date range by the actual date of the current period, not by its working-day number. Rest days share the previous working day's number, so Friday would otherwise take in Saturday's sales.
 - Must. 2022. https://www.sqlbi.com/articles/rolling-average-with-working-days-in-dax/
@@ -202,6 +244,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T14-A369-2.** For an average per calendar day, one option uses DIVIDE to divide the amount by the count of visible rows of a one-row-per-day Date table. Turning blanks into zero inside AVERAGEX also fixes the day count for a period with sales, but is slower.
 - Option. 2026. https://www.sqlbi.com/articles/the-hidden-complexity-of-a-daily-average-in-dax/
 - When: The denominator must include days without sales; a calendar longer than the data needs more handling.
+- Version: Any zero-for-blank logic needs the brief's request and an exception to the blank rule (M506).
 
 **T14-A369-3.** When the Date table covers days before the first or after the last available data, dividing an amount by all visible calendar days understates the daily average for partial months at both ends and for totals that include those days.
 - Fact. 2026. https://www.sqlbi.com/articles/the-hidden-complexity-of-a-daily-average-in-dax/

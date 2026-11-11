@@ -2,7 +2,7 @@
 
 Part 3 of 3 of this topic. Covers: Date columns, sorting and formats; Blank and placeholder dates; Calendar-based time intelligence.
 
-Practice notes drawn from public SQLBI articles, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail.
+Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail. A note may name a tool, a website or a custom visual that this template does not use, or describe publishing, deploying or changing a deployed model: that is information for the developer. You do not install, call or suggest such a tool, and nothing is published or deployed from this template.
 
 ## General practice
 
@@ -29,6 +29,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T04-A321-1.** Store a missing date as blank, not as a placeholder code or a far-future date: blank says the information is absent and matches the blank row of the Date table without adding unused dates to the calendar.
 - Should. 2024. https://www.sqlbi.com/articles/blank-in-date-columns-and-dax-time-intelligence-functions/
 - When: Date columns where a missing value is normal, such as a delivery date of orders not yet shipped.
+- Version: Blank keys on the many side must be intended and recorded (checklist item 14).
 
 **T04-A321-2.** The Date table's date column never holds a placeholder for a missing date, such as 00000000: real dates only, plus the blank of an invalid relationship. Moving the placeholder to a number or text key does not help: time intelligence needs a true date column.
 - Must. 2024. https://www.sqlbi.com/articles/blank-in-date-columns-and-dax-time-intelligence-functions/
@@ -142,12 +143,12 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T04-A371-2.** A continuous line-chart axis on years, quarters, months or weeks of your own Date table needs a hierarchy there: on top a year column with dataCategory Years, at the bottom the key date column with PaddedDateTableDates. Table-level dataCategory, once listed too, has no effect.
 - Must. 2026. https://www.sqlbi.com/articles/continuous-axis-for-any-date-table-in-power-bi/ ; https://www.sqlbi.com/articles/creating-a-simpler-and-chart-friendly-date-table-in-power-bi/
 - When: Line charts on a date hierarchy above the day; other visuals, slicers and filters work as usual.
-- Version: PaddedDateTableDates is an undocumented property.
+- Version: PaddedDateTableDates is an undocumented property. No shipped example carries these values: by this template's rule new syntax comes from an example, so ask the developer first.
 
 **T04-A371-3.** Date-related dataCategory values on columns, such as PaddedDateTableDates or Years, must be written in the model definition itself, for example in the TMDL view or in Tabular Editor: the Data category list of Power BI Desktop does not offer them.
 - Must. 2026. https://www.sqlbi.com/articles/continuous-axis-for-any-date-table-in-power-bi/
 - When: Setting date-related column categories, for example for a continuous date axis on a line chart.
-- Version: Power BI Desktop's Data category list shows only geography, URL, image and barcode values, none for dates.
+- Version: Power BI Desktop's Data category list shows only geography, URL, image and barcode values, none for dates. No shipped example carries these values: by this template's rule new syntax comes from an example, so ask the developer first.
 
 **T04-A371-4.** When the month level of a continuous-axis date hierarchy already holds the year, as Year Month does, a separate hierarchy built from plain Quarter and Month columns lets the line chart tooltip show names without the year twice. The issue is mostly cosmetic.
 - Option. 2026. https://www.sqlbi.com/articles/continuous-axis-for-any-date-table-in-power-bi/

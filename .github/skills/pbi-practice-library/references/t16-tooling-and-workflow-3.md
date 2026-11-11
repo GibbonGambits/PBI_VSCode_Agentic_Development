@@ -2,7 +2,7 @@
 
 Part 3 of 3 of this topic. Covers: Reusable libraries and templates; AI assistants and agents; Testing measures.
 
-Practice notes drawn from public SQLBI articles, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail.
+Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail. A note may name a tool, a website or a custom visual that this template does not use, or describe publishing, deploying or changing a deployed model: that is information for the developer. You do not install, call or suggest such a tool, and nothing is published or deployed from this template.
 
 ## General practice
 
@@ -28,6 +28,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T16-A311-5.** For a library of DAX objects and patterns that can be applied repeatably, a developer should script them in C# with Tabular Editor.
 - Should. 2024. https://www.sqlbi.com/articles/using-atomic-design-in-report-and-model-development/
 - When: Building a reusable library of DAX objects and patterns specifically.
+- Version: A tool outside this template: information for the developer, never called or suggested by Copilot.
 
 **T16-A311-6.** The built-in quick measures of Power BI Desktop can be a starting point for self-service authors or for the most common patterns, but they are limited: the set cannot be customised, and some quick measures place requirements on the model.
 - Option. 2024. https://www.sqlbi.com/articles/using-atomic-design-in-report-and-model-development/
@@ -110,10 +111,12 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T16-A370-1.** Before writing any measure, however simple, write its contract first: a business-language document giving the rules that compute values in this specific model, free of obvious statements; it may cover several measures and algorithms. With an AI assistant this is the most important step.
 - Should. 2026. https://www.sqlbi.com/articles/understanding-dax-contracts-when-using-ai/
 - When: Developing a semantic model, in particular when writing DAX with an AI assistant.
+- Version: In this template the answers belong in the report brief before the task; during a task Copilot writes a TODO question and carries on.
 
 **T16-A370-2.** Do not start by asking an AI assistant to write the measure. Start by asking which questions must be answered before the calculation can be written, and build the contract from that dialogue.
 - Must. 2026. https://www.sqlbi.com/articles/understanding-dax-contracts-when-using-ai/
 - When: Writing a new measure with an AI assistant.
+- Version: In this template the answers belong in the report brief before the task; during a task Copilot writes a TODO question and carries on.
 
 **T16-A370-4.** The AI assistant can be asked to save the contract as a document, and not merely to apply it when writing the measure.
 - Option. 2026. https://www.sqlbi.com/articles/understanding-dax-contracts-when-using-ai/
@@ -203,7 +206,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T16-A311-12.** Another option: a team can store each report definition as JSON in a remote repository and deploy it to a workspace through the Fabric REST APIs, optionally changing the definition by code on the way.
 - Option. 2024. https://www.sqlbi.com/articles/using-atomic-design-in-report-and-model-development/
 - When: A person or pipeline deploys reports from a repository; verify any change that code makes during deployment.
-- Version: Described in 2024 for Microsoft Fabric, with Azure Repos or GitHub as example repositories.
+- Version: Described in 2024 for Microsoft Fabric, with Azure Repos or GitHub as example repositories. Nothing is published or deployed from this template: this is a person's or a pipeline's step.
 
 **T16-A311-13.** When code changes report definitions during deployment, test the resulting report thoroughly to confirm that the changes had no unintended effect.
 - Should. 2024. https://www.sqlbi.com/articles/using-atomic-design-in-report-and-model-development/
@@ -238,6 +241,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T16-A343-8.** With agents, a remote repository can also give the work its structure, and a person can automate deployment to a Fabric workspace for testing through Git integration, tools or custom methods.
 - Option. 2025. https://www.sqlbi.com/articles/introducing-ai-and-agentic-development-for-business-intelligence/
 - When: Organising agentic work on Power BI project files.
+- Version: Nothing is published or deployed from this template: this is a person's or a pipeline's step.
 
 **T16-A343-9.** Agents that work asynchronously without supervision have few realistic uses beyond narrowly scoped tasks and reviews; the person reviews the result afterwards, typically as a pull request.
 - Fact. Check. 2025. https://www.sqlbi.com/articles/introducing-ai-and-agentic-development-for-business-intelligence/

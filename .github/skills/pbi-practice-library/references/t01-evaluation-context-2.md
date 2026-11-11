@@ -2,7 +2,7 @@
 
 Part 2 of 2 of this topic. Covers: Relationships, expanded tables and lineage; Context transition; Removing filters with ALL; ALLSELECTED and shadow filters; Totals and additivity.
 
-Practice notes drawn from public SQLBI articles, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail.
+Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail. A note may name a tool, a website or a custom visual that this template does not use, or describe publishing, deploying or changing a deployed model: that is information for the developer. You do not install, call or suggest such a tool, and nothing is published or deployed from this template.
 
 ## General practice
 
@@ -16,10 +16,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - Must. 2019. https://www.sqlbi.com/articles/understanding-data-lineage-in-dax/
 - When: Rewriting a measure into a more complex form for performance.
 - Version: In February 2023 tests, one original measure outperformed all of its earlier optimised versions.
-
-**T01-A245-2.** Never enable bidirectional filtering on a relationship unless the model author firmly grasps both DAX and data modeling theory: it is a powerful but dangerous tool.
-- Must. 2022. https://www.sqlbi.com/articles/filter-context-in-dax/
-- When: Deciding whether a relationship should also filter from its many side to its one side.
 
 **T01-A249-1.** In a row context on the many-side table, such as a calculated column of a fact table, you must read a column of a related one-side table through RELATED; a direct reference fails. RELATED works only when every relationship it crosses is regular, not limited.
 - Must. 2022. https://www.sqlbi.com/articles/using-related-and-relatedtable-in-dax/
@@ -101,7 +97,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T01-A228-1.** When a budget is stored per brand while the Product dimension is per product, one option is an intermediate Brand table related to both Product and Budget, so a brand filter reaches products, sales and budget together.
 - Option. 2016. https://www.sqlbi.com/articles/using-allexcept-vs-all-values/
 - When: Two fact tables share a dimension at different granularities.
-- Version: Offered for SSAS 2012/2014 and Power Pivot for Excel; another design is described for Power BI and SSAS 2016.
+- Version: Offered for SSAS 2012/2014 and Power Pivot for Excel; another design is described for Power BI and SSAS 2016. A chain of dimension tables needs its exception row in the brief (M412).
 
 **T01-A228-2.** With an intermediate Brand table linking Product and a brand-level Budget, hide the brand column of Product so users slice brands only through the Brand table: a selection on Product's own brand column cannot reach Budget.
 - Should. 2016. https://www.sqlbi.com/articles/using-allexcept-vs-all-values/

@@ -2,7 +2,7 @@
 
 Part 2 of 2 of this topic. Covers: Business-rule grain and testing; Duplicate names, Group By Columns; Circular dependency errors; Sankey chart funnels; User-context calculated columns.
 
-Practice notes drawn from public SQLBI articles, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail.
+Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail. A note may name a tool, a website or a custom visual that this template does not use, or describe publishing, deploying or changing a deployed model: that is information for the developer. You do not install, call or suggest such a tool, and nothing is published or deployed from this template.
 
 ## General practice
 
@@ -10,7 +10,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 
 **T06-A173-4.** Check new formulas against a small data set that can be understood at a glance, so the expected numbers are known beforehand; in a model with millions of rows errors are far harder to find.
 - Must. 2019. https://www.sqlbi.com/articles/the-importance-of-star-schemas-in-power-bi/
-- When: Testing a new formula; experts may depart only when they understand the consequences.
+- When: Testing a new formula.
 
 **T06-A368-1.** Evaluate a business rule at the lowest level of detail where each of its inputs has one unambiguous value, and aggregate the results only afterwards.
 - Should. 2026. https://www.sqlbi.com/articles/writing-dax-at-the-correct-granularity/
@@ -36,9 +36,9 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - Should. 2026. https://www.sqlbi.com/articles/writing-dax-at-the-correct-granularity/
 - When: Planning any measure that applies a business rule.
 
-**T06-A368-9.** Before writing a measure, settle: each source row's meaning; keys that give every rule input one meaning; inputs summable before the rule; the virtual table to iterate; independence from the visual's fields; keys lost upstream; the result below the data's grain; a hand check.
+**T06-A368-9.** Before writing a measure, settle: what a row means in each source table; which keys make each rule input unambiguous; which inputs sum before the rule; which table to iterate; whether the grain depends on the visual's fields; what to return below the data's grain.
 - Should. 2026. https://www.sqlbi.com/articles/writing-dax-at-the-correct-granularity/
-- When: Planning the granularity of a measure.
+- When: Planning a measure's grain; also look for a key lost upstream and verify a few rows by hand.
 
 **T06-A368-10.** Do not validate a measure by first checking that the grand total matches the visible rows. Build a small table at the business-rule grain, check each of its rows, and only then check how they aggregate.
 - Must. 2026. https://www.sqlbi.com/articles/writing-dax-at-the-correct-granularity/
@@ -215,42 +215,42 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T06-A290-1.** For a static Sankey Chart funnel, prepare a table with one row per transition between consecutive states, use its from and to columns as Source and Destination, and give Weight a row-count measure: a precomputed table and a plain count are very fast.
 - Should. Check. 2023. https://www.sqlbi.com/articles/preparing-a-data-model-for-sankey-charts-in-power-bi/
 - When: Each event happens at most once per customer in fixed order; users need not exclude events.
-- Version: Uses the Sankey Chart custom visual from AppSource; check current behaviour.
+- Version: Uses the Sankey Chart custom visual from AppSource; check current behaviour. Custom visuals are outside this template's standards.
 
 **T06-A290-2.** When users must be able to exclude events from a Sankey Chart funnel, compute the transitions inside the Weight measure by scanning the event table: a precomputed transition table cannot drop the chosen events from the flows.
 - Must. 2023. https://www.sqlbi.com/articles/preparing-a-data-model-for-sankey-charts-in-power-bi/
 - When: A Sankey Chart funnel with user-selectable events.
-- Version: Uses the Sankey Chart custom visual from AppSource.
+- Version: Uses the Sankey Chart custom visual from AppSource. Custom visuals are outside this template's standards.
 
 **T06-A290-3.** A placeholder state, such as None, can be added, with a dummy transition to it for every entity that has only one event: the Sankey Chart hides rows with no transition to show.
 - Option. Check. 2023. https://www.sqlbi.com/articles/preparing-a-data-model-for-sankey-charts-in-power-bi/
 - When: Entities with a single event must still appear in the chart.
-- Version: Uses the Sankey Chart custom visual from AppSource; check current behaviour.
+- Version: Uses the Sankey Chart custom visual from AppSource; check current behaviour. Custom visuals are outside this template's standards.
 
 **T06-A290-5.** For a dynamic Sankey Chart, create two separate copies of the state list, one bound to Source and one to Destination: one table cannot feed both inputs of the visual.
 - Must. Check. 2023. https://www.sqlbi.com/articles/preparing-a-data-model-for-sankey-charts-in-power-bi/
 - When: A Sankey Chart whose flows are computed by a measure.
-- Version: Uses the Sankey Chart custom visual from AppSource; check current behaviour.
+- Version: Uses the Sankey Chart custom visual from AppSource; check current behaviour. Custom visuals are outside this template's standards.
 
 **T06-A290-6.** In a dynamic Sankey Chart model, the Source and Destination state tables should not filter the state and event tables through relationships; the Weight measure moves their selections onto the event table itself, for example with TREATAS, since propagated filters would break it.
 - Should. 2023. https://www.sqlbi.com/articles/preparing-a-data-model-for-sankey-charts-in-power-bi/
 - When: A Sankey Chart whose Weight measure computes transitions.
-- Version: Uses the Sankey Chart custom visual from AppSource.
+- Version: Uses the Sankey Chart custom visual from AppSource. A table with no relationship needs its row in the brief (M411).
 
 **T06-A290-7.** Store each entity's first event type in a calculated column instead of hardcoding which event types count as start events.
 - Should. 2023. https://www.sqlbi.com/articles/preparing-a-data-model-for-sankey-charts-in-power-bi/
 - When: A funnel where users can hide events and a start event is treated differently from later ones.
-- Version: Uses the Sankey Chart custom visual from AppSource.
+- Version: Uses the Sankey Chart custom visual from AppSource. Custom visuals are outside this template's standards.
 
 **T06-A290-9.** If only a static Sankey Chart is needed, consider building the event table in Power Query or SQL and keeping DAX for the measures. A Power Query transformation can itself fail on memory during refresh when its steps do not fold into one request.
 - Consider. 2023. https://www.sqlbi.com/articles/preparing-a-data-model-for-sankey-charts-in-power-bi/
 - When: A funnel model that would otherwise need complex DAX calculated tables.
-- Version: Uses the Sankey Chart custom visual from AppSource.
+- Version: Uses the Sankey Chart custom visual from AppSource. Custom visuals are outside this template's standards.
 
 **T06-A290-11.** Before writing the Weight measure of a Sankey Chart funnel in which users can hide events, settle what hiding each kind means, for example: hiding a start event drops the customers who began with it; hiding a middle event only skips that step.
 - Must. 2023. https://www.sqlbi.com/articles/preparing-a-data-model-for-sankey-charts-in-power-bi/
 - When: Users may hide start and middle events of a funnel.
-- Version: Uses the Sankey Chart custom visual from AppSource.
+- Version: Uses the Sankey Chart custom visual from AppSource. Custom visuals are outside this template's standards.
 
 ### User-context calculated columns
 
@@ -287,7 +287,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T06-A360-9.** A hidden table that holds a sensitive column, hides all its rows from a role and is read through a User Context calculated column must have no relationship through which its filter could spread: restricted users would get an empty report, not a redacted one.
 - Must. 2026. https://www.sqlbi.com/articles/introducing-user-aware-calculated-columns-in-power-bi/
 - When: The hidden-table pattern for redacting a sensitive column.
-- Version: User-context calculated columns are a preview feature (May 2026) that needs the developer's yes.
+- Version: User-context calculated columns are a preview feature (May 2026) that needs the developer's yes. A table with no relationship needs its row in the brief (M411).
 
 **T06-A360-10.** Weigh the query-time cost before using LOOKUPVALUE in a User Context calculated column on a high-cardinality table: the lookup runs for every row where the column is evaluated, in every query. On a small table it is negligible.
 - Consider. 2026. https://www.sqlbi.com/articles/introducing-user-aware-calculated-columns-in-power-bi/

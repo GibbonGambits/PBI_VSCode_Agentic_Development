@@ -2,7 +2,7 @@
 
 Part 5 of 5 of this topic. Covers: Custom and SVG visuals; Themes and report templates.
 
-Practice notes drawn from public SQLBI articles, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail.
+Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail. A note may name a tool, a website or a custom visual that this template does not use, or describe publishing, deploying or changing a deployed model: that is information for the developer. You do not install, call or suggest such a tool, and nothing is published or deployed from this template.
 
 ## General practice
 
@@ -44,6 +44,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T15-A328-22.** Weigh how AI tools differ before choosing one for visual code: cost and daily limits; whether it accepts images of the design; step-by-step reasoning for complex tasks; web search; how recent its training data is; how well it does the task; policy or regional access.
 - Consider. 2025. https://www.sqlbi.com/articles/using-ai-assistance-to-create-power-bi-custom-visuals/
 - When: Choosing an AI tool to help generate custom visual code.
+- Version: Custom visuals are outside this template's standards.
 
 **T15-A317-2.** Look at simpler options with core visuals first, and build a custom visual only when it gives readers a clear business benefit. If a useful report can be built in a more direct way, that way is probably right.
 - Should. 2024. https://www.sqlbi.com/articles/creating-custom-visuals-in-power-bi-with-dax/
@@ -99,11 +100,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - Version: Custom visuals are outside this template's standards.
 
 ### Themes and report templates
-
-**T15-A322-1.** Build one theme for the team or organisation and let it carry the default static formatting; do this early when several pages or reports are planned.
-- Should. 2024. https://www.sqlbi.com/articles/re-using-visual-formatting-in-and-across-power-bi-reports/
-- When: Several pages or reports are planned and should share one look.
-- Version: This template's theme is fixed and is not changed.
 
 **T15-A322-5.** A free or commercial theme file from the community can be the starting point for a theme, adjusted afterwards, in place of writing one from nothing.
 - Option. 2024. https://www.sqlbi.com/articles/re-using-visual-formatting-in-and-across-power-bi-reports/

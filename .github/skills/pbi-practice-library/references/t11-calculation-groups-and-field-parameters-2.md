@@ -2,13 +2,13 @@
 
 Part 2 of 2 of this topic. Covers: Calculation group precedence; Per-user defaults and slicers; Field parameters; Selection expressions.
 
-Practice notes drawn from public SQLBI articles, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail.
+Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail. A note may name a tool, a website or a custom visual that this template does not use, or describe publishing, deploying or changing a deployed model: that is information for the developer. You do not install, call or suggest such a tool, and nothing is published or deployed from this template.
 
 ## General practice
 
 ### Calculation group precedence
 
-**T11-A190-1.** Set every calculation group's precedence deliberately, for the order of application that gives the meaning you intend. Example: apply a year-to-date item before a daily-average item, so the days are counted over the year-to-date period. A wrong order gives incorrect results, hard to debug.
+**T11-A190-1.** An example of precedence that changes the meaning: a year-to-date item must apply before a daily-average item, so that the days are counted over the year-to-date period. A wrong order gives incorrect results that are hard to debug.
 - Must. 2019. https://www.sqlbi.com/articles/understanding-calculation-group-precedence/ ; https://www.sqlbi.com/articles/avoiding-pitfalls-in-calculation-groups-precedence/
 - When: Items of different groups can be active together, through several slicers or CALCULATE filters.
 
@@ -94,6 +94,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T11-A223-3.** When one column alone needs a per-user default, store user and value pairs in a table related many-to-many to the model table, filtering towards it. The calculation item filters that table by USERPRINCIPALNAME when ISCROSSFILTERED under ALLSELECTED finds no explicit filter; otherwise it returns SELECTEDMEASURE.
 - Option. 2021. https://www.sqlbi.com/articles/customizing-default-values-for-each-user-in-power-bi-reports/
 - When: A single column needs a default value; the approach fails with two or more default columns.
+- Version: A many-to-many cardinality relationship needs its exception row in the brief (M406).
 
 **T11-A223-4.** In a per-user default item covering several columns, do not filter a defaults table in CALCULATE when the user has explicitly filtered its matching model column. That filter travels to the model table and hides every value absent from the defaults table, explicit choices included.
 - Must. 2021. https://www.sqlbi.com/articles/customizing-default-values-for-each-user-in-power-bi-reports/
@@ -126,6 +127,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T11-A280-2.** To show each user only the slicer values relevant to them when the grouping is not a natural hierarchy, build a table of allowed value and user pairs. Relate it many-to-many to the table that holds the values, filtering from the pairs table.
 - Option. 2023. https://www.sqlbi.com/articles/filtering-calculation-items-in-a-slicer/
 - When: A non-natural grouping, where the value column is not a key of the target table.
+- Version: A many-to-many cardinality relationship needs its exception row in the brief (M406).
 
 **T11-A280-4.** A calculation group cannot take part in a relationship. No other table can cross-filter its items, neither through a both-direction filter nor through a many-to-many relationship.
 - Fact. 2023. https://www.sqlbi.com/articles/filtering-calculation-items-in-a-slicer/
@@ -161,6 +163,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T11-A286-2.** With a field parameter, a formatting measure can read the chosen entry from the parameter table's display column and return a colour name for it, or blank unless exactly one row is visible. The slicer's filter stays in the query, so measures see it.
 - Option. 2023. https://www.sqlbi.com/articles/using-field-parameters-and-calculation-groups-for-conditional-formatting/
 - When: Conditional formatting driven by the selection in a field parameter.
+- Version: Theme colours only; a colour code needs an exception row (V009).
 
 **T11-A286-6.** A calculation group can stand in for a field parameter when users choose which measure to display. Behaviour is similar, with more flexibility, because each calculation item can hold any DAX; field parameters are simpler but less flexible.
 - Option. 2023. https://www.sqlbi.com/articles/using-field-parameters-and-calculation-groups-for-conditional-formatting/
@@ -182,11 +185,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - Option. Check. 2025. https://www.sqlbi.com/articles/controlling-empty-or-multiple-selections-in-calculation-groups/
 - When: Users may select several items expecting a combined calculation; DAX has no recursion to stack them.
 - Version: Described as a preview in May 2025.
-
-**T11-A332-5.** For a calculation group, an empty selection means a filter is active but leaves no item, as when a saved report filters an item renamed later; multipleOrEmptySelectionExpression handles it. No selection means no direct or indirect filter on the group; noSelectionExpression handles that.
-- Fact. Check. 2025. https://www.sqlbi.com/articles/controlling-empty-or-multiple-selections-in-calculation-groups/
-- When: Writing either selection expression for a calculation group.
-- Version: Described as a preview in May 2025; needs compatibility level 1605.
 
 **T11-A332-7.** A transformation that should reach all measures automatically, such as currency conversion, can go in the noSelectionExpression of a calculation group. It then runs whenever the group is not filtered, with no item to select in every report.
 - Option. Check. 2025. https://www.sqlbi.com/articles/controlling-empty-or-multiple-selections-in-calculation-groups/

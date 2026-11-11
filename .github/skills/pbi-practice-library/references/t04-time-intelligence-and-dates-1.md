@@ -2,7 +2,7 @@
 
 Part 1 of 3 of this topic. Covers: Time intelligence functions; Week-based and fiscal calendars; Mark as date table.
 
-Practice notes drawn from public SQLBI articles, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail.
+Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail. A note may name a tool, a website or a custom visual that this template does not use, or describe publishing, deploying or changing a deployed model: that is information for the developer. You do not install, call or suggest such a tool, and nothing is published or deployed from this template.
 
 ## General practice
 
@@ -194,14 +194,17 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T04-A121-11.** Set the reference Date table template by week standard. ISO: January year start, Monday weeks, year-end rule Nearest. US year ending on the month's last Saturday: Sunday weeks, rule Last. US year ending on the Saturday nearest month end: Sunday weeks, rule Nearest.
 - Should. Check. 2018. https://www.sqlbi.com/articles/reference-date-table-in-dax-and-power-bi/
 - When: Generating a fiscal weekly calendar from the reference Date table template.
+- Version: Refers to the Date table template its article describes; this template ships its own Date table example.
 
 **T04-A121-12.** In the reference Date table template, switch on the option that ignores the automatically generated weekly fiscal periods only when custom fiscal periods are switched on too.
 - Should. Check. 2018. https://www.sqlbi.com/articles/reference-date-table-in-dax-and-power-bi/
 - When: The template is used with arbitrary, custom-defined weekly fiscal years.
+- Version: Refers to the Date table template its article describes; this template ships its own Date table example.
 
 **T04-A121-13.** In the reference Date table template, a first fiscal month of January makes the fiscal monthly columns equal to the solar calendar columns, while the fiscal weekly columns still differ from the solar calendar.
 - Fact. Check. 2018. https://www.sqlbi.com/articles/reference-date-table-in-dax-and-power-bi/
 - When: Setting the first-fiscal-month parameter, which drives both the fiscal monthly and the fiscal weekly calendar.
+- Version: Refers to the Date table template its article describes; this template ships its own Date table example.
 
 **T04-A319-3.** A week-based calendar such as 4-4-5 is an option where the compared figures depend heavily on working days and weekends: each period is made of whole weeks and so holds the same number of working days, which Gregorian months do not.
 - Option. Check. 2024. https://www.sqlbi.com/articles/using-weekly-calendars-in-power-bi/

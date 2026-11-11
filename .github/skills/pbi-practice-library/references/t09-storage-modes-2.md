@@ -2,16 +2,11 @@
 
 Part 2 of 2 of this topic. Covers: Choosing a storage mode; Composite models; Push datasets.
 
-Practice notes drawn from public SQLBI articles, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail.
+Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail. A note may name a tool, a website or a custom visual that this template does not use, or describe publishing, deploying or changing a deployed model: that is information for the developer. You do not install, call or suggest such a tool, and nothing is published or deployed from this template.
 
 ## General practice
 
 ### Choosing a storage mode
-
-**T09-W380-1.** Consider the trade-offs per model, then tune the model for the mode chosen: DirectQuery gives current data with no processing, memory limit or data copy, but loses in-memory speed and moves the query work to the database.
-- Consider. 2017. https://www.sqlbi.com/whitepapers/directquery-in-analysis-services-2016/
-- When: Deciding between DirectQuery and Import for a model.
-- Version: Analysis Services 2016 Tabular; 2017 white paper.
 
 **T09-W380-4.** Before choosing DirectQuery, check that the relational server can serve report queries while it handles its normal update workload: every query goes to the engine that receives the updates, whereas an in-memory model reads the source once.
 - Should. 2017. https://www.sqlbi.com/whitepapers/directquery-in-analysis-services-2016/

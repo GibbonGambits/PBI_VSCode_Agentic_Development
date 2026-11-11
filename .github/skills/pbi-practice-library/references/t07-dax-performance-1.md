@@ -2,7 +2,7 @@
 
 Part 1 of 3 of this topic. Covers: Filters, counts and emptiness tests; Measuring and testing performance; Formula and storage engine.
 
-Practice notes drawn from public SQLBI articles, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail.
+Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail. A note may name a tool, a website or a custom visual that this template does not use, or describe publishing, deploying or changing a deployed model: that is information for the developer. You do not install, call or suggest such a tool, and nothing is published or deployed from this template.
 
 ## General practice
 
@@ -62,17 +62,9 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - When: Sums of separately filtered measures were replaced by one combined filter.
 - Version: A future DAX engine with a better query plan could make the rewrite unnecessary.
 
-**T07-A128-2.** Before relying on any DAX rewrite made for speed, measure the original and the rewritten version on the concrete use case: which one is faster can change with the details of the requirement and with how the data is distributed.
-- Should. 2018. https://www.sqlbi.com/articles/optimizing-mutually-exclusive-calculations/
-- When: Choosing between alternative formulations of the same calculation.
-
 **T07-A128-6.** Know more than one way to write a given DAX calculation: a slow measure is fixed by rewriting its DAX to obtain a better execution plan, and which formulation performs better depends on the requirement and on how the data is distributed.
 - Should. Check. 2018. https://www.sqlbi.com/articles/optimizing-mutually-exclusive-calculations/
 - When: A performance issue arises in a DAX calculation.
-
-**T07-A334-4.** Never assume one formulation of a DAX calculation is the fastest in every scenario, even for a simple-looking measure. Test the alternatives extensively and choose with the results in hand before production: the winner depends on model size, data distribution, compression and the measure's complexity.
-- Must. 2018. https://www.sqlbi.com/articles/optimizing-dax-with-cardinality-estimation-computing-working-days/ ; https://www.sqlbi.com/articles/finding-products-without-sales-by-using-dax/ ; https://www.sqlbi.com/articles/understanding-how-dax-evaluates-if-statements/
-- When: Any measure rewritten for speed, especially when performance is critical.
 
 **T07-A156-1.** When timing visuals with Performance Analyzer, base the analysis mainly on the durations recorded after pressing Refresh visuals, not on the first load of the page: the first run also allocates memory structures for visuals and model queries.
 - Should. 2019. https://www.sqlbi.com/articles/introducing-the-power-bi-performance-analyzer/
@@ -203,7 +195,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - When: Measures that each filter specific accounts are combined by addition and subtraction; confirm the gain.
 - Version: A future DAX engine with a better query plan could make this unnecessary.
 
-**T07-A156-7.** A possible fix for a slow CALCULATE around DISTINCTCOUNT: replace a FILTER over the whole fact table with the equivalent filter on the single column, written with KEEPFILTERS. A table filter with DISTINCTCOUNT gives an inefficient query plan; one query then fell below 10 milliseconds.
+**T07-A156-7.** A table filter on the whole fact table around DISTINCTCOUNT gives an inefficient query plan. With the equivalent filter on the single column, written with KEEPFILTERS, one query fell below 10 milliseconds.
 - Option. 2019. https://www.sqlbi.com/articles/introducing-the-power-bi-performance-analyzer/
 - When: A table filter on the fact table surrounds a DISTINCTCOUNT and an equivalent column filter exists.
 

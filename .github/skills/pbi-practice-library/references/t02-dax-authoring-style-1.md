@@ -2,23 +2,18 @@
 
 Part 1 of 2 of this topic. Covers: Formatting, naming and references; Variables and their evaluation; BLANK handling and conditions.
 
-Practice notes drawn from public SQLBI articles, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail.
+Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail. A note may name a tool, a website or a custom visual that this template does not use, or describe publishing, deploying or changing a deployed model: that is information for the developer. You do not install, call or suggest such a tool, and nothing is published or deployed from this template.
 
 ## General practice
 
 ### Formatting, naming and references
-
-**T02-A025-1.** In a formula split over several lines, each function call should start a line of its own, with its operator in front of it.
-- Should. Check. 2012. https://www.sqlbi.com/articles/rules-for-dax-code-formatting/
-- When: Formatting a DAX expression that continues over several lines and contains function calls.
-- Version: Formatting rules from 2012.
 
 **T02-A025-20.** To apply the formatting rule set for DAX code (spacing, line breaks, one argument per line), one option is the website www.daxformatter.com.
 - Option. Check. 2012. https://www.sqlbi.com/articles/rules-for-dax-code-formatting/
 - When: DAX code is to be formatted to that rule set.
 - Version: Stated in 2012; the DAX Editor tool supported the style then.
 
-**T02-A100-3.** Repeat the name check whenever columns are added, also through a source query or a calculated table: inside a row context of the new column's table, the unqualified name is read as the column, so existing measures can break or return different numbers.
+**T02-A100-3.** Whenever columns enter a model, also through a source query or a calculated table, check that none shares its name with a measure: inside a row context of the new column's table the unqualified name is read as the column, so existing measures can break.
 - Should. 2017. https://www.sqlbi.com/articles/duplicated-names-in-dax/
 - When: Columns enter a model by a calculated column, a source query change or a calculated table change.
 
@@ -78,18 +73,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T02-A082-3.** Consider a variable for a table too, such as a FILTER result that one expression repeats: it reads better and in certain conditions can also run faster. It helps most in long, complex expressions.
 - Consider. 2016. https://www.sqlbi.com/articles/dax-coding-style-using-variables/
 - When: The same table filter appears several times in one DAX expression.
-
-**T02-A082-4.** Name the intermediate steps of a calculation with variables, so that the variable names document what the code does.
-- Should. 2016. https://www.sqlbi.com/articles/dax-coding-style-using-variables/
-- When: Writing DAX that has intermediate calculation steps.
-
-**T02-A116-7.** Split a long or complex calculation into smaller steps and hold each intermediate result in a named variable.
-- Should. 2016. https://www.sqlbi.com/articles/dax-coding-style-using-variables/ ; https://www.sqlbi.com/articles/how-to-handle-blank-in-dax-measures/
-- When: Writing a long or complex DAX calculation.
-
-**T02-A154-1.** The steps of a complex calculation can be stored in variables that hold intermediate numbers, strings or tables.
-- Option. 2019. https://www.sqlbi.com/articles/table-and-column-references-using-dax-variables/
-- When: A complex DAX calculation can be split into smaller steps.
 
 **T02-A255-1.** Use variables extensively, and when unsure whether to introduce one, introduce it. Rare exception: a variable can hurt performance by forcing eager evaluation of a conditional statement.
 - Should. 2022. https://www.sqlbi.com/articles/variables-in-dax/
@@ -220,6 +203,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T02-A169-6.** If a model measure's name starts with @, renaming the measure is one way to remove the clash with the @ convention for temporary columns.
 - Option. 2019. https://www.sqlbi.com/articles/naming-temporary-columns-in-dax/
 - When: A measure name starts with @ in code that uses @ for temporary columns.
+- Version: An existing measure is renamed only after the developer's clear yes.
 
 **T02-A255-5.** A column created inside a measure, for example with ADDCOLUMNS, and held in a table variable may be referenced by its bare name, which reads better than the formally correct form with an empty table name.
 - Option. 2022. https://www.sqlbi.com/articles/variables-in-dax/

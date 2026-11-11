@@ -2,13 +2,13 @@
 
 Part 1 of 2 of this topic. Covers: Dates, time and sort keys; Calculated columns versus measures; Source views, names, data types; Star schema and fact tables.
 
-Practice notes drawn from public SQLBI articles, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail.
+Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail. A note may name a tool, a website or a custom visual that this template does not use, or describe publishing, deploying or changing a deployed model: that is information for the developer. You do not install, call or suggest such a tool, and nothing is published or deployed from this template.
 
 ## General practice
 
 ### Dates, time and sort keys
 
-**T06-A005-1.** After the split, the date part relates to the Date table and the time of day can carry its own set of attributes, such as hour and minute, for analysis at time levels.
+**T06-A005-1.** When a date-and-time column is split, the date part relates to the Date table and the time of day can carry its own set of attributes, such as hour and minute, for analysis at time levels.
 - Option. 2011. https://www.sqlbi.com/articles/separate-date-and-time-in-powerpivot-and-bism-tabular/
 - When: An imported column holds date and time, and the time of day matters to the business.
 
@@ -19,10 +19,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T06-A009-4.** Consider a Date table column that shows the month name together with its year, for month-by-month charts and for a year, month, day hierarchy: the year a month belongs to is then plain to the reader.
 - Consider. 2011. https://www.sqlbi.com/articles/sorting-dates-columns-in-powerpivot-v2-and-bism-tabular/
 - When: Reports plot data month by month or use a year-month-day hierarchy.
-
-**T06-A075-15.** Split a date-and-time column always, whatever the table size, and preferably in the source view rather than in a model query. An older view asked for the split only on tables of millions of rows and accepted DAX-derived columns otherwise.
-- Must. 2016. https://www.sqlbi.com/articles/data-import-best-practices-in-power-bi/ ; https://www.sqlbi.com/articles/separate-date-and-time-in-powerpivot-and-bism-tabular/
-- When: A source column holds a date and a time together.
 
 **T06-A192-1.** The match between a label and its sort key must be one to one: a month name that includes the year needs a separate key value for each month of each year.
 - Must. 2020. https://www.sqlbi.com/articles/sorting-duplicated-names-in-a-level-of-a-hierarchy-with-dax/
@@ -71,7 +67,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - Should. 2019. https://www.sqlbi.com/articles/comparing-dax-calculated-columns-with-power-query-computed-columns/
 - When: Import models; deciding whether a derived column belongs in Power Query or in DAX.
 
-**T06-A172-5.** The gain shows when several derived columns are planned: the effect of moving one column on total model size is almost unpredictable, because other columns may then compress worse, and it varies from case to case.
+**T06-A172-5.** When several derived columns are planned, prefer Power Query columns to DAX calculated columns, and accept that the overall effect varies: moving one column changes total model size almost unpredictably, because other columns may then compress worse.
 - Should. 2019. https://www.sqlbi.com/articles/comparing-dax-calculated-columns-with-power-query-computed-columns/
 - When: Import models; several derived columns are to be added.
 
@@ -105,10 +101,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T06-A075-11.** Avoid getting round a name clash between a measure and a column by giving the measure an awkward name, such as Sum of followed by the column name.
 - Should. 2016. https://www.sqlbi.com/articles/data-import-best-practices-in-power-bi/
 - When: A measure's intended name is already taken by a column.
-
-**T06-A075-14.** A source view must expose no column the model does not need, even when it is unclear which will prove useful: the model loads every column of a view by default, including costly technical ones such as a last-change timestamp or user name.
-- Must. 2016. https://www.sqlbi.com/articles/data-import-best-practices-in-power-bi/
-- When: Source views feed the model.
 
 **T06-A076-1.** Fixed Decimal Number suits financial values because, like whole numbers, it is stored exactly and its arithmetic is associative and fastest. A source column of two decimals may still import as floating point by default.
 - Should. 2016. https://www.sqlbi.com/articles/choosing-numeric-data-types-in-dax/
@@ -177,11 +169,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - Fact. 2013. https://www.sqlbi.com/articles/handling-wrong-or-missing-dates-in-tabular/
 - When: A Date dimension with a dummy unknown-date row is imported and marked as a date table.
 - Version: Stated for Tabular and Power Pivot; Analysis Services Multidimensional handles the dummy row well.
-
-**T06-A035-3.** Load the Date table through a query, preferably a view, that leaves out the dummy unknown-date row, and leave the fact rows that point to its key unchanged: they then show together under one blank item, and the data mart needs no change.
-- Should. Check. 2013. https://www.sqlbi.com/articles/handling-wrong-or-missing-dates-in-tabular/
-- When: A marked date table whose source has a dummy blank-date row; the blank item's name and position cannot be controlled.
-- Version: In 2013 the automatic blank item could not be customised; check current behaviour.
 
 **T06-A192-2.** When a column should be ordered by a measure-like value such as population, prefer a sort-key column to sorting the visual by the measure: a measure sort also reorders outer levels of a matrix, needs the measure in the visual, and cannot reach a slicer.
 - Should. 2020. https://www.sqlbi.com/articles/sorting-duplicated-names-in-a-level-of-a-hierarchy-with-dax/

@@ -2,7 +2,7 @@
 
 Part 1 of 1 of this topic. Covers: Naming and model-independent functions; Functions, measures and calculation groups; Parameters, types and passing modes; Calendar filters and result checks.
 
-Practice notes drawn from public SQLBI articles, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail.
+Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail. A note may name a tool, a website or a custom visual that this template does not use, or describe publishing, deploying or changing a deployed model: that is information for the developer. You do not install, call or suggest such a tool, and nothing is published or deployed from this template.
 
 ## General practice
 
@@ -168,11 +168,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T13-A344-2.** Each argument of a typed parameter is converted on its own, before the body runs, and with no error. Two decimals given to whole-number parameters become whole numbers first, so their sum can differ from the rounded total. This can confuse.
 - Fact. 2025. https://www.sqlbi.com/articles/introducing-user-defined-functions-in-dax/
 - When: A parameter is declared with a specific data type, such as a whole-number type.
-- Version: User-defined functions exist from the September 2025 version of DAX.
-
-**T13-A344-6.** Every reference to a VAL parameter gives the caller's one value, whatever filter or row context the body has set. A body that counts on re-evaluation is untouched by its own filters, and can even return an empty table.
-- Fact. 2025. https://www.sqlbi.com/articles/introducing-user-defined-functions-in-dax/
-- When: The body uses a VAL parameter inside CALCULATE or inside an iterator.
 - Version: User-defined functions exist from the September 2025 version of DAX.
 
 **T13-A344-7.** Reading an EXPR parameter does not by itself trigger a context transition. A measure passed as the argument transitions through its implicit CALCULATE; an equivalent plain formula, such as a SUMX expression, ignores the row context of the body's iterators and can return nothing.

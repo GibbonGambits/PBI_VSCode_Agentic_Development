@@ -2,7 +2,7 @@
 
 Part 1 of 5 of this topic. Covers: Totals and hierarchy levels; Budget, currency and financial calculations.
 
-Practice notes drawn from public SQLBI articles, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail.
+Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail. A note may name a tool, a website or a custom visual that this template does not use, or describe publishing, deploying or changing a deployed model: that is information for the developer. You do not install, call or suggest such a tool, and nothing is published or deployed from this template.
 
 ## General practice
 
@@ -41,6 +41,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T14-A010-1.** A parent-group total can be had with CALCULATE and ALLEXCEPT on the item table, keeping only the group column: every other filter on that table is cleared, the one on the current item included, so the group's total is left.
 - Option. 2011. https://www.sqlbi.com/articles/ratio-over-subtotals-with-normalized-tables-in-dax/
 - When: The parent-group column sits in the same table as the item column shown.
+- Version: From 2011. The DAX standard uses ALLEXCEPT only when the kept column is filtered directly; otherwise REMOVEFILTERS with VALUES (rule 20).
 
 **T14-A010-2.** ALLEXCEPT works on one table only. It cannot return the total of a parent group whose column sits in another table reached through relationships, such as a category table linked to products through a subcategory table.
 - Fact. 2011. https://www.sqlbi.com/articles/ratio-over-subtotals-with-normalized-tables-in-dax/

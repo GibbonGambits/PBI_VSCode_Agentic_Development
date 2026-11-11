@@ -2,17 +2,17 @@
 
 Part 1 of 1 of this topic. Covers: Reducing column cardinality; Measuring model size; Analysis Services processing; Calculated column and table storage.
 
-Practice notes drawn from public SQLBI articles, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail.
+Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail. A note may name a tool, a website or a custom visual that this template does not use, or describe publishing, deploying or changing a deployed model: that is information for the developer. You do not install, call or suggest such a tool, and nothing is published or deployed from this template.
 
 ## General practice
 
 ### Reducing column cardinality
 
-**T08-A016-5.** Split full timestamps into a date and a time column: the date column then holds at most 365 distinct values per year stored, and the time column is bounded by its grain, 86,400 values at one second.
+**T08-A016-5.** Split from its time, a date column holds at most 365 distinct values per year stored; the time column is bounded by its grain, 86,400 values at one second.
 - Should. 2012. https://www.sqlbi.com/articles/optimizing-high-cardinality-columns-in-vertipaq/
 - When: A date-time column holds full event timestamps.
 
-**T08-A030-2.** Also usually useless for analysis, and best left out of the import: a fact table's primary key or identity column, which serves neither analysis nor lookups from other tables, and housekeeping columns such as replication or audit identifiers, last-update dates and last-update users.
+**T08-A030-2.** A fact table's primary key or identity column, which serves neither analysis nor lookups from other tables, and housekeeping columns such as replication or audit identifiers, last-update dates and last-update users, are usually useless for analysis and best left out of the import.
 - Should. 2013. https://www.sqlbi.com/articles/checklist-for-memory-optimizations-in-powerpivot-and-tabular-models/
 - When: Choosing which source columns to import into a Tabular model.
 
@@ -24,7 +24,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - Should. 2013. https://www.sqlbi.com/articles/checklist-for-memory-optimizations-in-powerpivot-and-tabular-models/
 - When: A derivable column, such as a sales amount, was dropped from the import.
 
-**T08-A030-9.** Numbers count too: round to whole values where decimals do not matter to the analysis. Where a time is stored with milliseconds, cut it at least to the second. The data type alone changes nothing; distinct values must fall.
+**T08-A030-9.** Round numbers to whole values where decimals do not matter to the analysis, and cut a time stored with milliseconds at least to the second. The data type alone changes nothing: the count of distinct values must fall.
 - Should. 2013. https://www.sqlbi.com/articles/checklist-for-memory-optimizations-in-powerpivot-and-tabular-models/
 - When: Extra precision in a numeric or time column is not needed for analysis.
 

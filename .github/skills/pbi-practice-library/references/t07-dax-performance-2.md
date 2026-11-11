@@ -2,7 +2,7 @@
 
 Part 2 of 3 of this topic. Covers: Model design, relationships and memory; Server, processing and hardware; Report visuals and Excel clients.
 
-Practice notes drawn from public SQLBI articles, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail.
+Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail. A note may name a tool, a website or a custom visual that this template does not use, or describe publishing, deploying or changing a deployed model: that is information for the developer. You do not install, call or suggest such a tool, and nothing is published or deployed from this template.
 
 ## General practice
 
@@ -130,15 +130,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T07-W378-15.** A static Boolean condition over several columns of different tables, used as a CALCULATE filter, can be evaluated once in ETL as a true/false column of the fact table and filtered there. A calculated column would add processing time and model size.
 - Option. 2014. https://www.sqlbi.com/whitepapers/using-tabular-models-in-a-large-scale-commercial-solution/
 - When: The condition does not depend on the query and is costly to compute while the query runs.
-
-**T07-W378-16.** For a small dimension, such as one holding only a code and a description, weigh dropping it and copying the description into the fact table to save a join. Test it first: denormalizing is not always faster, and filtering the dimension was sometimes much faster.
-- Consider. 2014. https://www.sqlbi.com/whitepapers/using-tabular-models-in-a-large-scale-commercial-solution/
-- When: A dimension with very few columns; the outcome depends on table sizes and compression.
-
-**T07-A061-5.** When the lookup table on the one side of a relationship is large, consider denormalizing it into the many-side table, or moving its often-queried low-cardinality columns into a separate table with fewer rows. In one header and detail example, merging saved 61% of query time.
-- Consider. Check. 2015. https://www.sqlbi.com/articles/costs-of-relationships-in-dax/
-- When: Lookup tables above 5 to 10 million rows, or 200,000 to 5 million when performance degrades.
-- Version: Row figures date from 2015.
 
 **T07-A061-7.** In a star schema, large dimensions become a bottleneck: a dimension counts as large above 1 to 2 million rows, a hardware-dependent warning range runs from 500,000 to 2,000,000 rows, and above 10 million rows performance problems are certain.
 - Fact. Check. 2015. https://www.sqlbi.com/articles/costs-of-relationships-in-dax/

@@ -2,7 +2,7 @@
 
 Part 2 of 3 of this topic. Covers: Incomplete periods and future dates; Period-over-period comparisons; Building a Date table.
 
-Practice notes drawn from public SQLBI articles, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail.
+Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail. A note may name a tool, a website or a custom visual that this template does not use, or describe publishing, deploying or changing a deployed model: that is information for the developer. You do not install, call or suggest such a tool, and nothing is published or deployed from this template.
 
 ## General practice
 
@@ -39,7 +39,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T04-A121-2.** A new model can start from a template file that already holds a complete Date table as a calculated table, which avoids rewriting its DAX and setting display formats, hierarchies and column visibility again each time.
 - Option. Check. 2018. https://www.sqlbi.com/articles/reference-date-table-in-dax-and-power-bi/
 - When: Creating new models that need a custom Date table.
-- Version: The template is a PBIT file; a 2023 note adds that Bravo for Power BI can generate a Date table.
+- Version: The template is a PBIT file; a 2023 note adds that Bravo for Power BI can generate a Date table. This template starts a model with its own scaffold and the shipped Date table example.
 
 **T04-A121-9.** The first year of a Date table can be computed dynamically from the earliest year of data in the other tables of the model.
 - Option. 2018. https://www.sqlbi.com/articles/reference-date-table-in-dax-and-power-bi/
@@ -49,17 +49,9 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - Should. 2018. https://www.sqlbi.com/articles/reference-date-table-in-dax-and-power-bi/
 - When: A calculated Date table in a model set up to allow future dates.
 
-**T04-A152-4.** Auto Date/Time is enabled by default; its switch sits under Data Load in the Options dialog of Power BI Desktop.
-- Option. 2019. https://www.sqlbi.com/articles/automatic-time-intelligence-in-power-bi/
-- When: Checking or changing the Auto Date/Time setting.
-
 **T04-A153-6.** A basic date table can be extended with more columns as requirements ask, for example the weekday as text or number, the quarter, and fiscal months and years.
 - Option. 2019. https://www.sqlbi.com/articles/creating-a-simple-date-table-in-dax/
 - When: Reports or calculations need date attributes beyond those of a basic date table.
-
-**T04-A319-2.** A model needs one single Date table as soon as it holds more than one date column, whether the columns sit in one table or in several.
-- Must. 2024. https://www.sqlbi.com/articles/using-weekly-calendars-in-power-bi/
-- When: Any model with two or more date columns.
 
 ## Special-case techniques and facts
 
@@ -129,6 +121,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T04-A114-2.** A second date table for a two-period comparison can be linked to the main Date table by one inactive one-to-one relationship, not by an inactive relationship to every fact table. It is less intuitive, and while inactive it leaves calculations sliced by Date untouched.
 - Option. Check. 2017. https://www.sqlbi.com/articles/filtering-and-comparing-different-time-periods-with-power-bi/
 - When: The model has several fact tables; with one fact table a direct relationship to its date is enough.
+- Version: A one-to-one relationship needs its exception row in the brief (M409).
 
 **T04-A114-3.** The measure for the second period must, in one CALCULATE, remove every filter on the main Date table and activate the inactive relationship from the second date table with USERELATIONSHIP. The second selection then moves onto Date and filters every related fact table.
 - Must. Check. 2017. https://www.sqlbi.com/articles/filtering-and-comparing-different-time-periods-with-power-bi/
@@ -197,6 +190,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T04-A281-5.** A table of custom periods with start and end dates can be used in two ways: copy its columns into the Date table as calculated columns, or keep it visible and relate Date to it many-to-one on the sequential period number, hidden in Date.
 - Option. 2023. https://www.sqlbi.com/articles/comparing-different-school-terms-in-power-bi/
 - When: Custom periods such as terms, seasons or campaigns kept in their own table.
+- Version: Relating Date to another table makes a chain that needs its exception row in the brief (M412).
 
 **T04-A281-6.** In a calculated column of the Date table that looks up the custom period holding each date, one option is to trap the lookup error with IFERROR and raise your own message with ERROR, pointing to overlapping periods, so the refresh log names the cause.
 - Option. 2023. https://www.sqlbi.com/articles/comparing-different-school-terms-in-power-bi/
@@ -241,6 +235,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T04-A121-14.** Give the reference Date table template its parameters in the expected form: holiday country as a supported ISO country code (AU, BE, CA, DE, ES, FR, IT, NL, PT, UK, US); working days of the week and custom fiscal periods in DATATABLE syntax.
 - Should. Check. 2018. https://www.sqlbi.com/articles/reference-date-table-in-dax-and-power-bi/
 - When: Setting the holiday-country, working-days and custom-fiscal-periods parameters of the template.
+- Version: Refers to the Date table template its article describes; this template ships its own Date table example.
 
 **T04-A152-3.** Each hidden Auto Date/Time table filters only the table of its own column, so one date attribute also cannot slice two date columns of one table, such as order date and delivery date, in the same visual.
 - Fact. Check. 2019. https://www.sqlbi.com/articles/automatic-time-intelligence-in-power-bi/

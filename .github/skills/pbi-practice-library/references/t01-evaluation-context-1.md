@@ -2,7 +2,7 @@
 
 Part 1 of 2 of this topic. Covers: KEEPFILTERS and arbitrary filters; CALCULATE filter arguments; Visual queries and auto-exist; Reading the selected value; Row context and iterators.
 
-Practice notes drawn from public SQLBI articles, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail.
+Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail. A note may name a tool, a website or a custom visual that this template does not use, or describe publishing, deploying or changing a deployed model: that is information for the developer. You do not install, call or suggest such a tool, and nothing is published or deployed from this template.
 
 ## General practice
 
@@ -288,7 +288,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T01-A058-1.** To give a measure parameter values, one option is a hidden table per parameter holding every value needed: call the measure in CALCULATE with a filter that sets the column to the wanted value, and let the measure read it with VALUES.
 - Option. Check. 2015. https://www.sqlbi.com/articles/parameters-in-dax-measures/
 - When: Complex expressions compute a measure with different argument values; simple cases can keep the condition in inner measures.
-- Version: Written in 2015, when DAX had no way to pass arguments to a measure.
+- Version: Written in 2015, when DAX had no way to pass arguments to a measure. The DAX standard reads one value with SELECTEDVALUE (rule 4); user-defined functions now take parameters.
 
 **T01-A058-2.** Hide measures that read their parameter values from hidden parameter tables, so users never call them directly: with several values selected in a parameter table such a measure fails with an error.
 - Should. 2015. https://www.sqlbi.com/articles/parameters-in-dax-measures/

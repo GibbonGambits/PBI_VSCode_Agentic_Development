@@ -2,7 +2,7 @@
 
 Part 1 of 3 of this topic. Covers: Scripting with TOM and APIs; Choosing development tools; Translations and renaming objects.
 
-Practice notes drawn from public SQLBI articles, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail.
+Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail. A note may name a tool, a website or a custom visual that this template does not use, or describe publishing, deploying or changing a deployed model: that is information for the developer. You do not install, call or suggest such a tool, and nothing is published or deployed from this template.
 
 ## General practice
 
@@ -25,23 +25,20 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - When: Starting a Tabular model project with Microsoft tools.
 - Version: Describes the tools as of 2021.
 
-**T16-A221-8.** Tabular Editor can save a model as many files, one per object, which integrates better with a standard version control system such as GitHub than a single model.bim file that the Microsoft tools cannot merge.
-- Option. Check. 2021. https://www.sqlbi.com/articles/development-tools-for-tabular-models-in-2021/
-- When: Several developers work on one Tabular model kept in source control.
-- Version: Stated in 2021 about models kept as a single model.bim file.
-
 **T16-A221-9.** Keep ALM Toolkit among the model development tools: it compares two models, Analysis Services databases or Power BI datasets, shows their differences, and merges them or generates a file that deploys them.
 - Should. 2021. https://www.sqlbi.com/articles/development-tools-for-tabular-models-in-2021/
 - When: Comparing and merging two versions of one semantic model, a small part of the development cycle.
+- Version: A tool outside this template: information for the developer, never called or suggested by Copilot.
 
 **T16-A221-12.** For enterprise-level Tabular models, developers should take Tabular Editor as their main development tool, free or commercial edition by productivity needs and budget: it alone reaches every model feature in every situation, also for a model first made in Power BI Desktop.
 - Should. Check. 2021. https://www.sqlbi.com/articles/development-tools-for-tabular-models-in-2021/
 - When: Enterprise-level models on Power BI Premium or Analysis Services.
-- Version: 2021 view: the free, open-source edition is Tabular Editor 2; Tabular Editor 3 is the commercial one.
+- Version: 2021 view: the free, open-source edition is Tabular Editor 2; Tabular Editor 3 is the commercial one. A tool outside this template: information for the developer, never called or suggested by Copilot.
 
 **T16-A221-13.** Developers should keep DAX Studio in their toolset and use it to write and tune DAX queries, measures and data models, checking query results, query plans and performance.
 - Should. 2021. https://www.sqlbi.com/articles/development-tools-for-tabular-models-in-2021/
 - When: Developing and optimising Tabular models and their DAX code.
+- Version: A tool outside this template: information for the developer, never called or suggested by Copilot.
 
 **T16-A221-18.** Do not expect one all-in-one tool. For each need, select the tools that reach the required model features most productively: no single monolithic tool serves model authors, report authors and business users alike.
 - Should. 2021. https://www.sqlbi.com/articles/development-tools-for-tabular-models-in-2021/
@@ -51,11 +48,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - Option. 2021. https://www.sqlbi.com/articles/development-tools-for-tabular-models-in-2021/
 - When: Choosing the authoring tool at the start of a Tabular project for Analysis Services or Power BI Premium.
 - Version: Describes the tools as of 2021.
-
-**T16-A331-1.** A reason to weigh the PBIR report format when external tools will work on reports: it stores report metadata in a more structured, readable form, and some tools offer features that work on PBIR reports only.
-- Consider. Check. 2025. https://www.sqlbi.com/articles/tools-in-power-bi/
-- When: Deciding how to save reports that external tools will work on.
-- Version: Named in 2025 as having PBIR-only functions: semantic-link-labs and PBI Inspector V2.
 
 **T16-A331-3.** No tool is mandatory; pick one for a specific model task: design sketches (Figma, Excalidraw), Tabular Editor, Bravo, Analyze in Excel, DAX Studio, VertiPaq Analyzer, ALM Toolkit, Measure Killer, DAX Optimizer, pbi-tools, Fabric notebooks, DAX query view, TMDL view, Performance Analyzer, VS Code.
 - Option. 2025. https://www.sqlbi.com/articles/tools-in-power-bi/
@@ -86,42 +78,47 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T16-A084-1.** To change a Tabular model at compatibility level 1200 from code, prefer the Tabular Object Model (TOM) classes: at that level the object model maps one to one onto the physical entities of the database, and TOM exposes them.
 - Should. 2016. https://www.sqlbi.com/articles/adding-a-measure-to-a-tabular-model/
 - When: Programmatic edits of a deployed model, such as measures created by an add-in or generated variants.
-- Version: Compatibility level 1200 arrived with Analysis Services 2016; TOM ships as a namespace of the AMO library.
+- Version: Compatibility level 1200 arrived with Analysis Services 2016; TOM ships as a namespace of the AMO library. This template changes a model only in its files, never through a server or a library.
 
 **T16-A084-2.** For a model at the older 110x compatibility level, the Tabular AMO 2012 library is one way to get an object model similar to TOM; at that level one model table is split into several server objects, which makes direct access harder.
 - Option. Check. 2016. https://www.sqlbi.com/articles/adding-a-measure-to-a-tabular-model/
 - When: Programmatic access to Tabular models at the 110x compatibility level.
-- Version: 110x belongs to Analysis Services 2012 and 2014; the library was published on CodePlex.
+- Version: 110x belongs to Analysis Services 2012 and 2014; the library was published on CodePlex. This template changes a model only in its files, never through a server or a library.
 
 **T16-A084-3.** A C# project that edits a Tabular model through TOM needs references to two assemblies: Microsoft.AnalysisServices.Tabular, which holds the TOM classes, and Microsoft.AnalysisServices.Core, which is needed to connect to Analysis Services.
 - Must. 2016. https://www.sqlbi.com/articles/adding-a-measure-to-a-tabular-model/
 - When: Writing C# code that connects to Analysis Services to add or change model objects.
+- Version: This template changes a model only in its files, never through a server or a library.
 
 **T16-A084-4.** To add a measure to a deployed model through TOM: connect to the server, navigate to the database, its model and the target table, then add a new Measure object to that table's Measures collection.
 - Must. 2016. https://www.sqlbi.com/articles/adding-a-measure-to-a-tabular-model/
 - When: Adding a measure to a deployed Analysis Services model from C# or PowerShell.
+- Version: This template changes a model only in its files, never through a server or a library.
 
 **T16-A084-5.** Although a measure name is unique in the whole model, each measure belongs to one table, and that home table influences Q&A semantics in Power BI and drillthrough behaviour in Excel.
 - Fact. 2016. https://www.sqlbi.com/articles/adding-a-measure-to-a-tabular-model/
 - When: Judging what the home table of a measure changes for client tools.
-- Version: Stated in 2016. This template keeps every measure in one measures table (model standard rule 1).
+- Version: Stated in 2016. This template keeps every measure in one measures table (model standard rule 1). This template changes a model only in its files, never through a server or a library.
 
 **T16-A084-6.** To change through TOM a measure that may already exist, look it up with the Find method of the table's Measures collection; create and add a new Measure object only when the lookup returns nothing.
 - Must. 2016. https://www.sqlbi.com/articles/adding-a-measure-to-a-tabular-model/
 - When: Replacing a measure's expression, or creating the measure when missing, in a deployed model from C# or PowerShell.
+- Version: This template changes a model only in its files, never through a server or a library.
 
 **T16-A084-7.** After adding or changing objects through TOM, call SaveChanges on the model object. Until then the edits exist only in the client-side copy; the call sends all pending edits to the server in one transaction.
 - Must. 2016. https://www.sqlbi.com/articles/adding-a-measure-to-a-tabular-model/
 - When: Any measure created or modified through TOM in C# or PowerShell.
+- Version: This template changes a model only in its files, never through a server or a library.
 
 **T16-A084-8.** A PowerShell script that edits a Tabular model must first load the Microsoft.AnalysisServices.Tabular assembly to reach the TOM classes; after that it follows the same steps as the C# code.
 - Must. 2016. https://www.sqlbi.com/articles/adding-a-measure-to-a-tabular-model/
 - When: Adding or replacing measures in a deployed model from PowerShell.
+- Version: This template changes a model only in its files, never through a server or a library.
 
 **T16-A084-9.** To add or replace one measure in a deployed model, prefer TOM to TMSL: the TMSL CreateOrReplace command cannot target a single measure, so the definitions of all tables would have to be deployed.
 - Should. Check. 2016. https://www.sqlbi.com/articles/adding-a-measure-to-a-tabular-model/
 - When: Adding or replacing a single measure in a deployed model.
-- Version: State of TMSL in 2016; a later release may have added this support.
+- Version: State of TMSL in 2016; a later release may have added this support. This template changes a model only in its files, never through a server or a library.
 
 **T16-A205-2.** Token-acquisition code is not enough. The application must also be registered and configured in Azure Active Directory, API permissions included, so that the service principal the code relies on exists and is authorised.
 - Must. Check. 2020. https://www.sqlbi.com/articles/creating-a-service-principal-account-for-power-bi-api/
@@ -136,7 +133,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T16-A221-17.** Scripts in .NET Core languages, PowerShell included, can build Tabular models and deploy them through the XMLA endpoint to Analysis Services or Power BI Premium, also from operating systems other than Windows.
 - Option. 2021. https://www.sqlbi.com/articles/development-tools-for-tabular-models-in-2021/
 - When: Automating the creation or deployment of Tabular models.
-- Version: Microsoft released the TOM and ADOMD.NET libraries for .NET Core in February 2021.
+- Version: Microsoft released the TOM and ADOMD.NET libraries for .NET Core in February 2021. Nothing is published or deployed from this template: this is a person's or a pipeline's step.
 
 ### Choosing development tools
 
@@ -192,7 +189,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T16-A050-3.** Translations can serve as a renaming layer: build the model in a language no user works in, or add a translation for the model's own locale, and set the user-facing names there. Clients show the translated names; DAX and MDX queries keep the originals.
 - Option. Check. 2014. https://www.sqlbi.com/articles/frictionless-renaming-in-tabular-models-with-analysis-services/
 - When: User-facing names must change without editing DAX; possibly unsupported by Microsoft, so test first and accept the risk.
-- Version: 2014 technique for Analysis Services Tabular through BIDS Helper; not available in Power Pivot.
+- Version: 2014 technique for Analysis Services Tabular through BIDS Helper; not available in Power Pivot. Microsoft's guidance in this template uses default-language translations sparingly (multiple languages, rule 3).
 
 **T16-A081-2.** Upgrading a Tabular model to compatibility level 1200 discards every metadata translation that was added with BIDS Helper. Those translations must then be rebuilt from scratch or carried over with a separate migration procedure.
 - Fact. 2016. https://www.sqlbi.com/articles/translations-in-analysis-services-2016/

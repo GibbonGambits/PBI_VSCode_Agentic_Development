@@ -166,10 +166,10 @@ class Index(unittest.TestCase):
                 self.assertIn("\n" + label, block, name)
 
     def test_functions_named_in_the_index_are_in_the_function_index(self):
-        known = set(re.findall(r"^- ([A-Z][A-Z0-9.]*):", read(os.path.join(
+        known = set(re.findall(r"^- ([A-Z][A-Z0-9.]*)(?: \([a-z]+\))?:", read(os.path.join(
             REPO, ".github", "skills", "pbi-semantic-model", "references", "dax-functions.md")), re.M))
         text = read(os.path.join(REFERENCES, "index.md"))
-        for line in re.findall(r"^- DAX functions: (.*)\.$", text, re.M):
+        for line in re.findall(r"^- DAX functions: (.*?)\.(?: Also named, though missing from the function index of the model skill: .*\.)?$", text, re.M):
             if line == "none named":
                 continue
             for name in line.split(", "):

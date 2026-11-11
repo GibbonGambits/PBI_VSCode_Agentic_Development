@@ -2,7 +2,7 @@
 
 Part 1 of 2 of this topic. Covers: Grouping and adding columns; Writing DAX queries; Filter and text conditions.
 
-Practice notes drawn from public SQLBI articles, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail.
+Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail. A note may name a tool, a website or a custom visual that this template does not use, or describe publishing, deploying or changing a deployed model: that is information for the developer. You do not install, call or suggest such a tool, and nothing is published or deployed from this template.
 
 ## General practice
 
@@ -11,10 +11,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T03-A007-8.** Consider ADDCOLUMNS rather than SUMMARIZE when columns of a query result must be computed under different filter contexts, or when the writer reasons in MDX terms. SUMMARIZE applies the filter context already on its table before grouping and computing the columns.
 - Consider. 2011. https://www.sqlbi.com/articles/converting-mdx-to-dax-first-steps/
 - When: Shaping a query result; SUMMARIZE can still be exactly what is needed, and feels natural from SQL.
-
-**T03-A022-3.** A computed column may stay inside SUMMARIZE in two cases: ROLLUP is needed over the grouping columns to get subtotals, or the column's expression relies on non-trivial table expressions, such as a filtered table being grouped.
-- Should. Check. 2012. https://www.sqlbi.com/articles/best-practices-using-summarize-and-addcolumns/
-- When: Deciding whether to move a column out of SUMMARIZE into a surrounding ADDCOLUMNS.
 
 **T03-A048-2.** Avoid using SUMMARIZE to produce subtotals. The feature works, but the semantics of SUMMARIZE are convoluted enough that the results may be unexpected; only its grouping is safe.
 - Should. 2021. https://www.sqlbi.com/articles/all-the-secrets-of-summarize/

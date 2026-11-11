@@ -2,7 +2,7 @@
 
 Part 4 of 5 of this topic. Covers: Ranking and top N.
 
-Practice notes drawn from public SQLBI articles, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail.
+Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail. A note may name a tool, a website or a custom visual that this template does not use, or describe publishing, deploying or changing a deployed model: that is information for the developer. You do not install, call or suggest such a tool, and nothing is published or deployed from this template.
 
 ## General practice
 
@@ -111,7 +111,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T14-A164-1.** To show only each group's top N items in a visual, write one dedicated measure, such as a rank within the group, and use it in the visual-level filter. Do not add rank-and-blank logic to every measure shown: that changes each measure and hurts performance.
 - Should. Check. 2019. https://www.sqlbi.com/articles/filtering-the-top-3-products-for-each-category-in-power-bi/
 - When: Visuals with the top N per group; subtotals then cover the visible items only.
-- Version: In 2019 the Power BI interface had no easy way to show the top N of each group.
+- Version: In 2019 the Power BI interface had no easy way to show the top N of each group. The DAX standard (rule 37) notes that a measure filter on a visual works the measure out twice: measure both ways.
 
 **T14-A164-2.** A measure that ranks items within their group in a visual must build the ranking table as CALCULATETABLE over VALUES of the item column with ALLSELECTED on that column. ALLSELECTED of the column alone discards the visual's group filter and gives a wrong rank.
 - Must. Check. 2019. https://www.sqlbi.com/articles/filtering-the-top-3-products-for-each-category-in-power-bi/

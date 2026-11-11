@@ -2,7 +2,7 @@
 
 Part 2 of 2 of this topic. Covers: Calculated and static tables; SUMMARIZECOLUMNS behaviour; Joins and lookups; Set functions.
 
-Practice notes drawn from public SQLBI articles, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail.
+Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail. A note may name a tool, a website or a custom visual that this template does not use, or describe publishing, deploying or changing a deployed model: that is information for the developer. You do not install, call or suggest such a tool, and nothing is published or deployed from this template.
 
 ## General practice
 
@@ -23,6 +23,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T03-A094-8.** Inside an expression of SUMMARIZECOLUMNS, read the current value of a grouping column through VALUES, never by referencing the column directly. SUMMARIZECOLUMNS gives its expressions a filter context only, with no row context on the grouped columns; SUMMARIZE provides both.
 - Must. 2017. https://www.sqlbi.com/articles/introducing-summarizecolumns/
 - When: A single value of the column is active, which holds when the expression is not evaluated in a rollup.
+- Version: Where a single value is compared or returned, the DAX standard prefers SELECTEDVALUE (rules 4 and 5).
 
 **T03-A094-10.** Before relying on SUMMARIZECOLUMNS, consider whether the product and version that will run the DAX code support it.
 - Consider. Check. 2017. https://www.sqlbi.com/articles/introducing-summarizecolumns/
@@ -118,6 +119,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T03-A203-9.** UNION, INTERSECT and EXCEPT are not limited to DAX queries: they can be used inside measures to assemble complex filters. The data lineage of the resulting table is essential for it to filter; TREATAS can restore a lost lineage or assign a new one.
 - Option. 2020. https://www.sqlbi.com/articles/set-functions-in-dax-union-intersect-and-except/
 - When: Building filter tables for measures with set functions.
+- Version: M510 warns on every INTERSECT: such a formula needs its exception row in the brief.
 
 ## Special-case techniques and facts
 
@@ -126,7 +128,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T03-A070-1.** A static table of fixed values, such as settings, parameters or segment boundaries, can be a calculated table defined with DATATABLE, so its content is DAX that can be read and edited. Enter Data keeps typed values as an encoded, compressed JSON document instead.
 - Option. Check. 2016. https://www.sqlbi.com/articles/create-static-tables-in-dax-using-the-datatable-function/
 - When: Tables whose fixed rows cannot be refreshed and change only together with the model or its measures.
-- Version: DATATABLE: Power BI Desktop and Analysis Services 2016 (compatibility level 1200); Power Pivot cannot create such a table in DAX.
+- Version: DATATABLE: Power BI Desktop and Analysis Services 2016 (compatibility level 1200); Power Pivot cannot create such a table in DAX. A calculated table needs its reason line (M105); the standard keeps DAX for what Power Query cannot do.
 
 **T03-A070-5.** In Power BI Desktop, a static table can also be made with Enter Data, by typing values into a grid or pasting them. The model then keeps the values inside a Power Query expression as an encoded, compressed JSON document.
 - Option. Check. 2016. https://www.sqlbi.com/articles/create-static-tables-in-dax-using-the-datatable-function/

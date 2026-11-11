@@ -2,7 +2,7 @@
 
 Part 1 of 5 of this topic. Covers: Slicers and measure filters; Report design and requirements.
 
-Practice notes drawn from public SQLBI articles, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail.
+Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail. A note may name a tool, a website or a custom visual that this template does not use, or describe publishing, deploying or changing a deployed model: that is information for the developer. You do not install, call or suggest such a tool, and nothing is published or deployed from this template.
 
 ## General practice
 
@@ -13,11 +13,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - When: Deciding whether a measure may filter a table instead of columns, as in OR logic between slicers.
 
 ### Report design and requirements
-
-**T15-A072-2.** Give each measure the exact wording its label should have in the report, and rename a measure whose name does not match the report's wording.
-- Should. Check. 2016. https://www.sqlbi.com/articles/the-space-report-under-the-hood/
-- When: Naming measures for a report; limited where the report builder cannot change the model, as on a live connection.
-- Version: From 2016, when a visual could not show another name; renaming an existing measure needs the developer's yes.
 
 **T15-A072-10.** When no visual property meets a report requirement, look for the answer in every layer of the tool: queries, data model, DAX and custom visuals, not only in the visual's settings.
 - Should. 2016. https://www.sqlbi.com/articles/the-space-report-under-the-hood/
@@ -52,6 +47,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T15-A308-6.** The 30-second filter-and-zoom area guides readers to the categories that matter: consistent, limited chart formatting, readable titles, axes and labels, conditional formatting on categories readers are likely to filter, and user training in cross-filtering and drilldown. Avoid too many visuals, interactions and redundant information.
 - Should. 2024. https://www.sqlbi.com/articles/introducing-the-3-30-300-rule-for-better-reports/
 - When: The part of a report where readers filter and zoom to areas they may act on.
+- Version: Theme colours only; a colour code needs an exception row (V009).
 
 **T15-A308-7.** The 300-second details area surfaces the key details for the filtered areas and is no raw data dump. Keep tables concise with few categories and values, let drillthrough pass only needed filters, link to supplemental information, and never build pages meant only for export.
 - Should. 2024. https://www.sqlbi.com/articles/introducing-the-3-30-300-rule-for-better-reports/

@@ -2,7 +2,7 @@
 
 Part 1 of 1 of this topic. Covers: Many-to-many relationships; Virtual relationships in DAX; Bidirectional filters and propagation; Blank row and limited relationships; Inactive relationships and date roles.
 
-Practice notes drawn from public SQLBI articles, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail.
+Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail. A note may name a tool, a website or a custom visual that this template does not use, or describe publishing, deploying or changing a deployed model: that is information for the developer. You do not install, call or suggest such a tool, and nothing is published or deployed from this template.
 
 ## General practice
 
@@ -45,10 +45,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - When: Converting a virtual relationship from INTERSECT to TREATAS.
 
 ### Bidirectional filters and propagation
-
-**T05-A141-2.** When a both-direction relationship is used, verify that it leaves no more than one filter path between any two tables of the model.
-- Must. 2018. https://www.sqlbi.com/articles/bidirectional-relationships-and-ambiguity-in-dax/
-- When: One of the few cases where a both-direction relationship is worth having.
 
 **T05-A236-1.** Sending a filter to the one side always costs more than sending it to the many side. One safe both-direction case: between a dimension and an intermediate table built only to link tables of different grain, where the filter still flows one way.
 - Should. 2018. https://www.sqlbi.com/articles/bidirectional-relationships-and-ambiguity-in-dax/ ; https://www.sqlbi.com/articles/relationships-in-power-bi-and-tabular-models/ ; https://www.sqlbi.com/articles/different-options-to-model-many-to-many-relationships-in-power-bi-and-tabular/
@@ -94,10 +90,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - Option. 2020. https://www.sqlbi.com/articles/using-userelationship-in-dax/
 - When: Writing a USERELATIONSHIP call.
 
-**T05-A258-1.** When a fact has several date columns, start from one shared Date table related to each, one relationship active. Measures on different dates can then share one date axis in a visual. Add more date tables only when a visual needs two dates.
-- Should. 2022. https://www.sqlbi.com/articles/using-cross-highlight-with-order-and-delivery-dates-in-power-bi/
-- When: A fact table with two or more date columns for one event.
-
 **T05-A258-2.** With one shared Date table, every pairing of a calculation with a non-default date that reports use needs its own measure, each switching on the inactive relationship with USERELATIONSHIP in CALCULATE.
 - Must. 2022. https://www.sqlbi.com/articles/using-cross-highlight-with-order-and-delivery-dates-in-power-bi/
 - When: A shared Date table related to several date columns, one relationship active.
@@ -133,6 +125,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T05-A182-8.** A coarser table, such as a budget by brand and country, can be linked through a calculated table of the distinct shared values from both sides. Relate it one-to-many to the dimension and to the coarse table, and let the dimension relationship filter both ways.
 - Option. 2020. https://www.sqlbi.com/articles/relationships-in-power-bi-and-tabular-models/
 - When: The coarse table's grain allows no one-to-many relationship to the dimension.
+- Version: A both-direction relationship needs its reason and its exception row in the brief (M405; checklist item 12).
 
 **T05-A182-10.** When the column of a different-grain relationship has thousands of values or more, weigh an intermediate calculated table with two one-to-many relationships against one many-to-many cardinality relationship, which has no index and is slower. With about 10 to 100 values the difference can be ignored.
 - Consider. 2020. https://www.sqlbi.com/articles/relationships-in-power-bi-and-tabular-models/
@@ -142,6 +135,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T05-A236-3.** When a many-to-many between dimensions cannot use a both-direction relationship, relate both dimensions to the bridge and link the bridge to the fact by a many-to-many cardinality relationship that filters one way. Test well: some queries get faster, others slower.
 - Option. 2021. https://www.sqlbi.com/articles/different-options-to-model-many-to-many-relationships-in-power-bi-and-tabular/
 - When: A bridge design where a both-direction relationship would cause ambiguity.
+- Version: A many-to-many cardinality relationship needs its exception row in the brief (M406).
 
 **T05-A236-4.** Test performance thoroughly before a model goes to production with a bridge table tied to the fact by a limited many-to-many cardinality relationship. Its query plans are faster for some queries and slower for others than those of the both-direction bridge.
 - Should. 2021. https://www.sqlbi.com/articles/different-options-to-model-many-to-many-relationships-in-power-bi-and-tabular/
@@ -162,6 +156,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T05-A236-9.** An optimized layout keeps the bridge on a limited relationship to the fact and relates the dimension sharing the bridge key straight to the fact, so both filter one fact column. It tested fast, but counts across the two dimensions miss members without fact rows.
 - Option. Check. 2021. https://www.sqlbi.com/articles/different-options-to-model-many-to-many-relationships-in-power-bi-and-tabular/
 - When: A many-to-many between dimensions through a bridge table.
+- Version: A many-to-many cardinality relationship needs its exception row in the brief (M406).
 
 **T05-A236-10.** Where a dimension relates straight to the fact and no longer to the bridge, an inactive relationship between that dimension and the bridge can be added. Measures that must pass a filter between the two dimensions switch it on with USERELATIONSHIP in CALCULATE.
 - Option. 2021. https://www.sqlbi.com/articles/different-options-to-model-many-to-many-relationships-in-power-bi-and-tabular/

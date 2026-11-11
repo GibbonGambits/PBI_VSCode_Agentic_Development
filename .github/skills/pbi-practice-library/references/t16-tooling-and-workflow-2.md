@@ -2,15 +2,11 @@
 
 Part 2 of 3 of this topic. Covers: Model edits with external tools; Query tracing and debugging.
 
-Practice notes drawn from public SQLBI articles, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail.
+Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail. A note may name a tool, a website or a custom visual that this template does not use, or describe publishing, deploying or changing a deployed model: that is information for the developer. You do not install, call or suggest such a tool, and nothing is published or deployed from this template.
 
 ## General practice
 
 ### Query tracing and debugging
-
-**T16-A123-3.** When the durations of the captured queries add up to clearly less than the time the page needs to refresh its visuals, consider the number and complexity of the visuals on the page as a possible cause.
-- Consider. 2018. https://www.sqlbi.com/articles/capturing-power-bi-queries-using-dax-studio/
-- When: Analysing a page's captured queries in DAX Studio, whose Duration column gives milliseconds per query.
 
 **T16-A123-7.** Report performance can be improved step by step by repeating one cycle: trace the page's queries, fix the measure behind the slowest query, then trace again.
 - Option. 2018. https://www.sqlbi.com/articles/capturing-power-bi-queries-using-dax-studio/
@@ -78,7 +74,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - When: Debugging a measure whose intermediate table is too large to read as text in a visual.
 - Version: Tabular Editor 3 is commercial and has a step-by-step DAX debugger; DAX Studio is free.
 
-**T16-A353-11.** When row order matters, sort the table yourself before passing it to TOCSV or TOJSON, for example with TOPN: both emit rows in engine order, which may not be deterministic. TOPN picks the rows without sorting the output; CONCATENATEX can sort, with extra arguments.
+**T16-A353-11.** When it matters which rows appear, pick them yourself before passing the table to TOCSV or TOJSON, for example with TOPN and the sort order needed: both emit rows in engine order, which may vary. TOPN does not sort its output; CONCATENATEX can.
 - Should. 2026. https://www.sqlbi.com/articles/debugging-dax-variables-using-tojson-and-tocsv/
 - When: Debugging with TOCSV or TOJSON when it matters which rows appear.
 
@@ -139,14 +135,14 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - Should. 2020. https://www.sqlbi.com/articles/creating-kpis-in-power-bi-desktop/
 - When: Report visuals that display KPI properties.
 
-**T16-A200-9.** When building KPIs, be aware that three areas carry further important details beyond the basic steps: the graphics available, the numeric values Status and Trend return, and how a KPI behaves when the model also has calculation groups.
+**T16-A200-9.** Beyond the basic steps of building a KPI, three areas need a closer look before you rely on one: the graphics available, the numeric values that Status and Trend return, and how a KPI behaves when the model also has calculation groups.
 - Consider. Check. 2020. https://www.sqlbi.com/articles/creating-kpis-in-power-bi-desktop/
 - When: Designing KPI Status and Trend graphics and values, or using KPIs beside calculation groups.
 
 **T16-A232-1.** One way to give an ordinary numeric column the slicer Single Value option of New Parameter columns: in Tabular Editor, add to the column an extended property named ParameterMetadata whose value is the JSON text `{"version":0}`, then save the model.
 - Option. Check. 2021. https://www.sqlbi.com/articles/how-to-enable-the-single-value-option-in-a-power-bi-slicer/
 - When: A slicer on your own numeric column should offer Single Value; unsupported by Microsoft, so back up first.
-- Version: Described in 2021; the steps are the same in the free and commercial Tabular Editor.
+- Version: Described in 2021; the steps are the same in the free and commercial Tabular Editor. The project check reads a column with this property as a field parameter (M822): expect that finding.
 
 **T16-A232-2.** Always back up the Power BI file before adding the ParameterMetadata extended property to a column with Tabular Editor: the change is not supported by Microsoft and is made at your own risk.
 - Should. 2021. https://www.sqlbi.com/articles/how-to-enable-the-single-value-option-in-a-power-bi-slicer/

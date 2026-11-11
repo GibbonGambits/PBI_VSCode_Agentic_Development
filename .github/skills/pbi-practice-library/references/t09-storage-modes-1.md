@@ -2,7 +2,7 @@
 
 Part 1 of 2 of this topic. Covers: DirectQuery DAX and limits; DirectQuery model and source design.
 
-Practice notes drawn from public SQLBI articles, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail.
+Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail. A note may name a tool, a website or a custom visual that this template does not use, or describe publishing, deploying or changing a deployed model: that is information for the developer. You do not install, call or suggest such a tool, and nothing is published or deployed from this template.
 
 ## General practice
 
@@ -22,11 +22,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - Option. 2017. https://www.sqlbi.com/whitepapers/directquery-in-analysis-services-2016/
 - When: Grouping in DAX queries against DirectQuery.
 - Version: Analysis Services 2016, whose engine removes redundant joins; 2017 white paper.
-
-**T09-A295-1.** Time intelligence functions tend to generate complex SQL in DirectQuery; explicit filter logic you write yourself gives simpler SQL and keeps the query plan under your control, so prefer it where feasible.
-- Should. Check. 2024. https://www.sqlbi.com/articles/optimizing-time-intelligence-in-directquery/
-- When: Time intelligence calculations on DirectQuery over SQL.
-- Version: Tested in 2024; engine behaviour can change.
 
 **T09-A295-2.** When tuning time intelligence measures in VertiPaq, prefer DAX logic that does not rely on the built-in time intelligence functions: they mostly fetch data at day granularity and aggregate it in the formula engine, which materialises many day-level rows.
 - Should. Check. 2024. https://www.sqlbi.com/articles/optimizing-time-intelligence-in-directquery/
@@ -53,11 +48,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - Must. 2017. https://www.sqlbi.com/whitepapers/directquery-in-analysis-services-2016/
 - When: Building a pure DirectQuery model.
 - Version: Analysis Services 2016 Tabular, where a DirectQuery model takes one data source; 2017 white paper.
-
-**T09-W380-14.** Keep the SQL behind a DirectQuery table simple too, with no complex joins or convoluted code: it runs again inside every query that fetches a slice of data, where an in-memory model runs it once.
-- Should. 2017. https://www.sqlbi.com/whitepapers/directquery-in-analysis-services-2016/
-- When: Writing the SQL statement or view that a DirectQuery table reads.
-- Version: Analysis Services 2016 Tabular; 2017 white paper.
 
 **T09-W380-22.** In DirectQuery, consider storing a complex calculated column in the source database: the engine recomputes a model calculated column for every row each time a query uses it. Simple expressions are not a problem.
 - Consider. 2017. https://www.sqlbi.com/whitepapers/directquery-in-analysis-services-2016/
@@ -108,11 +98,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - Should. 2017. https://www.sqlbi.com/whitepapers/directquery-in-analysis-services-2016/
 - When: Designing source columns; compression and clustered columnstore indexes can limit the extra storage.
 - Version: Analysis Services 2016 Tabular; 2017 white paper.
-
-**T09-W380-36.** Inner joins give the SQL optimiser more ways to push filters toward the fact table, which made most test queries faster. In SSDT of December 2016 the property had to be added in model.bim and set again after each edit of the relationship.
-- Should. Check. 2017. https://www.sqlbi.com/whitepapers/directquery-in-analysis-services-2016/
-- When: Relationships of a DirectQuery model whose source keeps referential integrity.
-- Version: Analysis Services 2016 Tabular; SSDT as of December 2016.
 
 **T09-W380-46.** To make the source answer DirectQuery queries on star or snowflake schemas quickly, you can apply the established data warehouse modelling practices for relational databases: the generated SQL is a plain pattern of joins, filters and grouping.
 - Option. 2017. https://www.sqlbi.com/whitepapers/directquery-in-analysis-services-2016/

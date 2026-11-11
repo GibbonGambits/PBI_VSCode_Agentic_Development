@@ -2,7 +2,7 @@
 
 Part 1 of 1 of this topic. Covers: Measure or visual calculation; Window functions and apply semantics; Ranking with RANK and RANKX; Visual context and virtual table; Running totals and performance.
 
-Practice notes drawn from public SQLBI articles, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail.
+Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail. A note may name a tool, a website or a custom visual that this template does not use, or describe publishing, deploying or changing a deployed model: that is information for the developer. You do not install, call or suggest such a tool, and nothing is published or deployed from this template.
 
 ## General practice
 
@@ -138,6 +138,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T12-A320-6.** Base the performance choice between visual calculations and regular DAX measures on a study of the specific scenario: neither is faster as a rule.
 - Must. 2024. https://www.sqlbi.com/articles/computing-open-orders-with-visual-calculations-in-dax/
 - When: Choosing between a visual calculation and a measure for speed.
+- Version: This template restates Microsoft: an equivalent model measure is often slower. Test the case.
 
 **T12-A320-7.** Visual calculations can serve to try out a calculation technique that is then rewritten as a regular DAX measure with better performance.
 - Option. 2024. https://www.sqlbi.com/articles/computing-open-orders-with-visual-calculations-in-dax/
@@ -151,6 +152,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T12-A365-2.** Never assume a visual calculation is faster than the equivalent measure. It can make a report several times slower when the visual's virtual table is large, because the densification step it requires can take long on large tables.
 - Must. 2026. https://www.sqlbi.com/articles/analyzing-the-performance-impact-of-visual-calculations/
 - When: Small virtual tables suit visual calculations; the risk grows with the size of the virtual table.
+- Version: This template restates Microsoft: an equivalent model measure is often slower. Test the case.
 
 **T12-A365-3.** Keep in mind that a measure-based matrix computes only the levels currently visible. A visual calculation always makes the engine build the complete densified virtual table at leaf granularity, whether or not the levels are expanded.
 - Consider. 2026. https://www.sqlbi.com/articles/analyzing-the-performance-impact-of-visual-calculations/
@@ -214,18 +216,13 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T12-A357-3.** To highlight a matrix row by the highest value in the last column, a visual calculation can build the matrix content with ROWS COLUMNS, using COLLAPSEALL and EXPAND, find the last column header with LAST, and return a colour only for rows with the maximum.
 - Option. 2026. https://www.sqlbi.com/articles/using-visual-calculations-to-highlight-an-entire-row/
 - When: The highlight of a full row depends only on the rightmost matrix column; ties can highlight several rows.
-- Version: Names a function missing from this template's DAX function index; DAX standard rule 19 applies until the index lists it.
+- Version: Names a function missing from this template's DAX function index; DAX standard rule 19 applies until the index lists it. Theme colours only; a colour code needs an exception row (V009).
 
 ### Window functions and apply semantics
 
 **T12-A266-2.** INDEX needs every row of its source table to be unique. If the extra sort columns it adds by itself still cannot make the rows unique, it fails; for a model table, uniqueness has to come from a primary key.
 - Fact. Check. 2023. https://www.sqlbi.com/articles/introducing-window-functions-in-dax/
 - When: Any use of INDEX, above all over a model table.
-- Version: As described in 2023; verify on current versions.
-
-**T12-A266-3.** To decide which tied row INDEX returns, one option is to name in ORDERBY every column needed for a unique order. The tie-breaking columns INDEX picks by itself are undocumented: the row is always the same one, but cannot be predicted.
-- Option. Check. 2023. https://www.sqlbi.com/articles/introducing-window-functions-in-dax/
-- When: The result must be more predictable than the automatic tie-breaking of INDEX.
 - Version: As described in 2023; verify on current versions.
 
 **T12-A266-4.** A window function called with no source table uses ALLSELECTED over the ORDERBY columns. The shorter code can miss expected rows: an OFFSET previous-year measure shows nothing for the earliest year a year filter leaves visible, since that year has no previous row.

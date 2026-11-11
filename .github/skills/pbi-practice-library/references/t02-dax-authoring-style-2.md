@@ -2,7 +2,7 @@
 
 Part 2 of 2 of this topic. Covers: IN operator and constructors; Data types and comparisons.
 
-Practice notes drawn from public SQLBI articles, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail.
+Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail. A note may name a tool, a website or a custom visual that this template does not use, or describe publishing, deploying or changing a deployed model: that is information for the developer. You do not install, call or suggest such a tool, and nothing is published or deployed from this template.
 
 ## General practice
 
@@ -51,7 +51,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T02-A140-1.** Use the Decimal data type, not Currency, whenever values need more than four decimal digits: Currency is stored as a 64-bit integer scaled by 10,000, so it holds only four.
 - Must. 2018. https://www.sqlbi.com/articles/understanding-numeric-data-type-conversions-in-dax/
 - When: Choosing a numeric type for values or calculations that need more than four decimal digits.
-- Version: Power BI calls the Currency data type Fixed Decimal Number.
+- Version: Power BI calls the Currency data type Fixed Decimal Number. This template avoids the floating-point type: such a column needs its exception row in the brief (M108).
 
 **T02-A140-2.** Where an expression multiplies or divides operands of different numeric types, check whether a Currency value takes part: the order of multiplications, and Currency in a division numerator, change where the conversion to Currency happens, and so the result.
 - Consider. 2018. https://www.sqlbi.com/articles/understanding-numeric-data-type-conversions-in-dax/
@@ -81,6 +81,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T02-A273-3.** Choose between Fixed Decimal Number and Decimal Number by the operations performed and the accuracy required: Fixed Decimal loses no precision up to four decimal digits while the largest aggregated value stays below 900 trillion; Decimal has a wider range but rounding differences.
 - Consider. 2023. https://www.sqlbi.com/articles/rounding-errors-with-different-data-types-in-dax/
 - When: Choosing the data type of numeric columns.
+- Version: This template avoids the floating-point type: such a column needs its exception row in the brief (M108).
 
 **T02-A273-4.** When rounding differences do not matter for a calculation, also weigh the performance cost of data type conversions when choosing data types.
 - Consider. 2023. https://www.sqlbi.com/articles/rounding-errors-with-different-data-types-in-dax/
@@ -150,6 +151,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T02-A293-4.** To check whether any of two or more value combinations is present, use a table constructor that lists the combinations, for example with INTERSECT against the summarized columns and ISEMPTY, not the tuple-with-IN syntax, which suits a single tuple only.
 - Should. 2024. https://www.sqlbi.com/articles/using-tuple-syntax-in-dax-expressions/
 - When: Tests of two or more tuples, for example for conditional formatting.
+- Version: M510 warns on every INTERSECT: such a formula needs its exception row in the brief.
 
 **T02-A293-5.** A tuple is not a valid result of a DAX expression: it cannot be assigned to a variable, though it can be used with the IN operator.
 - Fact. 2024. https://www.sqlbi.com/articles/using-tuple-syntax-in-dax-expressions/
@@ -158,6 +160,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T02-A293-6.** For a small table of constant values, a calculated table written as a table constructor can replace the Enter data feature. Unlike Enter data, which generates a Power Query script of constants, its rows can also hold dynamic expressions.
 - Option. 2024. https://www.sqlbi.com/articles/using-tuple-syntax-in-dax-expressions/
 - When: A small table with constant values, or a mix of constant and calculated values.
+- Version: A calculated table needs its reason line (M105); the standard keeps DAX for what Power Query cannot do.
 
 ### Data types and comparisons
 

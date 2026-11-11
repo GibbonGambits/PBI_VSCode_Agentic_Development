@@ -2,7 +2,7 @@
 
 Part 2 of 5 of this topic. Covers: Customer, product and campaign analysis.
 
-Practice notes drawn from public SQLBI articles, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail.
+Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail. A note may name a tool, a website or a custom visual that this template does not use, or describe publishing, deploying or changing a deployed model: that is information for the developer. You do not install, call or suggest such a tool, and nothing is published or deployed from this template.
 
 ## General practice
 
@@ -11,10 +11,12 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T14-A330-10.** Keep the measures written only to show a data point's details in a visual's tooltips few: every measure in the tooltip area is computed once per data point.
 - Should. 2025. https://www.sqlbi.com/articles/dynamic-pareto-analysis-in-power-bi/
 - When: Line charts with tooltip measures, such as the name or amount of the item at each position.
+- Version: Tooltips are off in this template: needs the visual's exception row in the brief.
 
 **T14-A330-11.** When a visual has very many data points, consider moving its tooltip content to a separate report page: tooltip measures are computed once for each data point of the visual.
 - Consider. 2025. https://www.sqlbi.com/articles/dynamic-pareto-analysis-in-power-bi/
 - When: Visuals with many data points and tooltip measures.
+- Version: Tooltips are off in this template: needs the visual's exception row in the brief.
 
 **T14-A349-3.** To filter for rows that are, or are not, linked to a dimension member, test the dimension's key column, not the fact table's foreign key: fact rows whose key matches no dimension row then fall on the blank row, and the parts still add up.
 - Should. 2025. https://www.sqlbi.com/articles/measuring-the-impact-of-promotions-on-sales-in-power-bi/
@@ -31,12 +33,12 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T14-A031-2.** The customer's age at each transaction can be kept in a calculated column of the fact table, worked out from the transaction's order date and the birth date that RELATED fetches from the customer table.
 - Option. 2013. https://www.sqlbi.com/articles/grouping-transactions-by-age-of-customers-in-dax/
 - When: The customer table has a birth date and the fact table an order date, both typed as dates.
-- Version: Presented in 2013 for PowerPivot and Analysis Services Tabular models.
+- Version: Presented in 2013 for PowerPivot and Analysis Services Tabular models. A calculated column needs its reason line; the standard prefers the source or Power Query (M105, M106).
 
 **T14-A031-3.** To group fact rows into bands that a separate table defines by minimum and maximum, do not relate the fact table to the band table. Copy the band into the fact table with a calculated column returning the one band that encloses the row's value.
 - Should. 2013. https://www.sqlbi.com/articles/grouping-transactions-by-age-of-customers-in-dax/
 - When: Bands such as age groups: the band table has no row for every single value.
-- Version: In 2013 the band table was a linked table in PowerPivot or a regular table in Tabular.
+- Version: In 2013 the band table was a linked table in PowerPivot or a regular table in Tabular. A calculated column needs its reason line; the standard prefers the source or Power Query (M105, M106).
 
 **T14-A031-4.** When a band label is copied into the fact table, copy the band's position column there as well, hide it, and make it the Sort by Column of the band column.
 - Should. 2013. https://www.sqlbi.com/articles/grouping-transactions-by-age-of-customers-in-dax/
@@ -53,6 +55,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T14-A034-1.** When a calculation needs each customer's first order date, keep that date in a calculated column of the customer table and do not work it out inside the measure: the stored value performs better.
 - Should. 2013. https://www.sqlbi.com/articles/yearly-customer-historical-sales-in-dax/
 - When: Analysis of customer sales by year counted from each customer's first purchase.
+- Version: A calculated column needs its reason line; the standard prefers the source or Power Query (M105, M106).
 
 **T14-A034-3.** Sales in a customer's first, second or third year can be computed without ETL: iterate the customers whose first order date falls in the selected dates and filter, with DATESINPERIOD, the 12 months from that date, moved one or two years on with DATEADD.
 - Option. 2013. https://www.sqlbi.com/articles/yearly-customer-historical-sales-in-dax/
@@ -166,6 +169,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T14-A330-12.** In a tooltip measure returning values of the item at the current axis position, the item list can use ALLSELECTED, not VALUES or SUMMARIZE, when the returned item column is also on the X axis: the metric is needed for every item in the visual.
 - Option. 2025. https://www.sqlbi.com/articles/dynamic-pareto-analysis-in-power-bi/
 - When: Tooltip-only measures of a dynamic Pareto line chart, such as the customer name at a position.
+- Version: Tooltips are off in this template: needs the visual's exception row in the brief.
 
 **T14-A349-1.** To report both the sales directly tied to a grouping, such as a marketing campaign, and the wider sales it may have influenced, one model keeps a per-transaction column pointing to the grouping and adds a bridge table linking the grouping to its products.
 - Option. 2025. https://www.sqlbi.com/articles/measuring-the-impact-of-promotions-on-sales-in-power-bi/
@@ -174,6 +178,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T14-A349-2.** When fact rows may have no value in the foreign key to a dimension, one approach lets those rows fall on the dimension's automatic blank row and adds no artificial 'not assigned' member: measures isolate them with ISBLANK and need no special value.
 - Option. 2025. https://www.sqlbi.com/articles/measuring-the-impact-of-promotions-on-sales-in-power-bi/
 - When: A regular one-to-many relationship where some fact rows have a blank key, such as sales with no campaign.
+- Version: Blank keys on the many side must be intended and recorded (checklist item 14).
 
 **T14-A349-5.** For a measure of sales linked to no dimension member, one design branches on ISINSCOPE: when the dimension column is a grouping level, intersect the blank-member filter with the selection through KEEPFILTERS; otherwise clear the dimension's filters with REMOVEFILTERS, then filter the blank member.
 - Option. 2025. https://www.sqlbi.com/articles/measuring-the-impact-of-promotions-on-sales-in-power-bi/

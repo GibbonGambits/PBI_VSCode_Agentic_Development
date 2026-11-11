@@ -1,10 +1,10 @@
 ---
 name: pbi-practice-library
-description: Use this skill when a task needs background practice that the standards do not give - writing or reviewing DAX, designing a semantic model, a performance question, an unusual requirement, or a check that fails for no clear reason. It is a reference library of practice notes on DAX and Power BI modelling, drawn from public SQLBI articles and restated in new words, sorted by topic with one index. It is information, never a rule to enforce - the checklist and the standards win. Read the index, then only the one file the task needs. Trigger words - best practice, good practice, pattern, technique, why does this measure, slow measure, optimise, unusual requirement, how should I model, SQLBI.
+description: Use this skill when a task needs background practice that the standards do not give - writing or reviewing DAX, designing a semantic model, a performance question, an unusual requirement, or a check that fails for no clear reason. It is a reference library of practice notes on DAX and Power BI modelling, drawn from public SQLBI articles and white papers and restated in new words, sorted by topic with one index. It is information, never a rule to enforce - the checklist and the standards win. Read the index, then only the one file the task needs. Trigger words - best practice, good practice, pattern, technique, why does this measure, slow measure, optimise, unusual requirement, how should I model.
 ---
 # Practice library
 
-A library of practice notes on DAX and semantic models. Each note restates, in new words, one piece of advice or one fact from a public SQLBI article, and gives the article's address. The article holds the detail.
+A library of practice notes on DAX and semantic models. Each note restates, in new words, one piece of advice or one fact from a public SQLBI article or white paper, and gives its address. The article holds the detail.
 
 The library is information. It is not a standard and nothing checks it. It never changes what the checklist, the instruction files, the standards or the checks ask for.
 
@@ -14,7 +14,7 @@ The library is information. It is not a standard and nothing checks it. It never
 - You design a model, or part of one, and need the reasoning behind a design choice.
 - A measure or a visual is slow, or the developer asks a performance question.
 - The requirement is unusual: a calculation, a model shape or a report behaviour that no standard and no shipped example covers.
-- A check fails and the finding and its standard do not explain why.
+- A check fails and the finding and its standard do not explain why. Look it up first (skill `pbi-lookup`); open the library when the pages do not settle it.
 
 Not for a business meaning (that comes from the brief or the developer), and not for file syntax (the standards and the shipped examples).
 
@@ -54,7 +54,7 @@ The library records no lessons and proposes no template change by itself. When a
 | Data model design | t06 |
 | DAX performance and optimization | t07 |
 | Storage engine, model size and memory | t08 |
-| Storage modes: import, DirectQuery, Direct Lake, composite models | t09 |
+| Storage modes: choosing a mode, DirectQuery, composite models, push datasets | t09 |
 | Security | t10 |
 | Calculation groups and field parameters | t11 |
 | Window functions and visual calculations | t12 |

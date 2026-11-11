@@ -2,7 +2,7 @@
 
 Part 3 of 3 of this topic. Covers: Iterators and materialization; Conditional logic and variables; Text search and its index.
 
-Practice notes drawn from public SQLBI articles, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail.
+Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail. A note may name a tool, a website or a custom visual that this template does not use, or describe publishing, deploying or changing a deployed model: that is information for the developer. You do not install, call or suggest such a tool, and nothing is published or deployed from this template.
 
 ## General practice
 
@@ -54,10 +54,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 
 ### Conditional logic and variables
 
-**T07-A127-1.** When an IF tests measures and builds its result from the same measures, assign each to a variable before the IF and use the variables in both places. It gives a smaller query plan and pays off most for measures expensive for the formula engine.
-- Should. Check. 2018. https://www.sqlbi.com/articles/optimizing-if-conditions-using-variables/
-- When: The same measures are referenced repeatedly in one filter context inside a conditional expression.
-
 **T07-A137-1.** A variable helps when the repeats share one filter and row context, such as the condition and the result of an IF, also inside an iterator. The engine may reuse a measure result by itself, but not always; the gain shows on large iterated tables.
 - Should. Check. 2018. https://www.sqlbi.com/articles/optimizing-duplicated-dax-expressions-using-variables/ ; https://www.sqlbi.com/articles/optimizing-if-and-switch-expressions-using-variables/
 - When: A measure reference or sub-expression such as a CALCULATE is evaluated more than once in one context.
@@ -94,6 +90,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T07-A044-3.** One way to remove zero denominators before a row-by-row division: a CALCULATE filter argument, or iterating a FILTER of the table, then the plain operator. The plan stays in the storage engine, without CALLBACKDATAID, and is cacheable; one test ran over twice as fast.
 - Option. 2014. https://www.sqlbi.com/articles/divide-performance/
 - When: Iterations over large tables; it might not work for complex formulas and models, so test both.
+- Version: The plain operator needs its exception row in the brief (M502).
 
 **T07-A102-1.** Number rows by an ordering rule, such as each customer's sales by order date, with RANKX over the relevant rows, not COUNTROWS over FILTER of earlier rows. FILTER rescans the table per row and can be very slow and memory-hungry; RANKX uses an optimized operator.
 - Should. Check. 2017. https://www.sqlbi.com/articles/how-to-compute-index-numbers-at-top-speed/

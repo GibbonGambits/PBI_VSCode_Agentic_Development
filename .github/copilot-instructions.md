@@ -11,7 +11,7 @@ This repository holds a Power BI project in PBIP format: a semantic model (`*.Se
 - A business term in reliability, energy and gas, customer, safety, finance, workforce, IT and security, or work management: skill `business-definitions`.
 - The developer corrects you, or a check fails on something you created or changed: skill `pbi-lessons`.
 - A check fails and the cause is not clear, a DAX error, a function that is new to this model, or a lesson about to be written: skill `pbi-lookup`.
-- Background practice the standards do not give (a DAX or model design choice, a performance question, an unusual requirement, a check that fails for no clear reason): skill `pbi-practice-library`. It is information; the checklist and the standards win.
+- Background practice the standards do not give (a DAX or model design choice, a performance question, an unusual requirement, a failed check that a look-up did not explain): skill `pbi-practice-library`. It is information: the checklist and the standards win, and a note marked Check is confirmed with skill `pbi-lookup` first.
 
 ## Rules for every task
 

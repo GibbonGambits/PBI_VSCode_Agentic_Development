@@ -1,8 +1,8 @@
 # Business calculation patterns
 
-Part 3 of 5 of this topic. Covers: Semi-additive and running totals; Building and testing calculations.
+Part 3 of 5 of this topic. Covers: Semi-additive and running totals.
 
-Practice notes drawn from public SQLBI articles, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail.
+Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail. A note may name a tool, a website or a custom visual that this template does not use, or describe publishing, deploying or changing a deployed model: that is information for the developer. You do not install, call or suggest such a tool, and nothing is published or deployed from this template.
 
 ## General practice
 
@@ -42,44 +42,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T14-A323-5.** Do not carry the size results of a published snapshot example over to your own model. Always check your own model's metrics, such as whether the snapshot really has fewer rows than the transaction tables it summarises: that depends on dimension cardinality and data distribution.
 - Must. 2025. https://www.sqlbi.com/articles/optimizing-incremental-inventory-calculations-in-dax/
 - When: Designing snapshot tables for balance calculations.
-
-### Building and testing calculations
-
-**T14-A034-2.** When SUMX or another iterator must run CALCULATE per row, the cost can be cut by iterating the coarsest values that still give the same result, such as distinct first-order dates and not every customer: the inner expression then runs once per group.
-- Option. 2013. https://www.sqlbi.com/articles/yearly-customer-historical-sales-in-dax/
-- When: CALCULATE is needed inside the iteration and a coarser set of values gives the same result.
-
-**T14-A088-10.** Give the data model careful attention, even in a small report file, and do not settle for a naive design: with the right model formulas become simpler and faster, while a naive one leads to slower and more complex DAX.
-- Should. 2016. https://www.sqlbi.com/articles/analyzing-events-with-a-duration-in-dax/
-- When: Any model, small ones included.
-
-**T14-A117-5.** Build a complex formula one step at a time: store each step in a variable and return that variable for a moment to check the partial result before moving on. A variable known to be right lets you work on the harder parts with confidence.
-- Should. 2017. https://www.sqlbi.com/articles/computing-same-product-sales-in-dax/
-- When: Writing complex formulas.
-
-**T14-A117-6.** When an intermediate step of a measure produces a table, it can be tested by returning the row count of that table variable for a moment and checking the number in a report.
-- Option. 2017. https://www.sqlbi.com/articles/computing-same-product-sales-in-dax/
-- When: Writing and debugging a measure whose steps include a table variable.
-
-**T14-A326-8.** When facing a new business requirement, consider breaking it down into a series of smaller steps, each solvable with an existing generic modelling or DAX pattern. Reusing well-known, optimised patterns lowers effort and the risk of errors, and brings their known performance gains.
-- Consider. 2025. https://www.sqlbi.com/articles/account-receivable-aging-in-power-bi/
-- When: Any new business requirement.
-
-**T14-A346-4.** Inside GROUPBY, COUNTROWS cannot be the aggregation. To count the rows of each group, iterate CURRENTGROUP with SUMX over the constant 1: GROUPBY requires CURRENTGROUP to walk the rows of the group being aggregated.
-- Must. 2025. https://www.sqlbi.com/articles/find-the-products-in-the-top-10-every-year-with-dax/
-- When: Counting rows per group with GROUPBY.
-
-**T14-A346-5.** When a measure has to manipulate tables, first write and debug its logic as a DAX query, checking the partial results. Only then move it into a measure and fix the problems the outer filter context causes.
-- Should. 2025. https://www.sqlbi.com/articles/find-the-products-in-the-top-10-every-year-with-dax/
-- When: Non-trivial measures that build and manipulate intermediate tables.
-
-**T14-A369-13.** When defining a calculation, always check how it behaves in border cases: at the start or end of a time period, at subtotal and total level, under different selections, and with blank values in columns or partial results.
-- Must. 2026. https://www.sqlbi.com/articles/the-hidden-complexity-of-a-daily-average-in-dax/
-- When: Any calculation, even one that looks simple, such as an average.
-
-**T14-A369-15.** When DAX code comes from an AI assistant, the person responsible has to state the business requirements, question the proposed code and check its results. Code that runs is no proof that it returns the number the business needs.
-- Must. 2026. https://www.sqlbi.com/articles/the-hidden-complexity-of-a-daily-average-in-dax/
-- When: Measures, functions or queries generated by an AI assistant.
 
 ## Special-case techniques and facts
 
@@ -187,17 +149,3 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T14-A323-8.** To choose between a detailed and a coarser snapshot without naming dimension tables, you can evaluate ISCROSSFILTERED on the detailed one inside CALCULATE with REMOVEFILTERS on the coarser. TRUE means a filter on a dimension the coarser lacks: use the detailed snapshot; otherwise the coarser.
 - Option. 2025. https://www.sqlbi.com/articles/optimizing-incremental-inventory-calculations-in-dax/
 - When: The coarser snapshot's dimensions are a subset of the detailed one's; all relationships are regular one-to-many.
-
-**T14-A323-9.** When an amount is a quantity measure multiplied by a product attribute such as unit cost, one way to cut the iterations is to iterate the distinct values of that attribute, not every product.
-- Option. 2025. https://www.sqlbi.com/articles/optimizing-incremental-inventory-calculations-in-dax/
-- When: Valuing a quantity measure at product cost; a plain column sum computed without calling the measure is faster still.
-
-### Building and testing calculations
-
-**T14-A326-14.** Before relying on an accounts receivable aging calculation in your own scenario, you can check that it is correct on a small sample model, editing the movements data to exercise the corner cases you care about.
-- Option. 2025. https://www.sqlbi.com/articles/account-receivable-aging-in-power-bi/
-- When: Adopting an aging model and its measures for a specific scenario.
-
-**T14-A346-6.** Table logic that is right in a query with no outer filters can return wrong results once moved into a measure: the visual's filter context changes the table variables, and TOPN ranks by a measure evaluated in that current filter context.
-- Fact. 2025. https://www.sqlbi.com/articles/find-the-products-in-the-top-10-every-year-with-dax/
-- When: Moving query code that builds ranking tables into a measure shown in a visual such as a matrix.

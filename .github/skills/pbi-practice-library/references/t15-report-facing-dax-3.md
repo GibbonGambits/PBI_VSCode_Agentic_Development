@@ -2,7 +2,7 @@
 
 Part 3 of 5 of this topic. Covers: Choosing and building charts.
 
-Practice notes drawn from public SQLBI articles, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail.
+Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail. A note may name a tool, a website or a custom visual that this template does not use, or describe publishing, deploying or changing a deployed model: that is information for the developer. You do not install, call or suggest such a tool, and nothing is published or deployed from this template.
 
 ## General practice
 
@@ -20,11 +20,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T15-A325-11.** Judge a chart on filtered data as well: a report is interactive, and a chart that works on the unfiltered data can stop working after readers apply a few filters.
 - Must. 2025. https://www.sqlbi.com/articles/using-pie-charts-is-not-the-end-of-the-world/
 - When: Choosing or reviewing any chart in an interactive report.
-
-**T15-A325-19.** Choose each visual's chart type and formatting deliberately: the same information can be shown in several equally valid ways, so the deliberate choice counts for more than the chart itself. Use effective, consistent colours and keep formatting simple.
-- Should. 2025. https://www.sqlbi.com/articles/using-pie-charts-is-not-the-end-of-the-world/
-- When: Any visual on a report page.
-- Version: Colours and formatting come from the theme here, not from one visual (V009).
 
 **T15-A300-1.** One way to improve a report built around a large detail table or matrix is a scatterplot beside it: readers spot outliers and interesting groups quickly and cross-filter to the details, where the table alone makes them sort, drill and filter.
 - Option. 2024. https://www.sqlbi.com/articles/using-scatterplots-to-find-details-in-reports/
@@ -61,6 +56,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T15-A325-4.** Do not line up several pie or doughnut charts to track progress against a target such as the prior year: a stacked bar chart shows the proportions, and a bullet chart compares each category with the prior year, more clearly.
 - Should. 2025. https://www.sqlbi.com/articles/using-pie-charts-is-not-the-end-of-the-world/
 - When: Current figures are compared with a target or an earlier period.
+- Version: A bullet chart is not a core Power BI visual; custom visuals are outside this template's standards.
 
 **T15-A325-5.** To show how part-of-whole proportions change over time, think of a stacked area or 100% stacked area chart; stacked bars stay suitable for discrete periods such as years.
 - Consider. 2025. https://www.sqlbi.com/articles/using-pie-charts-is-not-the-end-of-the-world/
@@ -81,6 +77,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T15-A325-9.** Do not show achievement against a target with a pie or doughnut when going past 100% has a meaning of its own in the business process, as in a bonus plan: the overachievement disappears. A bullet chart or connected dot plot may serve better.
 - Should. 2025. https://www.sqlbi.com/articles/using-pie-charts-is-not-the-end-of-the-world/
 - When: KPI or target visuals where values above 100% carry meaning.
+- Version: Bullet charts and connected dot plots are not core Power BI visuals; custom visuals are outside this template's standards.
 
 **T15-A325-14.** Before placing pie charts on a map, ask critically whether another chart type, such as a stacked bar chart, would show the data more clearly.
 - Consider. 2025. https://www.sqlbi.com/articles/using-pie-charts-is-not-the-end-of-the-world/

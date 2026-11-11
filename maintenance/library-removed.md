@@ -14,10 +14,10 @@ The library started from 2,318 notes drawn from public SQLBI articles. Notes wer
 |---|---:|
 | 1. Outdated | 35 |
 | 2. Conflicts with the checklist | 20 |
-| 3. The repository already says it | 102 |
-| 4. Not adopted: a higher source says otherwise | 20 |
-| 5. Duplicate in another topic | 68 |
-| Kept in the library | 2073 |
+| 3. The repository already says it | 139 |
+| 4. Not adopted: a higher source says otherwise | 26 |
+| 5. Duplicate of a note kept in another topic | 65 |
+| Kept in the library | 2033 |
 
 | Note | Group | Covered by |
 |---|---|---|
@@ -40,6 +40,7 @@ The library started from 2,318 notes drawn from public SQLBI articles. Notes wer
 | T01-A135-2 | 5 | `.github/skills/pbi-practice-library/references/t06-data-model-design-1.md`, kept copy: T06-A173-5 |
 | T01-A135-3 | 3 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rule 1 |
 | T01-A220-4 | 3 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, rule 6 |
+| T01-A245-2 | 3 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rule 18 |
 | T01-A254-5 | 3 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, rule 34 |
 | T01-A338-1 | 3 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, rule 34 |
 | T01-A361-6 | 3 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, rule 20 |
@@ -53,8 +54,11 @@ The library started from 2,318 notes drawn from public SQLBI articles. Notes wer
 | T01-A336-5 | 5 | `.github/skills/pbi-practice-library/references/t02-dax-authoring-style-1.md`, kept copy: T02-A335-1 |
 | T01-A361-2 | 3 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, rule 20 |
 | T01-A361-7 | 3 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, rule 34 |
+| T02-A025-1 | 3 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, section B, rule 27 |
 | T02-A054-3 | 3 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, rule 9 |
 | T02-A054-4 | 3 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, rule 8 |
+| T02-A082-4 | 3 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, rule 8 and rule 31 |
+| T02-A116-7 | 3 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, rule 8 and rule 31 |
 | T02-A096-5 | 1 | - |
 | T02-A096-6 | 5 | `.github/skills/pbi-practice-library/references/t01-evaluation-context-1.md`, kept copy: T01-A220-1 |
 | T02-A100-1 | 3 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, rule 10 |
@@ -68,6 +72,7 @@ The library started from 2,318 notes drawn from public SQLBI articles. Notes wer
 | T02-A143-1 | 5 | `.github/skills/pbi-practice-library/references/t01-evaluation-context-1.md`, kept copy: T01-A310-1 |
 | T02-A143-2 | 5 | `.github/skills/pbi-practice-library/references/t01-evaluation-context-1.md`, kept copy: T01-A244-2 |
 | T02-A143-4 | 5 | `.github/skills/pbi-practice-library/references/t01-evaluation-context-2.md`, kept copy: T01-A249-1 |
+| T02-A154-1 | 3 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, rule 8 |
 | T02-A154-5 | 4 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, rule 30 |
 | T02-A154-6 | 4 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, rule 31 (and rule 30) |
 | T02-A169-1 | 3 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, rule 10 |
@@ -79,10 +84,11 @@ The library started from 2,318 notes drawn from public SQLBI articles. Notes wer
 | T03-A012-4 | 1 | - |
 | T03-A022-1 | 1 | - |
 | T03-A022-2 | 1 | - |
+| T03-A022-3 | 4 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, rule 32 |
 | T03-A045-3 | 2 | `checklist/checklist.md`, item 32 |
 | T03-A053-1 | 5 | `.github/skills/pbi-practice-library/references/t02-dax-authoring-style-2.md`, kept copy: T02-A242-1 |
 | T03-A053-3 | 5 | `.github/skills/pbi-practice-library/references/t07-dax-performance-1.md`, kept copy: T07-A041-1 |
-| T03-A053-6 | 5 | `.github/skills/pbi-practice-library/references/t07-dax-performance-1.md`, kept copy: T07-A334-4 |
+| T03-A053-6 | 3 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, rule 37 |
 | T03-A070-3 | 1 | - |
 | T03-A071-10 | 3 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, rule 32 |
 | T03-A094-11 | 1 | - |
@@ -113,18 +119,21 @@ The library started from 2,318 notes drawn from public SQLBI articles. Notes wer
 | T04-A153-1 | 3 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rule 32 |
 | T04-A153-2 | 3 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rules 30 and 31 |
 | T04-A199-1 | 3 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rule 30 |
+| T04-A152-4 | 3 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rule 29 |
 | T04-A175-1 | 3 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rule 35 |
 | T04-A199-6 | 4 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rule 30 |
 | T04-A204-11 | 5 | `.github/skills/pbi-practice-library/references/t15-report-facing-dax-3.md`, kept copy: T15-A139-3 |
 | T04-A204-4 | 3 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rule 35 |
 | T04-A043-4 | 1 | - |
+| T04-A319-2 | 3 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rule 30 |
 | T04-A321-12 | 5 | `.github/skills/pbi-practice-library/references/t01-evaluation-context-1.md`, kept copy: T01-A336-1 |
 | T04-A321-3 | 3 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rule 31 |
-| T04-A321-5 | 5 | `.github/skills/pbi-practice-library/references/t05-relationships-1.md`, kept copy: T05-A258-1 |
+| T04-A321-5 | 3 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rule 7 |
 | T04-A371-1 | 3 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rules 29 and 30 |
 | T05-A078-3 | 2 | `checklist/checklist.md`, item 12 |
 | T05-A080-2 | 1 | - |
 | T05-A099-2 | 5 | `.github/skills/pbi-practice-library/references/t01-evaluation-context-2.md`, kept copy: T01-A122-5 |
+| T05-A141-2 | 3 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rule 17 and rule 18 |
 | T05-A141-3 | 3 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rule 18 |
 | T05-A158-1 | 3 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rule 18 |
 | T05-A158-2 | 3 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rule 18 (check M405) |
@@ -139,15 +148,19 @@ The library started from 2,318 notes drawn from public SQLBI articles. Notes wer
 | T05-A036-3 | 5 | `.github/skills/pbi-practice-library/references/t01-evaluation-context-1.md`, kept copy: T01-A124-1 |
 | T05-A236-2 | 2 | `checklist/checklist.md`, item 12 |
 | T05-A236-6 | 5 | `.github/skills/pbi-practice-library/references/t07-dax-performance-2.md`, kept copy: T07-A350-6 |
+| T05-A258-1 | 3 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rule 7 |
 | T05-A267-3 | 3 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rule 17 |
 | T05-A333-4 | 5 | `.github/skills/pbi-practice-library/references/t01-evaluation-context-1.md`, kept copy: T01-A047-4 |
 | T06-A009-1 | 3 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rule 35 |
 | T06-A035-1 | 5 | `.github/skills/pbi-practice-library/references/t04-time-intelligence-and-dates-3.md`, kept copy: T04-A321-1 |
+| T06-A035-3 | 4 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rule 17 |
 | T06-A035-4 | 2 | `checklist/checklist.md`, item 31 |
 | T06-A062-11 | 4 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, section B, SQLBI rules the template does not check |
 | T06-A062-9 | 3 | `.github/skills/pbi-semantic-model/references/storage-and-security.md`, rule 17 |
 | T06-A075-10 | 5 | `.github/skills/pbi-practice-library/references/t02-dax-authoring-style-1.md`, kept copy: T02-A100-11 |
 | T06-A075-13 | 3 | `checklist/checklist.md`, Item 29 |
+| T06-A075-14 | 3 | `.github/skills/pbi-semantic-model/references/storage-and-security.md`, rule 13 |
+| T06-A075-15 | 3 | `.github/skills/pbi-semantic-model/references/storage-and-security.md`, rule 18 |
 | T06-A075-16 | 3 | `.github/skills/pbi-semantic-model/references/storage-and-security.md`, rule 20 |
 | T06-A075-17 | 5 | `.github/skills/pbi-practice-library/references/t04-time-intelligence-and-dates-1.md`, kept copy: T04-A199-3 |
 | T06-A075-18 | 4 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rule 30 |
@@ -161,13 +174,18 @@ The library started from 2,318 notes drawn from public SQLBI articles. Notes wer
 | T06-A290-10 | 2 | `checklist/checklist.md`, item 38 |
 | T06-A290-8 | 5 | `.github/skills/pbi-practice-library/references/t02-dax-authoring-style-1.md`, kept copy: T02-A178-1 |
 | T06-A368-5 | 5 | `.github/skills/pbi-practice-library/references/t01-evaluation-context-2.md`, kept copy: T01-A259-5 |
+| T07-W378-16 | 4 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rule 1 |
 | T07-W378-27 | 1 | - |
 | T07-W378-40 | 1 | - |
 | T07-W378-9 | 5 | `.github/skills/pbi-practice-library/references/t08-storage-engine-and-model-size-1.md`, kept copy: T08-A030-9 |
 | T07-A044-1 | 3 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, rule 2 |
 | T07-A044-4 | 2 | `checklist/checklist.md`, item 33 |
 | T07-A061-1 | 5 | `.github/skills/pbi-practice-library/references/t05-relationships-1.md`, kept copy: T05-A080-1 |
+| T07-A061-5 | 4 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rule 1 |
 | T07-A119-3 | 3 | `checklist/checklist.md`, Item 34 |
+| T07-A127-1 | 3 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, rule 8 |
+| T07-A128-2 | 3 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, rule 37 |
+| T07-A334-4 | 3 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, rule 37 |
 | T07-A156-2 | 2 | `checklist/checklist.md`, item 68 |
 | T07-A179-2 | 1 | - |
 | T07-A181-7 | 5 | `.github/skills/pbi-practice-library/references/t14-business-calculation-patterns-3.md`, kept copy: T14-A052-2 |
@@ -184,19 +202,27 @@ The library started from 2,318 notes drawn from public SQLBI articles. Notes wer
 | T08-A030-3 | 5 | `.github/skills/pbi-practice-library/references/t06-data-model-design-2.md`, kept copy: T06-A112-2 |
 | T08-A030-8 | 3 | `.github/skills/pbi-semantic-model/references/storage-and-security.md`, rule 18 |
 | T08-A108-3 | 5 | `.github/skills/pbi-practice-library/references/t06-data-model-design-1.md`, kept copy: T06-A172-9 |
+| T09-W380-1 | 3 | `.github/skills/pbi-semantic-model/references/storage-and-security.md`, rule 22 |
 | T09-W380-12 | 3 | `.github/skills/pbi-semantic-model/references/storage-and-security.md`, rule 3 (M701) |
 | T09-W380-13 | 5 | `.github/skills/pbi-practice-library/references/t06-data-model-design-1.md`, kept copy: T06-A075-1 |
+| T09-W380-14 | 3 | `.github/skills/pbi-semantic-model/references/storage-and-security.md`, rule 24 |
 | T09-W380-15 | 4 | `.github/skills/pbi-semantic-model/references/model-standard.md`, rule 1 |
 | T09-W380-2 | 2 | `checklist/checklist.md`, item 68 |
 | T09-W380-32 | 1 | - |
+| T09-W380-36 | 3 | `.github/skills/pbi-semantic-model/references/storage-and-security.md`, rule 24 |
 | T09-A227-1 | 1 | - |
 | T09-A234-2 | 1 | - |
 | T09-A237-3 | 4 | `.github/skills/pbi-semantic-model/references/storage-and-security.md`, rule 23 |
 | T09-A237-4 | 4 | `.github/skills/pbi-semantic-model/references/storage-and-security.md`, rule 23 |
 | T09-A238-2 | 5 | `.github/skills/pbi-practice-library/references/t01-evaluation-context-2.md`, kept copy: T01-A249-3 |
+| T09-A295-1 | 3 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, rule 17 |
+| T10-A090-3 | 3 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rule 18 |
 | T10-A279-9 | 4 | `.github/skills/pbi-report/references/report-standard.md`, rule 36 |
+| T10-A282-3 | 4 | `.github/skills/pbi-semantic-model/references/storage-and-security.md`, rule 32 |
+| T10-A288-5 | 3 | `.github/skills/pbi-semantic-model/references/storage-and-security.md`, rule 38 |
 | T10-A297-6 | 4 | `.github/skills/pbi-semantic-model/references/storage-and-security.md`, rule 29 |
 | T11-A159-2 | 3 | `.github/skills/pbi-semantic-model/references/model-objects.md`, section B, rule 5 (M813) |
+| T11-A160-3 | 3 | `.github/skills/pbi-semantic-model/references/model-objects.md`, section B, rules 1 and 5 |
 | T11-A184-3 | 5 | `.github/skills/pbi-practice-library/references/t14-business-calculation-patterns-1.md`, kept copy: T14-A183-9 |
 | T11-A210-1 | 3 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rule 7 |
 | T11-A210-2 | 3 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rule 7 |
@@ -206,18 +232,24 @@ The library started from 2,318 notes drawn from public SQLBI articles. Notes wer
 | T11-A268-2 | 2 | `checklist/checklist.md`, item 12 |
 | T11-A280-6 | 5 | `.github/skills/pbi-practice-library/references/t05-relationships-1.md`, kept copy: T05-A158-4 |
 | T11-A332-1 | 3 | `.github/skills/pbi-semantic-model/references/model-objects.md`, section B, rule 6 |
+| T11-A332-5 | 3 | `.github/skills/pbi-semantic-model/references/more-model-features.md`, rule 13 |
+| T11-A340-3 | 3 | `.github/skills/pbi-semantic-model/references/model-objects.md`, section A, rules 2, 3 and 7 |
 | T11-A340-4 | 3 | `.github/skills/pbi-semantic-model/references/model-objects.md`, section B, rule 6 |
+| T12-A266-3 | 3 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, rule 11 |
 | T13-A344-3 | 3 | `.github/skills/pbi-semantic-model/references/model-objects.md`, section A, rule 5 |
+| T13-A344-6 | 3 | `.github/skills/pbi-semantic-model/references/model-objects.md`, section A, rule 5 |
 | T14-A015-1 | 1 | - |
 | T14-A015-3 | 2 | `checklist/checklist.md`, item 14 |
 | T14-A015-5 | 3 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rule 19 |
 | T14-A019-5 | 4 | `.github/skills/pbi-semantic-model/references/model-standard.md`, rule 7 |
+| T14-A034-2 | 3 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, rule 35 |
 | T14-A149-4 | 3 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rule 31 |
 | T14-A149-6 | 1 | - |
 | T14-A052-3 | 1 | - |
 | T14-A066-3 | 3 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, rule 32 |
 | T14-A086-5 | 1 | - |
 | T14-A088-1 | 3 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rule 7 |
+| T14-A088-2 | 3 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rule 7 |
 | T14-A088-7 | 3 | `.github/skills/pbi-semantic-model/references/model-standard.md`, rule 7 |
 | T14-A136-2 | 1 | - |
 | T14-A150-2 | 5 | `.github/skills/pbi-practice-library/references/t01-evaluation-context-1.md`, kept copy: T01-A002-2 |
@@ -230,6 +262,7 @@ The library started from 2,318 notes drawn from public SQLBI articles. Notes wer
 | T14-A323-10 | 2 | `checklist/checklist.md`, item 35 |
 | T14-A323-11 | 5 | `.github/skills/pbi-practice-library/references/t02-dax-authoring-style-1.md`, kept copy: T02-A178-1 |
 | T14-A323-12 | 5 | `.github/skills/pbi-practice-library/references/t06-data-model-design-2.md`, kept copy: T06-A290-4 |
+| T14-A323-9 | 3 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, rule 35 |
 | T14-A326-7 | 2 | `checklist/checklist.md`, item 38 |
 | T14-A346-10 | 5 | `.github/skills/pbi-practice-library/references/t13-user-defined-functions-1.md`, kept copy: T13-A358-4 |
 | T14-A346-3 | 5 | `.github/skills/pbi-practice-library/references/t03-table-functions-and-queries-1.md`, kept copy: T03-A283-5 |
@@ -237,6 +270,8 @@ The library started from 2,318 notes drawn from public SQLBI articles. Notes wer
 | T14-A349-4 | 3 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, rule 6 |
 | T14-A369-10 | 5 | `.github/skills/pbi-practice-library/references/t10-security-1.md`, kept copy: T10-A288-1 |
 | T14-A369-14 | 5 | `.github/skills/pbi-practice-library/references/t16-tooling-and-workflow-3.md`, kept copy: T16-A367-4 |
+| T15-A072-2 | 4 | `.github/skills/pbi-semantic-model/references/model-standard.md`, rule 3 |
+| T15-A072-4 | 3 | `.github/skills/pbi-semantic-model/references/storage-and-security.md`, rule 8 |
 | T15-A125-5 | 5 | `.github/skills/pbi-practice-library/references/t01-evaluation-context-1.md`, kept copy: T01-A250-3 |
 | T15-A166-2 | 2 | `checklist/checklist.md`, item 14 |
 | T15-A166-5 | 2 | `checklist/checklist.md`, item 12 |
@@ -248,8 +283,10 @@ The library started from 2,318 notes drawn from public SQLBI articles. Notes wer
 | T15-A276-2 | 3 | `.github/skills/pbi-semantic-model/references/model-objects.md`, section D, Dynamic format string |
 | T15-A317-13 | 4 | `.github/skills/pbi-semantic-model/references/model-standard.md`, rule 1 |
 | T15-A317-4 | 3 | `.github/skills/pbi-report/references/report-standard.md`, rule 44 (checklist item 54) |
+| T15-A322-1 | 3 | `checklist/checklist.md`, Item 50 |
 | T15-A322-2 | 3 | `.github/skills/pbi-report/references/theme.md`, section The theme, third paragraph (V009) |
 | T15-A325-17 | 2 | `checklist/checklist.md`, Item 49 |
+| T15-A325-19 | 3 | `.github/skills/pbi-report/references/report-standard.md`, rule 44 |
 | T15-A325-21 | 3 | `.github/skills/pbi-semantic-model/references/relationships-and-dates.md`, rules 17 to 19 |
 | T15-A325-3 | 3 | `.github/skills/pbi-report/references/report-standard.md`, rule 44 (checklist item 54) |
 | T15-A351-12 | 5 | `.github/skills/pbi-practice-library/references/t02-dax-authoring-style-1.md`, kept copy: T02-A178-1 |
@@ -258,11 +295,14 @@ The library started from 2,318 notes drawn from public SQLBI articles. Notes wer
 | T16-A050-1 | 5 | `.github/skills/pbi-practice-library/references/t06-data-model-design-1.md`, kept copy: T06-A075-5 |
 | T16-A081-1 | 3 | `.github/skills/pbi-semantic-model/references/model-objects.md`, section D, "Translations and cultures" |
 | T16-A123-10 | 3 | `checklist/checklist.md`, Item 68 |
+| T16-A123-3 | 3 | `checklist/checklist.md`, Item 68 |
 | T16-A123-4 | 5 | `.github/skills/pbi-practice-library/references/t07-dax-performance-1.md`, kept copy: T07-A156-6 |
 | T16-A123-6 | 3 | `.github/skills/pbi-semantic-model/references/dax-standard.md`, rule 6 (M505) |
 | T16-A205-1 | 1 | - |
 | T16-A221-10 | 1 | - |
 | T16-A221-7 | 1 | - |
-| T16-A331-2 | 5 | `.github/skills/pbi-practice-library/references/t15-report-facing-dax-5.md`, kept copy: T15-A322-1 |
+| T16-A221-8 | 3 | `.github/skills/pbi-semantic-model/SKILL.md`, section "Before you change anything", step 2 |
+| T16-A331-1 | 3 | `.github/skills/pbi-checklist-review/references/native-features.md`, table "Tooling Copilot can use", row "Power BI Project format" |
+| T16-A331-2 | 3 | `checklist/checklist.md`, Item 50 |
 | T16-A343-1 | 3 | `.github/skills/pbi-checklist-review/references/native-features.md`, section "Tooling Copilot can use", row "Power BI Project format" (F001) |
 | T16-A366-1 | 3 | `.github/skills/pbi-semantic-model/SKILL.md`, section "What the files cannot tell", third point (whether the model loads and the numbers are right) |

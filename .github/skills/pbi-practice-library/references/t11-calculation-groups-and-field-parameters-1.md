@@ -2,7 +2,7 @@
 
 Part 1 of 2 of this topic. Covers: Calculation group design patterns; Calculation item application; Format string expressions.
 
-Practice notes drawn from public SQLBI articles, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail.
+Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail. A note may name a tool, a website or a custom visual that this template does not use, or describe publishing, deploying or changing a deployed model: that is information for the developer. You do not install, call or suggest such a tool, and nothing is published or deployed from this template.
 
 ## General practice
 
@@ -33,6 +33,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T11-A240-2.** A calculation group in DAX script starts with CALCULATIONGROUP, the group name and its column name, then optional Description, Visible and Precedence. Each CALCULATIONITEM has a quoted name, `=` and its expression, then optional Description, Ordinal and FormatString; without FormatString the measure's format stays.
 - Option. 2022. https://www.sqlbi.com/articles/scripting-syntax-for-calculation-groups/
 - When: Writing a calculation group as a DAX script in a tool that supports that syntax.
+- Version: Script syntax of an external tool, not TMDL: this template writes calculation groups in TMDL from the shipped example.
 
 **T11-A268-5.** Do not assume a published speed comparison holds for your model. Repeat the measurements on your own system before choosing between a calculation group and a period bridge table; results reflect one model and its data distribution.
 - Must. 2023. https://www.sqlbi.com/articles/using-calculation-groups-or-many-to-many-relationships-for-time-intelligence-selection/
@@ -56,10 +57,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - Should. 2025. https://www.sqlbi.com/articles/sideways-recursion-in-dax-calculation-groups/
 - When: Writing calculation items; hidden groups managed only by code are the safe case.
 
-**T11-A340-3.** Put DAX logic that several expressions need into a user-defined function: functions involve no recursion at all, and the DAX engine runs them efficiently.
-- Should. 2025. https://www.sqlbi.com/articles/sideways-recursion-in-dax-calculation-groups/
-- When: The same piece of DAX code is reused across several expressions.
-
 **T11-A340-5.** Be aware that a recursion loop can arise even when calculation items never name each other, for example when items reference measures that themselves filter a calculation item of the same group. The items then reach each other through the measures.
 - Consider. 2025. https://www.sqlbi.com/articles/sideways-recursion-in-dax-calculation-groups/
 - When: Measures that filter a calculation item are referenced from items of that same group.
@@ -69,10 +66,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T11-A160-1.** A calculation item with no format string expression shows its result in the format of the underlying measure, so a ratio appears as 0.12 and not 12%. Give the item a format of its own when it changes the nature of the result.
 - Should. 2019. https://www.sqlbi.com/articles/understanding-calculation-groups/
 - When: An item turns an amount into a percentage; a difference in the same unit can keep the measure's format.
-
-**T11-A160-3.** When you give a calculation item its own format string, consider that it acts on every measure the item is combined with, not on one measure. With several calculation groups in a report, the format shown also depends on their precedence.
-- Consider. 2019. https://www.sqlbi.com/articles/understanding-calculation-groups/
-- When: A calculation item carries a format string expression.
 
 **T11-A184-1.** A calculation item whose formula changes how a measure's number must be read needs a format string expression, so the format shown follows the changed result. Not every visual fully honours such formats: custom visuals are affected, and others can be.
 - Must. Check. 2020. https://www.sqlbi.com/articles/controlling-format-strings-in-calculation-groups/
@@ -122,10 +115,12 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T11-A268-3.** Choosing between a calculation group and a period bridge table for selecting time periods, weigh flexibility against effort. The group defines periods freely but needs new DAX and a deployment per period; the bridge table needs one configuration row, if the period fits its grain.
 - Consider. 2023. https://www.sqlbi.com/articles/using-calculation-groups-or-many-to-many-relationships-for-time-intelligence-selection/
 - When: Deciding how to implement relative time periods that users select.
+- Version: The bridge rests on a both-direction relationship: it needs its reason and exception row in the brief (M405; checklist item 12).
 
 **T11-A268-4.** In tests on a large model, a period bridge table with a both-direction relationship beat a calculation group for additive measures: one storage engine query against one small query per item driven by the formula engine. Small models and distinct counts performed about the same.
 - Fact. 2023. https://www.sqlbi.com/articles/using-calculation-groups-or-many-to-many-relationships-for-time-intelligence-selection/
 - When: Relative period selection; both-direction filters are usually slow, but this bridge holds only a few hundred rows.
+- Version: A both-direction relationship needs its reason and its exception row in the brief (M405; checklist item 12).
 
 **T11-A286-5.** To tell a formatting measure which calculation item is selected, add a disconnected calculated table of item names. Each item, when ISSELECTEDMEASURE finds the formatting measure, evaluates it with a filter on its own name in that table; the measure reads the name with SELECTEDVALUE.
 - Option. 2023. https://www.sqlbi.com/articles/using-field-parameters-and-calculation-groups-for-conditional-formatting/

@@ -2,7 +2,7 @@
 
 Part 1 of 1 of this topic. Covers: Dynamic security, relationships and testing; Role filter performance; Totals under row-level security; Object-level security and active roles.
 
-Practice notes drawn from public SQLBI articles, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail.
+Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail. A note may name a tool, a website or a custom visual that this template does not use, or describe publishing, deploying or changing a deployed model: that is information for the developer. You do not install, call or suggest such a tool, and nothing is published or deployed from this template.
 
 ## General practice
 
@@ -50,12 +50,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - When: A large model that uses security roles is about to be released.
 - Version: When written, DAX Studio could not trace queries run with a role applied.
 
-### Totals under row-level security
-
-**T10-A090-3.** When several fact tables share dimension tables, as a hidden pre-aggregated table for non-visual totals does with the original fact table, relate each fact table to the shared dimensions in a single direction, not with both-direction filters.
-- Should. 2016. https://www.sqlbi.com/articles/implement-non-visual-totals-with-power-bi-security-roles/
-- When: Several fact tables share dimensions, including a hidden table added for non-visual totals.
-
 ### Object-level security and active roles
 
 **T10-A279-8.** Data security should rest on the security roles alone. No part of it should be handled in the report layer, even when reports are customised by the user's active roles.
@@ -73,10 +67,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T10-A282-2.** Between an expanded permissions table and the organization table it secures, neither side is unique, and Power BI proposes a both-direction filter by default. Do not accept it: the filter must run one way only, from permissions to organization.
 - Must. 2023. https://www.sqlbi.com/articles/managing-hierarchical-organizations-in-power-bi-security-roles/
 - When: A relationship of many-to-many cardinality links the expanded permissions table to the secured organization table.
-
-**T10-A282-3.** One way to define a hierarchy-based dynamic role: a plain equality between the user column of the expanded permissions table and the signed-in user, with the single-direction relationship carrying the filter to the organization table. Minimal DAX there keeps formula-engine work and materialization low.
-- Option. Check. 2023. https://www.sqlbi.com/articles/managing-hierarchical-organizations-in-power-bi-security-roles/
-- When: An expanded permissions table holding user and visible node already exists.
+- Version: A role filter on a table with a many-to-many relationship gives M604 and M406: each needs its exception row in the brief.
 
 **T10-A282-4.** When node names in an organization hierarchy can repeat, the security configuration must identify each node by its full path from the top of the hierarchy, never by name alone: two managers can share a name.
 - Must. 2023. https://www.sqlbi.com/articles/managing-hierarchical-organizations-in-power-bi-security-roles/
@@ -156,10 +147,6 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 - Should. 2023. https://www.sqlbi.com/articles/computing-accurate-percentages-with-row-level-security-in-power-bi/
 - When: Percentages must compare visible values with totals that include rows hidden on one secured dimension.
 
-**T10-A288-5.** Before exposing non-visual totals, weigh carefully what they reveal. Hiding the unsecured summary table does not stop users from connecting to the model and querying all its content, and a correct percentage indirectly discloses the total.
-- Consider. 2023. https://www.sqlbi.com/articles/computing-accurate-percentages-with-row-level-security-in-power-bi/
-- When: A model adds an unsecured summary table for non-visual totals beside row-level security.
-
 **T10-A288-6.** To slice unsecured totals by some attributes of a secured dimension, one approach: a separate dimension of only those attributes plus a generated key. Add its key to the fact table as a calculated column, carry it into the summary table, and relate the two.
 - Option. 2023. https://www.sqlbi.com/articles/computing-accurate-percentages-with-row-level-security-in-power-bi/
 - When: Non-visual totals need slicing by some attributes of the secured dimension while its other attributes stay hidden.
@@ -177,7 +164,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T10-A253-1.** To hide one measure from some users while its tables and columns stay visible, one way is to reference a dedicated empty table in an unused variable of the measure and hide that table with object-level security. Execution plan and performance do not change.
 - Option. Check. 2022. https://www.sqlbi.com/articles/hiding-measures-by-using-object-level-security-in-power-bi/
 - When: Some users must not see a measure, while every existing table and column stays visible to them.
-- Version: Written in 2022, when Power BI Desktop set only row filters and object permissions needed an external tool.
+- Version: Written in 2022, when Power BI Desktop set only row filters and object permissions needed an external tool. A table with no relationship needs its row in the brief (M411).
 
 **T10-A253-2.** An empty table that exists only so that measures can reference it for object-level security should be made invisible to users.
 - Should. Check. 2022. https://www.sqlbi.com/articles/hiding-measures-by-using-object-level-security-in-power-bi/
@@ -202,7 +189,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T10-A279-1.** To read the current user's active security roles in DAX, one approach is a hidden table with no relationships and one row per role name; the row filter of each role keeps only the row that equals its own name.
 - Option. 2023. https://www.sqlbi.com/articles/reading-active-power-bi-security-roles-in-dax/
 - When: DAX logic must react to the active roles; the table can be calculated or imported.
-- Version: As of 2023, Power BI had functions for the user name but none that returned the active roles.
+- Version: As of 2023, Power BI had functions for the user name but none that returned the active roles. A table with no relationship needs its row in the brief (M411).
 
 **T10-A279-2.** The role-name table can hold one extra value whose name matches no security role. No role filter keeps it, so it is visible only when no role applies, which tells DAX the user is an administrator.
 - Option. 2023. https://www.sqlbi.com/articles/reading-active-power-bi-security-roles-in-dax/

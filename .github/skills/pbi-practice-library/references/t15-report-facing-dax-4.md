@@ -2,7 +2,7 @@
 
 Part 4 of 5 of this topic. Covers: Conditional formatting and KPIs; Format strings in reports.
 
-Practice notes drawn from public SQLBI articles, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail.
+Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail. A note may name a tool, a website or a custom visual that this template does not use, or describe publishing, deploying or changing a deployed model: that is information for the developer. You do not install, call or suggest such a tool, and nothing is published or deployed from this template.
 
 ## General practice
 
@@ -208,6 +208,7 @@ Practice notes drawn from public SQLBI articles, each restated in new words. The
 **T15-A322-11.** Bind a colour-returning measure to a visual property with the Field value format style of the conditional formatting dialog; Power BI Desktop calls the measure a field in that option.
 - Must. 2024. https://www.sqlbi.com/articles/re-using-visual-formatting-in-and-across-power-bi-reports/
 - When: A measure that returns a colour drives conditional formatting.
+- Version: Theme colours only; a colour code needs an exception row (V009).
 
 **T15-A362-1.** When each level of a hierarchy needs its own formatting calculation, the formatting expression must first find the level of the current cell and then apply that level's logic; it can be a model measure or a visual calculation.
 - Must. 2026. https://www.sqlbi.com/articles/dynamic-formatting-by-hierarchy-level-with-isinscope-and-isatlevel/
