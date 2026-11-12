@@ -2,7 +2,7 @@
 
 Part 2 of 5 of this topic. Covers: Customer, product and campaign analysis.
 
-Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail. A note may name a tool, a website or a custom visual that this template does not use, or describe publishing, deploying or changing a deployed model: that is information for the developer. You do not install, call or suggest such a tool, and nothing is published or deployed from this template.
+Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit or condition. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. **Paper** means the note comes from a white paper: its link opens only a summary, and the paper itself is on a download site that `pbi-lookup` does not open, so confirm the point on Microsoft Learn instead. The article holds the detail. A note may name another product in passing, such as Analysis Services or Excel: that is information for the developer. Nothing is installed, published or deployed from this template.
 
 ## General practice
 
@@ -160,7 +160,6 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T14-A330-8.** For a table that shows each item's Pareto contribution inside one group, visual calculations can do the work: a hidden running sum over the rows of the visual, and a percentage that divides it by its total, obtained with COLLAPSE.
 - Option. 2025. https://www.sqlbi.com/articles/dynamic-pareto-analysis-in-power-bi/
 - When: A table visual lists the items of one selected group; several groups in one line chart need measures.
-- Version: Names a function missing from this template's DAX function index; DAX standard rule 19 applies until the index lists it.
 
 **T14-A330-9.** When Pareto visual calculations must show several groups at once, partition the running sum by the group column with PARTITIONBY inside WINDOW, so each item's percentage is relative to its own group, and use a matrix to make navigation easier.
 - Should. 2025. https://www.sqlbi.com/articles/dynamic-pareto-analysis-in-power-bi/

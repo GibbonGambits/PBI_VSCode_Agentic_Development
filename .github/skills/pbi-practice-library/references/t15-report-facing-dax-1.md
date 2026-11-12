@@ -1,8 +1,8 @@
 # Report-facing DAX and report design
 
-Part 1 of 5 of this topic. Covers: Slicers and measure filters; Report design and requirements.
+Part 1 of 4 of this topic. Covers: Slicers and measure filters; Report design and requirements; Measures written for visuals.
 
-Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail. A note may name a tool, a website or a custom visual that this template does not use, or describe publishing, deploying or changing a deployed model: that is information for the developer. You do not install, call or suggest such a tool, and nothing is published or deployed from this template.
+Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit or condition. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. **Paper** means the note comes from a white paper: its link opens only a summary, and the paper itself is on a download site that `pbi-lookup` does not open, so confirm the point on Microsoft Learn instead. The article holds the detail. A note may name another product in passing, such as Analysis Services or Excel: that is information for the developer. Nothing is installed, published or deployed from this template.
 
 ## General practice
 
@@ -14,10 +14,10 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 
 ### Report design and requirements
 
-**T15-A072-10.** When no visual property meets a report requirement, look for the answer in every layer of the tool: queries, data model, DAX and custom visuals, not only in the visual's settings.
+**T15-A072-10.** When no visual property meets a report requirement, look for the answer in every layer of the tool: queries, data model and DAX, not only in the visual's settings.
 - Should. 2016. https://www.sqlbi.com/articles/the-space-report-under-the-hood/
 - When: A report requirement cannot be met by configuring a visual.
-- Version: Written for 2016 Power BI. Custom visuals, one layer named, are outside this template's standards.
+- Version: Written for 2016 Power BI.
 
 **T15-A325-12.** When users insist on a pie chart, a short talk to learn their view and offer an alternative is one approach; if they still prefer the pie, accepting it is reasonable, and the talk may show it fits best.
 - Option. 2025. https://www.sqlbi.com/articles/using-pie-charts-is-not-the-end-of-the-world/
@@ -92,6 +92,20 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T15-A318-6.** Gather good requirements to decide which context a report shows, from the business problems and questions it must address and the information people need for their work. Showing everything is inefficient; a single measure can omit what some need.
 - Should. 2024. https://www.sqlbi.com/articles/building-bullet-charts-in-power-bi-reports/
 - When: Deciding which comparisons and targets a report shows.
+
+### Measures written for visuals
+
+**T15-A163-3.** When a measure turns a table result into text and the table may hold several rows, use CONCATENATEX; do not rely on VALUES being converted to a scalar, which works only for exactly one row and one column.
+- Should. 2019. https://www.sqlbi.com/articles/using-concatenatex-in-measures/
+- When: A text measure where a single-row table cannot be assumed.
+
+**T15-A222-1.** Weigh the report's requirements before a measure shows zero where it would be blank. A visible zero says the item had no activity; a dropped row hides the item as if it did not matter. Zeros suit some reports and not others.
+- Consider. 2021. https://www.sqlbi.com/articles/how-to-return-0-instead-of-blank-in-dax/
+- When: Deciding whether a report should show combinations with no data, such as products without sales.
+
+**T15-A351-2.** Do not add each detail attribute as one more row field of a matrix: every field becomes another hierarchy level, which hampers navigation, can slow the query and blurs the layout.
+- Should. 2026. https://www.sqlbi.com/articles/show-transaction-details-on-the-matrix-visual-in-power-bi/
+- When: Detail attributes are wanted beside the rows of a matrix.
 
 ## Special-case techniques and facts
 
@@ -226,3 +240,114 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 - Should. Check. 2016. https://www.sqlbi.com/articles/the-space-report-under-the-hood/
 - When: A report object needs a graphical background, such as a number label over an illustration.
 - Version: From 2016 (Arrange menu). Any transparency must come from the theme, not from formatting on the visual.
+
+### Measures written for visuals
+
+**T15-A072-3.** Where the requirement is to show zero, not blank, for a selection without matching rows, adding zero to the measure result is one way. A blank result can otherwise make the item vanish from a chart or table.
+- Option. 2016. https://www.sqlbi.com/articles/the-space-report-under-the-hood/
+- When: Only when the report must display zero in place of hiding the item.
+- Version: Departs from the blank-stays-blank default (M506): only for a zero the brief asks for, listed as an exception.
+
+**T15-A072-9.** Visibility logic a visual cannot apply, such as the top three of one group plus the top one of another, can go into the measure: it returns blank for members to hide, and a parameter table sets how many to show.
+- Option. 2016. https://www.sqlbi.com/articles/the-space-report-under-the-hood/
+- When: The filter logic a visual needs cannot be configured on the visual itself.
+
+**T15-A163-1.** A measure that returns the name of the top item as text must return every tied item when there is a tie, for example by joining the rows TOPN returns into one string with CONCATENATEX. Showing one of them hides the tie.
+- Must. 2019. https://www.sqlbi.com/articles/using-concatenatex-in-measures/
+- When: A text measure reports the best performer or a similar top item, and ties are possible.
+
+**T15-A163-2.** When values tie, TOPN returns every tied row, so a request for one row can return several.
+- Fact. 2019. https://www.sqlbi.com/articles/using-concatenatex-in-measures/
+- When: TOPN is used to pick a single top row and ties are possible.
+
+**T15-A163-4.** To put each item that CONCATENATEX joins on its own line, give it a delimiter, its third argument, that contains the line feed from `UNICHAR ( 10 )`, for example after a comma.
+- Option. 2019. https://www.sqlbi.com/articles/using-concatenatex-in-measures/
+- When: A text measure may list several items, such as tied top performers.
+
+**T15-A222-2.** Power BI builds most of its queries on SUMMARIZECOLUMNS, which drops every row whose computed values are all blank. Combinations with no data therefore vanish from the visual; they do not show as empty or zero. This is by design, to keep reports short.
+- Fact. 2021. https://www.sqlbi.com/articles/how-to-return-0-instead-of-blank-in-dax/
+- When: Explaining why items without data are missing from a visual.
+
+**T15-A222-3.** When zeros should appear only for some combinations, do not just add zero to the measure result: that turns every blank into zero, also for combinations that never had data, such as years that exist only in the Date table. The logic must be selective.
+- Must. 2021. https://www.sqlbi.com/articles/how-to-return-0-instead-of-blank-in-dax/
+- When: A measure must show zero for a controlled subset of combinations, not for all of them.
+- Version: Any zero-for-blank logic needs the brief's request and an exception to the blank rule (M506).
+
+**T15-A222-4.** One selective way to show zero for blank: the measure finds the first and last transaction dates and adds zero only when the current date, or the selected date range, falls inside that span. It is fast and gives correct results.
+- Option. 2021. https://www.sqlbi.com/articles/how-to-return-0-instead-of-blank-in-dax/
+- When: Simple cases; it cannot start the zeros before the first sale, for example at a product launch date.
+- Version: Any zero-for-blank logic needs the brief's request and an exception to the blank rule (M506).
+
+**T15-A222-5.** For general or complex rules on where zero replaces blank, keep the logic out of DAX: list the combinations that should show zero in a physical table related to the relevant dimensions, and add zero only where it has rows; cost moves to processing time.
+- Should. 2021. https://www.sqlbi.com/articles/how-to-return-0-instead-of-blank-in-dax/
+- When: Complex requirements; when the start depends on the product alone, a column in the Product table is enough.
+- Version: Any zero-for-blank logic needs the brief's request and an exception to the blank rule (M506).
+
+**T15-A222-8.** The zero-for-blank logic written for one measure can move into a calculation group, so that it applies to any measure and report users choose between showing blank and showing zero.
+- Option. 2021. https://www.sqlbi.com/articles/how-to-return-0-instead-of-blank-in-dax/
+- When: Several measures need the same choice between blank and zero.
+- Version: Any zero-for-blank logic needs the brief's request and an exception to the blank rule (M506).
+
+**T15-A312-1.** A measure that calls RAND returns a new random value at every interaction with the report, so chart positions driven by it keep moving. Readers find that irritating and may think the visual is being filtered.
+- Fact. 2024. https://www.sqlbi.com/articles/highlighting-a-data-point-and-comparing-to-all-others-in-a-distribution/
+- When: A visual, such as a jitter plot, whose axis is driven by a RAND-based measure.
+
+**T15-A312-2.** Random jitter values stay stable when computed once with RAND in a column of a calculated table, or in a calculated column, with the axis measure reading the stored value. A stored column changes only when its table refreshes.
+- Option. 2024. https://www.sqlbi.com/articles/highlighting-a-data-point-and-comparing-to-all-others-in-a-distribution/
+- When: Visuals that need random offsets, such as a jitter plot on a scatterplot.
+- Version: A calculated column or table here carries its reason line (M105).
+
+**T15-A312-15.** A chart that compares one selected item with the distribution of all others can end with a title from a measure that states the selected value and, where useful, context such as how many data points fall below it.
+- Option. 2024. https://www.sqlbi.com/articles/highlighting-a-data-point-and-comparing-to-all-others-in-a-distribution/
+- When: Charts comparing a selected item against all others.
+
+**T15-A318-2.** To compare a year still in progress with the same period a year earlier, the SAMEPERIODLASTYEAR dates in the prior-year measure can be limited to those flagged by a date-table calculated column that marks dates with sales. No cumulative year-to-date calculation is then needed.
+- Option. 2024. https://www.sqlbi.com/articles/building-bullet-charts-in-power-bi-reports/
+- When: A previous-year target measure set against a current year that is not complete.
+- Version: The calculated column carries its reason line (M105).
+
+**T15-A351-1.** To show many attributes of a business entity or transaction, above all in a matrix, combine the relevant fields into one column instead of one column per attribute: many columns take space, force horizontal scrolling and read badly.
+- Should. 2026. https://www.sqlbi.com/articles/show-transaction-details-on-the-matrix-visual-in-power-bi/
+- When: Many descriptive attributes must be visible for each item.
+
+**T15-A351-4.** The details of a unique identifier, such as an order, product or customer code, can be shown in the matrix itself by a details measure placed after the other measures, in place of a separate table visual that readers must click to sync.
+- Option. 2026. https://www.sqlbi.com/articles/show-transaction-details-on-the-matrix-visual-in-power-bi/
+- When: A matrix lists items by a unique identifier and readers want their details.
+
+**T15-A351-5.** The layout of a details measure can first be checked with a prototype measure that returns a fixed text for one chosen item, before the real logic is written.
+- Option. 2026. https://www.sqlbi.com/articles/show-transaction-details-on-the-matrix-visual-in-power-bi/
+- When: Starting a details measure.
+
+**T15-A351-6.** A details measure can be guarded with ISINSCOPE on the identifier column, so that it returns text only when the identifier is really a row of the visual, and not when it is merely filtered from outside.
+- Option. 2026. https://www.sqlbi.com/articles/show-transaction-details-on-the-matrix-visual-in-power-bi/
+- When: A details measure must stay blank on rows where several items share a value.
+
+**T15-A351-7.** Once a measure has checked that exactly one item is in scope and has visible rows, it can read column values with VALUES, not SELECTEDVALUE, which costs more because it rests on a DISTINCTCOUNT.
+- Option. 2026. https://www.sqlbi.com/articles/show-transaction-details-on-the-matrix-visual-in-power-bi/
+- When: Only after a test such as ISINSCOPE plus a non-empty check on the fact table.
+- Version: The DAX standard reads one value with SELECTEDVALUE (rule 4); keep this form only for a measured gain.
+
+**T15-A351-8.** Several attribute values can be joined into one text by putting them in a table constructor, dropping the empty entries with FILTER and joining the rest with CONCATENATEX and a fixed separator; the result is BLANK when every value is empty.
+- Option. 2026. https://www.sqlbi.com/articles/show-transaction-details-on-the-matrix-visual-in-power-bi/
+- When: A measure builds one text from several columns, some of which may be empty.
+
+**T15-A351-9.** Filtering one fact-table identifier does not filter the related dimension: a details measure that shows dimension columns must pass the filter from the fact table to that dimension, for example with CROSSFILTER set to both directions inside CALCULATE or CALCULATETABLE.
+- Must. 2026. https://www.sqlbi.com/articles/show-transaction-details-on-the-matrix-visual-in-power-bi/
+- When: Details grouped by a fact-table identifier show attributes of a related dimension.
+
+**T15-A351-10.** In a details measure, prefer an outer CONCATENATEX over the one related row, obtained with CALCULATETABLE, with the columns read directly in an inner concatenation, to fetching each column with VALUES: fewer storage engine queries and a plain list of columns.
+- Should. 2026. https://www.sqlbi.com/articles/show-transaction-details-on-the-matrix-visual-in-power-bi/
+- When: The identifier is in scope, so the outer iterator sees one row only.
+
+**T15-A351-11.** The variant of a details measure built on SUMMARIZE needs no both-direction filter and can mix columns of several tables, but lists the columns twice: use it only when you can prove it is faster and needed.
+- Should. 2026. https://www.sqlbi.com/articles/show-transaction-details-on-the-matrix-visual-in-power-bi/
+- When: Choosing the form of a details measure.
+
+**T15-A351-13.** For details of each line of an order, not of the order as a whole, a measure can iterate the fact rows with CONCATENATEX, read dimension columns with RELATED, and separate the lines with a new-line character from UNICHAR.
+- Option. 2026. https://www.sqlbi.com/articles/show-transaction-details-on-the-matrix-visual-in-power-bi/
+- When: Per-line details, for example per product, of the selected order.
+
+**T15-A351-14.** The repeated inner step of a details measure, which drops empty values and concatenates the list, can move into a user-defined function used by several measures; it shortens the code and changes nothing in performance.
+- Option. 2026. https://www.sqlbi.com/articles/show-transaction-details-on-the-matrix-visual-in-power-bi/
+- When: Several details measures repeat the same concatenation logic.
+- Version: User-defined functions need compatibility level 1702 or higher (M801).

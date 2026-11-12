@@ -2,7 +2,7 @@
 
 Part 2 of 2 of this topic. Covers: Business-rule grain and testing; Duplicate names, Group By Columns; Circular dependency errors; Sankey chart funnels; User-context calculated columns.
 
-Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail. A note may name a tool, a website or a custom visual that this template does not use, or describe publishing, deploying or changing a deployed model: that is information for the developer. You do not install, call or suggest such a tool, and nothing is published or deployed from this template.
+Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit or condition. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. **Paper** means the note comes from a white paper: its link opens only a summary, and the paper itself is on a download site that `pbi-lookup` does not open, so confirm the point on Microsoft Learn instead. The article holds the detail. A note may name another product in passing, such as Analysis Services or Excel: that is information for the developer. Nothing is installed, published or deployed from this template.
 
 ## General practice
 
@@ -68,7 +68,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 - Consider. 2021. https://www.sqlbi.com/articles/avoiding-circular-dependency-errors-in-dax/
 - When: A calculated column in a table without a primary key.
 
-**T06-A112-5.** When a calculated column references a measure, put the measure inside CALCULATE with ALLEXCEPT keeping only the table's primary key column: a measure call always implies CALCULATE. It is not mandatory on the one side of a relationship, but still recommended there.
+**T06-A112-5.** When a calculated column references a measure, put the measure inside CALCULATE with ALLEXCEPT keeping only the primary key column of the table: a measure call always implies CALCULATE. On a one-side table it is not required, yet still advised.
 - Should. 2021. https://www.sqlbi.com/articles/avoiding-circular-dependency-errors-in-dax/
 - When: Every calculated column that references a measure, even when no error appears.
 
@@ -126,12 +126,12 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T06-A269-1.** Adopt the Group By Columns property on a column only once its internal behaviour is understood and it is accepted that Excel clients cannot work with it: the property is not compatible with MDX queries.
 - Must. 2023. https://www.sqlbi.com/articles/understanding-group-by-columns-in-power-bi/
 - When: Considering Group By Columns for a column of a Power BI model.
-- Version: In 2023: Power BI from compatibility level 1400; not Analysis Services, so such a model cannot be deployed there.
+- Version: In 2023: Power BI from compatibility level 1400; not Analysis Services.
 
 **T06-A269-3.** To make Power BI always group a descriptive column by the table's primary key without showing the key, mark the key column as the table key and set Keep Unique Rows to true on the descriptive column.
 - Option. Check. 2023. https://www.sqlbi.com/articles/understanding-group-by-columns-in-power-bi/
 - When: The descriptive column is unique through the table's primary key; Excel and other MDX clients ignore the setting.
-- Version: Keep Unique Rows could not be set in Power BI Desktop and needed Tabular Editor; check current options.
+- Version: Keep Unique Rows could not be set in the Power BI Desktop interface; check current options.
 
 **T06-A269-4.** MDX, and therefore Excel, ignores Keep Unique Rows: a PivotTable over the descriptive column still merges different entities that share a display value, giving inaccurate figures with no error.
 - Fact. 2023. https://www.sqlbi.com/articles/understanding-group-by-columns-in-power-bi/
@@ -140,7 +140,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T06-A269-5.** When a column's values are unique only together with other non-key columns, such as a city name with state and country, its Group By Columns property can be set to the columns that identify each value.
 - Option. 2023. https://www.sqlbi.com/articles/understanding-group-by-columns-in-power-bi/
 - When: Keep Unique Rows does not fit; Excel PivotTables raise an error unless every listed column is in the report.
-- Version: Set in Tabular Editor; in 2023 Power BI only, from compatibility level 1400.
+- Version: In 2023 Power BI only, from compatibility level 1400.
 
 **T06-A269-6.** When setting Group By Columns for a column, add the column holding the displayed value itself to the list; without it, a slicer selection filters only the other listed columns and returns every value sharing them, such as all cities of the selected states.
 - Should. 2023. https://www.sqlbi.com/articles/understanding-group-by-columns-in-power-bi/
@@ -151,8 +151,8 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 - Fact. 2023. https://www.sqlbi.com/articles/understanding-group-by-columns-in-power-bi/
 - When: Hand-written DAX, and Excel PivotTables that leave those columns out; Power BI adds them to its own queries.
 
-**T06-A269-8.** To filter a column that has Group By Columns in DAX, pass one filter table holding the column together with all its group-by columns, for example TREATAS over a list of value tuples mapped to those columns.
-- Option. 2023. https://www.sqlbi.com/articles/understanding-group-by-columns-in-power-bi/
+**T06-A269-8.** To filter a column that has Group By Columns in DAX, you must pass one filter table holding the column together with all its group-by columns, for example TREATAS over a list of value tuples mapped to those columns.
+- Must. 2023. https://www.sqlbi.com/articles/understanding-group-by-columns-in-power-bi/
 - When: A CALCULATE condition on the column alone, or separate conditions per column, fails with the composite-key error.
 
 **T06-A269-9.** To read the single selected value of a column that has Group By Columns, replace SELECTEDVALUE by a table that summarises the column with its group-by columns, keep only the column, and return its value when the table has exactly one row.
@@ -163,8 +163,8 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 - Fact. 2023. https://www.sqlbi.com/articles/understanding-group-by-columns-in-power-bi/
 - When: A column with Group By Columns is used in a filter or slicer.
 
-**T06-A269-11.** When a measure uses ISFILTERED to detect a slicer selection on a column with Group By Columns, consider testing the group-by column: Power BI filters that one, and the column shown is absent from the generated query.
-- Consider. 2023. https://www.sqlbi.com/articles/understanding-group-by-columns-in-power-bi/
+**T06-A269-11.** When a measure uses ISFILTERED to detect a slicer selection on a column with Group By Columns, the column to test is the group-by column: Power BI filters that one, and the column shown is absent from the generated query.
+- Fact. 2023. https://www.sqlbi.com/articles/understanding-group-by-columns-in-power-bi/
 - When: A measure reacts to a selection on a column that has Group By Columns.
 
 **T06-A269-12.** Measures in a model that uses Group By Columns must allow for two side effects: grouping by the column requires all its group-by columns, and report filters and slicers filter only the group-by columns, not the column shown.
@@ -212,45 +212,17 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 
 ### Sankey chart funnels
 
-**T06-A290-1.** For a static Sankey Chart funnel, prepare a table with one row per transition between consecutive states, use its from and to columns as Source and Destination, and give Weight a row-count measure: a precomputed table and a plain count are very fast.
-- Should. Check. 2023. https://www.sqlbi.com/articles/preparing-a-data-model-for-sankey-charts-in-power-bi/
-- When: Each event happens at most once per customer in fixed order; users need not exclude events.
-- Version: Uses the Sankey Chart custom visual from AppSource; check current behaviour. Custom visuals are outside this template's standards.
-
-**T06-A290-2.** When users must be able to exclude events from a Sankey Chart funnel, compute the transitions inside the Weight measure by scanning the event table: a precomputed transition table cannot drop the chosen events from the flows.
-- Must. 2023. https://www.sqlbi.com/articles/preparing-a-data-model-for-sankey-charts-in-power-bi/
-- When: A Sankey Chart funnel with user-selectable events.
-- Version: Uses the Sankey Chart custom visual from AppSource. Custom visuals are outside this template's standards.
-
-**T06-A290-3.** A placeholder state, such as None, can be added, with a dummy transition to it for every entity that has only one event: the Sankey Chart hides rows with no transition to show.
-- Option. Check. 2023. https://www.sqlbi.com/articles/preparing-a-data-model-for-sankey-charts-in-power-bi/
-- When: Entities with a single event must still appear in the chart.
-- Version: Uses the Sankey Chart custom visual from AppSource; check current behaviour. Custom visuals are outside this template's standards.
-
-**T06-A290-5.** For a dynamic Sankey Chart, create two separate copies of the state list, one bound to Source and one to Destination: one table cannot feed both inputs of the visual.
-- Must. Check. 2023. https://www.sqlbi.com/articles/preparing-a-data-model-for-sankey-charts-in-power-bi/
-- When: A Sankey Chart whose flows are computed by a measure.
-- Version: Uses the Sankey Chart custom visual from AppSource; check current behaviour. Custom visuals are outside this template's standards.
-
-**T06-A290-6.** In a dynamic Sankey Chart model, the Source and Destination state tables should not filter the state and event tables through relationships; the Weight measure moves their selections onto the event table itself, for example with TREATAS, since propagated filters would break it.
-- Should. 2023. https://www.sqlbi.com/articles/preparing-a-data-model-for-sankey-charts-in-power-bi/
-- When: A Sankey Chart whose Weight measure computes transitions.
-- Version: Uses the Sankey Chart custom visual from AppSource. A table with no relationship needs its row in the brief (M411).
-
 **T06-A290-7.** Store each entity's first event type in a calculated column instead of hardcoding which event types count as start events.
 - Should. 2023. https://www.sqlbi.com/articles/preparing-a-data-model-for-sankey-charts-in-power-bi/
 - When: A funnel where users can hide events and a start event is treated differently from later ones.
-- Version: Uses the Sankey Chart custom visual from AppSource. Custom visuals are outside this template's standards.
 
-**T06-A290-9.** If only a static Sankey Chart is needed, consider building the event table in Power Query or SQL and keeping DAX for the measures. A Power Query transformation can itself fail on memory during refresh when its steps do not fold into one request.
+**T06-A290-9.** If only a static funnel chart is needed, consider building the event table in Power Query or SQL and keeping DAX for the measures. A Power Query transformation can itself fail on memory during refresh when its steps do not fold into one request.
 - Consider. 2023. https://www.sqlbi.com/articles/preparing-a-data-model-for-sankey-charts-in-power-bi/
 - When: A funnel model that would otherwise need complex DAX calculated tables.
-- Version: Uses the Sankey Chart custom visual from AppSource. Custom visuals are outside this template's standards.
 
-**T06-A290-11.** Before writing the Weight measure of a Sankey Chart funnel in which users can hide events, settle what hiding each kind means, for example: hiding a start event drops the customers who began with it; hiding a middle event only skips that step.
+**T06-A290-11.** Before writing the measure that weights the flows of a funnel in which users can hide events, settle what hiding each kind means, for example: hiding a start event drops the customers who began with it; hiding a middle event only skips that step.
 - Must. 2023. https://www.sqlbi.com/articles/preparing-a-data-model-for-sankey-charts-in-power-bi/
 - When: Users may hide start and middle events of a funnel.
-- Version: Uses the Sankey Chart custom visual from AppSource. Custom visuals are outside this template's standards.
 
 ### User-context calculated columns
 
@@ -272,12 +244,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T06-A360-4.** Set Group By Columns of a translated user-aware column to its numeric counterpart, such as month number for month name or weekday number for weekday name: slicers then save numbers, so selections survive when the report is viewed in another language.
 - Should. 2026. https://www.sqlbi.com/articles/introducing-user-aware-calculated-columns-in-power-bi/
 - When: A selection made in one language must hold in another.
-- Version: Preview feature (May 2026) that needs the developer's yes; property edited in Tabular Editor or TMDL view.
-
-**T06-A360-6.** A row-level result that is otherwise reachable only through a measure, such as quantity times net price, can be exposed as a User Context calculated column, so users slice and filter by it without a stored high-cardinality column.
-- Option. 2026. https://www.sqlbi.com/articles/introducing-user-aware-calculated-columns-in-power-bi/
-- When: Simple arithmetic on columns of one table; iterators need a per-row formula-engine callback and can cost much more.
-- Version: User-context calculated columns are a preview feature (May 2026) that needs the developer's yes.
+- Version: Preview feature (May 2026) that needs the developer's yes; property edited in the TMDL view.
 
 **T06-A360-8.** To hide a sensitive column's values from some users without breaking visuals, the column can live in a separate hidden table whose row-level security filter is FALSE for the restricted role, read into the main table by a User Context calculated column with LOOKUPVALUE.
 - Option. 2026. https://www.sqlbi.com/articles/introducing-user-aware-calculated-columns-in-power-bi/

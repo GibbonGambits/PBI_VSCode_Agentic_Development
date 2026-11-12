@@ -9,7 +9,8 @@ Order of trust: 1 the owner's checklist; 2 Microsoft Learn; 3 Microsoft's own sk
 | Source | Address | Commit or date | Licence | How it is used |
 |---|---|---|---|---|
 | Microsoft Learn: Power BI, DAX, Power Query, Fabric, Analysis Services documentation | https://learn.microsoft.com/power-bi/ | read 2026-11-11 | Microsoft Learn terms of use | Restated in new words, each rule with its page address. Nothing copied beyond property and function names |
-| Microsoft Learn: DAX reference table of contents | https://learn.microsoft.com/en-us/dax/toc.json | read 2026-11-11 | Microsoft Learn terms of use | Names and addresses of the 464 functions in the DAX function index |
+| Microsoft Learn: DAX reference table of contents | https://learn.microsoft.com/en-us/dax/toc.json | read 2026-11-12 | Microsoft Learn terms of use | Names and addresses of the 461 functions it lists in the DAX function index |
+| Microsoft Learn: sitemap (DAX pages) | https://learn.microsoft.com/_sitemaps/sitemapindex.xml | read 2026-11-12 | Microsoft Learn terms of use | Names and addresses of the 20 functions and 2 statements the table of contents leaves out, in the DAX function index |
 | microsoft/skills-for-fabric | https://github.com/microsoft/skills-for-fabric | f8fac110ac3b, 2026-11-05 | MIT | Rules restated; file forms followed (visual roles, button actions, field parameters, theme registration). Notice in `THIRD_PARTY_NOTICES.md` |
 | microsoft/Analysis-Services (best practice rules) | https://github.com/microsoft/Analysis-Services | d3ccb5032c90, 2026-07-08 | MIT | All 71 rules read, each mapped in `coverage.md`; rules restated. Notice in `THIRD_PARTY_NOTICES.md` |
 | microsoft/json-schemas | https://github.com/microsoft/json-schemas | 235796d8b03b, 2026-11-10 | MIT | Every published version of each report schema is copied into `scripts/schemas` with its licence file |

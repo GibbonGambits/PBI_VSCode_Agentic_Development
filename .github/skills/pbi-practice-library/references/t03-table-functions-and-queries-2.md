@@ -2,7 +2,7 @@
 
 Part 2 of 2 of this topic. Covers: Calculated and static tables; SUMMARIZECOLUMNS behaviour; Joins and lookups; Set functions.
 
-Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail. A note may name a tool, a website or a custom visual that this template does not use, or describe publishing, deploying or changing a deployed model: that is information for the developer. You do not install, call or suggest such a tool, and nothing is published or deployed from this template.
+Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit or condition. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. **Paper** means the note comes from a white paper: its link opens only a summary, and the paper itself is on a download site that `pbi-lookup` does not open, so confirm the point on Microsoft Learn instead. The article holds the detail. A note may name another product in passing, such as Analysis Services or Excel: that is information for the developer. Nothing is installed, published or deployed from this template.
 
 ## General practice
 
@@ -41,6 +41,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T03-A341-5.** When SUMMARIZECOLUMNS groups columns without any measure or aggregation expression, always pass a table, such as the fact table, as a filter table argument. It drives auto-exists, so only combinations existing in that table return; without it the result is the full cross-join.
 - Must. 2017. https://www.sqlbi.com/articles/introducing-summarizecolumns/ ; https://www.sqlbi.com/articles/summarizecolumns-best-practices/
 - When: SUMMARIZECOLUMNS with grouping columns only; the filter table goes after them and before any name and expression pair.
+- Version: Inside a measure, DAX standard rule 33 moves filters to a CALCULATETABLE around SUMMARIZECOLUMNS (M523).
 
 **T03-A341-6.** For grouping with measures from a single fact table, the preference for SUMMARIZECOLUMNS over ADDCOLUMNS with SUMMARIZE is slight: test both for speed and choose on the results. The two are not fully equivalent in the combinations returned and in how outer filters act.
 - Should. 2025. https://www.sqlbi.com/articles/summarizecolumns-best-practices/

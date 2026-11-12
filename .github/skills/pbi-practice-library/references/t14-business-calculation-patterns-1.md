@@ -2,7 +2,7 @@
 
 Part 1 of 5 of this topic. Covers: Totals and hierarchy levels; Budget, currency and financial calculations.
 
-Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail. A note may name a tool, a website or a custom visual that this template does not use, or describe publishing, deploying or changing a deployed model: that is information for the developer. You do not install, call or suggest such a tool, and nothing is published or deployed from this template.
+Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit or condition. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. **Paper** means the note comes from a white paper: its link opens only a summary, and the paper itself is on a download site that `pbi-lookup` does not open, so confirm the point on Microsoft Learn instead. The article holds the detail. A note may name another product in passing, such as Analysis Services or Excel: that is information for the developer. Nothing is installed, published or deployed from this template.
 
 ## General practice
 
@@ -186,7 +186,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 - When: Dynamic conversion in a measure where rates are stored at a coarser grain than the transactions.
 - Version: Described in 2020.
 
-**T14-A183-5.** Before deploying a currency conversion measure that groups amounts by month and applies that month's rate, confirm that the model really holds exactly one exchange rate per month and that only one currency is selected. If either fails, the measure returns inaccurate numbers.
+**T14-A183-5.** Before relying on a currency conversion measure that groups amounts by month and applies that month's rate, confirm that the model really holds exactly one exchange rate per month and that only one currency is selected. If either fails, the measure returns inaccurate numbers.
 - Should. Check. 2020. https://www.sqlbi.com/articles/currency-conversion-in-power-bi-reports/
 - When: Dynamic conversion measures that iterate a month-level table of exchange rates.
 - Version: Described in 2020.

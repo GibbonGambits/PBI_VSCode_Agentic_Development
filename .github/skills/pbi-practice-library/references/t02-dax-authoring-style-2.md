@@ -1,8 +1,8 @@
 # DAX authoring style
 
-Part 2 of 2 of this topic. Covers: IN operator and constructors; Data types and comparisons.
+Part 2 of 2 of this topic. Covers: IN operator and constructors; Formatting, naming and references; Data types and comparisons.
 
-Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail. A note may name a tool, a website or a custom visual that this template does not use, or describe publishing, deploying or changing a deployed model: that is information for the developer. You do not install, call or suggest such a tool, and nothing is published or deployed from this template.
+Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit or condition. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. **Paper** means the note comes from a white paper: its link opens only a summary, and the paper itself is on a download site that `pbi-lookup` does not open, so confirm the point on Microsoft Learn instead. The article holds the detail. A note may name another product in passing, such as Analysis Services or Excel: that is information for the developer. Nothing is installed, published or deployed from this template.
 
 ## General practice
 
@@ -45,6 +45,48 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 - Should. 2024. https://www.sqlbi.com/articles/using-tuple-syntax-in-dax-expressions/ ; https://www.sqlbi.com/articles/the-in-operator-in-dax/
 - When: Multi-column filter arguments of CALCULATE or CALCULATETABLE.
 - Version: A tuple with IN as a direct filter argument is the 2024 view.
+
+### Formatting, naming and references
+
+**T02-A100-3.** Whenever columns enter a model, also through a source query or a calculated table, check that none shares its name with a measure: inside a row context of the new column's table the unqualified name is read as the column, so existing measures can break.
+- Should. 2017. https://www.sqlbi.com/articles/duplicated-names-in-dax/
+- When: Columns enter a model by a calculated column, a source query change or a calculated table change.
+
+**T02-A100-9.** Columns that hold the same content in different tables should have the same name; in particular, the two columns of a relationship should share one name.
+- Should. 2017. https://www.sqlbi.com/articles/duplicated-names-in-dax/
+- When: Naming columns that carry the same content across tables, including relationship keys.
+
+**T02-A100-10.** Do not rely on the editor's colour highlighting to tell a measure reference from a column reference: it is not always clear, and not every editor offers it.
+- Consider. Check. 2017. https://www.sqlbi.com/articles/duplicated-names-in-dax/
+- When: Reading or reviewing DAX where a name could be a measure or a column.
+- Version: In 2017 the Power BI formula editor showed measure references in purple.
+
+**T02-A143-3.** Do not check a column's spelling when the error says a single value for it cannot be determined: the message confirms the column exists. The cause is a missing row context for its table.
+- Must. Check. 2019. https://www.sqlbi.com/articles/dax-error-messages-in-power-bi/
+- When: Also when an iterator gives a row context, but over a different table.
+- Version: Message wording as described in 2019.
+
+**T02-A143-5.** When the error reports that a column is not found or is not usable in the expression, look for the right column name: the reference may be misspelled, since this message means the column exists nowhere in the model.
+- Should. Check. 2019. https://www.sqlbi.com/articles/dax-error-messages-in-power-bi/
+- When: A formula fails with the cannot-be-found error for a column.
+- Version: Message wording as described in 2019.
+
+**T02-A143-6.** With columns always qualified and measures never, an error about a missing object reads reliably: a message without a table name points to a missing measure, one with a table name to a missing column.
+- Should. Check. 2019. https://www.sqlbi.com/articles/dax-error-messages-in-power-bi/
+- When: Reading an error message about an object a formula cannot find.
+- Version: Message wording as described in 2019.
+
+**T02-A169-4.** In a temporary table too, refer to a column that carries the data lineage of a model column by its full table and column name.
+- Should. 2019. https://www.sqlbi.com/articles/naming-temporary-columns-in-dax/
+- When: Referencing columns of temporary tables built in DAX code.
+
+**T02-A169-5.** Do not put the @ prefix on columns returned as the result of a DAX query: give them names that read clearly in the user interface, because a report or a calculated table consumes them.
+- Should. 2019. https://www.sqlbi.com/articles/naming-temporary-columns-in-dax/
+- When: Columns in the output of a DAX query.
+
+**T02-A255-4.** When iterating a table held in a variable, prefix its model columns with the original table name: DAX has no syntax that uses the variable name as a column prefix.
+- Must. 2022. https://www.sqlbi.com/articles/variables-in-dax/
+- When: A table variable whose columns come from a model table.
 
 ### Data types and comparisons
 
@@ -161,6 +203,35 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 - Option. 2024. https://www.sqlbi.com/articles/using-tuple-syntax-in-dax-expressions/
 - When: A small table with constant values, or a mix of constant and calculated values.
 - Version: A calculated table needs its reason line (M105); the standard keeps DAX for what Power Query cannot do.
+
+### Formatting, naming and references
+
+**T02-A100-11.** A new measure is refused when its name matches any column or measure in the model, but a new column in another table may take an existing measure's name. So a measure and a column come to share a name only when columns are added.
+- Fact. 2017. https://www.sqlbi.com/articles/duplicated-names-in-dax/
+- When: Adding measures or columns to a model.
+- Version: In Power BI a column cannot be added to the table that holds a measure of that name.
+
+**T02-A154-3.** A table stored in a variable is not a new table with its own columns: a column reference that uses the variable name as table name fails with a cannot-find-table error. A reference must name a model column or a column a table function created.
+- Fact. 2019. https://www.sqlbi.com/articles/table-and-column-references-using-dax-variables/
+- When: Referencing columns of a table expression, such as a TOPN result, held in a variable.
+
+**T02-A154-4.** A column added inside an expression can be referenced with an empty table name, two single quotes before the bracketed column name. This is valid DAX and keeps the reference explicit; it is usually unnecessary when the name is unique and the expression simple.
+- Option. Check. 2019. https://www.sqlbi.com/articles/table-and-column-references-using-dax-variables/
+- When: A column created by ADDCOLUMNS in a table variable is referenced later.
+- Version: Power BI Desktop of April 2019 flagged the syntax in IntelliSense although it works.
+
+**T02-A169-2.** A table built inside an expression can mix model columns, which take their table name, with temporary columns made by table functions. Temporary columns cannot be qualified, carry no lineage, and filter no model column unless TREATAS is applied.
+- Fact. 2019. https://www.sqlbi.com/articles/naming-temporary-columns-in-dax/
+- When: Expressions that build temporary tables with table functions, such as ADDCOLUMNS in a variable.
+
+**T02-A169-6.** If a model measure's name starts with @, renaming the measure is one way to remove the clash with the @ convention for temporary columns.
+- Option. 2019. https://www.sqlbi.com/articles/naming-temporary-columns-in-dax/
+- When: A measure name starts with @ in code that uses @ for temporary columns.
+- Version: An existing measure is renamed only after the developer's clear yes.
+
+**T02-A255-5.** A column created inside a measure, for example with ADDCOLUMNS, and held in a table variable may be referenced by its bare name, which reads better than the formally correct form with an empty table name.
+- Option. 2022. https://www.sqlbi.com/articles/variables-in-dax/
+- When: Only columns added inside the measure that belong to a table variable.
 
 ### Data types and comparisons
 

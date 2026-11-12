@@ -24,7 +24,7 @@ LINE_LIMIT = 400                      # no library file is longer than about thi
 WORD_LIMIT = 45                       # a note is one or two lines
 SHELVES = ["## General practice", "## Special-case techniques and facts"]
 NOTE = re.compile(r"^\*\*(T(\d\d)-[AW]\d{3}-\d+)\.\*\* (\S.*)$")
-FACTS = re.compile(r"^- (Must|Should|Consider|Option|Fact)\. (Check\. )?(20[12]\d)\. "
+FACTS = re.compile(r"^- (Must|Should|Consider|Option|Fact)\. (Check\. )?(Paper\. )?(20[12]\d)\. "
                    r"(https://www\.sqlbi\.com/\S+/(?: ; https://www\.sqlbi\.com/\S+/)*)$")
 TOPIC_FILE = re.compile(r"^t(\d\d)-[a-z0-9-]+-(\d+)\.md$")
 
@@ -176,11 +176,35 @@ class Index(unittest.TestCase):
                 self.assertIn(name, known)
 
 
+class Scope(unittest.TestCase):
+    """What the review of the library settled: white paper notes are marked, and nothing out of scope is left."""
+
+    def test_every_white_paper_note_is_marked_paper(self):
+        for name in topic_files():
+            for note, _, under, _ in notes_of(name):
+                facts = under[0]
+                self.assertEqual("/whitepapers/" in facts, " Paper. " in facts, "%s in %s" % (note, name))
+
+    def test_skill_and_files_say_what_paper_means(self):
+        self.assertIn("**Paper**", read(os.path.join(SKILL, "SKILL.md")))
+        for name in topic_files():
+            self.assertIn("**Paper**", read(os.path.join(REFERENCES, name)).split("## General practice")[0], name)
+
+    def test_no_note_depends_on_tools_this_template_leaves_out(self):
+        banned = re.compile(r"DAX Studio|Tabular Editor|VertiPaq Analyzer|Bravo|Deneb|AppSource|custom visual|"
+                            r"ALM Toolkit|daxlib|DAX Formatter|missing from this template's (DAX )?function index",
+                            re.I)
+        for name in topic_files():
+            for note, text, under, _ in notes_of(name):
+                body = " ".join([text] + under[1:])
+                self.assertIsNone(banned.search(body), "%s in %s" % (note, name))
+
+
 class Record(unittest.TestCase):
     """maintenance/library-removed.md: one row for each note that was removed, by ID only."""
 
     def rows(self):
-        return re.findall(r"^\| (T\d\d-[AW]\d{3}-\d+) \| ([1-5]) \| (.+) \|$", read(RECORD), re.M)
+        return re.findall(r"^\| (T\d\d-[AW]\d{3}-\d+) \| ([1-6]) \| (.+) \|$", read(RECORD), re.M)
 
     def test_kept_and_removed_add_up_to_the_start(self):
         kept = set(note for name in topic_files() for note, _, _, _ in notes_of(name))

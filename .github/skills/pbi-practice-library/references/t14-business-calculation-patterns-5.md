@@ -2,7 +2,7 @@
 
 Part 5 of 5 of this topic. Covers: Events, durations and sequences; Building and testing calculations; Averages, working days and trends.
 
-Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail. A note may name a tool, a website or a custom visual that this template does not use, or describe publishing, deploying or changing a deployed model: that is information for the developer. You do not install, call or suggest such a tool, and nothing is published or deployed from this template.
+Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit or condition. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. **Paper** means the note comes from a white paper: its link opens only a summary, and the paper itself is on a download site that `pbi-lookup` does not open, so confirm the point on Microsoft Learn instead. The article holds the detail. A note may name another product in passing, such as Analysis Services or Excel: that is information for the developer. Nothing is installed, published or deployed from this template.
 
 ## General practice
 
@@ -134,7 +134,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T14-A088-6.** To speed up events-in-progress analysis, a calculated table with one row per event for each day it is open, holding date key and event identifier, can be materialized and its rows counted, so that no date range is evaluated at query time.
 - Option. Check. 2016. https://www.sqlbi.com/articles/analyzing-events-with-a-duration-in-dax/
 - When: The table is far larger than its source and fixes the grain at the event; weigh that first.
-- Version: On SQL Server 2016 or Power BI the measure-only version was judged fast enough.
+- Version: On SQL Server 2016 or Power BI the measure-only version was judged fast enough. Checklist item 38: a table that only reshapes source data belongs upstream.
 
 **T14-A088-8.** A precomputed events snapshot table fixes the grain at the event. If it cannot simply be related to the other dimensions needed, either raise the granularity of the snapshot table or guard the measures so they show no numbers the model cannot compute.
 - Must. Check. 2016. https://www.sqlbi.com/articles/analyzing-events-with-a-duration-in-dax/

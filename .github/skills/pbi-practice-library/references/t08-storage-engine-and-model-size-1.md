@@ -2,7 +2,7 @@
 
 Part 1 of 1 of this topic. Covers: Reducing column cardinality; Measuring model size; Analysis Services processing; Calculated column and table storage.
 
-Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail. A note may name a tool, a website or a custom visual that this template does not use, or describe publishing, deploying or changing a deployed model: that is information for the developer. You do not install, call or suggest such a tool, and nothing is published or deployed from this template.
+Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit or condition. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. **Paper** means the note comes from a white paper: its link opens only a summary, and the paper itself is on a download site that `pbi-lookup` does not open, so confirm the point on Microsoft Learn instead. The article holds the detail. A note may name another product in passing, such as Analysis Services or Excel: that is information for the developer. Nothing is installed, published or deployed from this template.
 
 ## General practice
 
@@ -39,18 +39,13 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 - When: Reducing the size of a model in Power BI, Analysis Services Tabular or Power Pivot.
 - Version: Older sources: the DMV $system.Discover_object_memory_usage, and helper workbooks for Power Pivot and Analysis Services.
 
-**T08-A059-2.** To study object sizes in one database, VertiPaq Analyzer is an option: it collects the size of every object in one pass and ranks the costliest columns across all tables, where DMVs must be queried one by one and cannot group or join.
-- Option. Check. 2015. https://www.sqlbi.com/articles/data-model-size-with-vertipaq-analyzer/
-- When: Analysing the size of the objects of one specific database.
-- Version: Its first version was a Power Pivot workbook; from version 2 only its entities and measures still apply.
-
-**T08-A107-2.** For accurate dictionary sizes in a Power BI file, run VertiPaq Analyzer straight after opening the file, with no refresh and no edit of a calculated table's expression in between. After either, save, close and reopen the file before measuring again.
+**T08-A107-2.** For accurate dictionary sizes in a Power BI file, measure straight after opening the file, with no refresh and no edit of a calculated table's expression in between. After either, save, close and reopen the file before measuring again.
 - Must. 2017. https://www.sqlbi.com/articles/measuring-the-dictionary-size-of-a-column-correctly/
-- When: Measuring column dictionary sizes of a Power BI model with VertiPaq Analyzer.
+- When: Measuring column dictionary sizes of a Power BI model.
 
-**T08-A108-6.** When comparing the storage compression of tables or columns with VertiPaq Analyzer, apply the procedure for measuring dictionary size correctly, so that inflated dictionary figures do not distort the comparison.
+**T08-A108-6.** When comparing the storage compression of tables or columns, apply the procedure for measuring dictionary size correctly, so that inflated dictionary figures do not distort the comparison.
 - Should. 2017. https://www.sqlbi.com/articles/storage-differences-between-calculated-columns-and-calculated-tables/
-- When: Comparing the storage compression of different techniques with VertiPaq Analyzer.
+- When: Comparing the storage compression of different techniques.
 
 ## Special-case techniques and facts
 
@@ -94,7 +89,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 
 ### Measuring model size
 
-**T08-A107-1.** Right after a refresh, the dictionary size VertiPaq Analyzer or the storage DMV reports for a column is the memory reserved: it starts at 1 MB a column, is not trimmed, and can far overstate the real size. Reopening the file gives the true figure.
+**T08-A107-1.** Right after a refresh, the dictionary size the storage DMV reports for a column is the memory reserved: it starts at 1 MB a column, is not trimmed, and can far overstate the real size. Reopening the file gives the true figure.
 - Fact. Check. 2017. https://www.sqlbi.com/articles/measuring-the-dictionary-size-of-a-column-correctly/
 - When: Columns with a dictionary (all text columns, many numeric ones), measured after a refresh.
 
@@ -102,16 +97,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 - Fact. 2017. https://www.sqlbi.com/articles/measuring-the-dictionary-size-of-a-column-correctly/
 - When: Calculated tables with no dependency on other tables, when dictionary sizes are measured.
 
-**T08-A107-4.** For correct dictionary sizes of a Power Pivot model, one way is to save the workbook, import it into Power BI with its existing data and no reprocessing, and run VertiPaq Analyzer on that model without pressing Refresh.
-- Option. Check. 2017. https://www.sqlbi.com/articles/measuring-the-dictionary-size-of-a-column-correctly/
-- When: Measuring a Power Pivot model; figures stay right only until Refresh is used in Power BI.
-- Version: Written when VertiPaq Analyzer could not connect to a Power Pivot model directly (2017).
-
 ### Analysis Services processing
-
-**T08-A039-1.** One way to show when a Tabular database was last processed: a calculated column defined as NOW () and a measure returning its MAX. The column holds a single value on all rows, so it takes almost no memory at any table size.
-- Option. 2014. https://www.sqlbi.com/articles/last-process-date-in-ssas-tabular/
-- When: Last process time shown in DAX or MDX queries; reliable only if the column's table is in every process operation.
 
 **T08-A039-2.** A NOW () calculated column that records the last process time must sit in a table that every process operation includes. When other tables are processed without it, the time shown can be wrong; a Process Full of the whole database is always right.
 - Must. 2014. https://www.sqlbi.com/articles/last-process-date-in-ssas-tabular/
@@ -130,12 +116,12 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 - When: A new table's first processing likely left more dictionary memory allocated than needed.
 - Version: On Azure Analysis Services, pausing and starting the service counts as a restart.
 
-**T08-A107-6.** On Analysis Services the extra dictionary memory that VertiPaq Analyzer shows is truly allocated, not a reporting error; only a detach and attach, a restore or a restart frees it. It seldom matters on a large database; small databases with hundreds of columns may gain.
+**T08-A107-6.** On Analysis Services the extra dictionary memory in the storage figures is truly allocated, not a reporting error; only a detach and attach, a restore or a restart frees it. It seldom matters for a large database; small ones with hundreds of columns may gain.
 - Fact. 2017. https://www.sqlbi.com/articles/measuring-the-dictionary-size-of-a-column-correctly/
 - When: Analysis Services Tabular databases showing inflated dictionary sizes.
 
 **T08-A107-7.** Dictionaries on an always-on Analysis Services server can exceed the size needed. Process Full (database or table) and Process Data (table) always build new dictionaries for hash-encoded columns; other processing adds overhead only to columns receiving values new to their dictionary.
-- Consider. 2017. https://www.sqlbi.com/articles/measuring-the-dictionary-size-of-a-column-correctly/
+- Fact. 2017. https://www.sqlbi.com/articles/measuring-the-dictionary-size-of-a-column-correctly/
 - When: Reading dictionary sizes on a server running all day; partial refresh leaves a mix of column states.
 
 ### Calculated column and table storage

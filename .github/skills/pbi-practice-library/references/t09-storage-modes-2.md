@@ -2,54 +2,54 @@
 
 Part 2 of 2 of this topic. Covers: Choosing a storage mode; Composite models; Push datasets.
 
-Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail. A note may name a tool, a website or a custom visual that this template does not use, or describe publishing, deploying or changing a deployed model: that is information for the developer. You do not install, call or suggest such a tool, and nothing is published or deployed from this template.
+Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit or condition. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. **Paper** means the note comes from a white paper: its link opens only a summary, and the paper itself is on a download site that `pbi-lookup` does not open, so confirm the point on Microsoft Learn instead. The article holds the detail. A note may name another product in passing, such as Analysis Services or Excel: that is information for the developer. Nothing is installed, published or deployed from this template.
 
 ## General practice
 
 ### Choosing a storage mode
 
 **T09-W380-4.** Before choosing DirectQuery, check that the relational server can serve report queries while it handles its normal update workload: every query goes to the engine that receives the updates, whereas an in-memory model reads the source once.
-- Should. 2017. https://www.sqlbi.com/whitepapers/directquery-in-analysis-services-2016/
+- Should. Paper. 2017. https://www.sqlbi.com/whitepapers/directquery-in-analysis-services-2016/
 - When: Deciding whether a source can carry DirectQuery.
 - Version: Analysis Services 2016 Tabular; 2017 white paper.
 
 **T09-W380-5.** When a source table feeds an in-memory model, tune the source for one large read of the whole table during processing; indexes bring no benefit to that workload, which is a single SELECT over every row.
-- Must. 2017. https://www.sqlbi.com/whitepapers/directquery-in-analysis-services-2016/
+- Must. Paper. 2017. https://www.sqlbi.com/whitepapers/directquery-in-analysis-services-2016/
 - When: Preparing source tables for import.
 - Version: Analysis Services 2016 Tabular; 2017 white paper.
 
 **T09-W380-6.** If a source table that feeds an in-memory model is partitioned, make its partitions match the partitions defined in the Tabular model.
-- Should. 2017. https://www.sqlbi.com/whitepapers/directquery-in-analysis-services-2016/
+- Should. Paper. 2017. https://www.sqlbi.com/whitepapers/directquery-in-analysis-services-2016/
 - When: Only where the source table needs partitioning.
 - Version: Analysis Services 2016 Tabular; 2017 white paper.
 
 **T09-W380-8.** On SQL Server, give tables that a DirectQuery model queries a columnstore index; for tables that only feed an in-memory model such an index is far from ideal. The source design has to match how the model uses it.
-- Should. 2017. https://www.sqlbi.com/whitepapers/directquery-in-analysis-services-2016/
+- Should. Paper. 2017. https://www.sqlbi.com/whitepapers/directquery-in-analysis-services-2016/
 - When: Choosing indexes for model source tables on SQL Server.
 - Version: Analysis Services 2016 Tabular; 2017 white paper.
 
 **T09-W380-9.** Before committing a project to DirectQuery, build a prototype, collect the SQL queries your DAX formulas produce and take time to understand them: knowing that workload helps you design the best relational data model.
-- Should. 2017. https://www.sqlbi.com/whitepapers/directquery-in-analysis-services-2016/
+- Should. Paper. 2017. https://www.sqlbi.com/whitepapers/directquery-in-analysis-services-2016/
 - When: Evaluating DirectQuery for a new project.
 - Version: Analysis Services 2016 Tabular; 2017 white paper.
 
 **T09-W380-30.** When only recent data must be real time, build two models: a small DirectQuery model for the last few days with simple calculations, and an in-memory model for the full history with the complex calculations.
-- Should. Check. 2017. https://www.sqlbi.com/whitepapers/directquery-in-analysis-services-2016/
+- Should. Check. Paper. 2017. https://www.sqlbi.com/whitepapers/directquery-in-analysis-services-2016/
 - When: Real-time needs cover only recent days.
 - Version: Analysis Services 2016 Tabular; 2017 white paper.
 
 **T09-W380-42.** Avoid enabling paging for an in-memory Tabular model.
-- Should. 2017. https://www.sqlbi.com/whitepapers/directquery-in-analysis-services-2016/
+- Should. Paper. 2017. https://www.sqlbi.com/whitepapers/directquery-in-analysis-services-2016/
 - When: Configuring memory for an Analysis Services in-memory model.
 - Version: Analysis Services 2016 Tabular; 2017 white paper.
 
 **T09-W380-43.** When an in-memory model does not fit in memory, prefer adding RAM: reducing the memory the data model uses is the harder alternative, because optimising it is a complex task.
-- Should. 2017. https://www.sqlbi.com/whitepapers/directquery-in-analysis-services-2016/
+- Should. Paper. 2017. https://www.sqlbi.com/whitepapers/directquery-in-analysis-services-2016/
 - When: An Analysis Services in-memory model outgrows the memory of its server.
 - Version: Analysis Services 2016 Tabular; 2017 white paper.
 
 **T09-W380-44.** Build solid DAX skills before adopting DirectQuery, so you can judge how each calculation behaves there: which functions a project needs, and how much data they materialise, is hard to foresee at the start.
-- Should. 2017. https://www.sqlbi.com/whitepapers/directquery-in-analysis-services-2016/
+- Should. Paper. 2017. https://www.sqlbi.com/whitepapers/directquery-in-analysis-services-2016/
 - When: Planning a DirectQuery project.
 - Version: Analysis Services 2016 Tabular; 2017 white paper.
 
@@ -91,7 +91,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 ### Choosing a storage mode
 
 **T09-W380-3.** In one benchmark, queries took 1.5 to 2.9 times as long in DirectQuery as in memory, varying with the query and its number of joins; DirectQuery was never the faster of the two.
-- Fact. Check. 2017. https://www.sqlbi.com/whitepapers/directquery-in-analysis-services-2016/
+- Fact. Check. Paper. 2017. https://www.sqlbi.com/whitepapers/directquery-in-analysis-services-2016/
 - When: Measured on a 4-billion-row fact table in a SQL Server clustered columnstore; results may differ elsewhere.
 - Version: Analysis Services 2016 benchmark published in 2017.
 
@@ -151,11 +151,6 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 - When: Building a push dataset from an existing Tabular model.
 - Version: Written in 2021; Microsoft now lists push semantic models as retiring: check before building one.
 
-**T09-A227-5.** Before turning a Tabular model into a push dataset, validate it to find the objects a push dataset cannot hold. Invalid objects can stay, since only valid ones are published; user hierarchies are dropped without a warning.
-- Should. Check. 2021. https://www.sqlbi.com/articles/implementing-real-time-updates-in-power-bi-using-push-datasets-instead-of-directquery/
-- When: Deriving a push dataset from a regular model.
-- Version: Validation run with the Power BI Push Tools on a .bim file (2021); push models now listed as retiring.
-
 **T09-A227-6.** A push dataset cannot contain a table called Date; one workaround is another name, such as Dates or Calendar, given inside Power BI Desktop so that every reference to the table follows the new name.
 - Option. Check. 2021. https://www.sqlbi.com/articles/implementing-real-time-updates-in-power-bi-using-push-datasets-instead-of-directquery/
 - When: The date table of the source model is named Date.
@@ -181,15 +176,10 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 - When: A push dataset holds pre-aggregated rows with prices recalculated for the new grain.
 - Version: Written in 2021; Microsoft now lists push semantic models as retiring: check before building one.
 
-**T09-A227-11.** Build and test the DAX queries that fill a push dataset in DAX Studio, and check that their results are consistent.
+**T09-A227-11.** Build and test the DAX queries that fill a push dataset, and check that their results are consistent.
 - Should. Check. 2021. https://www.sqlbi.com/articles/implementing-real-time-updates-in-power-bi-using-push-datasets-instead-of-directquery/
 - When: Writing the DAX queries that load a push dataset from the original model.
 - Version: Written in 2021; Microsoft now lists push semantic models as retiring: check before building one.
-
-**T09-A227-12.** When a tool loads a push dataset by matching DAX result column names to the destination, name every result column with its full table and column name, using the destination table name; a destination column missing from the query stays blank. Column order is free.
-- Must. Check. 2021. https://www.sqlbi.com/articles/implementing-real-time-updates-in-power-bi-using-push-datasets-instead-of-directquery/
-- When: Loading push dataset tables from DAX queries with the Power BI Push Tools.
-- Version: Behaviour of the Power BI Push Tools in 2021; push semantic models are now listed as retiring.
 
 **T09-A227-13.** Set the report page filter correctly before pinning visuals to a real-time dashboard, even while the visuals still show blanks: a pinned tile keeps the filters of the moment of pinning, and later report filter changes do not reach it.
 - Must. Check. 2021. https://www.sqlbi.com/articles/implementing-real-time-updates-in-power-bi-using-push-datasets-instead-of-directquery/
@@ -221,7 +211,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 - When: Moving a push dataset solution from simulation to production.
 - Version: Written in 2021; Microsoft now lists push semantic models as retiring: check before building one.
 
-**T09-A234-3.** Design a push dataset within its size and throughput limits: initialise it at the start of each day with history summarised at a grain that fits, then add new data through the Power BI REST API during the day.
+**T09-A234-3.** Design a push dataset within its size and throughput limits: initialise it at the start of each day with history summarised at a grain that fits, then add the new data during the day.
 - Must. Check. 2021. https://www.sqlbi.com/articles/creating-real-time-dashboards-in-power-bi-with-push-datasets/
 - When: Push datasets behind real-time dashboards; loading less history cuts size further.
 - Version: Written in 2021; Microsoft now lists push semantic models as retiring: check before building one.
@@ -229,11 +219,6 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T09-A234-4.** A push dataset loaded with history summarised by store and date matches the original model only for queries at that grain; filtering or grouping by attributes that were aggregated away, such as product or customer, does not work.
 - Fact. Check. 2021. https://www.sqlbi.com/articles/creating-real-time-dashboards-in-power-bi-with-push-datasets/
 - When: History was pre-aggregated to fewer dimensions than the original model.
-- Version: Written in 2021; Microsoft now lists push semantic models as retiring: check before building one.
-
-**T09-A234-5.** Run the push dataset initialisation first thing each morning, right after the import model it copies from has refreshed, and add the new transactions of the day afterwards.
-- Should. Check. 2021. https://www.sqlbi.com/articles/creating-real-time-dashboards-in-power-bi-with-push-datasets/
-- When: A push dataset initialised from a daily-refreshed import model.
 - Version: Written in 2021; Microsoft now lists push semantic models as retiring: check before building one.
 
 **T09-A234-6.** To feed new transactions into a push dataset, prefer a developer-built service that captures them in the transactional system and sends them directly; polling the source, for example a Power Automate flow every 30 seconds, is the costlier fallback.

@@ -2,7 +2,7 @@
 
 Part 1 of 1 of this topic. Covers: Naming and model-independent functions; Functions, measures and calculation groups; Parameters, types and passing modes; Calendar filters and result checks.
 
-Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail. A note may name a tool, a website or a custom visual that this template does not use, or describe publishing, deploying or changing a deployed model: that is information for the developer. You do not install, call or suggest such a tool, and nothing is published or deployed from this template.
+Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit or condition. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. **Paper** means the note comes from a white paper: its link opens only a summary, and the paper itself is on a download site that `pbi-lookup` does not open, so confirm the point on Microsoft Learn instead. The article holds the detail. A note may name another product in passing, such as Analysis Services or Excel: that is information for the developer. Nothing is installed, published or deployed from this template.
 
 ## General practice
 
@@ -25,7 +25,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T13-A347-3.** Write a function meant for a library, or for several models, as model-independent: it gets every table, column and measure it needs through parameters and names no model object. It then fits any model, and the caller answers for valid arguments.
 - Should. 2025. https://www.sqlbi.com/articles/model-dependent-and-model-independent-user-defined-functions-in-dax/
 - When: Functions written for reusable libraries, not for one model.
-- Version: daxlib.org libraries may hold only model-independent functions. Functions came as a preview in September 2025.
+- Version: Functions came as a preview in September 2025.
 
 **T13-A347-4.** After importing a model-independent function, add a model-dependent function that calls it with this model's own tables and columns. Other formulas in the model then call that wrapper with fewer parameters.
 - Should. 2025. https://www.sqlbi.com/articles/model-dependent-and-model-independent-user-defined-functions-in-dax/
@@ -41,11 +41,6 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 - Should. Check. 2025. https://www.sqlbi.com/articles/model-dependent-and-model-independent-user-defined-functions-in-dax/
 - When: Naming user-defined functions and their parameters.
 - Version: DAX keywords are those the DISCOVER_KEYWORDS view lists. Stated for the 2025 preview; may have changed.
-
-**T13-A347-8.** For ready-made reusable DAX functions, look at daxlib.org: a free, open-source public repository of libraries of model-independent functions that can be imported into a model.
-- Should. 2025. https://www.sqlbi.com/articles/model-dependent-and-model-independent-user-defined-functions-in-dax/
-- When: A developer looks for an existing function before writing a new one.
-- Version: The repository accepts only model-independent functions.
 
 **T13-A347-9.** A model-independent function must not call a model-dependent function, nor refer, directly or indirectly, to specific tables, columns, calendars or measures. It may call other model-independent functions. Any such reference, however indirect, makes the function model-dependent itself.
 - Must. 2025. https://www.sqlbi.com/articles/model-dependent-and-model-independent-user-defined-functions-in-dax/

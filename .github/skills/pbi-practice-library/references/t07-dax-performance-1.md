@@ -2,7 +2,7 @@
 
 Part 1 of 3 of this topic. Covers: Filters, counts and emptiness tests; Measuring and testing performance; Formula and storage engine.
 
-Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail. A note may name a tool, a website or a custom visual that this template does not use, or describe publishing, deploying or changing a deployed model: that is information for the developer. You do not install, call or suggest such a tool, and nothing is published or deployed from this template.
+Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit or condition. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. **Paper** means the note comes from a white paper: its link opens only a summary, and the paper itself is on a download site that `pbi-lookup` does not open, so confirm the point on Microsoft Learn instead. The article holds the detail. A note may name another product in passing, such as Analysis Services or Excel: that is information for the developer. Nothing is installed, published or deployed from this template.
 
 ## General practice
 
@@ -22,7 +22,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 - Version: ISEMPTY arrived in SQL Server 2012 SP1 CU4; in 2014 Excel 2013 lacked it, breaking upgraded Excel 2010 models.
 
 **T07-W378-1.** When one business entity appears in the fact table as several rows, one per status change, count the entity with a distinct count over its identifier, not by counting rows: a row count adds up every status transition and returns wrong numbers.
-- Must. 2014. https://www.sqlbi.com/whitepapers/using-tabular-models-in-a-large-scale-commercial-solution/
+- Must. Paper. 2014. https://www.sqlbi.com/whitepapers/using-tabular-models-in-a-large-scale-commercial-solution/
 - When: A fact table stores each status change of an entity as its own row and a measure counts entities.
 
 **T07-A079-2.** When a measure sums copies of one base measure that differ only in the value each CALCULATE filters on the same column, rewrite it as one CALCULATE whose single filter on that column admits all wanted values: one storage engine query, not one per value.
@@ -45,15 +45,15 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 ### Measuring and testing performance
 
 **T07-W378-33.** Build a set of test queries that reflects how users really query the model, record their baseline execution times, and keep those results with the project's documents.
-- Should. 2014. https://www.sqlbi.com/whitepapers/using-tabular-models-in-a-large-scale-commercial-solution/
+- Should. Paper. 2014. https://www.sqlbi.com/whitepapers/using-tabular-models-in-a-large-scale-commercial-solution/
 - When: Any model whose query speed matters.
 
 **T07-W378-34.** Once the model is in production, collect the queries users actually run, at regular intervals: these real queries save a lot of time when architecture decisions come up later.
-- Should. 2014. https://www.sqlbi.com/whitepapers/using-tabular-models-in-a-large-scale-commercial-solution/
+- Should. Paper. 2014. https://www.sqlbi.com/whitepapers/using-tabular-models-in-a-large-scale-commercial-solution/
 - When: A model in production use.
 
 **T07-W378-37.** Before going live with many concurrent users, consider a load test on a test server that simulates them, measuring how many users one server supports and how fast queries run under load. One Tabular query can use every core, so single-query speed says little.
-- Consider. 2014. https://www.sqlbi.com/whitepapers/using-tabular-models-in-a-large-scale-commercial-solution/
+- Consider. Paper. 2014. https://www.sqlbi.com/whitepapers/using-tabular-models-in-a-large-scale-commercial-solution/
 - When: Multi-user deployments with hundreds of concurrent users.
 - Version: Described for Analysis Services Tabular in SQL Server 2012 and 2014.
 
@@ -71,32 +71,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 - When: Analysing visual durations captured by Performance Analyzer in Power BI Desktop.
 - Version: Performance Analyzer exists in Power BI Desktop since May 2019.
 
-**T07-A156-5.** For a visual with a long DAX Query time, one way to dig further is to copy its query from Performance Analyzer and run it in DAX Studio with the Query Plan and Server Timings traces on. Causes: a slow measure, model or data source.
-- Option. Check. 2019. https://www.sqlbi.com/articles/introducing-the-power-bi-performance-analyzer/
-- When: A visual whose DAX Query duration in Performance Analyzer is large; a slow source is likeliest with DirectQuery.
-- Version: Performance Analyzer exists in Power BI Desktop since May 2019.
-
-**T07-A156-6.** When you run again in DAX Studio a query taken from Performance Analyzer, consider clearing the engine cache before the run: Performance Analyzer leaves the Tabular engine cache in place between executions.
-- Consider. 2019. https://www.sqlbi.com/articles/introducing-the-power-bi-performance-analyzer/
-- When: Repeating in DAX Studio a DAX query copied from Performance Analyzer.
-- Version: Performance Analyzer exists in Power BI Desktop since May 2019.
-
-**T07-A157-1.** To find a report's slowest queries, one option is to export the Performance Analyzer capture from Power BI Desktop as a JSON file, open it in DAX Studio with Load Perf Data, and sort by Query Ms descending; the list also names the visual responsible.
-- Option. Check. 2019. https://www.sqlbi.com/articles/importing-performance-analyzer-data-in-dax-studio/
-- When: A Performance Analyzer capture has been recorded and exported.
-- Version: DAX Studio imports Performance Analyzer data from version 2.9.0.
-
-**T07-A157-2.** When saving the Performance Analyzer export for DAX Studio, you may change the file name, but keep the .json extension.
-- Should. 2019. https://www.sqlbi.com/articles/importing-performance-analyzer-data-in-dax-studio/
-- When: Exporting Performance Analyzer data, saved by default as PowerBIPerformanceData.JSON, to load into DAX Studio.
-- Version: DAX Studio imports Performance Analyzer data from version 2.9.0.
-
-**T07-A157-3.** After loading Performance Analyzer data in DAX Studio, you can double-click the Query text of a query to send it to the editor, then run it again with Query Plan and Server Timings enabled to see why it is slow.
-- Option. Check. 2019. https://www.sqlbi.com/articles/importing-performance-analyzer-data-in-dax-studio/
-- When: Investigating a query from a capture loaded into DAX Studio; the copied code starts with a metrics comment.
-- Version: DAX Studio imports Performance Analyzer data from version 2.9.0.
-
-**T07-A171-3.** Measure the alternative distinct count implementations on your own model and reports with DAX Studio, and study their query plans there: nothing else tells you what to expect, and the plans help foresee behaviour in other reports.
+**T07-A171-3.** Measure the alternative distinct count implementations on your own model and reports, and study their query plans: nothing else tells you what to expect, and the plans help foresee behaviour in other reports.
 - Should. 2019. https://www.sqlbi.com/articles/analyzing-distinctcount-performance-in-dax/
 - When: Choosing between alternative implementations of a distinct count.
 
@@ -123,15 +98,6 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T07-A372-4.** When optimizing a measure, build a broad set of test queries that evaluate the original and the candidate measure on known edge cases, and check that their results match: this verifies that the new measure is functionally equivalent.
 - Should. 2026. https://www.sqlbi.com/articles/optimizing-dax-with-ai/
 - When: Rewriting an existing measure for performance.
-
-**T07-A372-5.** Use an AI assistant to write and run the test queries of a DAX optimization, gather their results and report whether a new formula can replace the old one: running many tests by hand is tedious and error-prone.
-- Should. 2026. https://www.sqlbi.com/articles/optimizing-dax-with-ai/
-- When: Verifying a rewritten measure with many test queries.
-
-**T07-A372-11.** One approach to DAX optimization combines human and AI work: a person proposes new optimization ideas and an AI assistant refines them. In one example the AI-refined human version won overall and was found much faster.
-- Option. 2026. https://www.sqlbi.com/articles/optimizing-dax-with-ai/
-- When: Optimizing a DAX formula with an AI assistant; drawn from one simple test, results may vary.
-- Version: Initial 2026 findings, expected to change quickly as new language models appear.
 
 ### Formula and storage engine
 
@@ -177,16 +143,16 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 - When: The result of COUNTROWS is used to detect an empty table.
 
 **T07-W378-12.** Distinct counts in Tabular are very fast on low-cardinality columns, with a few hundred values, but slow down as the cardinality of the counted column rises.
-- Fact. 2014. https://www.sqlbi.com/whitepapers/using-tabular-models-in-a-large-scale-commercial-solution/
+- Fact. Paper. 2014. https://www.sqlbi.com/whitepapers/using-tabular-models-in-a-large-scale-commercial-solution/
 - When: A distinct count measure runs over a column with many distinct values, such as a unique contact id.
 - Version: Cumulative update 9 for SQL Server 2012 SP1 improved distinct counts on columns with many values.
 
 **T07-W378-13.** When a high-cardinality id column exists in the fact table only to be distinct-counted and every query stays within one business unit or similar group, you can replace it with a group id plus an id unique within the group: fewer distinct values, nothing lost.
-- Option. 2014. https://www.sqlbi.com/whitepapers/using-tabular-models-in-a-large-scale-commercial-solution/
+- Option. Paper. 2014. https://www.sqlbi.com/whitepapers/using-tabular-models-in-a-large-scale-commercial-solution/
 - When: The id column is used only for counting and all analysis is done within one group at a time.
 
 **T07-W378-39.** Tabular computes distinct counts with good performance without tuning and without extra processing time, and better than Analysis Services Multidimensional; some optimization can still be needed.
-- Fact. 2014. https://www.sqlbi.com/whitepapers/using-tabular-models-in-a-large-scale-commercial-solution/
+- Fact. Paper. 2014. https://www.sqlbi.com/whitepapers/using-tabular-models-in-a-large-scale-commercial-solution/
 - When: Choosing an engine for a model whose measures rely heavily on distinct counts.
 - Version: Described for Analysis Services Tabular in SQL Server 2012 and 2014.
 
@@ -241,20 +207,14 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 - Fact. 2020. https://www.sqlbi.com/articles/optimizing-card-visuals-in-slow-power-bi-reports/
 - When: Reading Performance Analyzer results for a page with many visuals that send queries.
 
-**T07-A235-1.** To find storage engine operations that do not spread their work over several cores, you can read the Par. column of the Server Timings pane in DAX Studio: each operation's CPU time divided by its duration.
-- Option. Check. 2021. https://www.sqlbi.com/articles/analyzing-the-parallelism-of-storage-engine-operations-in-dax-studio/
-- When: Queries on a model with imported data; no ratio shows when CPU or duration is zero.
-- Version: The parallelism column was presented as new in DAX Studio 2.17.
-
 **T07-A235-3.** When server timings leave out the cost of storage engine Batch events, a formula engine cost worked out as total query duration minus the sum of Scan events is distorted.
 - Fact. 2021. https://www.sqlbi.com/articles/analyzing-the-parallelism-of-storage-engine-operations-in-dax-studio/
 - When: Complex models where batch requests hold several storage engine operations.
-- Version: DAX Studio up to 2.16 showed only Scan operations by default; 2.17 reports each Batch event's net cost.
 
 ### Formula and storage engine
 
 **T07-W378-10.** A basic principle of Tabular query performance: the less memory a query has to scan, the faster it runs. The principle has many subtle variations.
-- Fact. 2014. https://www.sqlbi.com/whitepapers/using-tabular-models-in-a-large-scale-commercial-solution/
+- Fact. Paper. 2014. https://www.sqlbi.com/whitepapers/using-tabular-models-in-a-large-scale-commercial-solution/
 - When: Reasoning about the query speed of an in-memory Tabular model.
 
 **T07-A044-2.** DIVIDE always runs in the formula engine. Row by row inside an iterator such as SUMX, it puts a CALLBACKDATAID in the storage engine query, which then cannot use the VertiPaq cache and often runs slower; an IF test inside the iterator does the same.
@@ -274,7 +234,6 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T07-A235-2.** Inside a storage engine batch, usually only the last scan's result goes to the formula engine; results of earlier scans stay in the storage engine. Materialization handed to the formula engine costs more than materialization kept within the batch.
 - Fact. 2021. https://www.sqlbi.com/articles/analyzing-the-parallelism-of-storage-engine-operations-in-dax-studio/
 - When: Complex models where one formula engine batch request runs several storage engine operations.
-- Version: DAX Studio 2.17 shows the Batch subclass in Server Timings by default.
 
 **T07-A260-1.** Horizontal fusion computes in one storage engine query, grouped by a column, several similar calculations that differ only in the single value filtered on that column; aggregations need only fit one scan, as MIN and AVERAGE do. Earlier, differently filtered aggregations each ran separately.
 - Fact. 2022. https://www.sqlbi.com/articles/introducing-horizontal-fusion-in-dax/ ; https://www.sqlbi.com/articles/optimizing-dax-expressions-involving-multiple-measures/

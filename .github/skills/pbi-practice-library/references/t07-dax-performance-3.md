@@ -2,7 +2,7 @@
 
 Part 3 of 3 of this topic. Covers: Iterators and materialization; Conditional logic and variables; Text search and its index.
 
-Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail. A note may name a tool, a website or a custom visual that this template does not use, or describe publishing, deploying or changing a deployed model: that is information for the developer. You do not install, call or suggest such a tool, and nothing is published or deployed from this template.
+Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit or condition. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. **Paper** means the note comes from a white paper: its link opens only a summary, and the paper itself is on a download site that `pbi-lookup` does not open, so confirm the point on Microsoft Learn instead. The article holds the detail. A note may name another product in passing, such as Analysis Services or Excel: that is information for the developer. Nothing is installed, published or deployed from this template.
 
 ## General practice
 
@@ -119,6 +119,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T07-A134-5.** For a value complex to compute, such as working days between pairs of existing dates, prefer precomputing it for every existing input combination in a hidden calculated table; the measure then only retrieves it, for example with LOOKUPVALUE. Do not precompute just any value.
 - Should. Check. 2018. https://www.sqlbi.com/articles/optimizing-dax-with-cardinality-estimation-computing-working-days/
 - When: A measure's logic is complex and its inputs form existing combinations that a table can hold.
+- Version: An unrelated table needs its brief row (relationships and dates, rule 4; M411), and M105 asks why DAX is needed.
 
 **T07-A134-6.** When a measure retrieves precomputed values for many key combinations, it can join the iterated combinations to the precomputed table with NATURALLEFTOUTERJOIN, not call LOOKUPVALUE for each one. This cuts LOOKUPVALUE calls and allows more formula engine optimization.
 - Option. 2018. https://www.sqlbi.com/articles/optimizing-dax-with-cardinality-estimation-computing-working-days/

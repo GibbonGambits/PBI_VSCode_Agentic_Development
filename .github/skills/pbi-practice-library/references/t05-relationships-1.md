@@ -2,7 +2,7 @@
 
 Part 1 of 1 of this topic. Covers: Many-to-many relationships; Virtual relationships in DAX; Bidirectional filters and propagation; Blank row and limited relationships; Inactive relationships and date roles.
 
-Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail. A note may name a tool, a website or a custom visual that this template does not use, or describe publishing, deploying or changing a deployed model: that is information for the developer. You do not install, call or suggest such a tool, and nothing is published or deployed from this template.
+Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit or condition. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. **Paper** means the note comes from a white paper: its link opens only a summary, and the paper itself is on a download site that `pbi-lookup` does not open, so confirm the point on Microsoft Learn instead. The article holds the detail. A note may name another product in passing, such as Analysis Services or Excel: that is information for the developer. Nothing is installed, published or deployed from this template.
 
 ## General practice
 
@@ -75,6 +75,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T05-A167-4.** A limited relationship can be relied on while its join column has few values, up to roughly 100 to 200. Above that, treat it with great care: no join structure is built at refresh, so queries scan the fact table several times.
 - Consider. Check. 2019. https://www.sqlbi.com/articles/strong-and-weak-relationships-in-power-bi/
 - When: A many-to-many cardinality or cross-source relationship, judged by its join column.
+- Version: Storage and security rule 23 sets the limit at 50,000 distinct values; this note's figure is where costs start to show.
 
 **T05-A167-5.** Be wary of many-to-many cardinality on data that is really one-to-many. The setting alone makes the relationship limited, even inside one Import storage, so keys missing on the one side get no blank row.
 - Consider. 2019. https://www.sqlbi.com/articles/strong-and-weak-relationships-in-power-bi/
@@ -268,7 +269,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 - Should. 2019. https://www.sqlbi.com/articles/blank-row-in-dax/
 - When: Versions of a measure differ only in how they treat the blank row.
 
-**T05-A267-1.** For an invalid regular relationship the engine adds one blank row to the one-side table and ties every unmatched many-side row to it, so report rows still sum to the total. A limited relationship gets none. VertiPaq Analyzer reports a referential integrity violation.
+**T05-A267-1.** For an invalid regular relationship the engine adds one blank row to the one-side table and ties every unmatched many-side row to it, so report rows still sum to the total. A limited relationship gets none.
 - Fact. 2019. https://www.sqlbi.com/articles/blank-row-in-dax/ ; https://www.sqlbi.com/articles/relationships-in-power-bi-and-tabular-models/ ; https://www.sqlbi.com/articles/understanding-blank-row-and-limited-relationships/
 - When: A regular relationship where some many-side keys have no one-side match.
 

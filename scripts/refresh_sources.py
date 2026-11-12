@@ -5,6 +5,7 @@ Usage (run from the repository root):
     python scripts/refresh_sources.py check                  compare each Git source in maintenance/sources.md
                                                              with its repository today; list the ones that moved
     python scripts/refresh_sources.py dax-index              rebuild the DAX function index from Microsoft Learn
+                                                             (its table of contents and its sitemap)
     python scripts/refresh_sources.py schemas <folder>       copy every version of Microsoft's report schemas from a
                                                              local clone of https://github.com/microsoft/json-schemas
 
@@ -38,6 +39,8 @@ SCHEMAS = os.path.join(ROOT, "scripts", "schemas")
 DAX_INDEX = os.path.join(ROOT, ".github", "skills", "pbi-semantic-model", "references", "dax-functions.md")
 DAX_TOC = "https://learn.microsoft.com/en-us/dax/toc.json"
 DAX_PAGE = "https://learn.microsoft.com/dax/"
+DAX_PAGE_EN = "https://learn.microsoft.com/en-us/dax/"
+DAX_SITEMAP = "https://learn.microsoft.com/_sitemaps/sitemapindex.xml"
 SCHEMA_ADDRESS = "https://developer.microsoft.com/json-schemas/"
 NOT_COPIED = ("schedules", "localSettings", "unappliedChanges", "editorSettings")    # not project files Copilot writes
 TIMEOUT = 30
@@ -97,10 +100,14 @@ def check():
 
 # ---------------------------------------------------------------- DAX function index
 
-def fetch_json(address):
+def fetch_text(address):
     request = urllib.request.Request(address, headers={"User-Agent": "pbi-template-refresh"})
     with urllib.request.urlopen(request, timeout=TIMEOUT) as response:
-        return json.loads(response.read().decode("utf-8-sig"))
+        return response.read().decode("utf-8-sig")
+
+
+def fetch_json(address):
+    return json.loads(fetch_text(address))
 
 
 def _find(items, title):
@@ -113,55 +120,118 @@ def _find(items, title):
     return None
 
 
-def dax_index_text(toc, today):
-    """The index file, built from the table of contents of Microsoft Learn's DAX reference."""
+FUNCTION_NAME = re.compile(r"[A-Z][A-Z0-9.]*( \([a-z]+\))?\Z")     # SUM, PERCENTILE.INC, DISTINCT (column)
+
+
+def _hrefs(items):
+    """Every page address in the table of contents, without query or anchor."""
+    found = set()
+    for item in items:
+        if item.get("href"):
+            found.add(item["href"].split("?")[0].split("#")[0])
+        found |= _hrefs(item.get("children", []))
+    return found
+
+
+def sitemap_pages(index_text, fetch=fetch_text):
+    """The page names (such as 'sum-function-dax') of the English DAX pages in Microsoft Learn's sitemap.
+
+    The table of contents leaves some function pages out; the sitemap lists every page."""
+    pages = []
+    for address in re.findall(r"<loc>\s*([^<\s]*/dax_en-us_\d+\.xml)\s*</loc>", index_text):
+        for page in re.findall(r"<loc>\s*https://learn\.microsoft\.com/en-us/dax/([^<\s/?#]+)\s*</loc>", fetch(address)):
+            if page not in pages:
+                pages.append(page)
+    return pages
+
+
+def page_title(html):
+    """The heading of a Microsoft Learn page, such as 'TOPNSKIP'."""
+    match = re.search(r"<h1[^>]*>\s*([^<]+?)\s*</h1>", html)
+    return match.group(1).strip() if match else ""
+
+
+def missing_pages(toc, pages):
+    """(functions, statements): sitemap pages that the table of contents leaves out, as page names."""
+    listed = _hrefs(toc.get("items", []))
+    extra = [p for p in pages if p not in listed]
+    return ([p for p in extra if p.endswith("-function-dax")], [p for p in extra if p.endswith("-statement-dax")])
+
+
+def dax_index_text(toc, today, extra_functions=(), extra_statements=()):
+    """The index file, built from the table of contents of Microsoft Learn's DAX reference and, for the pages the
+    table of contents leaves out, from its sitemap. extra_functions and extra_statements are (title, page) pairs."""
     functions = _find(toc.get("items", []), "DAX functions")
     if functions is None:
         raise ValueError("the table of contents has no 'DAX functions' section")
-    lines = ["# DAX function index", "",
-             "Each DAX function and its Microsoft Learn address, and nothing else: no descriptions are kept here. "
-             "Built by `python scripts/refresh_sources.py dax-index` from the table of contents of Microsoft "
-             "Learn's DAX reference (%s) on %s." % (DAX_TOC, today), "",
-             "- Before you use a function that is new to this model, read its page: skill `pbi-lookup`.",
-             "- A function that is not in this list is not a DAX function Microsoft documents. Do not use it.",
-             "- Some functions are listed in two groups. Functions marked as not recommended or deprecated on "
-             "their page are still listed: the page says so.", ""]
+    body = []
     count = 0
+    seen = {}
+    other_pages = []                                   # entries in a function group that are not functions
     for group in functions.get("children", []):
         members = [(c.get("toc_title", ""), c.get("href", "")) for c in group.get("children", [])
                    if c.get("href") and not c.get("toc_title", "").lower().endswith("overview")]
-        if not members:
+        names = [(t, h) for t, h in members if FUNCTION_NAME.match(t)]
+        other_pages += [(t, h) for t, h in members if not FUNCTION_NAME.match(t)]
+        if not names:
             continue
-        lines += ["## %s" % group.get("toc_title", ""), ""]
-        for title, href in members:
-            lines.append("- %s: %s%s" % (title, DAX_PAGE, href))
+        body += ["## %s" % group.get("toc_title", ""), ""]
+        for title, href in names:
+            body.append("- %s: %s%s" % (title, DAX_PAGE, href))
+            seen.setdefault(title, set()).add(group.get("toc_title", ""))
             count += 1
-        lines.append("")
-    for heading, title in (("Statements", "DAX statements"),):
-        section = _find(toc.get("items", []), title)
-        if section is not None:
-            lines += ["## %s" % heading, ""]
-            lines += ["- %s: %s%s" % (c.get("toc_title", ""), DAX_PAGE, c["href"])
-                      for c in section.get("children", []) if c.get("href")]
-            lines.append("")
-    lines += ["## Language", "",
-              "- Operators: %sdax-operator-reference" % DAX_PAGE,
-              "- Syntax: %sdax-syntax-reference" % DAX_PAGE,
-              "- Queries: %sdax-queries" % DAX_PAGE,
-              "- New functions: %snew-dax-functions" % DAX_PAGE, "",
-              "Functions listed: %d." % count, "",
-              "Checklist items: 32, 33, 34"]
-    return "\n".join(lines) + "\n", count
+        body.append("")
+    extra = [(t, h) for t, h in extra_functions if FUNCTION_NAME.match(t) and t not in seen]
+    if extra:
+        body += ["## Functions not in the table of contents", "",
+                 "Microsoft Learn documents these functions, but its table of contents does not list them: they were "
+                 "found in its sitemap. Read the page before you use one.", ""]
+        for title, href in sorted(extra):
+            body.append("- %s: %s%s" % (title, DAX_PAGE, href))
+            seen.setdefault(title, set()).add("sitemap")
+            count += 1
+        body.append("")
+    section = _find(toc.get("items", []), "DAX statements")
+    statements = [(c.get("toc_title", ""), c["href"]) for c in (section or {}).get("children", []) if c.get("href")]
+    statements += [(t, h) for t, h in extra_statements if h not in [s for _, s in statements]]
+    if statements:
+        body += ["## Statements", ""]
+        body += ["- %s: %s%s" % (t, DAX_PAGE, h) for t, h in statements]
+        body.append("")
+    body += ["## Language", "",
+             "- Operators: %sdax-operator-reference" % DAX_PAGE,
+             "- Syntax: %sdax-syntax-reference" % DAX_PAGE,
+             "- Queries: %sdax-queries" % DAX_PAGE,
+             "- New functions: %snew-dax-functions" % DAX_PAGE]
+    body += ["- %s: %s%s" % (t, DAX_PAGE, h) for t, h in other_pages]
+    body += ["", "Functions listed: %d." % count, "", "Checklist items: 32, 33, 34"]
+    twice = sorted(t for t, groups in seen.items() if len(groups) > 1)
+    lines = ["# DAX function index", "",
+             "Each DAX function and its Microsoft Learn address, and nothing else: no descriptions are kept here. "
+             "Built by `python scripts/refresh_sources.py dax-index` from the table of contents of Microsoft "
+             "Learn's DAX reference (%s) and, for the function pages it leaves out, from Microsoft Learn's sitemap "
+             "(%s), on %s." % (DAX_TOC, DAX_SITEMAP, today), "",
+             "- Before you use a function that is new to this model, read its page: skill `pbi-lookup`.",
+             "- A function that is not in this list is not a DAX function Microsoft documents. Do not use it.",
+             ("- These functions are listed in two groups: %s. " % ", ".join(twice) if twice
+              else "- Each function is listed once. ") +
+             "Functions marked as not recommended or deprecated on their page are still listed: the page says so.",
+             "- Pages under Language that are not functions (an overview, the table constructor) are not counted.", ""]
+    return "\n".join(lines + body) + "\n", count
 
 
 def dax_index():
     try:
         toc = fetch_json(DAX_TOC)
+        functions, statements = missing_pages(toc, sitemap_pages(fetch_text(DAX_SITEMAP)))
+        extra_functions = [(page_title(fetch_text(DAX_PAGE_EN + p)) or p[:-len("-function-dax")].upper(), p)
+                           for p in functions]
+        extra_statements = [(page_title(fetch_text(DAX_PAGE_EN + p)) or p, p) for p in statements]
     except (urllib.error.URLError, OSError, ValueError) as exc:
         print("Microsoft Learn could not be reached (%s). The index was left as it is." % exc)
         return 1
     try:
-        text, count = dax_index_text(toc, datetime.date.today().isoformat())
+        text, count = dax_index_text(toc, datetime.date.today().isoformat(), extra_functions, extra_statements)
     except ValueError as exc:
         print("The index was left as it is: %s." % exc)
         return 1

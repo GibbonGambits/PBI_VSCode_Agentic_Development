@@ -14,7 +14,7 @@ Only in these five cases:
 2. DAX returns an error, or Power BI Desktop reports one after a reload.
 3. You are about to use a DAX function that this model does not use yet. First find it in `.github/skills/pbi-semantic-model/references/dax-functions.md`: a function that is not listed there is not used. Then read its page.
 4. Before a lesson is written (skill `pbi-lessons`): check what the right way is, so that the lesson records a fact.
-5. A note of the practice library (skill `pbi-practice-library`) is marked Check, or you need the detail behind a note you are about to use: confirm it on Microsoft Learn first, then read the note's article.
+5. A note of the practice library (skill `pbi-practice-library`) is marked Check, or you need the detail behind a note you are about to use: confirm it on Microsoft Learn first, then read the note's article. A note marked Paper links a white paper page that holds only a summary, and the paper's download site is not one of the four: confirm such a note on Microsoft Learn only.
 
 Not for anything else. A business meaning is never looked up: it comes from the brief or the developer.
 

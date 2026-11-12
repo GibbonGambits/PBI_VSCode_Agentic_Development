@@ -2,7 +2,7 @@
 
 Part 1 of 2 of this topic. Covers: Calculation group design patterns; Calculation item application; Format string expressions.
 
-Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail. A note may name a tool, a website or a custom visual that this template does not use, or describe publishing, deploying or changing a deployed model: that is information for the developer. You do not install, call or suggest such a tool, and nothing is published or deployed from this template.
+Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit or condition. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. **Paper** means the note comes from a white paper: its link opens only a summary, and the paper itself is on a download site that `pbi-lookup` does not open, so confirm the point on Microsoft Learn instead. The article holds the detail. A note may name another product in passing, such as Analysis Services or Excel: that is information for the developer. Nothing is installed, published or deployed from this template.
 
 ## General practice
 
@@ -24,16 +24,6 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T11-A207-1.** Never add up values recorded in different units of measure, such as weights held in ounces, pounds and grams. The total has no meaning.
 - Must. 2020. https://www.sqlbi.com/articles/dynamic-format-strings-with-calculation-groups/
 - When: Each row stores a value together with its own unit of measure.
-
-**T11-A240-1.** A calculation group can be written and shared as a DAX script, which holds every expression and property of the group in one readable place. Tabular Editor can generate the script from an existing group with its Script DAX command.
-- Option. Check. 2022. https://www.sqlbi.com/articles/scripting-syntax-for-calculation-groups/
-- When: Reading, copying or sharing the full definition of a calculation group.
-- Version: DAX script syntax for calculation groups arrived with Tabular Editor 3; in 2019 no text form existed.
-
-**T11-A240-2.** A calculation group in DAX script starts with CALCULATIONGROUP, the group name and its column name, then optional Description, Visible and Precedence. Each CALCULATIONITEM has a quoted name, `=` and its expression, then optional Description, Ordinal and FormatString; without FormatString the measure's format stays.
-- Option. 2022. https://www.sqlbi.com/articles/scripting-syntax-for-calculation-groups/
-- When: Writing a calculation group as a DAX script in a tool that supports that syntax.
-- Version: Script syntax of an external tool, not TMDL: this template writes calculation groups in TMDL from the shipped example.
 
 **T11-A268-5.** Do not assume a published speed comparison holds for your model. Repeat the measurements on your own system before choosing between a calculation group and a period bridge table; results reflect one model and its data distribution.
 - Must. 2023. https://www.sqlbi.com/articles/using-calculation-groups-or-many-to-many-relationships-for-time-intelligence-selection/
@@ -67,7 +57,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 - Should. 2019. https://www.sqlbi.com/articles/understanding-calculation-groups/
 - When: An item turns an amount into a percentage; a difference in the same unit can keep the measure's format.
 
-**T11-A184-1.** A calculation item whose formula changes how a measure's number must be read needs a format string expression, so the format shown follows the changed result. Not every visual fully honours such formats: custom visuals are affected, and others can be.
+**T11-A184-1.** A calculation item whose formula changes how a measure's number must be read needs a format string expression, so the format shown follows the changed result. Not every visual fully honours such formats.
 - Must. Check. 2020. https://www.sqlbi.com/articles/controlling-format-strings-in-calculation-groups/
 - When: A calculation item changes the numeric representation of the measures it is applied to.
 - Version: The visual limitation was reported as still unfixed in October 2021; check current behaviour.
@@ -91,6 +81,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T11-A201-7.** A disconnected table that users slice in place of a hidden calculation group must hold exactly the same values as that group. A calculated table built from the columns of the calculation group is one way to make it.
 - Must. 2020. https://www.sqlbi.com/articles/using-calculation-groups-to-selectively-replace-measures-in-dax-expressions/
 - When: A hidden calculation group is applied inside a measure from the selection in a visible disconnected table.
+- Version: The disconnected table needs its brief row (relationships and dates, rule 4; M411), and M105 asks why DAX builds it.
 
 **T11-A201-8.** The items of a calculation group that is hidden and applied only from inside chosen measures can leave out their tests on the selected measure, which makes them faster. The developer controls every place the group is applied, so the safety tests are not needed.
 - Option. 2020. https://www.sqlbi.com/articles/using-calculation-groups-to-selectively-replace-measures-in-dax-expressions/
@@ -190,7 +181,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 - Option. 2020. https://www.sqlbi.com/articles/controlling-format-strings-in-calculation-groups/
 - When: An item reformats only some measures, such as a currency conversion that skips non-currency measures.
 
-**T11-A184-6.** Some Power BI visuals do not fully support custom format strings, which matters for formats set through calculation groups. Custom visuals are affected, and the problem reaches other visuals too.
+**T11-A184-6.** Some Power BI visuals do not fully support custom format strings, which matters for formats set through calculation groups.
 - Fact. Check. 2020. https://www.sqlbi.com/articles/controlling-format-strings-in-calculation-groups/
 - When: Reports that show measures whose format a calculation item controls.
 - Version: A fix was announced in 2020 but reported as still missing in October 2021; check current behaviour.

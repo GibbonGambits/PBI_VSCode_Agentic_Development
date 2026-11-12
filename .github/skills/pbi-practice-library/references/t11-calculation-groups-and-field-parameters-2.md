@@ -2,7 +2,7 @@
 
 Part 2 of 2 of this topic. Covers: Calculation group precedence; Per-user defaults and slicers; Field parameters; Selection expressions.
 
-Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail. A note may name a tool, a website or a custom visual that this template does not use, or describe publishing, deploying or changing a deployed model: that is information for the developer. You do not install, call or suggest such a tool, and nothing is published or deployed from this template.
+Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit or condition. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. **Paper** means the note comes from a white paper: its link opens only a summary, and the paper itself is on a download site that `pbi-lookup` does not open, so confirm the point on Microsoft Learn instead. The article holds the detail. A note may name another product in passing, such as Analysis Services or Excel: that is information for the developer. Nothing is installed, published or deployed from this template.
 
 ## General practice
 
@@ -174,7 +174,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T11-A332-2.** To control what happens when several calculation items are selected together, multipleOrEmptySelectionExpression can hold, for example, an ERROR call whose own text tells the user that the combination is not allowed.
 - Option. Check. 2025. https://www.sqlbi.com/articles/controlling-empty-or-multiple-selections-in-calculation-groups/
 - When: A calculation group used from a slicer in which users may select several items.
-- Version: Described as a preview in May 2025; compatibility level 1605; edited in TMDL view or an external editor.
+- Version: Described as a preview in May 2025; compatibility level 1605; edited in the TMDL view.
 
 **T11-A332-3.** multipleOrEmptySelectionExpression can settle a multiple selection by applying one of the selected items by a priority of your own, such as the highest ordinal, which keeps the model's item order. Write its formatStringDefinition the same way, so the format follows that item.
 - Option. Check. 2025. https://www.sqlbi.com/articles/controlling-empty-or-multiple-selections-in-calculation-groups/

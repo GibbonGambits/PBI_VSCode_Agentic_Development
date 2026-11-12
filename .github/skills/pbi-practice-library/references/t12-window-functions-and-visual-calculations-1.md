@@ -2,7 +2,7 @@
 
 Part 1 of 1 of this topic. Covers: Measure or visual calculation; Window functions and apply semantics; Ranking with RANK and RANKX; Visual context and virtual table; Running totals and performance.
 
-Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail. A note may name a tool, a website or a custom visual that this template does not use, or describe publishing, deploying or changing a deployed model: that is information for the developer. You do not install, call or suggest such a tool, and nothing is published or deployed from this template.
+Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit or condition. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. **Paper** means the note comes from a white paper: its link opens only a summary, and the paper itself is on a download site that `pbi-lookup` does not open, so confirm the point on Microsoft Learn instead. The article holds the detail. A note may name another product in passing, such as Analysis Services or Excel: that is information for the developer. Nothing is installed, published or deployed from this template.
 
 ## General practice
 
@@ -20,7 +20,6 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T12-A357-1.** Avoid model measures whose only job is the look of one visual, such as highlighting rows; put that logic in a visual calculation. Such measures multiply, clutter the model and need rewriting when the visual's structure changes.
 - Should. 2026. https://www.sqlbi.com/articles/using-visual-calculations-to-highlight-an-entire-row/
 - When: Formatting logic tied to one visual; the code can be less intuitive, moving through the lattice with EXPAND and COLLAPSE.
-- Version: Names a function missing from this template's DAX function index; DAX standard rule 19 applies until the index lists it.
 
 **T12-A357-2.** When a visual calculation would repeat the same column and measure names in several places, move the generic logic into a user-defined function that takes the matrix table, the needed columns and the expression as parameters, so the names appear only in the call.
 - Should. 2026. https://www.sqlbi.com/articles/using-visual-calculations-to-highlight-an-entire-row/
@@ -79,7 +78,6 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T12-A348-4.** Wrap a ranking in an IF test so that no rank appears on the total row: ISINSCOPE for a RANKX measure, ISATLEVEL for a RANK visual calculation. Without the test both show a value on the total; a RANK measure needs none.
 - Must. 2025. https://www.sqlbi.com/articles/using-rank-instead-of-rankx-in-dax/
 - When: A ranking measure that uses RANKX, or a ranking visual calculation, in a visual with a total row.
-- Version: Names a function missing from this template's DAX function index; DAX standard rule 19 applies until the index lists it.
 
 **T12-A348-6.** When the ranking expression is a floating-point value, use RANK, not RANKX: RANKX can return a wrong ranking on such values, an issue RANK does not have. This also holds for existing RANKX measures that otherwise work.
 - Should. 2025. https://www.sqlbi.com/articles/using-rank-instead-of-rankx-in-dax/
@@ -94,7 +92,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T12-A298-1.** Before writing complex visual calculations, learn how they are implemented: the hierarchical structure of their virtual table, the visual context, what ROWS and COLUMNS mean, how CALCULATE behaves there, and the EXPAND and COLLAPSE modifiers.
 - Should. Check. 2024. https://www.sqlbi.com/articles/introducing-visual-shape-for-visual-calculations-in-power-bi/
 - When: Complex visual calculations; simple ones are straightforward.
-- Version: Visual calculations arrived as a preview in February 2024; generally available since Microsoft's May 2026 release notes. Names a function missing from this template's DAX function index; DAX standard rule 19 applies until the index lists it.
+- Version: Visual calculations arrived as a preview in February 2024; generally available since Microsoft's May 2026 release notes.
 
 **T12-A301-1.** Do not reason about a visual calculation with row context or filter context. It runs in a separate visual context: no row context exists, nothing is iterated by default, and the visual context, not the filter context, drives the filtering.
 - Must. 2024. https://www.sqlbi.com/articles/introducing-expand-and-collapse-for-visual-calculations/
@@ -103,17 +101,14 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T12-A301-4.** When a visual calculation evaluates an expression after EXPAND, wrap column references in an aggregation function so that one scalar value results: EXPAND moves down one or more levels and exposes several descendant rows of the current row.
 - Must. 2024. https://www.sqlbi.com/articles/introducing-expand-and-collapse-for-visual-calculations/
 - When: Visual calculations using EXPAND; also after COLLAPSE when the engine cannot tell that only one row results.
-- Version: Names a function missing from this template's DAX function index; DAX standard rule 19 applies until the index lists it.
 
 **T12-A301-5.** When a visual calculation applies a filter through CALCULATE, always check that the filtered column is available in two places: the filter argument, and the expression that CALCULATE evaluates.
 - Must. 2024. https://www.sqlbi.com/articles/introducing-expand-and-collapse-for-visual-calculations/
 - When: A visual calculation filters with CALCULATE while navigating the visual context with EXPAND or COLLAPSE.
-- Version: Names a function missing from this template's DAX function index; DAX standard rule 19 applies until the index lists it.
 
 **T12-A301-6.** EXPAND, EXPANDALL, COLLAPSE and COLLAPSEALL can be written in scalar form, taking the expression directly, instead of as modifiers inside CALCULATE. The scalar form is only shorthand for the CALCULATE form.
 - Option. 2024. https://www.sqlbi.com/articles/introducing-expand-and-collapse-for-visual-calculations/
 - When: Visual calculations that navigate the visual context.
-- Version: Names a function missing from this template's DAX function index; DAX standard rule 19 applies until the index lists it.
 
 **T12-A302-1.** Control how a visual calculation is displayed by giving it a format string, in preference to turning its result into text with FORMAT inside the expression.
 - Should. 2024. https://www.sqlbi.com/articles/using-expand-and-collapse-in-visual-calculations/
@@ -123,7 +118,6 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T12-A302-3.** In a visual calculation of more than trivial complexity, first move the visual context to the level the calculation requires, with EXPAND and COLLAPSE, and only then compute it. The result is not correct otherwise.
 - Must. 2024. https://www.sqlbi.com/articles/using-expand-and-collapse-in-visual-calculations/
 - When: Visual calculations beyond simple ones such as the predefined templates.
-- Version: Names a function missing from this template's DAX function index; DAX standard rule 19 applies until the index lists it.
 
 **T12-A302-6.** When a visual calculation iterates the rows of the current visual context, wrap ROWS in VALUES or DISTINCT; do not iterate ROWS directly. In the visual context, ROWS by itself behaves like ALL applied to ROWS.
 - Must. 2024. https://www.sqlbi.com/articles/using-expand-and-collapse-in-visual-calculations/
@@ -147,7 +141,6 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T12-A365-1.** Consider a visual calculation for speed when a visual applies further computation, such as a year-over-year comparison with PREVIOUS, on top of a few expensive base measures: it reuses values already in the virtual table instead of sending more storage engine queries.
 - Consider. 2026. https://www.sqlbi.com/articles/analyzing-the-performance-impact-of-visual-calculations/
 - When: A few heavy base measures, such as distinct counts, in a modest-size visual; speed is not their main goal.
-- Version: Names a function missing from this template's DAX function index; DAX standard rule 19 applies until the index lists it.
 
 **T12-A365-2.** Never assume a visual calculation is faster than the equivalent measure. It can make a report several times slower when the visual's virtual table is large, because the densification step it requires can take long on large tables.
 - Must. 2026. https://www.sqlbi.com/articles/analyzing-the-performance-impact-of-visual-calculations/
@@ -216,7 +209,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T12-A357-3.** To highlight a matrix row by the highest value in the last column, a visual calculation can build the matrix content with ROWS COLUMNS, using COLLAPSEALL and EXPAND, find the last column header with LAST, and return a colour only for rows with the maximum.
 - Option. 2026. https://www.sqlbi.com/articles/using-visual-calculations-to-highlight-an-entire-row/
 - When: The highlight of a full row depends only on the rightmost matrix column; ties can highlight several rows.
-- Version: Names a function missing from this template's DAX function index; DAX standard rule 19 applies until the index lists it. Theme colours only; a colour code needs an exception row (V009).
+- Version: Theme colours only; a colour code needs an exception row (V009).
 
 ### Window functions and apply semantics
 
@@ -305,32 +298,26 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T12-A298-4.** In a visual calculation, a previous-value lookup can use PREVIOUS with the ROWS or COLUMNS axis, without spelling out the PARTITIONBY and ORDERBY that OFFSET needs: the axis keyword already supplies grouping, partitioning and sort order.
 - Option. 2024. https://www.sqlbi.com/articles/introducing-visual-shape-for-visual-calculations-in-power-bi/
 - When: Reading the previous value along a visual axis; PREVIOUS and NEXT move along the axis only, not between hierarchy levels.
-- Version: Names a function missing from this template's DAX function index; DAX standard rule 19 applies until the index lists it.
 
 **T12-A301-2.** COLLAPSE given a column does not stop at that column's level: it moves to the lowest level of the axis hierarchy without the column, so collapsing on year returns the grand total. If the column is not in the current visual context, nothing moves.
 - Fact. 2024. https://www.sqlbi.com/articles/introducing-expand-and-collapse-for-visual-calculations/
 - When: Visual calculations that pass a column, not a number of levels, to COLLAPSE.
-- Version: Names a function missing from this template's DAX function index; DAX standard rule 19 applies until the index lists it.
 
 **T12-A301-3.** EXPAND given a column lands on the uppermost hierarchy level of that axis where the column is present, so EXPAND and COLLAPSE called with the same column end at different levels.
 - Fact. 2024. https://www.sqlbi.com/articles/introducing-expand-and-collapse-for-visual-calculations/
 - When: Visual calculations that pass a column to EXPAND or COLLAPSE.
-- Version: Names a function missing from this template's DAX function index; DAX standard rule 19 applies until the index lists it.
 
 **T12-A302-2.** The virtual-table columns a visual calculation can see depend on the hierarchy level its visual context points to. After COLLAPSE moves up a level, a column that exists only lower down, such as month at the year level, evaluates to blank.
 - Fact. 2024. https://www.sqlbi.com/articles/using-expand-and-collapse-in-visual-calculations/
 - When: Visual calculations that reference columns after moving the visual context with COLLAPSE.
-- Version: Names a function missing from this template's DAX function index; DAX standard rule 19 applies until the index lists it.
 
 **T12-A302-4.** To get the rows of one specific hierarchy level whatever level the current cell is at, move the visual context to the top with COLLAPSEALL, then EXPAND on the column of the target level, then evaluate ROWS; the two moves can be nested CALCULATETABLE calls.
 - Option. 2024. https://www.sqlbi.com/articles/using-expand-and-collapse-in-visual-calculations/
 - When: A visual calculation needs a table at a fixed granularity, such as months.
-- Version: Names a function missing from this template's DAX function index; DAX standard rule 19 applies until the index lists it.
 
 **T12-A302-5.** When a value must be computed at one granularity, say month by month, yet shown at year and grand total too, run the iteration inside CALCULATE with EXPAND to the column of that granularity. Higher levels then iterate at that level; lower ones stay put.
 - Option. 2024. https://www.sqlbi.com/articles/using-expand-and-collapse-in-visual-calculations/
 - When: Visual calculations whose result cannot be computed directly at the upper levels of the hierarchy.
-- Version: Names a function missing from this template's DAX function index; DAX standard rule 19 applies until the index lists it.
 
 **T12-A302-7.** A hidden column the visual uses for sorting, such as a year-month number, is part of the virtual table. A visual calculation can refer to it freely, for example in the ORDERBY of a window function to put months in their right order.
 - Option. 2024. https://www.sqlbi.com/articles/using-expand-and-collapse-in-visual-calculations/

@@ -2,7 +2,7 @@
 
 Part 1 of 2 of this topic. Covers: Dates, time and sort keys; Calculated columns versus measures; Source views, names, data types; Star schema and fact tables.
 
-Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail. A note may name a tool, a website or a custom visual that this template does not use, or describe publishing, deploying or changing a deployed model: that is information for the developer. You do not install, call or suggest such a tool, and nothing is published or deployed from this template.
+Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit or condition. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. **Paper** means the note comes from a white paper: its link opens only a summary, and the paper itself is on a download site that `pbi-lookup` does not open, so confirm the point on Microsoft Learn instead. The article holds the detail. A note may name another product in passing, such as Analysis Services or Excel: that is information for the developer. Nothing is installed, published or deployed from this template.
 
 ## General practice
 
@@ -45,10 +45,6 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T06-A062-5.** A measure is worked out for each report cell in that cell's context, so it follows slicers, rows, columns, axes and filters; a calculated column is computed per row at refresh and ignores what the user selects.
 - Must. 2015. https://www.sqlbi.com/articles/calculated-columns-and-measures-in-dax/
 - When: A value must react to the user's selection and show in the values area of a visual.
-
-**T06-A062-6.** Where a calculation can be either, the measure is preferred because it is computed at query time and takes no memory or disk, which counts more as data grows. When model size is no concern, either form is acceptable.
-- Should. 2015. https://www.sqlbi.com/articles/calculated-columns-and-measures-in-dax/
-- When: A calculation such as gross margin can be written as a calculated column or as a measure.
 
 **T06-A062-7.** Consider dropping calculated columns that are only intermediate steps for a measure: an iterator inside the measure, such as SUMX over the table, can evaluate the same row-level expression.
 - Consider. 2015. https://www.sqlbi.com/articles/calculated-columns-and-measures-in-dax/

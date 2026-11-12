@@ -1,10 +1,11 @@
 # DAX function index
 
-Each DAX function and its Microsoft Learn address, and nothing else: no descriptions are kept here. Built by `python scripts/refresh_sources.py dax-index` from the table of contents of Microsoft Learn's DAX reference (https://learn.microsoft.com/en-us/dax/toc.json) on 2026-11-11.
+Each DAX function and its Microsoft Learn address, and nothing else: no descriptions are kept here. Built by `python scripts/refresh_sources.py dax-index` from the table of contents of Microsoft Learn's DAX reference (https://learn.microsoft.com/en-us/dax/toc.json) and, for the function pages it leaves out, from Microsoft Learn's sitemap (https://learn.microsoft.com/_sitemaps/sitemapindex.xml), on 2026-11-12.
 
 - Before you use a function that is new to this model, read its page: skill `pbi-lookup`.
 - A function that is not in this list is not a DAX function Microsoft documents. Do not use it.
-- Some functions are listed in two groups. Functions marked as not recommended or deprecated on their page are still listed: the page says so.
+- Each function is listed once. Functions marked as not recommended or deprecated on their page are still listed: the page says so.
+- Pages under Language that are not functions (an overview, the table constructor) are not counted.
 
 ## Aggregation functions
 
@@ -350,7 +351,6 @@ Each DAX function and its Microsoft Learn address, and nothing else: no descript
 
 ## Parent and child functions
 
-- Understanding functions for parent-child hierarchies: https://learn.microsoft.com/dax/understanding-functions-for-parent-child-hierarchies-in-dax
 - PATH: https://learn.microsoft.com/dax/path-function-dax
 - PATHCONTAINS: https://learn.microsoft.com/dax/pathcontains-function-dax
 - PATHITEM: https://learn.microsoft.com/dax/pathitem-function-dax
@@ -359,7 +359,6 @@ Each DAX function and its Microsoft Learn address, and nothing else: no descript
 
 ## Relationship functions
 
-- Relationship functions: https://learn.microsoft.com/dax/relationship-functions-dax
 - CROSSFILTER: https://learn.microsoft.com/dax/crossfilter-function-dax
 - RELATED: https://learn.microsoft.com/dax/related-function-dax
 - RELATEDTABLE: https://learn.microsoft.com/dax/relatedtable-function-dax
@@ -441,7 +440,6 @@ Each DAX function and its Microsoft Learn address, and nothing else: no descript
 - SUBSTITUTEWITHINDEX: https://learn.microsoft.com/dax/substitutewithindex-function-dax
 - SUMMARIZE: https://learn.microsoft.com/dax/summarize-function-dax
 - SUMMARIZECOLUMNS: https://learn.microsoft.com/dax/summarizecolumns-function-dax
-- Table constructor: https://learn.microsoft.com/dax/table-constructor
 - TOPN: https://learn.microsoft.com/dax/topn-function-dax
 - TREATAS: https://learn.microsoft.com/dax/treatas-function-dax
 - UNION: https://learn.microsoft.com/dax/union-function-dax
@@ -515,6 +513,31 @@ Each DAX function and its Microsoft Learn address, and nothing else: no descript
 - TOTALQTD: https://learn.microsoft.com/dax/totalqtd-function-dax
 - TOTALYTD: https://learn.microsoft.com/dax/totalytd-function-dax
 
+## Functions not in the table of contents
+
+Microsoft Learn documents these functions, but its table of contents does not list them: they were found in its sitemap. Read the page before you use one.
+
+- ALLSELECTEDAPPLY: https://learn.microsoft.com/dax/allselectedapply-function-dax
+- ALLSELECTEDREMOVE: https://learn.microsoft.com/dax/allselectedremove-function-dax
+- ALWAYSAPPLY: https://learn.microsoft.com/dax/alwaysapply-function-dax
+- COLLAPSE: https://learn.microsoft.com/dax/collapse-function-dax
+- COLLAPSEALL: https://learn.microsoft.com/dax/collapseall-function-dax
+- DEPENDON: https://learn.microsoft.com/dax/dependon-function-dax
+- EXPAND: https://learn.microsoft.com/dax/expand-function-dax
+- EXPANDALL: https://learn.microsoft.com/dax/expandall-function-dax
+- FILTERCLUSTER: https://learn.microsoft.com/dax/filtercluster-function-dax
+- FIRST: https://learn.microsoft.com/dax/first-function-dax
+- GROUPCROSSAPPLY: https://learn.microsoft.com/dax/groupcrossapply-function-dax
+- GROUPCROSSAPPLYTABLE: https://learn.microsoft.com/dax/groupcrossapplytable-function-dax
+- ISATLEVEL: https://learn.microsoft.com/dax/isatlevel-function-dax
+- LAST: https://learn.microsoft.com/dax/last-function-dax
+- NEXT: https://learn.microsoft.com/dax/next-function-dax
+- NONFILTER: https://learn.microsoft.com/dax/nonfilter-function-dax
+- PREVIOUS: https://learn.microsoft.com/dax/previous-function-dax
+- SAMPLEAXISWITHLOCALMINMAX: https://learn.microsoft.com/dax/sampleaxiswithlocalminmax-function-dax
+- SHADOWCLUSTER: https://learn.microsoft.com/dax/shadowcluster-function-dax
+- TOPNSKIP: https://learn.microsoft.com/dax/topnskip-function-dax
+
 ## Statements
 
 - Statements overview: https://learn.microsoft.com/dax/statements-dax
@@ -525,6 +548,8 @@ Each DAX function and its Microsoft Learn address, and nothing else: no descript
 - ORDER BY: https://learn.microsoft.com/dax/orderby-statement-dax
 - START AT: https://learn.microsoft.com/dax/startat-statement-dax
 - VAR: https://learn.microsoft.com/dax/var-dax
+- Virtual Column: https://learn.microsoft.com/dax/virtual-column-statement-dax
+- Virtual Table: https://learn.microsoft.com/dax/virtual-table-statement-dax
 
 ## Language
 
@@ -532,7 +557,10 @@ Each DAX function and its Microsoft Learn address, and nothing else: no descript
 - Syntax: https://learn.microsoft.com/dax/dax-syntax-reference
 - Queries: https://learn.microsoft.com/dax/dax-queries
 - New functions: https://learn.microsoft.com/dax/new-dax-functions
+- Understanding functions for parent-child hierarchies: https://learn.microsoft.com/dax/understanding-functions-for-parent-child-hierarchies-in-dax
+- Relationship functions: https://learn.microsoft.com/dax/relationship-functions-dax
+- Table constructor: https://learn.microsoft.com/dax/table-constructor
 
-Functions listed: 464.
+Functions listed: 481.
 
 Checklist items: 32, 33, 34

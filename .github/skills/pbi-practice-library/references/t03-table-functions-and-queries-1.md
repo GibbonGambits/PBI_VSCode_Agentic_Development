@@ -2,7 +2,7 @@
 
 Part 1 of 2 of this topic. Covers: Grouping and adding columns; Writing DAX queries; Filter and text conditions.
 
-Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. The article holds the detail. A note may name a tool, a website or a custom visual that this template does not use, or describe publishing, deploying or changing a deployed model: that is information for the developer. You do not install, call or suggest such a tool, and nothing is published or deployed from this template.
+Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit or condition. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. **Paper** means the note comes from a white paper: its link opens only a summary, and the paper itself is on a download site that `pbi-lookup` does not open, so confirm the point on Microsoft Learn instead. The article holds the detail. A note may name another product in passing, such as Analysis Services or Excel: that is information for the developer. Nothing is installed, published or deployed from this template.
 
 ## General practice
 
@@ -246,14 +246,14 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T03-A115-1.** To fetch a page of raw rows quickly, a DAX query can wrap the table in TOPNSKIP (rows to return, rows to skip, an optional sort column) inside SELECTCOLUMNS that lists every column.
 - Option. Check. 2017. https://www.sqlbi.com/articles/querying-raw-data-to-tabular/
 - When: Reading raw table rows in blocks, as Power BI does when a table is browsed in Data view.
-- Version: Described in 2017 as undocumented and open to change. Microsoft Learn now has a TOPNSKIP page; this template's function index lacks it (DAX standard rule 19).
+- Version: Described in 2017 as undocumented and open to change; Microsoft Learn now has a TOPNSKIP page.
 
 **T03-A115-3.** A TOPNSKIP raw-data query can be limited to some rows by wrapping it in CALCULATETABLE with the filter condition.
 - Option. Check. 2017. https://www.sqlbi.com/articles/querying-raw-data-to-tabular/
 - When: Raw-data DAX queries that page through a table with TOPNSKIP and need a filter.
-- Version: In October 2017 Power BI accepted the syntax but did not support this filtering. TOPNSKIP is missing from this template's function index (DAX standard rule 19).
+- Version: In October 2017 Power BI accepted the syntax but did not support this filtering.
 
-**T03-A115-4.** When sending SQL-syntax queries to a Tabular model, add SqlQueryMode=DataKeys; to the connection string. DAX Studio takes it under Advanced Options when you connect.
+**T03-A115-4.** When sending SQL-syntax queries to a Tabular model, add SqlQueryMode=DataKeys; to the connection string.
 - Should. Check. 2017. https://www.sqlbi.com/articles/querying-raw-data-to-tabular/
 - When: Querying raw Tabular data with the SQL syntax used by SSDT and Power Pivot.
 - Version: Found by analysing tool queries; undocumented by Microsoft, may change and might be unsupported.
@@ -271,7 +271,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T03-A115-7.** Raw-data queries that page, sort and filter on a column are one way to build drillthrough over a large table, or a tool that browses model data quickly.
 - Option. Check. 2017. https://www.sqlbi.com/articles/querying-raw-data-to-tabular/
 - When: A reporting environment where you control how queries are generated, or a custom data-browsing tool.
-- Version: Rests on TOPNSKIP, described in 2017 as undocumented; the function is missing from this template's function index (DAX standard rule 19).
+- Version: Rests on TOPNSKIP, described in 2017 as undocumented; Microsoft Learn now has its page.
 
 **T03-A214-2.** Avoid defining a query column with DEFINE COLUMN only to shorten a query, for example to replace an inline filter condition. Query columns are evaluated with different semantics from inline expressions or ADDCOLUMNS columns, so the shorter query can return very different numbers.
 - Should. Check. 2021. https://www.sqlbi.com/articles/introducing-define-column-in-dax-queries/
@@ -321,7 +321,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 - Fact. 2014. https://www.sqlbi.com/articles/from-sql-to-dax-filtering-data/
 - When: Filtering a table with several conditions, the counterpart of a SQL WHERE clause.
 
-**T03-A046-3.** To keep only the groups whose aggregated value meets a condition, as SQL HAVING does, apply FILTER to the table returned by SUMMARIZE or ADDCOLUMNS and test the aggregated column there. An aggregation result cannot appear in a filter argument of CALCULATE or CALCULATETABLE.
+**T03-A046-3.** To keep only the groups whose aggregated value meets a condition, as SQL HAVING does, apply FILTER to the table returned by SUMMARIZE or ADDCOLUMNS and test the aggregated column there. CALCULATE and CALCULATETABLE cannot take an aggregation result as a filter argument.
 - Must. Check. 2014. https://www.sqlbi.com/articles/from-sql-to-dax-grouping-data/
 - When: Filtering grouped rows on the value of an aggregation computed in the grouping.
 
@@ -342,7 +342,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T03-A129-1.** To avoid repeating one complex table filter in many measures, the table expression can be kept in one measure's Detail Rows Expression property, and each measure can pass DETAILROWS of that measure to CALCULATE as its filter.
 - Option. Check. 2018. https://www.sqlbi.com/articles/creating-table-functions-in-dax-using-detailrows/
 - When: Complex filters shared by several measures; the feature was not designed for this, so check performance.
-- Version: Compatibility level 1400; in 2018 the only reusable table expression; in Power BI the property is set with Tabular Editor.
+- Version: Compatibility level 1400; in 2018 the only reusable table expression.
 
 **T03-A129-3.** DETAILROWS used as a CALCULATE filter returns correct results, but its query plan can be worse than the same table expression written directly in CALCULATE, notably when the filter picks standard time intelligence functions from dynamic conditions.
 - Fact. Check. 2018. https://www.sqlbi.com/articles/creating-table-functions-in-dax-using-detailrows/
