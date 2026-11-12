@@ -191,6 +191,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T16-A311-11.** One option for cataloguing and distributing report layouts and report-wide formatting is the Power BI Template (.pbit) file. It holds model and report metadata, so it can also carry a theme, background images and common model patterns such as date tables and calculation groups.
 - Option. 2024. https://www.sqlbi.com/articles/using-atomic-design-in-report-and-model-development/
 - When: Sharing standard layouts or model patterns across reports.
+- Version: This template's theme is fixed, and Copilot sets up no .pbit file (PBIR instructions, rule 9; native features).
 
 **T16-A366-5.** One option to keep measures that share logic very short: a model-dependent user-defined function whose only parameter is the expression to compute, evaluated for the subset the function defines. A model-independent function taking the columns as arguments also works, but each call needs more arguments.
 - Option. 2026. https://www.sqlbi.com/articles/creating-dax-functions-with-ai-to-remove-duplicated-code/

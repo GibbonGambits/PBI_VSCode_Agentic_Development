@@ -250,7 +250,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 
 ### Choosing development tools
 
-**T16-A221-2.** A Tabular model built in Visual Studio cannot be opened in Power BI Desktop, whether it reached Power BI Premium from Visual Studio or from an Analysis Services backup. Desktop-only features such as Incremental Refresh stay out of reach.
+**T16-A221-2.** A Tabular model built in Visual Studio cannot be opened in Power BI Desktop, whether it reached Power BI Premium from Visual Studio or from an Analysis Services backup. With Microsoft's own tools, Desktop-only features such as Incremental Refresh then stay out of reach.
 - Fact. 2021. https://www.sqlbi.com/articles/development-tools-for-tabular-models-in-2021/
 - When: Moving an Analysis Services model, or one developed in Visual Studio, to Power BI Premium.
 - Version: Stated in 2021; restoring an Analysis Services backup into Premium was announced from April 2021.

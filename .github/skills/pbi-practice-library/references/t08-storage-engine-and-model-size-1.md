@@ -67,7 +67,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 
 **T08-A016-7.** For an integer column with very many distinct values, such as a transaction ID, one option is to import two or more integer columns made by integer division and remainder instead. One test: 100 million IDs fell from about 3 GB to under 200 MB.
 - Option. 2012. https://www.sqlbi.com/articles/optimizing-high-cardinality-columns-in-vertipaq/
-- When: The identifier is still needed, for example to find one transaction.
+- When: The identifier is still needed, for example to find one transaction, and no fast distinct count over it is required.
 - Version: On an existing model, replacing the column needs the developer's yes (storage and security, part B and rule 20).
 
 **T08-A016-8.** When an integer ID exists only as high and low part columns, a measure can return the original ID: the high part multiplied by the split factor, plus the low part, with blank returned where that expression cannot be worked out.

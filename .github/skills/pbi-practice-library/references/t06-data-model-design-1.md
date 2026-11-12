@@ -54,6 +54,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T06-A172-1.** The preference for a Power Query column over a DAX calculated column, for an expression on values of the same row, holds for Import models only: in DirectQuery a calculated column is evaluated at query time, much like a Power Query column.
 - Should. 2019. https://www.sqlbi.com/articles/comparing-dax-calculated-columns-with-power-query-computed-columns/
 - When: A new column whose expression reads only other columns of its own row.
+- Version: This template still asks for a CalculatedReason and prefers the source (storage and security, rules 17 and 24; M105).
 
 **T06-A172-2.** What remains for DAX calculated columns is logic that reads other rows or other tables: typically aggregations over other model tables, or lookups between tables from different data sources, where a Power Query merge would gain nothing from folding.
 - Should. 2019. https://www.sqlbi.com/articles/comparing-dax-calculated-columns-with-power-query-computed-columns/
@@ -288,4 +289,4 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T06-A233-4.** A separate header table can be kept to speed up specific calculations, such as a distinct count of customers sliced by dimensions linked to the header (about five times faster in one test). Slicing by detail-side dimensions needs a both-direction relationship, which removes the gain.
 - Option. 2021. https://www.sqlbi.com/articles/header-detail-vs-star-schema-models-in-tabular-and-power-bi/
 - When: A header and detail source; the header table also takes much memory.
-- Version: A both-direction relationship needs its reason and M405 row in the brief (relationships and dates, rule 2).
+- Version: A fact-to-fact link needs its written reason, and a both-direction one its M405 row (relationships and dates, rules 2 and 18).

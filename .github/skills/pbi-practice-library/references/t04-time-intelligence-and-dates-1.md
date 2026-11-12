@@ -96,6 +96,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T04-A147-3.** A simple way to fill the working-day flag of a date table is to mark a date as non-working when WEEKDAY places it on a Saturday or a Sunday.
 - Option. 2019. https://www.sqlbi.com/articles/counting-working-days-in-dax/
 - When: A date table needs a working-day flag for working-day calculations.
+- Version: Only when Power Query cannot supply the flag, with its CalculatedReason (storage and security, rule 17; M105).
 
 **T04-A329-3.** With a weekday filter active, a shift such as DATEADD moves the dates the weekday filter selected: a previous-month measure returns the matching dates of the month before, not the same weekdays.
 - Fact. 2025. https://www.sqlbi.com/articles/filtering-weekdays-in-dax/

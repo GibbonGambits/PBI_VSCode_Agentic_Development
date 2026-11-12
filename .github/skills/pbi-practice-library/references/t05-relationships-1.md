@@ -96,6 +96,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T05-A258-2.** With one shared Date table, every pairing of a calculation with a non-default date that reports use needs its own measure, each switching on the inactive relationship with USERELATIONSHIP in CALCULATE.
 - Must. 2022. https://www.sqlbi.com/articles/using-cross-highlight-with-order-and-delivery-dates-in-power-bi/
 - When: A shared Date table related to several date columns, one relationship active.
+- Version: With many such measures or security roles, this template prefers a Date copy per role (relationships and dates, rules 7, 24, 25).
 
 ## Special-case techniques and facts
 
@@ -143,6 +144,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T05-A236-4.** Test performance thoroughly before a model goes to production with a bridge table tied to the fact by a limited many-to-many cardinality relationship. Its query plans are faster for some queries and slower for others than those of the both-direction bridge.
 - Should. 2021. https://www.sqlbi.com/articles/different-options-to-model-many-to-many-relationships-in-power-bi-and-tabular/
 - When: Adopting the limited bridge layout in place of a both-direction relationship.
+- Version: The many-to-many layout needs its reason and M406 row in the brief (relationships and dates, rule 19).
 
 **T05-A236-5.** Choose between the both-direction bridge and the limited many-to-many layout from the queries users will run. The both-direction bridge fits when the many-to-many path is rarely used; the limited layout pays off when every query goes through it.
 - Should. 2021. https://www.sqlbi.com/articles/different-options-to-model-many-to-many-relationships-in-power-bi-and-tabular/

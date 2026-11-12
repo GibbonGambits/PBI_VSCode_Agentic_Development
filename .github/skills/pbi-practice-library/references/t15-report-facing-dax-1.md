@@ -102,6 +102,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T15-A222-1.** Weigh the report's requirements before a measure shows zero where it would be blank. A visible zero says the item had no activity; a dropped row hides the item as if it did not matter. Zeros suit some reports and not others.
 - Consider. 2021. https://www.sqlbi.com/articles/how-to-return-0-instead-of-blank-in-dax/
 - When: Deciding whether a report should show combinations with no data, such as products without sales.
+- Version: A zero needs the brief's request and its row in section 9 (DAX standard, rule 7; M506).
 
 **T15-A351-2.** Do not add each detail attribute as one more row field of a matrix: every field becomes another hierarchy level, which hampers navigation, can slow the query and blurs the layout.
 - Should. 2026. https://www.sqlbi.com/articles/show-transaction-details-on-the-matrix-visual-in-power-bi/

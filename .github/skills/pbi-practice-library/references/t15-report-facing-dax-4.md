@@ -87,7 +87,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 - When: Core visuals cannot produce the design directly.
 - Version: Overlapping data visuals need an exception (G002).
 
-**T15-A317-9.** A DAX measure shows SVG markup as a picture only when its text starts with `data:image/svg+xml;utf8,`, the markup is valid SVG and a valid DAX string (inner double quotes doubled or replaced by single quotes), and a visual that renders images uses it.
+**T15-A317-9.** A DAX measure shows SVG markup as a picture only when its text begins with `data:image/svg+xml;utf8,`, the markup is valid SVG and a valid DAX string (inner double quotes doubled or made single), its data category is Image URL, and an image-capable visual shows it.
 - Must. 2024. https://www.sqlbi.com/articles/creating-custom-visuals-in-power-bi-with-dax/
 - When: Building SVG images returned by DAX measures.
 - Version: In 2024: tables, matrices, the new card, the new slicer and the scatter chart background render such images.

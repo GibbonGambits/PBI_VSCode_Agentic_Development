@@ -38,7 +38,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T10-A069-7.** When a role filters a large fact table, confirm that the resulting storage engine query holds no CallbackDataID. A callback keeps the result out of the storage engine cache, which removes the benefit of the embedded filter expression.
 - Must. Check. 2016. https://www.sqlbi.com/articles/security-cost-in-analysis-services-tabular/
 - When: A security role places a filter on a large fact table.
-- Version: A currency column compared with a constant caused a callback in SSAS 2012 and 2014, not from SSAS 2016 on.
+- Version: A currency column compared with a constant caused a callback in SSAS 2012 and 2014, not from SSAS 2016 on. This template puts role filters on dimension tables (storage and security, rule 29; M602).
 
 **T10-A069-8.** Weigh carefully how many dimension tables get a security filter. Filters on many dimensions always add several joins with the fact table, even to very simple queries.
 - Consider. 2016. https://www.sqlbi.com/articles/security-cost-in-analysis-services-tabular/
@@ -163,6 +163,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T10-A253-2.** An empty table that exists only so that measures can reference it for object-level security should be made invisible to users.
 - Should. Check. 2022. https://www.sqlbi.com/articles/hiding-measures-by-using-object-level-security-in-power-bi/
 - When: An empty helper table was added to hide measures through object-level security.
+- Version: The unrelated helper table needs its M411 row and purpose in the brief (relationships and dates, rule 4).
 
 **T10-A253-3.** The empty table that measures reference for object-level security can be a calculated table whose expression returns no rows, for example FILTER over a table with a condition that is always FALSE.
 - Option. Check. 2022. https://www.sqlbi.com/articles/hiding-measures-by-using-object-level-security-in-power-bi/

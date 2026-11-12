@@ -276,7 +276,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T07-A275-7.** When you benchmark SEARCH or CONTAINSSTRING queries with a cleared cache, find the index build in the timings, shown as formula engine activity before the matching storage engine request, and leave its time out of the typical execution time you report.
 - Must. Check. 2023. https://www.sqlbi.com/articles/optimizing-text-search-in-dax/
 - When: Performance tests with the cache cleared on columns that get the text search index.
-- Version: October 2022 onward: Azure Analysis Services and Power BI, not SQL Server Analysis Services 2022; a 2026 preview persists it.
+- Version: October 2022 onward: Azure Analysis Services and Power BI, not SQL Server Analysis Services 2022; a 2026 preview persists it. Clearing the cache is the developer's own step: Copilot never calls it (data facts).
 
 **T07-A275-8.** Take into account that the first query needing the text search index builds it. In models refreshed or evicted from memory often, that build can cost users more than the CallbackDataID plan it replaces: the index pays off only when ready most of the time.
 - Consider. Check. 2023. https://www.sqlbi.com/articles/optimizing-text-search-in-dax/

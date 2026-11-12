@@ -325,6 +325,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T03-A046-3.** To keep only the groups whose aggregated value meets a condition, as SQL HAVING does, apply FILTER to the table returned by SUMMARIZE or ADDCOLUMNS and test the aggregated column there. CALCULATE and CALCULATETABLE cannot take an aggregation result as a filter argument.
 - Must. Check. 2014. https://www.sqlbi.com/articles/from-sql-to-dax-grouping-data/
 - When: Filtering grouped rows on the value of an aggregation computed in the grouping.
+- Version: This template adds the aggregated column with ADDCOLUMNS, not inside SUMMARIZE (DAX standard, rule 32; M522).
 
 **T03-A053-2.** Where the IN operator cannot be used, one way to filter a column on a list of values is to keep the values in a separate table and check the column against that table.
 - Option. Check. 2015. https://www.sqlbi.com/articles/from-sql-to-dax-in-and-exists/

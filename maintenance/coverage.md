@@ -722,28 +722,28 @@ No text of SQLBI or of the GPL repository is quoted; every practice is restated.
 
 ### D2b. SQLBI articles and white papers: the practice library
 
-The rows of D2 are the SQLBI practices this template adopts as standards. Beyond them, the skill `pbi-practice-library` (PL) is a second place where practices are covered, as information and not as standards: 2033 short notes, each restating one idea from a public SQLBI article or white paper, with its year and address. Copilot reads the index and one topic file when a task calls for it; the checklist and the standards win; no check reads the library. The notes are therefore not counted in the summary table above.
+The rows of D2 are the SQLBI practices this template adopts as standards. Beyond them, the skill `pbi-practice-library` (PL) is a second place where practices are covered, as information and not as standards: 1892 short notes, each restating one idea from a public SQLBI article or white paper, with its year and address. Copilot reads the index and one topic file when a task calls for it; the checklist and the standards win; no check reads the library. The notes are therefore not counted in the summary table above.
 
-A note was left out of the library when it was outdated, when it conflicted with the checklist, when this repository already says it (the standards of D2 and of the other sections), when a higher source says otherwise, or when another topic keeps the same note. `library-removed.md` lists every such note with the file that covers it; `library.md` holds the numbers, the decisions and the checks.
+A note was left out of the library when it was outdated, when it conflicted with the checklist, when this repository already says it (the standards of D2 and of the other sections), when a higher source or a rule of this template says otherwise, when another topic keeps the same note, or when its advice depends on a custom visual, another vendor's tool or another system, or on publishing or deploying (out of scope). `library-removed.md` lists every such note with the file that covers it; `library.md` holds the numbers, the decisions and the checks.
 
 | Topic | Files in PL `references/` | Notes |
 | --- | --- | ---: |
-| DAX evaluation context | `t01-evaluation-context-1.md` to `t01-evaluation-context-2.md` | 156 |
-| DAX authoring style | `t02-dax-authoring-style-1.md` to `t02-dax-authoring-style-2.md` | 112 |
+| DAX evaluation context | `t01-evaluation-context-1.md` to `t01-evaluation-context-2.md` | 154 |
+| DAX authoring style | `t02-dax-authoring-style-1.md` to `t02-dax-authoring-style-2.md` | 108 |
 | DAX table functions and queries | `t03-table-functions-and-queries-1.md` to `t03-table-functions-and-queries-2.md` | 154 |
-| Time intelligence and date tables | `t04-time-intelligence-and-dates-1.md` to `t04-time-intelligence-and-dates-3.md` | 166 |
+| Time intelligence and date tables | `t04-time-intelligence-and-dates-1.md` to `t04-time-intelligence-and-dates-2.md` | 149 |
 | Relationships and filter propagation | `t05-relationships-1.md` | 67 |
-| Data model design | `t06-data-model-design-1.md` to `t06-data-model-design-2.md` | 127 |
-| DAX performance and optimization | `t07-dax-performance-1.md` to `t07-dax-performance-3.md` | 180 |
-| Storage engine, model size and memory | `t08-storage-engine-and-model-size-1.md` | 33 |
-| Storage modes | `t09-storage-modes-1.md` to `t09-storage-modes-2.md` | 95 |
-| Security | `t10-security-1.md` | 45 |
-| Calculation groups and field parameters | `t11-calculation-groups-and-field-parameters-1.md` to `t11-calculation-groups-and-field-parameters-2.md` | 87 |
-| Window functions and visual calculations | `t12-window-functions-and-visual-calculations-1.md` | 78 |
-| User-defined functions in DAX | `t13-user-defined-functions-1.md` | 48 |
-| Business calculation patterns | `t14-business-calculation-patterns-1.md` to `t14-business-calculation-patterns-5.md` | 244 |
-| Report-facing DAX and report design | `t15-report-facing-dax-1.md` to `t15-report-facing-dax-5.md` | 290 |
-| Tooling, workflow and AI assistance | `t16-tooling-and-workflow-1.md` to `t16-tooling-and-workflow-3.md` | 151 |
+| Data model design | `t06-data-model-design-1.md` to `t06-data-model-design-2.md` | 116 |
+| DAX performance and optimization | `t07-dax-performance-1.md` to `t07-dax-performance-3.md` | 171 |
+| Storage engine, model size and memory | `t08-storage-engine-and-model-size-1.md` | 29 |
+| Storage modes | `t09-storage-modes-1.md` to `t09-storage-modes-2.md` | 86 |
+| Security | `t10-security-1.md` | 43 |
+| Calculation groups and field parameters | `t11-calculation-groups-and-field-parameters-1.md` to `t11-calculation-groups-and-field-parameters-2.md` | 85 |
+| Window functions and visual calculations | `t12-window-functions-and-visual-calculations-1.md` | 77 |
+| User-defined functions in DAX | `t13-user-defined-functions-1.md` | 47 |
+| Business calculation patterns | `t14-business-calculation-patterns-1.md` to `t14-business-calculation-patterns-4.md` | 243 |
+| Report-facing DAX and report design | `t15-report-facing-dax-1.md` to `t15-report-facing-dax-4.md` | 252 |
+| Tooling, workflow and AI assistance | `t16-tooling-and-workflow-1.md` to `t16-tooling-and-workflow-2.md` | 111 |
 
 ### D3. data-goblin/power-bi-agentic-development (GPL: ideas only)
 
