@@ -238,7 +238,7 @@ One request, such as "Evaluate and improve this report", runs these steps in ord
    - **Needs a person**: a fact or a decision no file holds: why something is calculated in the model, summarisation, formulas whose result would change, relationships, security roles, access, user testing, export tests, performance runs. These are questions, not approvals.
 4. **Apply.** Each kind in turn, then the checks, then one commit for that kind.
 5. **Evaluate again**, all 79 items. `python scripts/improve.py compare` prints Pass, Fail and Not applicable before and after; how many of the items that still fail can pass only on a fact from a person; the pages to look at; what was held and why; what was skipped; and the questions, with rows that ask the same thing shown once.
-6. **One final answer** with all of that. When you answer a question, Copilot does the work. When the gate opens (you write no in the brief), `python scripts/improve.py release` frees the held rows and Copilot carries on.
+6. **One final answer** with all of that. When you answer a question, Copilot does the work. When the gate opens (you tell Copilot that no other report uses the model, and it writes that in the brief), `python scripts/improve.py release` frees the held rows and Copilot carries on.
 
 Never in this flow: a change that would break another report, a change to the checklist, the theme file or a template file, a made-up business meaning, publishing, deploying or merging.
 
