@@ -43,7 +43,7 @@ scripts/schemas/                     a copy of every version of Microsoft's sche
 tests/                               tests of the scripts, on made-up data
 tests/fixtures/examples/             one working example of every native object kind, with INDEX.md
 evals/prompts.md                     test prompts for the guidance (not yet run)
-evals/first-test.md                  how to try the whole flow on one of Microsoft's sample reports
+evals/first-test.md                  how to try the whole flow on a report nobody here built
 maintenance/                         the template's own working papers: coverage, feature inventory, decisions, sources,
                                      and the working paper and removal record of the practice library
 THIRD_PARTY_NOTICES.md               licence notices for what the template follows or ships
@@ -149,15 +149,15 @@ Fill in `docs/report-brief.md` first. Then ask Copilot in agent mode.
 |---|---|---|
 | Build new | "Add a page that shows sales by month" | Copilot follows the model and report skills, copies the shipped example of any object kind the project lacks, gives new visuals a `Page_Type_Subject` name, and runs the checks |
 | Evaluate | "Evaluate this report against the checklist" | Copilot runs every check and gives Pass, Fail or Not applicable for all 79 items in a new file, `docs/checklist-review.md`. It changes nothing else |
-| Evaluate and improve | "Evaluate and improve this report" | Copilot makes a branch and an untouched copy, evaluates, writes a fix plan and applies it without waiting for an approval: the theme, the mechanical fixes, the layout, all measures into `_Measures`, names, and changes that need a refresh, one commit for each kind. It holds back only what could break other reports or leave tables without data, evaluates again, and ends with one answer: the counts before and after, what was held, and the questions. See section 5 |
+| Evaluate and improve | "Evaluate and improve this report" | Copilot makes a branch and an untouched copy, evaluates, writes a fix plan and applies it without waiting for an approval: the theme, the mechanical fixes, the layout, all measures into `_Measures`, names, and changes that need a refresh, one commit for each kind. It holds nothing back, evaluates again, and ends with one answer: the counts before and after, what was skipped, and the questions. See section 5 |
 | Change existing | "Add descriptions to the Sales table" or "Move the slicers to the top" | Copilot edits pages, visuals, measures and descriptions, and does not rename what already exists |
-| Rename or move | "Rename the measure Total Sales to Net Sales" | The brief decides (section 3, "Other reports use this model"). With no, Copilot does the work at once and proves every reference with the checks. With yes or no answer, it lists every reference and what may break in other reports on the same model, and waits for your clear yes |
+| Rename or move | "Rename the measure Total Sales to Net Sales" | Copilot does the work at once, repairs every reference in this project and proves it with the checks. Its final answer says that other reports on a published copy of the model may break |
 
 What Copilot asks you, and when:
 
 - **Meaning.** What a column or measure means comes from the brief or from you. When neither says it, Copilot writes `/// TODO(owner): <question>` above the object and carries on. At the end of the task it asks about all of them in one message. `python scripts/list_todos.py .` prints the list.
 - **Facts about the data.** Row counts, unique keys, whether a step folds. When you have set up Microsoft's modeling server Copilot reads the counts and the keys itself; otherwise the question goes into its final answer, in one list. Whether a step folds stays a question for you.
-- **A yes.** For a preview feature; for a suggested native feature; for a change to a template file; and for a rename, a move or a deletion when other reports use the model or the brief does not say.
+- **A yes.** For a preview feature; for a suggested native feature; and for a change to a template file.
 - **Never in the middle.** Copilot asks at the start of a task or in its final answer. A fact it cannot find becomes a `TODO(owner)` line or a question at the end, and a tool that was not set up or failed is named there.
 - **A look.** Files that pass the checks can still look wrong on screen. Copilot asks you to reload and look, or does it itself through Microsoft's Desktop Bridge when you have agreed to that.
 
@@ -221,26 +221,26 @@ It fails when a lesson is badly formed, when a fix points at the checklist or th
 
 One request, such as "Evaluate and improve this report", runs these steps in order (skill `pbi-improve`). Copilot does not have to remember them: `python scripts/improve.py next` reads the files and Git and says which step comes next.
 
-**Nothing waits for an approval.** The safeguard is the branch, the untouched copy and one commit for each kind of fix: each kind can be undone alone with `git revert`. One gate holds a row back instead, and the plan says which rows.
+**Nothing waits for an approval.** The safeguard is the branch, the untouched copy and one commit for each kind of fix: each kind can be undone alone with `git revert`. No row is held back, and Copilot asks nothing at the start.
 
-- **Other reports.** A report that reads a published copy of the model names a measure with its table, so a move or a rename would break it, and no file here can show that. Measures are moved and names corrected only when section 3 of the brief answers "Other reports use this model" with no. This is the one question Copilot asks, at the start, when the brief does not answer it.
+- **Other reports can break.** A report that reads a published copy of the model names a measure with its table, so a move or a rename breaks it, and no file here can show such a report. The flow moves and renames all the same and says so in its final answer: run it on a model that is yours to change.
 - **A missing data source never stops a fix.** A change to a query's text, a partition's name or a data type, and a new table, are applied like every other fix. Such a table is empty until Power BI Desktop refreshes the model, so refresh once after the run. Work on a report whose data sources you can reach.
 
 1. **Safety first.** Save and close the project in Power BI Desktop, and commit. `python scripts/improve.py start` stops unless everything is committed and no earlier flow left its files behind. It makes a new branch, and copies the project unchanged into the folder `_before/`, so you can open before and after side by side. Git ignores that folder and the checks skip it.
 2. **Evaluate.** The checklist review writes `docs/checklist-review.md`. Copilot asks nothing: a fact no file holds is a Fail with "Evidence missing", and its question goes into the final answer.
-3. **Fix plan.** `docs/fix-plan.md` lists every finding and every failed item with a kind and a status (`to do`, `done`, `held: <why>`, `skipped: <why>`, and `question` or `answered` for a row that needs a person). The kinds, in the order they are applied:
+3. **Fix plan.** `docs/fix-plan.md` lists every finding and every failed item with a kind and a status (`to do`, `done`, `skipped: <why>`, and `question` or `answered` for a row that needs a person). The kinds, in the order they are applied:
    - **Theme**: the owner's theme is registered in the report (`python scripts/scaffold.py theme .`).
    - **Mechanical**: descriptions, format strings, folders, hiding, header icons and tooltips, alt text and titles, the DAX style, two rewrites that cannot change a result, styling the theme should do. A visual that uses drill-down, a help tooltip, a tooltip page or tooltip fields keeps that setting, with a row in section 7 of the brief.
    - **Layout**: positions and sizes by the numbers of the layout standard, a back button, tab order.
-   - **Measures**: every measure moves to `_Measures`, with every reference repaired. Other-reports gate.
-   - **Renames**: names the naming standard rejects. Other-reports gate.
+   - **Measures**: every measure moves to `_Measures`, with every reference repaired.
+   - **Renames**: names the naming standard rejects.
    - **Data**: a comment line in a query, a partition's name, a floating-point column, an unused column removed. Applied last; refresh the model afterwards.
    - **Needs a person**: a fact or a decision no file holds: why something is calculated in the model, summarisation, formulas whose result would change, relationships, security roles, access, user testing, export tests, performance runs. These are questions, not approvals.
 4. **Apply.** Each kind in turn, then the checks, then one commit for that kind.
-5. **Evaluate again**, all 79 items. `python scripts/improve.py compare` prints Pass, Fail and Not applicable before and after; how many of the items that still fail can pass only on a fact from a person; the pages to look at; what was held and why; what was skipped; and the questions, with rows that ask the same thing shown once.
-6. **One final answer** with all of that. When you answer a question, Copilot does the work. When the gate opens (you write no in the brief), `python scripts/improve.py release` frees the held rows and Copilot carries on.
+5. **Evaluate again**, all 79 items. `python scripts/improve.py compare` prints Pass, Fail and Not applicable before and after; how many of the items that still fail can pass only on a fact from a person; the pages to look at; what was skipped; and the questions, with rows that ask the same thing shown once.
+6. **One final answer** with all of that. When you answer a question, Copilot does the work.
 
-Never in this flow: a change that would break another report, a change to the checklist, the theme file or a template file, a made-up business meaning, publishing, deploying or merging.
+Never in this flow: a change to the checklist, the theme file or a template file, a made-up business meaning, publishing, deploying or merging.
 
 Why the copy is safe: the `.pbip` file points to the report folder, and the report points to the model, both by relative path, so the three are copied together with their names unchanged and nothing inside is edited. Each `.platform` file holds an identifier that must stay unique within a Git branch, which is why the copy is never committed. If Git would not ignore `_before/`, or a path would pass 260 characters, the script makes no copy, says so, and the branch is the safeguard.
 
@@ -347,7 +347,7 @@ Optional (see "Optional tools from Microsoft"): `status`, `reload`, `screenshots
 python scripts/improve.py next
 ```
 
-Says which step of the evaluate-and-improve flow comes next (section 5). `python scripts/improve.py release` gives new plan rows their status and frees held rows whose reason is gone; `python scripts/improve.py compare` prints the result.
+Says which step of the evaluate-and-improve flow comes next (section 5). `python scripts/improve.py release` gives new plan rows their status; `python scripts/improve.py compare` prints the result.
 
 ```bash
 python scripts/check_project.py --review docs/checklist-review.md
