@@ -53,7 +53,7 @@ Copilot writes model descriptions from this table. It does not write business me
 
 ## 6. Decisions and justifications
 
-Record anything a checklist item asks to be justified or done by hand. Examples: Auto date/time turned off in Power BI Desktop (18); why a relationship filters in both directions (12); why a page has more visuals than usual (20).
+Record anything a checklist item asks to be justified or done by hand. Examples: Auto date/time turned off in Power BI Desktop (18); why a relationship filters in both directions (12); why a page has more visuals than usual (20). Copilot also records here each default it chose where the brief was silent (a measure folder subject, a number format, the reason line of an existing calculated object), with `assumed` under By: change the row if the default is wrong.
 
 | Checklist item | Decision or justification | By | Date |
 |---|---|---|---|
@@ -89,7 +89,7 @@ The layout standard is `.github/skills/pbi-report/references/layout-standard.md`
 
 ## 11. Preview features and optional tools the developer agreed to
 
-Copilot uses a preview feature, or one of Microsoft's optional tools, only after the developer's yes. Write one row for each yes. Feature or tool: for example `calendar-based time intelligence`, `Desktop Bridge`, `Microsoft's modeling server`, `registering the theme in the files`.
+Copilot uses a preview feature, or one of Microsoft's optional tools, only after the developer's yes. Write one row for each yes. Feature or tool: for example `calendar-based time intelligence`, `Microsoft's modeling server`. The Desktop Bridge needs no row: Copilot uses it whenever its tools are installed.
 
 | Feature or tool | Agreed by | Date | Notes |
 |---|---|---|---|

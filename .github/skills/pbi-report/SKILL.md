@@ -71,7 +71,7 @@ Never set up a connection to a workspace yourself. The check compares every fiel
 
 Files that pass the checks can still look wrong: text that is cut off, real colours, a visual with an error icon.
 
-- Where the developer has agreed to the Desktop Bridge: reload and take a picture of each page yourself, look at the pictures, and delete them (`references/desktop-bridge.md`).
+- Where the Desktop Bridge is installed (the script says "not available" when it is not): reload and take a picture of each page yourself, look at the pictures, and delete them (`references/desktop-bridge.md`).
 - Otherwise name the pages that changed and ask the developer to reload the project in Power BI Desktop and to look at them.
 - Never say a page looks right from the files alone. Slow visuals and export results (items 68, 77) need a person.
 

@@ -199,6 +199,22 @@ class Pages(ReportCase):
                     objects={"labels": [{"properties": {"color": keyword}}]})
         self.assertNot("V009")
 
+    def test_V009_a_colour_scale_may_use_the_theme_files_scale_colours(self):
+        import report_rules as rr
+        theme_colour = sorted(rr.scale_colours())[0]
+        def scale(low, high):
+            return {"dataPoint": [{"properties": {"fillRule": {"linearGradient2": {
+                "min": {"color": lit("'%s'" % low)}, "max": {"color": lit("'%s'" % high)}}}}}]}
+        path = self.visual("Overview", "Overview_Card_Styled", fields=[SALES], objects=scale(theme_colour, theme_colour.lower()))
+        self.assertNot("V009")
+        data = self.read_json(path)
+        data["visual"]["objects"] = scale(theme_colour, "#123456")           # not a colour of the theme file
+        self.write_json(path, data)
+        self.assertFinds("V009", "warn")
+        data["visual"]["objects"] = {"labels": [{"properties": {"color": {"solid": {"color": lit("'%s'" % theme_colour)}}}}]}
+        self.write_json(path, data)
+        self.assertFinds("V009", "warn")                                     # outside a scale a code is still styling
+
     def test_V024_data_bars_with_a_part_missing_fail(self):
         def colour(word):
             return {"solid": {"color": lit("'%s'" % word)}}

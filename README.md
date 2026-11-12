@@ -159,7 +159,7 @@ What Copilot asks you, and when:
 - **Facts about the data.** Row counts, unique keys, whether a step folds. When you have set up Microsoft's modeling server Copilot reads the counts and the keys itself; otherwise the question goes into its final answer, in one list. Whether a step folds stays a question for you.
 - **A yes.** For a preview feature; for a suggested native feature; and for a change to a template file.
 - **Never in the middle.** Copilot asks at the start of a task or in its final answer. A fact it cannot find becomes a `TODO(owner)` line or a question at the end, and a tool that was not set up or failed is named there.
-- **A look.** Files that pass the checks can still look wrong on screen. Copilot asks you to reload and look, or does it itself through Microsoft's Desktop Bridge when you have agreed to that.
+- **A look.** Files that pass the checks can still look wrong on screen. Copilot asks you to reload and look, or does it itself through Microsoft's Desktop Bridge whenever its tools are installed on your computer.
 
 It does not ask you to make a first table, visual or measures table in Desktop: it copies a shipped example.
 
@@ -235,7 +235,7 @@ One request, such as "Evaluate and improve this report", runs these steps in ord
    - **Measures**: every measure moves to `_Measures`, with every reference repaired.
    - **Renames**: names the naming standard rejects.
    - **Data**: a comment line in a query, a partition's name, a floating-point column, an unused column removed. Applied last; refresh the model afterwards.
-   - **Needs a person**: a fact or a decision no file holds: why something is calculated in the model, summarisation, formulas whose result would change, relationships, security roles, access, user testing, export tests, performance runs. These are questions, not approvals.
+   - **Needs a person**: a fact or a decision no file holds: summarisation, formulas whose result would change, relationships, security roles, access, user testing, export tests, performance runs. These are questions, not approvals.
 4. **Apply.** Each kind in turn, then the checks, then one commit for that kind.
 5. **Evaluate again**, all 79 items. `python scripts/improve.py compare` prints Pass, Fail and Not applicable before and after; how many of the items that still fail can pass only on a fact from a person; the pages to look at; what was skipped; and the questions, with rows that ask the same thing shown once.
 6. **One final answer** with all of that. When you answer a question, Copilot does the work.
@@ -385,7 +385,7 @@ Header icons always show while you edit. Microsoft applies the "off" setting onl
 
 ## Optional tools from Microsoft
 
-Everything in the template works without these. Each one is your decision: you install it, and you say yes to it in section 11 of `docs/report-brief.md`. Copilot never installs a tool, never publishes or deploys, and never sets up a connection to a workspace.
+Everything in the template works without these. Each one is your decision: you install it. The Desktop Bridge is used as soon as it is installed; the modeling server and a preview feature of Power BI need your yes in section 11 of `docs/report-brief.md`. Copilot never installs a tool, never publishes or deploys, and never sets up a connection to a workspace.
 
 | Tool | What Copilot does with it | What you set up |
 |---|---|---|
@@ -393,7 +393,7 @@ Everything in the template works without these. Each one is your decision: you i
 | Power BI Authoring MCP Server, the local one (`microsoft/powerbi-modeling-mcp`) | Reads facts about the data with DAX queries: row counts, distinct values, whether a key is unique. Read only. Guidance: `.github/skills/pbi-semantic-model/references/data-facts.md` | The VS Code extension "Power BI Authoring MCP"; you accept Microsoft's licence terms for it; run it with `--readonly`; you open the connection |
 | Microsoft Learn MCP server | A second way to read Microsoft Learn pages. The look-up script needs no setup | Add the server in VS Code if you want it |
 
-- The Desktop Bridge is treated as a preview feature: Microsoft's pages disagree on whether it still is one. The second npm package is a public preview.
+- Microsoft's pages disagree on whether the Desktop Bridge is still a preview. Installing its tools is your yes to it. The second npm package is a public preview.
 - A reload does not refresh data, and the Bridge cannot read the error box Desktop shows when a file fails to load.
 - Pictures of pages can show data. The script writes them outside the project and deletes them on request.
 - Query results pass through the chat to the AI service behind it. If your data is sensitive, give Copilot the facts yourself instead.

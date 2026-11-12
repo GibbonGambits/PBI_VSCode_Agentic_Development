@@ -15,6 +15,7 @@ An exception counts only when section 10 of docs/report-brief.md lists the code,
 (or '-' for a whole page) with a reason.
 Needs Python 3.8 or later. Uses the standard library only.
 """
+import json
 import os
 import re
 
@@ -34,6 +35,23 @@ SLICER_TYPES = frozenset(("slicer", "advancedSlicerVisual", "listSlicer", "textS
 STYLE_PROPERTIES = frozenset(("fontFamily", "fontSize", "fontColor", "color", "bold", "italic", "underline"))
 STYLE_CARDS = frozenset(("border", "dropShadow", "background"))
 HEX_COLOUR = re.compile(r"#[0-9A-Fa-f]{6}(?:[0-9A-Fa-f]{2})?\b")
+SCALE_KEYS = ("minimum", "center", "maximum", "null")     # the theme file's colours for a colour scale
+SCALE_PARTS = frozenset(("linearGradient2", "linearGradient3"))
+_SCALE_COLOURS = None
+
+
+def scale_colours():
+    """The colour codes the owner's theme file gives for a colour scale, in upper case."""
+    global _SCALE_COLOURS
+    if _SCALE_COLOURS is None:
+        path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "theme", "theme.json")
+        try:
+            with open(path, encoding="utf-8-sig") as fh:
+                theme = json.load(fh)
+        except (OSError, ValueError):
+            theme = {}
+        _SCALE_COLOURS = frozenset(theme[k].upper() for k in SCALE_KEYS if isinstance(theme.get(k), str))
+    return _SCALE_COLOURS
 RETIRING_TYPES = {"map": "the Bing map (deprecated: use the Azure map, azureMap)",
                   "filledMap": "the filled Bing map (deprecated: use the Azure map, azureMap)",
                   "qnaVisual": "the Q&A visual (deprecated with Q&A)",
@@ -111,8 +129,9 @@ def _half_data_bars(node, missing=None):
     return missing
 
 
-def styling(node, path, found):
-    """Add the names of colour, font and size settings written on a visual itself."""
+def styling(node, path, found, scale=False):
+    """Add the names of colour, font and size settings written on a visual itself.
+    Inside a colour scale (scale=True) the theme file's own scale colours pass: a scale cannot use ThemeDataColor."""
     if isinstance(node, dict):
         for key, value in node.items():
             if key in STYLE_PROPERTIES and isinstance(value, dict):
@@ -124,15 +143,19 @@ def styling(node, path, found):
                         continue                         # a colour taken from the theme
                 if text is not None and key.lower().endswith("color") and not HEX_COLOUR.search(text):
                     continue                             # a theme colour named by keyword, such as 'maxColor'
+                if text is not None and scale and text.strip("'").upper() in scale_colours():
+                    continue                             # the theme file's colour for a colour scale
                 if text is not None or solid is not None:
                     found.add("%s.%s" % (path, key) if path else key)
             elif isinstance(value, str) and HEX_COLOUR.search(value) and key == "Value":
-                found.add("%s (a colour written as a code)" % path if path else "a colour written as a code")
+                if not (scale and value.strip("'").upper() in scale_colours()):
+                    found.add("%s (a colour written as a code)" % path if path else "a colour written as a code")
             else:
-                styling(value, path if key in ("properties", "expr", "solid", "Literal") or isinstance(node, list) else key, found)
+                styling(value, path if key in ("properties", "expr", "solid", "Literal") or isinstance(node, list) else key,
+                        found, scale or key in SCALE_PARTS)
     elif isinstance(node, list):
         for value in node:
-            styling(value, path, found)
+            styling(value, path, found, scale)
 
 
 def read_pages(cp, report_dir):

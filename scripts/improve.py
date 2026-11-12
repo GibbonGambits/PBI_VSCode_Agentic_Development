@@ -81,16 +81,22 @@ MECHANICAL = {
     "N003": ("Add a VisualLabel annotation; the visual keeps its name", "Nothing: Power BI Desktop ignores annotations"),
     "M003": ("Set the measure's display folder to Subject\\Type (scripts/set_model_properties.py)",
              "The measure moves in the Data pane; visuals keep working"),
-    "M004": ("Set the measure's display folder to a subject and a type from the lists",
+    "M004": ("Set the measure's display folder to a subject and a type from the lists. When no subject fits, take one from "
+             "what the model measures, add it to the brief's list and record the assumption",
              "The measure moves in the Data pane; visuals keep working"),
-    "M009": ("Set the measure's format string to the brief's format for that kind of number",
+    "M009": ("Set the measure's format string to the brief's format for that kind of number; with none in the brief, the "
+             "standard's default, recorded as an assumption",
              "Numbers show differently wherever the measure is used"),
     "M101": ("Put each visible column in one of the four column folders", "Columns move in the Data pane"),
     "M102": ("Hide the key column (scripts/set_model_properties.py --from-findings M102)",
              "Report authors no longer see it; a visual that uses it is reported as M104"),
     "M103": ("Hide the numeric column the measure totals (--from-findings M103)",
              "Report authors no longer see it; a visual that uses it is reported as M104"),
-    "M112": ("Set the column's format string to the brief's format", "Values show differently wherever the column is used"),
+    "M112": ("Set the column's format string to the brief's format; with none in the brief, the standard's default, recorded "
+             "as an assumption", "Values show differently wherever the column is used"),
+    "M105": ("Write the reason line of the calculated column or table from what the files show: what the formula builds, and "
+             "that no query delivers it. Record it as an assumption and ask the owner to confirm",
+             "Nothing in the report: an annotation is added"),
     "M114": ("Set the data category the column's name states (City, Country, Latitude and so on)",
              "A map may place the values differently"),
     "M518": ("Replace DIVIDE by the '/' operator where the divisor is a fixed number",
@@ -102,7 +108,8 @@ MECHANICAL = {
     "M907": ("Set isAvailableInMdx back to true on the column", "Nothing: the column is used for sorting or in a hierarchy"),
     "V002": ("Hide the tooltip page (visibility HiddenInViewMode)", "The page no longer shows as a tab; the tooltip still works"),
     "V009": ("Remove the colour, font, size, border, shadow or background set on the visual, so that it follows the theme. "
-             "Remove a whole setting, never one part of a setting made of parts (data bars, a colour scale, icons)",
+             "Remove a whole setting, never one part of a setting made of parts (data bars, a colour scale, icons). A colour "
+             "scale keeps its shape and takes the theme file's minimum and maximum colours",
              "The visual looks different: it takes the theme's style"),
     "V024": ("Put the missing bar colour of the data bars back with a theme colour, or remove the data bars as a whole",
              "Nothing: without the part Power BI Desktop does not load the report at all"),
@@ -167,7 +174,6 @@ DATA = {
 PERSON = {
     "M010": "Edit the DAX reference; the developer checks the result",
     "M104": "Decide whether the hidden column should be shown again",
-    "M105": "The developer states why it is calculated in the model; then the reason is written as an annotation",
     "M106": "Decide whether the calculated columns can come from the source",
     "M107": "Decide on 'do not summarise': Microsoft does not document its effect on visuals that already total the column",
     "M109": "Give both relationship columns the same type, at the source or in Power Query",

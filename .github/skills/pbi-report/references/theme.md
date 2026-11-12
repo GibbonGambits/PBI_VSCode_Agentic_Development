@@ -27,7 +27,7 @@ Not confirmed from Microsoft: whether Power BI Desktop keeps and applies the two
 
 ## Removing styling from a visual
 
-When a visual sets its own styling (V009), remove the whole setting so the theme takes over. Never remove one part of a setting that is made of parts: data bars (`dataBars` with `positiveColor`, `negativeColor`, `axisColor`), a colour scale (`FillRule`), icons. A half-removed setting passes Microsoft's schema, and Power BI Desktop then fails to load the whole report (V024). If such a setting holds a colour code, replace that colour with a theme colour, or keep the setting and say so in your final answer. A colour named by a theme keyword (`'maxColor'`, `'minColor'`, `'foreground'`) is already a theme colour: leave it.
+When a visual sets its own styling (V009), remove the whole setting so the theme takes over. Never remove one part of a setting that is made of parts: data bars (`dataBars` with `positiveColor`, `negativeColor`, `axisColor`), a colour scale (`FillRule`), icons. A half-removed setting passes Microsoft's schema, and Power BI Desktop then fails to load the whole report (V024). If such a setting holds a colour code, replace that colour with a theme colour; in a colour scale, with the theme file's `minimum`, `center` or `maximum` colour. A colour named by a theme keyword (`'maxColor'`, `'minColor'`, `'foreground'`) is already a theme colour: leave it.
 
 ## Features a visual uses
 

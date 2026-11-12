@@ -21,7 +21,7 @@ This file covers measures, folders, hiding, calculated objects, summarising, dat
 
 **2. Folders.** Every measure has one display folder with exactly two levels: subject, then type. Never one level, never three, never a list of folders. Item 22. Checks: M003, M004 (fail).
 
-- Subject comes from "Measure folder subjects" in the brief. If that field is empty the list is: Reliability, Energy and Gas, Customer, Safety, Finance, Workforce, IT and Security, Work Management (the eight business definition areas of this template).
+- Subject comes from "Measure folder subjects" in the brief. If that field is empty the list is: Reliability, Energy and Gas, Customer, Safety, Finance, Workforce, IT and Security, Work Management (the eight business definition areas of this template). When no subject on the list fits what the model measures, do not leave the measure without a folder: take a subject from the model's own business (the name of what its fact table records, such as Sales Pipeline), add it to "Measure folder subjects" in the brief, and record it as an assumption (section 6 of the brief, `assumed` under By).
 - Type is one of: Base, Time Intelligence, Comparisons, Ratios, Counts.
 - Both lists are the owner's. No public source prescribes them.
 - The levels are separated by one backslash, written plainly, with no space on either side of it: `displayFolder: Finance\Base`. A forward slash does not make a second level.
@@ -40,7 +40,7 @@ This file covers measures, folders, hiding, calculated objects, summarising, dat
 - The last seven points give a warning, M008.
 - A name is used once in the model, whatever its capitals (M005, fail), and is never the name of a column in any table (M006, fail).
 
-**4. Description and format string.** Every measure has both. The script checks the visible ones, as items 23 and 36 do: D001 and M009 (fail). A measure that is only a text value needs no format string. The format comes from the brief (item 71).
+**4. Description and format string.** Every measure has both. The script checks the visible ones, as items 23 and 36 do: D001 and M009 (fail). A measure that is only a text value needs no format string. The format comes from the brief (item 71). When the brief gives none, use the default and record it as an assumption: a count or whole number `#,0`; a number with decimals `#,0.00`; a ratio, share or probability `0.0%`; an amount of money, the currency format the model already uses, else `#,0.00`.
 
 **5. References in DAX.** Write a column as `Table[Column]` and a measure as `[Measure]`. Item: beyond. Check: M010 (warn; the script reads text and is not a DAX parser).
 
@@ -56,7 +56,7 @@ This file covers measures, folders, hiding, calculated objects, summarising, dat
 - A table that only bridges two tables, or only feeds formulas, is hidden. `_Measures` is never hidden.
 - A column that a hierarchy level or a report visual uses stays visible, and no script proposes to hide it. This last point is the owner's rule. Microsoft states that a hidden column still works in the model and in queries; hiding only takes it out of the field list, so authors can no longer pick it.
 
-**8. Calculated columns and calculated tables.** They get no special name. Each carries an annotation with one line of justification: `annotation CalculatedReason = <one line>`. The line states what makes a DAX calculation necessary here, and what stops the value being delivered by Power Query or the source system. The words are the developer's: ask for them. The tables the standards define carry the standard's own line and need no question: a calculated `_Measures` table (rule 1), a field parameter and a numeric range parameter (`model-objects.md`, beside this file). If the developer has no such reason, say that Microsoft's guidance is to push the logic upstream, and leave the finding open. More than five calculated columns in a model, or one that uses RELATED, is reported for review. The tables that Power BI makes for Auto date/time (`LocalDateTable_...`, `DateTableTemplate_...`) are left out; item 18 deals with them. Items 27 and 38. Checks: M105 (fail), M106 (warn).
+**8. Calculated columns and calculated tables.** They get no special name. Each carries an annotation with one line of justification: `annotation CalculatedReason = <one line>`. The line states what makes a DAX calculation necessary here, and what stops the value being delivered by Power Query or the source system. The words are the developer's for a new object: ask for them. For an object that already exists, in the evaluate-and-improve flow, write the line yourself from what the files show (what the formula builds, and that no query or source table delivers it), record it as an assumption, and ask the owner to confirm it in your final answer. The tables the standards define carry the standard's own line and need no question: a calculated `_Measures` table (rule 1), a field parameter and a numeric range parameter (`model-objects.md`, beside this file). If the developer has no such reason, say that Microsoft's guidance is to push the logic upstream, and leave the finding open. More than five calculated columns in a model, or one that uses RELATED, is reported for review. The tables that Power BI makes for Auto date/time (`LocalDateTable_...`, `DateTableTemplate_...`) are left out; item 18 deals with them. Items 27 and 38. Checks: M105 (fail), M106 (warn).
 
 **9. Summarise.** A visible number column does not total by default: `summarizeBy: none`. Authors use a measure instead (item 29). A column that analysts must total ad hoc is listed in section 9 of the brief. Check: M107 (fail). Turning it off in an existing model is the developer's decision: Microsoft documents this setting as the default used when a field is added, and does not say what happens to visuals that already total the column.
 
@@ -64,7 +64,7 @@ This file covers measures, folders, hiding, calculated objects, summarising, dat
 
 **11. Date and time together.** A column that holds both is reported for review. The files do not show the data, so the script reports a date column whose format shows a time, is `General Date`, or is missing. Item: beyond. Check: M111 (warn).
 
-**12. Formats.** A visible date column and a visible number column have a format string, taken from the brief. Items 71 and 72. Check: M112 (warn).
+**12. Formats.** A visible date column and a visible number column have a format string, taken from the brief; when the brief gives none, the defaults of rule 4, and `Short Date` for a date, recorded as an assumption. Items 71 and 72. Check: M112 (warn).
 
 ## C. Assess only (no failure)
 

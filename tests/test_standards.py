@@ -322,7 +322,8 @@ class BadProject(Case):
         self.assertEqual(kinds["M001"], {"Measures"})
         self.assertEqual(kinds["M007"], {"Renames"})
         self.assertEqual(kinds["M108"], {"Data"})                         # a data type is never Mechanical
-        for code in ("M105", "M107", "M109", "B001"):
+        self.assertEqual(kinds["M105"], {"Mechanical"})                   # the reason is read from the files, as an assumption
+        for code in ("M107", "M109", "B001"):
             self.assertEqual(kinds[code], {"Needs a person"}, code)
             self.assertEqual(statuses[code], {"question"}, code)
         for code in ("H001", "M003", "G002"):
