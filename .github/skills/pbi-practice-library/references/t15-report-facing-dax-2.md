@@ -1,0 +1,370 @@
+# Report-facing DAX and report design
+
+Part 2 of 4 of this topic. Covers: Model support for reports; Tooltips, drillthrough and detail rows; Choosing and building charts.
+
+Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit or condition. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. **Paper** means the note comes from a white paper: its link opens only a summary, and the paper itself is on a download site that `pbi-lookup` does not open, so confirm the point on Microsoft Learn instead. The article holds the detail. A note may name another product in passing, such as Analysis Services or Excel: that is information for the developer. Nothing is installed, published or deployed from this template.
+
+## General practice
+
+### Model support for reports
+
+**T15-A072-5.** Set a column's type in the query step that loads the data, not on the model column. Later measures and default formats then behave as expected, and bad data in a later refresh fails in the query, where it is easier to fix.
+- Should. 2016. https://www.sqlbi.com/articles/the-space-report-under-the-hood/
+- When: Loading untyped sources such as Excel files, where the guessed type may be Any.
+
+**T15-A188-7.** Measures that exist only to support visual formatting, such as the rank and band measures behind row colouring, can be hidden.
+- Option. 2020. https://www.sqlbi.com/articles/applying-color-banding-by-document-number-in-power-bi/
+- When: A model holds helper measures whose only role is to improve a visual.
+
+**T15-A296-15.** Measures that exist only as a format string variant of another measure are narrow-purpose: isolate them from the rest of the model by hiding them and stating the intended use case in the description.
+- Should. 2024. https://www.sqlbi.com/articles/improving-data-labels-with-format-strings/
+- When: Report-specific formats are handled by adding variant measures to the model.
+- Version: Here measures stay in the one measures table (model standard rule 1); a separate table needs an exception row (M001).
+
+**T15-A300-9.** Be careful not to add too many field parameters to a semantic model. They are reporting objects; too many clutter the model and confuse developers and model consumers alike.
+- Consider. 2024. https://www.sqlbi.com/articles/using-scatterplots-to-find-details-in-reports/
+- When: Adding field parameters to a model.
+
+**T15-A312-9.** Keep model objects that exist only to serve one visual apart from the core semantic model: hide those measures, calculation groups and calculated tables, so they do not clutter the model or confuse users and other developers.
+- Should. 2024. https://www.sqlbi.com/articles/highlighting-a-data-point-and-comparing-to-all-others-in-a-distribution/
+- When: Models holding helper objects built for specific visual requirements.
+- Version: Here measures stay in the one measures table (model standard rule 1); a separate table needs an exception row (M001).
+
+**T15-A312-10.** In the description of each helper object that exists only for a report, record which visuals rely on it and how it works.
+- Should. 2024. https://www.sqlbi.com/articles/highlighting-a-data-point-and-comparing-to-all-others-in-a-distribution/
+- When: Model objects created only to support specific visuals.
+
+### Tooltips, drillthrough and detail rows
+
+**T15-A113-9.** Keep measure references and context transitions out of detail rows expressions; work out per-line values such as line amount or line cost from columns. Drillthrough may be evaluated for every row of a large table, so a context transition costs much memory and time.
+- Should. Check. 2017. https://www.sqlbi.com/articles/controlling-drillthrough-using-detail-rows-expressions-in-dax/
+- When: Writing a detail rows expression over a large table.
+- Version: The source notes that Excel returns only the first 1,000 drillthrough rows by default.
+
+**T15-A231-12.** Whoever builds the model must keep its drillthrough expressions efficient: their speed is that person's responsibility.
+- Must. 2021. https://www.sqlbi.com/articles/controlling-drillthrough-in-excel-pivottables-connected-to-power-bi-or-analysis-services/
+- When: Defining a detail rows expression or a default detail rows expression in a tabular model.
+
+**T15-A318-4.** Extra context such as absolute figures can go in a tooltip, with three limits in mind: tooltips offer little formatting, readers must hover, and comparing categories within or across visuals becomes impractical.
+- Option. 2024. https://www.sqlbi.com/articles/building-bullet-charts-in-power-bi-reports/
+- When: A visual shows a variance but lacks supporting figures.
+- Version: Tooltips are off by default here: the visual needs its exception row in the brief.
+
+### Choosing and building charts
+
+**T15-A325-1.** Weigh limiting a pie or doughnut chart to about three categories: angles and areas are judged less accurately than lengths or positions, so more slices, or slices of similar size, are hard to compare. The limit is approximate.
+- Consider. 2025. https://www.sqlbi.com/articles/using-pie-charts-is-not-the-end-of-the-world/
+- When: A pie or doughnut shows shares; a chart that highlights one or two key categories is an exception.
+- Version: The checklist's review line stays more than 5 categories (item 54).
+
+**T15-A325-10.** When a pie or doughnut chart has more than three colour-coded categories, take care that the slice colours do not form a gradient, which suggests quantity; schemes of red, blue and green likewise imply volume or sentiment.
+- Must. 2025. https://www.sqlbi.com/articles/using-pie-charts-is-not-the-end-of-the-world/
+- When: A chart with more than three colour-coded categories.
+
+**T15-A325-11.** Judge a chart on filtered data as well: a report is interactive, and a chart that works on the unfiltered data can stop working after readers apply a few filters.
+- Must. 2025. https://www.sqlbi.com/articles/using-pie-charts-is-not-the-end-of-the-world/
+- When: Choosing or reviewing any chart in an interactive report.
+
+**T15-A300-1.** One way to improve a report built around a large detail table or matrix is a scatterplot beside it: readers spot outliers and interesting groups quickly and cross-filter to the details, where the table alone makes them sort, drill and filter.
+- Option. 2024. https://www.sqlbi.com/articles/using-scatterplots-to-find-details-in-reports/
+- When: Many data points whose spread, outliers or clusters matter.
+
+**T15-A300-5.** The details behind interesting scatterplot points can be given by a details table beside or below the chart: selecting points cross-filters it, so it lists the selected ones only. Tooltips are another way.
+- Option. Check. 2024. https://www.sqlbi.com/articles/using-scatterplots-to-find-details-in-reports/
+- When: Readers of a scatterplot want more detail on chosen points.
+- Version: Written in 2024 before lasso select was available; check the current product. Tooltips need the visual's exception row.
+
+**T15-A300-10.** Scatterplot variants by question: standard for two measures, animated for change over time, bubble for a third measure, quadrant for four segments, volcano for change between two periods.
+- Option. 2024. https://www.sqlbi.com/articles/using-scatterplots-to-find-details-in-reports/
+- When: Choosing a kind of scatterplot.
+
+**T15-A300-11.** In a dense scatterplot, overlapping points can hide many items. Treat it as an exploratory view for spotting possible segments, and plan a deeper analysis before drawing final conclusions.
+- Consider. 2024. https://www.sqlbi.com/articles/using-scatterplots-to-find-details-in-reports/
+- When: Scatterplots with many closely packed points.
+
+**T15-A308-11.** An alternative to a simple bar chart for actuals against a target, such as a bar chart with variance, may take extra effort to build and support.
+- Consider. 2024. https://www.sqlbi.com/articles/introducing-the-3-30-300-rule-for-better-reports/
+- When: Choosing an alternative to a simple bar chart.
+
+## Special-case techniques and facts
+
+### Model support for reports
+
+**T15-A072-6.** A shared dimension the source lacks can be built in Power Query: combine the attribute column from each table, remove duplicates and blanks, and relate the result to all those tables.
+- Option. 2016. https://www.sqlbi.com/articles/the-space-report-under-the-hood/
+- When: The same attribute sits in several tables and has no source table of its own.
+
+**T15-A072-8.** When data cannot be bound to a visual in its present shape, a dedicated table shaped for that visual, even a redundant one, is an option: for example several sources appended, with a column that names the origin of each row.
+- Option. 2016. https://www.sqlbi.com/articles/the-space-report-under-the-hood/
+- When: One visual must show data from different tables or sources together.
+
+**T15-A222-6.** Build the helper table that lists where a measure shows zero for blank in Power Query, not as a DAX calculated table: built in DAX it exposes the model to circular dependencies.
+- Should. 2021. https://www.sqlbi.com/articles/how-to-return-0-instead-of-blank-in-dax/
+- When: A model uses a physical table to drive where zero replaces blank.
+
+**T15-A296-14.** Report-specific formatted measures can live in a proxy composite model that the reports connect to, while other users keep using the original model. It adds management overhead and composite model limits, and its author can override the original measures' formats and definitions.
+- Option. 2024. https://www.sqlbi.com/articles/improving-data-labels-with-format-strings/
+- When: Report-specific format strings must stay out of the main model.
+
+**T15-A312-11.** A helper calculated table built only for a visual can also be marked private. A private object stays out of view even when hidden objects are shown, and DAX autocomplete does not offer it.
+- Option. 2024. https://www.sqlbi.com/articles/highlighting-a-data-point-and-comparing-to-all-others-in-a-distribution/
+- When: A report-only helper table, such as a disconnected table of category names used for highlighting.
+- Version: A calculated table carries its reason line (M105); one without a relationship is listed as an exception (M411).
+
+### Tooltips, drillthrough and detail rows
+
+**T15-A113-3.** In a detail rows expression, return only the columns that help the reader, and show readable descriptions such as product, store and customer names in place of internal keys.
+- Should. 2017. https://www.sqlbi.com/articles/controlling-drillthrough-using-detail-rows-expressions-in-dax/
+- When: Choosing the columns that drillthrough on a measure returns.
+
+**T15-A113-4.** Give DETAILROWS one measure as its argument, not a more complex expression: the design tool only warns, but after deployment such a call makes the user's query fail with an unexpected-exception error.
+- Should. Check. 2017. https://www.sqlbi.com/articles/controlling-drillthrough-using-detail-rows-expressions-in-dax/
+- When: Any use of DETAILROWS, which returns a table and combines with other table expressions.
+- Version: Seen in 2017 with Analysis Services tooling; check current behaviour.
+
+**T15-A113-5.** For a measure built from two other measures, the detail rows expression can call DETAILROWS on each, join the two results with NATURALINNERJOIN, which drops the columns they share, and add derived columns with ADDCOLUMNS.
+- Option. Check. 2017. https://www.sqlbi.com/articles/controlling-drillthrough-using-detail-rows-expressions-in-dax/
+- When: A measure such as a margin combines the detail rows of sales and cost.
+- Version: Stated in 2017; check current behaviour. Only in a model without a calculation group (more model features, rule 14; M815).
+
+**T15-A113-6.** When a measure evaluates a base measure under a changed filter context, write its detail rows expression as DETAILROWS of the base measure inside CALCULATETABLE, with the same filter modifiers the measure uses.
+- Should. 2017. https://www.sqlbi.com/articles/controlling-drillthrough-using-detail-rows-expressions-in-dax/
+- When: Year-to-date, prior-year and similar variants of a base measure.
+- Version: Only in a model without a calculation group (more model features, rule 14; M815).
+
+**T15-A113-8.** When one measure's drillthrough should equal another's, call DETAILROWS on that other measure; do not copy its detail rows expression.
+- Should. 2017. https://www.sqlbi.com/articles/controlling-drillthrough-using-detail-rows-expressions-in-dax/
+- When: For example a year-over-year percentage that reuses the detail rows of the year-over-year difference.
+- Version: Only in a model without a calculation group (more model features, rule 14; M815).
+
+**T15-A231-1.** Without a detail rows expression, drillthrough on a measure returns all columns of the measure's own table, hidden ones included and none from related tables, for the visible rows. It ignores filter changes inside the measure and returns nothing useful for a separate measures table.
+- Fact. 2017. https://www.sqlbi.com/articles/controlling-drillthrough-using-detail-rows-expressions-in-dax/ ; https://www.sqlbi.com/articles/controlling-drillthrough-in-excel-pivottables-connected-to-power-bi-or-analysis-services/
+- When: A PivotTable drills into a measure that has no detail rows expression; Excel returns 1,000 rows by default.
+
+**T15-A231-2.** Besides a detail rows expression on one measure, a table can carry a default detail rows expression, which every measure of that table without its own then uses. The client receives that table expression evaluated in the measure's filter context.
+- Option. Check. 2017. https://www.sqlbi.com/articles/controlling-drillthrough-using-detail-rows-expressions-in-dax/ ; https://www.sqlbi.com/articles/controlling-drillthrough-in-excel-pivottables-connected-to-power-bi-or-analysis-services/
+- When: Users drill through measures from a client such as an Excel PivotTable.
+- Version: Compatibility level 1400 or higher; at first usable from Excel only. Not in a model with a calculation group.
+
+**T15-A231-3.** The detail rows expression of a measure and the default detail rows expression of a table accept only a DAX table expression; an expression that returns a scalar gives an error.
+- Fact. 2021. https://www.sqlbi.com/articles/controlling-drillthrough-in-excel-pivottables-connected-to-power-bi-or-analysis-services/
+- When: Defining custom drillthrough for measures or tables in a tabular model.
+
+**T15-A231-5.** A detail rows expression can give the chosen columns plain names without the table prefix and read descriptive attributes, such as product or customer names, from related tables with RELATED. The client still shows each name in square brackets, which cannot be removed.
+- Option. 2021. https://www.sqlbi.com/articles/controlling-drillthrough-in-excel-pivottables-connected-to-power-bi-or-analysis-services/
+- When: Shaping the columns that Excel drillthrough returns from a tabular model.
+
+**T15-A231-6.** When a measure should share another measure's drillthrough, set its detail rows expression to DETAILROWS of that measure. For measures in a separate measures table, do this per measure and not as a table default, which later measures would inherit, suitable or not.
+- Option. 2021. https://www.sqlbi.com/articles/controlling-drillthrough-in-excel-pivottables-connected-to-power-bi-or-analysis-services/
+- When: Measures hosted in a measures table need the drillthrough of measures defined elsewhere.
+- Version: Only in a model without a calculation group (more model features, rule 14; M815).
+
+**T15-A231-7.** For a measure that changes the filter context, such as a same-period-last-year measure, the detail rows expression can wrap DETAILROWS of the base measure in CALCULATETABLE with the same filter function. The default drillthrough ignores filter changes made inside the measure.
+- Option. 2021. https://www.sqlbi.com/articles/controlling-drillthrough-in-excel-pivottables-connected-to-power-bi-or-analysis-services/
+- When: Excel drillthrough on measures whose definition shifts or changes the filter context.
+- Version: Only in a model without a calculation group (more model features, rule 14; M815).
+
+**T15-A231-8.** When users want a summarised drillthrough, as for a year-over-year difference, the detail rows expression must change the granularity and aggregate, for instance one row per date with current and prior-year values. An older alternative appends the detail rows of both periods with UNION.
+- Must. 2021. https://www.sqlbi.com/articles/controlling-drillthrough-in-excel-pivottables-connected-to-power-bi-or-analysis-services/ ; https://www.sqlbi.com/articles/controlling-drillthrough-using-detail-rows-expressions-in-dax/
+- When: Business users expect an aggregated drillthrough view, not every transaction of both periods.
+- Version: Only in a model without a calculation group (more model features, rule 14; M815).
+
+**T15-A231-9.** Numeric columns returned by a detail rows expression have no format string that can be set, and rounding them in the expression removes the dropped digits for good. A measure format in a PivotTable only hides decimals and keeps the full number.
+- Fact. 2021. https://www.sqlbi.com/articles/controlling-drillthrough-in-excel-pivottables-connected-to-power-bi-or-analysis-services/
+- When: Writing detail rows expressions that return numeric columns.
+
+**T15-A231-10.** A measure has one drillthrough behaviour, so several detail views for the same PivotTable filters need one dedicated measure per view: for example a measure that shows how many customers will be listed and whose drillthrough returns those distinct customers.
+- Option. 2021. https://www.sqlbi.com/articles/controlling-drillthrough-in-excel-pivottables-connected-to-power-bi-or-analysis-services/
+- When: Users need more than one kind of detail list, such as customers and products, for the same cell.
+- Version: Only in a model without a calculation group (more model features, rule 14; M815).
+
+**T15-A231-11.** Where detailed data tables are a key need, Excel drillthrough with custom detail rows expressions can serve them efficiently: it runs as one DAX query and can return tens of thousands of rows in seconds, while a PivotTable with many attributes on rows is slow.
+- Option. 2021. https://www.sqlbi.com/articles/controlling-drillthrough-in-excel-pivottables-connected-to-power-bi-or-analysis-services/
+- When: Users need detail-level extracts from a tabular model in Excel.
+- Version: Only in a model without a calculation group (more model features, rule 14; M815).
+
+**T15-A145-2.** To validate or debug a report, a measure that lists the active filters can go into the tooltip fields of a visual: it shows the filter context of each data point, including filters the standard filter display leaves out.
+- Option. 2019. https://www.sqlbi.com/articles/displaying-filter-context-in-power-bi-tooltips/
+- When: A measure returns unexpected results on a visual that supports tooltips.
+- Version: Tooltips are off by default here: the visual needs its exception row in the brief.
+
+**T15-A145-3.** The filter list in a visual's header shows the filters that come from outside the visual, such as slicers and cross-highlighting. It leaves out the visual-level filters, which can change results in non-obvious ways when they filter a measure.
+- Fact. Check. 2019. https://www.sqlbi.com/articles/displaying-filter-context-in-power-bi-tooltips/
+- When: Checking which filters affect a visual through its header.
+- Version: Seen in 2019, with the updated filter pane setting on. Header icons here need an exception row in the brief.
+
+**T15-A145-4.** Power BI evaluates a measure shown in a visual's tooltip without the cross-highlighting filter that comes from other visuals, so the tooltip value does not reflect that cross-highlight.
+- Fact. 2019. https://www.sqlbi.com/articles/displaying-filter-context-in-power-bi-tooltips/
+- When: Reading values or filter context through a tooltip measure while another visual cross-highlights this one.
+- Version: Tooltips are off by default here: the visual needs its exception row in the brief.
+
+**T15-A145-6.** To inspect a table or matrix with a filter-listing tooltip measure, the visual can be turned into a chart for a while, so that its tooltip properties become available.
+- Option. Check. 2019. https://www.sqlbi.com/articles/displaying-filter-context-in-power-bi-tooltips/
+- When: Debugging a table or matrix visual.
+- Version: From 2019, when tables and matrices had no tooltips. Tooltips need the visual's exception row in the brief.
+
+**T15-A145-7.** A report tooltip page holding a table or card that shows a filter-listing measure, with word wrap on, displays the filter context of table and matrix visuals. It takes some effort to set up.
+- Option. Check. 2019. https://www.sqlbi.com/articles/displaying-filter-context-in-power-bi-tooltips/
+- When: Showing the filter context behind cells of a table or matrix visual.
+- Version: From 2019. Needs the visual's tooltip exception row; text size and font stay with the theme.
+
+**T15-A312-8.** On a chart built with helper measures, a default tooltip can show confusing helper values such as jitter numbers. Where a tooltip is wanted there, a report-page tooltip keeps those values out of sight.
+- Should. 2024. https://www.sqlbi.com/articles/highlighting-a-data-point-and-comparing-to-all-others-in-a-distribution/
+- When: Final clean-up of charts built with helper measures.
+- Version: A report-page tooltip needs the visual's exception row in the brief.
+
+### Choosing and building charts
+
+**T15-A325-2.** A pie or doughnut with many categories can still work when it draws attention to one or two of them: colour those, leave the other slices neutral, and possibly merge the rest into one others slice.
+- Option. 2025. https://www.sqlbi.com/articles/using-pie-charts-is-not-the-end-of-the-world/
+- When: One or two of more than about three categories matter most; a dynamic others slice is hard to maintain.
+- Version: Theme colours only (V009). Power BI offers static grouping and binning.
+
+**T15-A325-4.** Do not line up several pie or doughnut charts to track progress against a target such as the prior year: a stacked bar chart shows the proportions more clearly.
+- Should. 2025. https://www.sqlbi.com/articles/using-pie-charts-is-not-the-end-of-the-world/
+- When: Current figures are compared with a target or an earlier period.
+
+**T15-A325-5.** To show how part-of-whole proportions change over time, think of a stacked area or 100% stacked area chart; stacked bars stay suitable for discrete periods such as years.
+- Consider. 2025. https://www.sqlbi.com/articles/using-pie-charts-is-not-the-end-of-the-world/
+- When: Shares of a whole are followed over time.
+
+**T15-A325-6.** Pie charts, doughnut charts and many other part-of-whole charts cannot show negative values, nor percentages above 100% such as overachievement.
+- Fact. 2025. https://www.sqlbi.com/articles/using-pie-charts-is-not-the-end-of-the-world/
+- When: Choosing a part-of-whole chart.
+
+**T15-A325-7.** Break down a total that has negative parts, such as costs inside a margin, with a waterfall chart, not a pie or doughnut; the waterfall is among the few charts that show both part-of-whole and negative values.
+- Should. 2025. https://www.sqlbi.com/articles/using-pie-charts-is-not-the-end-of-the-world/
+- When: A part-of-whole breakdown where some parts are negative.
+
+**T15-A325-8.** For a breakdown whose parts follow an implied flow or process, such as open orders that are past due, current or future, prefer a waterfall chart to a pie or doughnut, with a custom sort order where it helps.
+- Should. 2025. https://www.sqlbi.com/articles/using-pie-charts-is-not-the-end-of-the-world/
+- When: Part-of-whole breakdowns with an implied sequence, such as order-to-cash or demand planning.
+
+**T15-A325-9.** Do not show achievement against a target with a pie or doughnut when going past 100% has a meaning of its own in the business process, as in a bonus plan: the overachievement disappears.
+- Should. 2025. https://www.sqlbi.com/articles/using-pie-charts-is-not-the-end-of-the-world/
+- When: KPI or target visuals where values above 100% carry meaning.
+
+**T15-A325-14.** Before placing pie charts on a map, ask critically whether another chart type, such as a stacked bar chart, would show the data more clearly.
+- Consider. 2025. https://www.sqlbi.com/articles/using-pie-charts-is-not-the-end-of-the-world/
+- When: A report shows proportions by geography with pies on a map.
+
+**T15-A325-18.** Pulling one or more slices out of a pie (an exploded pie) emphasises them, but weigh that readers may then find the slices harder to compare.
+- Consider. 2025. https://www.sqlbi.com/articles/using-pie-charts-is-not-the-end-of-the-world/
+- When: A pie chart must emphasise certain slices.
+
+**T15-A139-1.** A date hierarchy on the axis of a line chart first shows only its top level, the year, so the chart may hold very few points.
+- Fact. 2018. https://www.sqlbi.com/articles/improving-temporal-line-charts-in-power-bi-with-dax/
+- When: A line chart has a year, quarter and month hierarchy on its axis, from a Date table or auto date/time.
+
+**T15-A139-2.** In a categorical line chart drilled to quarter or month, switching off the X axis option Concatenate Labels is a partial workaround for labels that repeat the year. The gain is small, and more than three years stay hard to show.
+- Option. Check. 2018. https://www.sqlbi.com/articles/improving-temporal-line-charts-in-power-bi-with-dax/
+- When: A categorical line chart has an expanded date hierarchy on its axis.
+- Version: As of 2018; check the current product.
+
+**T15-A139-3.** A line chart can use the Continuous X-axis type at month or quarter grain when the axis holds a date-typed column that maps each period to one date, most naturally its last date. All points then fit without a scrollbar.
+- Option. 2018. https://www.sqlbi.com/articles/improving-temporal-line-charts-in-power-bi-with-dax/
+- When: A trend line at a grain coarser than day, where the period column would otherwise be text.
+
+**T15-A139-5.** When grouping Date rows by period, identify the period by one column that is unique across years; failing that, keep every column that together identifies it, such as year and quarter number.
+- Should. 2018. https://www.sqlbi.com/articles/improving-temporal-line-charts-in-power-bi-with-dax/
+- When: Computing a period-level value, such as the end-of-period date, with ALLEXCEPT over the period columns.
+
+**T15-A139-6.** End-of-month and end-of-quarter date columns used on a continuous axis can take the format string `MMMM yyyy`; by default the tooltip labels a point with the full end-of-period date.
+- Option. 2018. https://www.sqlbi.com/articles/improving-temporal-line-charts-in-power-bi-with-dax/
+- When: A continuous line chart whose axis column stores the last date of each month or quarter.
+- Version: Only when the brief's date format allows it (model standard, rule 12; M112).
+
+**T15-A139-7.** On a continuous line chart plotted on an end-of-period date column, switch on the X-axis title: the dates alone do not show whether a point stands for a month or a quarter.
+- Should. 2018. https://www.sqlbi.com/articles/improving-temporal-line-charts-in-power-bi-with-dax/
+- When: A continuous line chart whose axis column stores the last date of each month or quarter.
+
+**T15-A139-8.** A continuous line chart at week grain needs a Date column grouping the days of each week: build a sequential week number from a fixed reference date with a settable first weekday (a hideable helper), then a date column with each week's last day.
+- Must. 2018. https://www.sqlbi.com/articles/improving-temporal-line-charts-in-power-bi-with-dax/
+- When: A line chart with a continuous axis at week granularity.
+
+**T15-A139-9.** A measure can blank out the partial weeks at both ends of the user's date selection: read the selected range and the week boundaries with ALLSELECTED, then apply only the dates of complete weeks through DATESBETWEEN inside KEEPFILTERS. Totals and weekly averages then stay correct.
+- Option. 2018. https://www.sqlbi.com/articles/improving-temporal-line-charts-in-power-bi-with-dax/
+- When: A weekly chart on a calendar that is not week-based, where a date selection can cut the edge weeks.
+
+**T15-A139-10.** A weekly line chart gains 52 points for each year it covers, so narrowing the date range the chart shows can help.
+- Option. 2018. https://www.sqlbi.com/articles/improving-temporal-line-charts-in-power-bi-with-dax/
+- When: A line chart at week grain spans several years; outside a week-based calendar the edge weeks may be incomplete.
+
+**T15-A284-1.** One way to hold a chart's Y-axis still while slicers change: bind the axis maximum to a measure, the largest bar value, such as MAXX over the axis column, inside CALCULATE with REMOVEFILTERS on the slicer column. A typed maximum needs editing when data changes.
+- Option. 2023. https://www.sqlbi.com/articles/using-dax-to-control-a-chart-range-in-power-bi/
+- When: The axis should keep the range it shows with no selection; which filters to remove depends on requirements.
+
+**T15-A284-2.** A measure that computes a chart's axis maximum can round its result up with ROUNDUP to a clean magnitude, such as whole millions, so the axis does not end at an odd value.
+- Option. 2023. https://www.sqlbi.com/articles/using-dax-to-control-a-chart-range-in-power-bi/
+- When: An axis maximum bound to a measure.
+
+**T15-A284-3.** Two side-by-side charts that slice one value by different columns can share a Y-axis maximum: compute the largest value per grouping, take the larger of the two with MAX, and bind that one measure to the axis maximum of both charts.
+- Option. 2023. https://www.sqlbi.com/articles/using-dax-to-control-a-chart-range-in-power-bi/
+- When: Two charts meant to be compared by eye, each grouped by a different column.
+
+**T15-A284-4.** Two charts, each filtered by its own slicer on one column, share one Y-axis range only when the slicers use two disconnected tables. Each chart's measure applies its slicer's selection with TREATAS; both axis maxima bind to one measure returning the highest value either reaches.
+- Must. 2023. https://www.sqlbi.com/articles/using-dax-to-control-a-chart-range-in-power-bi/
+- When: Comparing two free selections of one attribute, each chosen with its own slicer.
+- Version: Each disconnected slicer table is listed with its purpose as an exception (M411).
+
+**T15-A300-2.** A scatterplot with very many points may not show them all, so an unfiltered chart can miss data points. The core scatter visual shows 3,500 points by default, at most 10,000.
+- Fact. 2024. https://www.sqlbi.com/articles/using-scatterplots-to-find-details-in-reports/
+- When: Charts with a very large number of points.
+- Version: Limits as stated in 2024.
+
+**T15-A300-3.** For a volcano plot in a year-over-year review, put the target measure on the Y-axis and the comparison measure on the X-axis, and place the whole dimension hierarchy, not only its lowest-level name, in the Values well so readers can drill down.
+- Should. 2024. https://www.sqlbi.com/articles/using-scatterplots-to-find-details-in-reports/
+- When: Readers must see change between two periods and pick the items to analyse further.
+- Version: Drill icons are off here: tell readers on the page how to drill, or list the visual's exception.
+
+**T15-A300-4.** Make a volcano plot easier to use: an X-axis constant line at zero, minimum and maximum constant lines whose names label below-target and above-target, a size measure for emphasis, colour by the change measure or by category, and optionally zoom sliders.
+- Should. 2024. https://www.sqlbi.com/articles/using-scatterplots-to-find-details-in-reports/
+- When: A volcano-style scatterplot comparing a change against a target.
+- Version: Theme colours only; a colour code, transparency or font set on the visual needs an exception row (V009).
+
+**T15-A300-6.** In an exploratory report, consider two scatterplots that cross-filter each other. It helps most when studying how two closely linked attributes, such as product and region, relate.
+- Consider. 2024. https://www.sqlbi.com/articles/using-scatterplots-to-find-details-in-reports/
+- When: Exploratory reports.
+
+**T15-A300-8.** When field parameters let readers switch the axes or grouping of a scatterplot, take care to offer only combinations that make sense: meaningless ones confuse.
+- Consider. 2024. https://www.sqlbi.com/articles/using-scatterplots-to-find-details-in-reports/
+- When: Scatterplots driven by field parameters, usually for advanced readers exploring several views on one page.
+
+**T15-A312-3.** When a one-dimensional dot plot of a single measure has many overlapping points, the points can be spread randomly along the Y-axis (jitter). Overlap hides how many points there are and whether groups exist.
+- Option. 2024. https://www.sqlbi.com/articles/highlighting-a-data-point-and-comparing-to-all-others-in-a-distribution/
+- When: Showing the distribution of one measure across many items with a scatterplot.
+
+**T15-A312-4.** When a scatterplot is repurposed as a jitter plot, turn off the Responsive setting in the general properties of the visual container.
+- Should. 2024. https://www.sqlbi.com/articles/highlighting-a-data-point-and-comparing-to-all-others-in-a-distribution/
+- When: A core scatterplot used as a jitter or swarm plot.
+
+**T15-A312-12.** When a jitter plot holds very many points, a second chart can sit directly above it, such as a line chart of item counts per binned value with its X-axis aligned, with the selected item's value marked by an X-axis constant line (one value only).
+- Option. 2024. https://www.sqlbi.com/articles/highlighting-a-data-point-and-comparing-to-all-others-in-a-distribution/
+- When: A jitter plot comparing a selected item with all others, with too many points to judge clusters.
+
+**T15-A312-13.** The random jitter offset can be kept narrow, for example by centring the RAND value on zero and scaling it down, so the points do not spread over too much vertical space and clutter the chart.
+- Option. 2024. https://www.sqlbi.com/articles/highlighting-a-data-point-and-comparing-to-all-others-in-a-distribution/
+- When: A jitter plot whose Y-axis position comes from a random offset.
+
+**T15-A312-14.** Finish a chart assembled from several visuals with a clean-up pass: for example add a background container, and group and name all its visual containers in the selection pane.
+- Should. 2024. https://www.sqlbi.com/articles/highlighting-a-data-point-and-comparing-to-all-others-in-a-distribution/
+- When: Composite charts built from several visuals, such as a jitter plot with a joint plot.
+- Version: Data visuals that overlap need an exception row in the brief (G002); visual names follow the template's label pattern.
+
+**T15-A312-16.** In a scatterplot used as a dot or jitter plot, a Y-axis constant line named after the measure can serve as an axis label marking where the chart begins. It shows up when the minimum of the X-axis is moved below zero.
+- Option. 2024. https://www.sqlbi.com/articles/highlighting-a-data-point-and-comparing-to-all-others-in-a-distribution/
+- When: A core scatterplot repurposed as a one-measure dot or jitter plot.
+
+**T15-A318-8.** A simple bullet chart can be made from the core bar chart: enable error bars, bind both the upper and the lower bound to the target measure, set bar width and marker width to the highest value and border width to zero.
+- Option. 2024. https://www.sqlbi.com/articles/building-bullet-charts-in-power-bi-reports/
+- When: Simple category comparisons; aggregate performance or qualitative ranges need other approaches.
+- Version: The widths are sizes set on one visual, which the theme rule allows only when the developer asks.
+
+**T15-A318-19.** A bullet chart made from a core bar chart with error bars can be refined: a wider gap between categories for thinner bars, conditional formatting on bars and data labels to flag underperforming categories, gridlines, and a title naming what actuals are compared with.
+- Option. 2024. https://www.sqlbi.com/articles/building-bullet-charts-in-power-bi-reports/
+- When: A bullet chart built from the core bar chart, with error bars marking the target.
+- Version: Theme colours only; a colour code needs an exception row (V009). Bar spacing is set only when the developer asks.
+
+**T15-A318-21.** Action dots can be added to an actual-versus-target chart to draw the eye to categories that over-perform or under-perform.
+- Option. 2024. https://www.sqlbi.com/articles/building-bullet-charts-in-power-bi-reports/
+- When: Charts comparing actuals with a target by category, such as a bullet chart.

@@ -28,6 +28,8 @@ If `python` is not found, use `py` (Windows) or `python3` (macOS, Linux) in the 
 .github/skills/pbi-lookup/           looking things up on Microsoft Learn, DAX Guide and SQLBI, and nowhere else
 .github/skills/business-definitions/ starter definitions for eight business areas, read one at a time
 .github/skills/pbi-lessons/          the improvement loop: what Copilot does when it gets something wrong
+.github/skills/pbi-practice-library/ a reference library of practice notes on DAX and modelling, restated from public
+                                     SQLBI articles and white papers: one index, topic files. Information, not rules
 checklist/checklist.md               the 79 checklist items, word for word
 theme/theme.json                     the report theme, unchanged
 docs/report-brief.md                 what you tell Copilot before it builds
@@ -38,7 +40,8 @@ tests/                               tests of the scripts, on made-up data
 tests/fixtures/examples/             one working example of every native object kind, with INDEX.md
 evals/prompts.md                     test prompts for the guidance (not yet run)
 evals/first-test.md                  how to try the whole flow on one of Microsoft's sample reports
-maintenance/                         the template's own working papers: coverage, feature inventory, decisions, sources
+maintenance/                         the template's own working papers: coverage, feature inventory, decisions, sources,
+                                     and the working paper and removal record of the practice library
 THIRD_PARTY_NOTICES.md               licence notices for what the template follows or ships
 ```
 
@@ -157,7 +160,9 @@ It does not ask you to make a first table, visual or measures table in Desktop: 
 
 **Suggestions.** When a native feature would do a job better (a field parameter in place of stacked visuals, a calculation group in place of many time variants, sync slicers, an aggregation table), Copilot says so at the end of its answer, and the check prints a note whose code starts with U. It never stops a task to ask, and it builds the feature only after your yes.
 
-**Looking things up.** When a check fails for no clear reason, DAX returns an error, a function is new to the model, or a lesson is about to be written, Copilot looks it up: on Microsoft Learn and on the pages listed in the sitemaps of dax.guide and sqlbi.com, and nowhere else (`python scripts/lookup.py`). VS Code asks you to approve the command. With no network Copilot says so and carries on from the repository.
+**Looking things up.** When a check fails for no clear reason, DAX returns an error, a function is new to the model, a lesson is about to be written, or a note of the practice library needs confirming, Copilot looks it up: on Microsoft Learn and on the pages listed in the sitemaps of dax.guide and sqlbi.com, and nowhere else (`python scripts/lookup.py`). VS Code asks you to approve the command. With no network Copilot says so and carries on from the repository.
+
+**The practice library.** The skill `pbi-practice-library` holds short practice notes on DAX and semantic model design. Each note restates, in new words, one piece of advice or one fact from a public SQLBI article or white paper, and gives its year and address; the article stays the place for the detail. The notes are sorted by topic, and each topic file has two shelves: general practice, and special-case techniques and facts. Copilot uses the library as information, when a task calls for it and the standards leave the question open: writing or reviewing DAX, designing a model, a performance question, an unusual requirement, or a failed check that a look-up did not explain. It reads the index (`.github/skills/pbi-practice-library/references/index.md`), then opens only the file it needs (two at most), never the whole library, and names the notes it used by ID. The library is not a standard and nothing checks it: the checklist and the standards win, and a note never justifies an exception. A note marked **Check** may no longer hold in current Power BI; Copilot confirms it through the look-up skill before it relies on it. A note marked **Paper** comes from a white paper whose full text is on a download site the look-up skill does not open; Copilot confirms it on Microsoft Learn instead. Advice that depends on a custom visual, another vendor's tool or another system, or on publishing or deploying, was left out of the library.
 
 Where each case is covered:
 
@@ -191,7 +196,7 @@ Both triggers work through Copilot's guidance; no script records a lesson by its
 
 Template files are everything under `.github/`, `scripts/`, `tests/`, `evals/` and `maintenance/`, and the root files `README.md`, `LICENSE`, `THIRD_PARTY_NOTICES.md`, `.gitignore` and `.gitattributes`. The brief and the lessons file are your project's own content.
 
-Every standard, its checks, the shipped examples, the tools and the skills are template files too, so they are inside the loop, manual and automatic. A lesson may propose a change to any of them. Copilot always asks first, and a person approves by pull request. Before it writes a lesson, Copilot may look the right way up (skill `pbi-lookup`).
+Every standard, its checks, the shipped examples, the tools and the skills are template files too, so they are inside the loop, manual and automatic. A lesson may propose a change to any of them. Copilot always asks first, and a person approves by pull request. Before it writes a lesson, Copilot may look the right way up (skill `pbi-lookup`). A lesson may point to a note of the practice library by its ID; the library records no lessons and proposes no template change by itself.
 
 **What can never happen this way**
 
@@ -387,6 +392,7 @@ What the theme means for drill, tooltips, export, contrast and text size is set 
 ## Not tested, and not confirmed
 
 - Copilot prompt tests have not been run. Steps are in `evals/prompts.md`.
+- The practice library is information drawn from articles, the oldest from 2011. No note was tried in Power BI Desktop. Notes whose advice may have aged carry the mark Check; a note without the mark showed no sign of change when it was written, which is not proof that it still holds.
 - Nothing here has been opened in Power BI Desktop by the template's builder. That includes every shipped example and the starter project. They parse (the model files load in Microsoft's own Tabular Object Model library and pass its validation), pass Microsoft's schemas, and pass the project check. Microsoft's library does not parse DAX or Power Query, and Microsoft's own skill warns that a wrong field or role can pass validation and still show an error icon. Look at the first use of each kind in Desktop.
 - Written, not run: `scripts/desktop_bridge.py` and the guidance for Microsoft's modeling server. Neither Power BI Desktop nor the server could be run where the template was built. The tests replace Microsoft's tools with stand-ins.
 - The starter project's report holds an empty theme collection until you import the theme. Whether Power BI Desktop opens it without a remark is not confirmed.
@@ -404,7 +410,7 @@ What the theme means for drill, tooltips, export, contrast and text size is set 
 
 The standards follow, in this order of trust: the owner's checklist; Microsoft Learn; Microsoft's own skills for Fabric (`microsoft/skills-for-fabric`), best practice rules for tabular models (`microsoft/Analysis-Services`) and report schemas (`microsoft/json-schemas`); SQLBI, for DAX; then the sources below. A lower source never overrides a higher one. Each standard file names its sources and where they disagree. `THIRD_PARTY_NOTICES.md` holds the licence notices.
 
-- SQLBI's DAX formatting rules and DAX patterns are restated in the template's own words, with their addresses. No SQLBI text, code or image is copied.
+- SQLBI's DAX formatting rules and DAX patterns are restated in the template's own words, with their addresses. The practice library (skill `pbi-practice-library`) restates ideas from SQLBI's public articles and two of its white papers the same way, one short note at a time, each with the address of its article. No SQLBI text, code or image is copied.
 - Some working practices were informed by Kurt Buhler's public writing and repository on agentic Power BI development (`data-goblin/power-bi-agentic-development`, GPL-3.0) and by the Tabular Editor blog: short always-loaded guidance, detail loaded on demand, hard rules enforced by scripts, a written brief before building; and several ideas in the standards (a measures table, the order of a measure name, column folders, what to hide, a recorded reason for calculated objects, equal margins and gaps). These are ideas only. No text, code or files were taken from it, and the `pbir` command-line tool (authors: Kurt Buhler, Maxim Anatsko) is not used.
 - GitHub's `awesome-copilot` repository (MIT): its modeling skill was read for naming and folder guidance, and two of its instruction files for DAX practice and report design.
 - `Mofaji/Agentic-PBIP-Template` (MIT) was read in full: for the topics it covers and for how Microsoft's Desktop Bridge tools are called. None of its code is used.

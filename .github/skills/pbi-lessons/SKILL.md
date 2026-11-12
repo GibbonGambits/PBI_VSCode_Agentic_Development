@@ -12,7 +12,7 @@ description: Use this skill when the developer points out a mistake in your work
 ## Steps
 
 1. Put the mistake right in the report or model, and run the check again.
-2. Read `docs/lessons.md`. If an earlier lesson is the same kind of mistake, reuse its key. If you are not sure what the right way is, look it up before you write the lesson (skill `pbi-lookup`), so that the lesson records a fact.
+2. Read `docs/lessons.md`. If an earlier lesson is the same kind of mistake, reuse its key. If you are not sure what the right way is, look it up before you write the lesson (skill `pbi-lookup`), so that the lesson records a fact. The correction may point to a note of the practice library by its ID (skill `pbi-practice-library`); the library itself starts no lesson.
 3. Record the lesson, one for each kind of mistake in this task, however many places it showed up:
    `python scripts/lessons.py add --trigger developer --key <key> --mistake "<what was wrong>" --correction "<what is right>"`
    Use `--trigger check` when a check failed, with the finding code as the key (for example `D001`). Otherwise the key is a short name in lower-case words joined by hyphens. Write what the developer said or the check reported. Do not guess at causes.

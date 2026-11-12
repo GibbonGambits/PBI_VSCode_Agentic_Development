@@ -11,6 +11,7 @@ import contextlib
 import io
 import json
 import os
+import re
 import shutil
 import sys
 import tempfile
@@ -399,6 +400,60 @@ class SourcesRoutine(TempCase):
         self.assertIn("- SUM: https://learn.microsoft.com/dax/sum-function-dax", text)
         self.assertNotIn("overview", text.lower().split("## aggregation functions")[1].split("##")[0])
         self.assertTrue(text.rstrip().endswith("Checklist items: 32, 33, 34"))
+
+    def test_dax_index_adds_sitemap_pages_and_counts_only_functions(self):
+        toc = {"items": [{"toc_title": "DAX", "children": [
+            {"toc_title": "DAX functions", "children": [
+                {"toc_title": "Relationship functions", "children": [
+                    {"toc_title": "Relationship functions", "href": "relationship-functions-dax"},
+                    {"toc_title": "RELATED", "href": "related-function-dax"}]},
+                {"toc_title": "Table manipulation functions", "children": [
+                    {"toc_title": "Table constructor", "href": "table-constructor"},
+                    {"toc_title": "DISTINCT (column)", "href": "distinct-function-dax"}]}]},
+            {"toc_title": "DAX statements", "children": [{"toc_title": "VAR", "href": "var-dax"}]}]}]}
+        index = ("<sitemapindex><sitemap><loc>https://learn.microsoft.com/_sitemaps/dax_en-us_1.xml</loc></sitemap>"
+                 "<sitemap><loc>https://learn.microsoft.com/_sitemaps/dax_de-de_1.xml</loc></sitemap></sitemapindex>")
+        pages = {"https://learn.microsoft.com/_sitemaps/dax_en-us_1.xml": "".join(
+            "<url><loc>https://learn.microsoft.com/en-us/dax/%s</loc></url>" % p for p in (
+                "related-function-dax", "table-constructor", "topnskip-function-dax", "isatlevel-function-dax",
+                "virtual-table-statement-dax", "var-dax"))}
+        found = refresh_sources.sitemap_pages(index, fetch=lambda address: pages[address])
+        functions, statements = refresh_sources.missing_pages(toc, found)
+        self.assertEqual(functions, ["topnskip-function-dax", "isatlevel-function-dax"])
+        self.assertEqual(statements, ["virtual-table-statement-dax"])
+        self.assertEqual(refresh_sources.page_title('<h1 id="topnskip">TOPNSKIP</h1>'), "TOPNSKIP")
+        text, count = refresh_sources.dax_index_text(
+            toc, "2026-11-12", [("TOPNSKIP", functions[0]), ("ISATLEVEL", functions[1])],
+            [("Virtual Table", statements[0])])
+        self.assertEqual(count, 4)                       # RELATED, DISTINCT (column), TOPNSKIP, ISATLEVEL
+        self.assertIn("- TOPNSKIP: https://learn.microsoft.com/dax/topnskip-function-dax", text)
+        self.assertIn("- Virtual Table: https://learn.microsoft.com/dax/virtual-table-statement-dax", text)
+        self.assertIn("Each function is listed once.", text)
+        language = text.split("## Language")[1]
+        self.assertIn("- Table constructor:", language)
+        self.assertIn("- Relationship functions:", language)
+
+    def test_shipped_index_keeps_the_sitemap_functions(self):
+        path = refresh_sources.DAX_INDEX
+        with open(path, encoding="utf-8") as fh:
+            text = fh.read()
+        names = re.findall(r"^- ([A-Z][A-Z0-9.]*(?: \([a-z]+\))?): https://", text.split("## Statements")[0], re.M)
+        for name in ("TOPNSKIP", "PREVIOUS", "NEXT", "FIRST", "LAST", "EXPAND", "EXPANDALL", "COLLAPSE",
+                     "COLLAPSEALL", "ISATLEVEL", "SAMPLEAXISWITHLOCALMINMAX", "ALLSELECTEDAPPLY", "ALLSELECTEDREMOVE",
+                     "ALWAYSAPPLY", "DEPENDON", "FILTERCLUSTER", "GROUPCROSSAPPLY", "GROUPCROSSAPPLYTABLE",
+                     "NONFILTER", "SHADOWCLUSTER"):
+            self.assertIn(name, names)
+        for name in ("HIGHESTPARENT", "LOWESTPARENT"):          # option values, not functions
+            self.assertNotIn(name, names)
+        self.assertIn("virtual-column-statement-dax", text)
+        self.assertIn("virtual-table-statement-dax", text)
+        self.assertEqual(len(names), len(set(names)))           # no function is listed twice
+        self.assertNotIn("listed in two groups", text)
+        self.assertIn("Functions listed: %d." % len(names), text)
+        functions_part = text.split("## Statements")[0]
+        for page in ("Understanding functions for parent-child hierarchies", "Relationship functions:",
+                     "Table constructor"):
+            self.assertNotIn("- " + page, functions_part)
 
     def test_shipped_index_lists_the_functions_the_checks_rely_on(self):
         import model_rules
