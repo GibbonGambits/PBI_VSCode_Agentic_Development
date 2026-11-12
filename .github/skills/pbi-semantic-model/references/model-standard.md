@@ -42,7 +42,7 @@ This file covers measures, folders, hiding, calculated objects, summarising, dat
 
 **4. Description and format string.** Every measure has both. The script checks the visible ones, as items 23 and 36 do: D001 and M009 (fail). A measure that is only a text value needs no format string. The format comes from the brief (item 71). When the brief gives none, use the default and record it as an assumption: a count or whole number `#,0`; a number with decimals `#,0.00`; a ratio, share or probability `0.0%`; an amount of money, the currency format the model already uses, else `#,0.00`.
 
-**5. References in DAX.** Write a column as `Table[Column]` and a measure as `[Measure]`. Item: beyond. Check: M010 (warn; the script reads text and is not a DAX parser).
+**5. References in DAX.** Write a column as `'Table'[Column]`, with the table name in single quotes, and a measure as `[Measure]`. Item: beyond. Check: M010 (warn; the script reads text and is not a DAX parser).
 
 ## B. Columns and tables
 
@@ -98,7 +98,7 @@ A new `_Measures` table is empty until Power BI Desktop refreshes the model. Say
 
 What can break:
 
-- DAX: a formula that names the measure with its table (`Sales[Total Sales]`) breaks when the measure's table changes. Formulas that write `[Total Sales]` keep working.
+- DAX: a formula that names the measure with its table (`'Sales'[Total Sales]`) breaks when the measure's table changes. Formulas that write `[Total Sales]` keep working.
 - Report visuals: a visual stores the measure's table beside its name, so a move or a rename can break visuals, filters and bookmarks in this report.
 - Other reports connected to a published model can break in the same way, and no file here can show it. Say so every time.
 
@@ -106,7 +106,7 @@ Copilot does the work itself:
 
 1. Run `python scripts/find_references.py . "<object>"`, written as `[Measure]`, `Table[Column]` or `Table`. It prints the references it recognises, and the text it cannot classify.
 2. If the second list is not empty, show it to the developer and change only what they confirm. If the script cannot confirm the references at all (the object is not in the model, or a file cannot be read), stop and say so.
-3. Moving a measure: cut the measure, with its description lines and its properties, from its table file and paste it into the `_Measures` file. Its name does not change. Rewrite every `OldTable[Measure]` in DAX to `[Measure]`. In report files, change the table (`Entity`) of that measure and the `OldTable.Measure` query names to the new table.
+3. Moving a measure: cut the measure, with its description lines and its properties, from its table file and paste it into the `_Measures` file. Its name does not change. Rewrite every `OldTable[Measure]` and `'OldTable'[Measure]` in DAX to `[Measure]`. In report files, change the table (`Entity`) of that measure and the `OldTable.Measure` query names to the new table.
 4. Renaming: change the definition and every reference in the first list: DAX, relationship columns, sort column, hierarchy level, group-by column, aggregation, perspective, translation, role, and in report files the `Property` and the `Table.Field` query names. Change no display text the developer typed (a title, a label in a field parameter) without asking.
 5. Run `python scripts/check_project.py .`. M901 to M903 and M908 fail on a model reference that was missed; B001 fails on a report file that names a field the model no longer has; M010 lists formulas that still name a measure with its table. Fix until they are clean.
 6. Reload and look (project instructions), then tell the developer what changed and repeat the warning about other reports.

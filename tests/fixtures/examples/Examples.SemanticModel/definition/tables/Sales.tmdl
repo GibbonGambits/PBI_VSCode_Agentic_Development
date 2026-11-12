@@ -71,7 +71,7 @@ table Sales
 	/// Example of a calculated column: Large for an order line of 100 or more, else Small.
 	column 'Order Size' =
 			IF (
-			    Sales[Amount] >= 100,
+			    'Sales'[Amount] >= 100,
 			    "Large",
 			    "Small"
 			)

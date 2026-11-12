@@ -233,6 +233,38 @@ class Pages(ReportCase):
         self.write_json(path, data)
         self.assertFinds("V024", False)
 
+    def test_V026_a_colour_scale_from_red_to_green_warns(self):
+        import report_rules as rr
+        def scale(low, high):           # the form Power BI Desktop writes: color holds Literal directly
+            return {"values": [{"properties": {"backColor": {"solid": {"color": {"expr": {"FillRule": {
+                "Input": {"SelectRef": {"ExpressionName": "_Measures.Total Sales"}},
+                "FillRule": {"linearGradient2": {"min": {"color": {"Literal": {"Value": "'%s'" % low}}},
+                                                 "max": {"color": {"Literal": {"Value": "'%s'" % high}}}}}}}}}}}}]}
+        path = self.visual("Overview", "Overview_Matrix_Scaled", kind="pivotTable", fields=[SALES],
+                           objects=scale("minColor", "maxColor"))
+        self.assertFinds("V026", "warn")
+        data = self.read_json(path)
+        data["visual"]["objects"] = scale(rr.theme_colour("maximum"), rr.theme_colour("minimum").lower())
+        self.write_json(path, data)
+        self.assertFinds("V026", "warn")                                     # theme codes, either way round
+        data["visual"]["objects"] = scale("#A4DDEE", "#1B4D5C")              # light to dark blue: data colours
+        self.write_json(path, data)
+        self.assertNot("V026")
+        self.assertNot("V009")
+
+    def test_V025_a_base_theme_that_shows_subtitles_warns_until_the_visual_says(self):
+        report = self.read_json(os.path.join(DEFINITION, "report.json"))
+        report["themeCollection"]["baseTheme"] = {"name": "Fluent2-CY26SU08", "type": "SharedResources",
+                                                  "reportVersionAtImport": {"visual": "2.5.0", "report": "3.1.0", "page": "2.3.0"}}
+        self.write_json(os.path.join(DEFINITION, "report.json"), report)
+        path = self.visual("Overview", "Overview_Card_Titled", fields=[SALES])
+        self.assertFinds("V025", "warn")
+        data = self.read_json(path)
+        data["visual"]["visualContainerObjects"]["subTitle"] = OFF
+        self.write_json(path, data)
+        found = [f for f in self.found() if f[0] == "V025" and "Overview_Card_Titled" in f[3]]
+        self.assertEqual(found, [])
+
     def test_V010_bookmark_with_a_visual_that_is_gone_warns(self):
         self.write_json(os.path.join(DEFINITION, "bookmarks", "ShowTrend.bookmark.json"),
                         {"$schema": BOOKMARK_SCHEMA, "name": "ShowTrend", "displayName": "Show trend",

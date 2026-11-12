@@ -35,13 +35,14 @@ SLICER_TYPES = frozenset(("slicer", "advancedSlicerVisual", "listSlicer", "textS
 STYLE_PROPERTIES = frozenset(("fontFamily", "fontSize", "fontColor", "color", "bold", "italic", "underline"))
 STYLE_CARDS = frozenset(("border", "dropShadow", "background"))
 HEX_COLOUR = re.compile(r"#[0-9A-Fa-f]{6}(?:[0-9A-Fa-f]{2})?\b")
-SCALE_KEYS = ("minimum", "center", "maximum", "null")     # the theme file's colours for a colour scale
+SCALE_KEYS = ("minimum", "center", "maximum", "null", "background")   # theme colours a colour scale may use
 SCALE_PARTS = frozenset(("linearGradient2", "linearGradient3"))
 _SCALE_COLOURS = None
 
 
 def scale_colours():
-    """The colour codes the owner's theme file gives for a colour scale, in upper case."""
+    """The colour codes of the owner's theme file a colour scale may use, in upper case: its data colours, its
+    background, and its minimum, center, maximum and null colours."""
     global _SCALE_COLOURS
     if _SCALE_COLOURS is None:
         path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "theme", "theme.json")
@@ -50,8 +51,52 @@ def scale_colours():
                 theme = json.load(fh)
         except (OSError, ValueError):
             theme = {}
-        _SCALE_COLOURS = frozenset(theme[k].upper() for k in SCALE_KEYS if isinstance(theme.get(k), str))
+        colours = [theme[k] for k in SCALE_KEYS if isinstance(theme.get(k), str)]
+        colours += [c for c in theme.get("dataColors", []) if isinstance(c, str)]
+        _SCALE_COLOURS = frozenset(c.upper() for c in colours)
     return _SCALE_COLOURS
+
+
+def theme_colour(key):
+    """One colour code of the owner's theme file, in upper case, or None."""
+    path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "theme", "theme.json")
+    try:
+        with open(path, encoding="utf-8-sig") as fh:
+            value = json.load(fh).get(key)
+    except (OSError, ValueError, AttributeError):
+        return None
+    return value.upper() if isinstance(value, str) else None
+
+
+def _scale_end(part):
+    """'minimum', 'maximum' or None: which of the theme's scale colours one end of a colour scale uses."""
+    colour = part.get("color") if isinstance(part, dict) else None
+    text = literal({"expr": colour}) if isinstance(colour, dict) and "Literal" in colour else literal(colour)
+    if not isinstance(text, str):
+        return None
+    for keyword, key in (("minColor", "minimum"), ("maxColor", "maximum")):
+        if text == keyword or text.upper() == theme_colour(key):
+            return key
+    return None
+
+
+def red_green_scales(node, found=None):
+    """How many colour scales in a visual run from the theme's minimum colour to its maximum colour, either way."""
+    found = [] if found is None else found
+    if isinstance(node, dict):
+        for key, value in node.items():
+            if key in SCALE_PARTS and isinstance(value, dict):
+                ends = {_scale_end(value.get("min")), _scale_end(value.get("max"))}
+                if ends == {"minimum", "maximum"}:
+                    found.append(key)
+            else:
+                red_green_scales(value, found)
+    elif isinstance(node, list):
+        for value in node:
+            red_green_scales(value, found)
+    return len(found)
+
+
 RETIRING_TYPES = {"map": "the Bing map (deprecated: use the Azure map, azureMap)",
                   "filledMap": "the filled Bing map (deprecated: use the Azure map, azureMap)",
                   "qnaVisual": "the Q&A visual (deprecated with Q&A)",
@@ -209,6 +254,7 @@ def check(cp, report_dir, brief, findings):
     reduction = report.get("slowDataSourceSettings") if isinstance(report.get("slowDataSourceSettings"), dict) else {}
     apply_buttons = reduction.get("isSlicerSelectionsButtonEnabled") is True or reduction.get("isApplyAllButtonEnabled") is True
     registered = _registered(report)
+    auto_subtitles = _subtitles_on(cp, report_dir, report, registered)
     slicer_fields = {}
     for page in pages:
         title = page["page"].get("displayName") or page["name"]
@@ -284,6 +330,13 @@ def check(cp, report_dir, brief, findings):
                     "list the reason in section 10 of the brief" % (shown(visual), RETIRING_TYPES[kind]))
             elif kind in OLD_CARD_TYPES and not excused("U105", page, visual):
                 old_cards.append(shown(visual))
+            red_green = red_green_scales(visual["visual"])
+            if red_green:
+                add("V026", page, visual, "'%s' colours %d colour scale(s) from the theme's red (minimum) to its green "
+                    "(maximum). That says low is bad and high is good, and red with green is hard to tell apart. For an "
+                    "amount use one colour from light to dark; keep red to green only where the brief says which way is "
+                    "good, with an icon, a sign or a word beside it, and list the reason in section 10 of the brief"
+                    % (shown(visual), red_green))
             half = _half_data_bars(visual["visual"])
             if half:
                 add("V024", page, visual, "the data bars of '%s' lack %s. Data bars are one setting made of parts; "
@@ -335,7 +388,7 @@ def check(cp, report_dir, brief, findings):
                         add("V008", page, visual, "the action of '%s' goes to %s '%s', which this report does not have; "
                             "the button does nothing" % (shown(visual), target, name))
 
-        no_alt, made_up = [], []
+        no_alt, made_up, second = [], [], []
         for visual in page["visuals"]:
             body = visual["visual"]
             if not body:
@@ -365,6 +418,11 @@ def check(cp, report_dir, brief, findings):
             if (has_data and kind not in SLICER_TYPES and literal(title_card.get("show")) != "false"
                     and "text" not in title_card and page["kind"] != "Tooltip" and not excused("A003", page, visual)):
                 made_up.append(shown(visual))
+            subtitle = card(body, "subTitle")
+            if (auto_subtitles and has_data and kind not in SLICER_TYPES and literal(title_card.get("show")) != "false"
+                    and literal(subtitle.get("show")) != "false" and "text" not in subtitle
+                    and not excused("V025", page, visual)):
+                second.append(shown(visual))
             if kind in SLICER_TYPES and page["kind"] is None:
                 used = set()
                 fields(body.get("query"), used)
@@ -376,6 +434,11 @@ def check(cp, report_dir, brief, findings):
                 "asks for alt text on every visual that is not decoration: say what the visual shows (general.altText). "
                 "An image that is only decoration is listed in section 10 of the brief instead"
                 % (title, len(no_alt), ", ".join(no_alt[:10]) + (" ..." if len(no_alt) > 10 else "")))
+        if second:
+            add("V025", page, None, "page '%s': %d visual(s) may show a second heading under the title: %s. Their files "
+                "neither switch the subtitle off nor write one, and the report's base theme switches it on (it then "
+                "repeats the field names). Set subTitle show to false, or write a subtitle that adds something"
+                % (title, len(second), ", ".join(second[:10]) + (" ..." if len(second) > 10 else "")))
         if made_up:
             add("A003", page, None, "page '%s': %d visual(s) show a title Power BI makes up from field names: %s. "
                 "Write a title that says what the visual shows (title.text), or switch the title off when a text box "
@@ -545,6 +608,42 @@ def _registered(report):
             if isinstance(item, dict) and isinstance(item.get("name"), str) and isinstance(item.get("path"), str):
                 out[item["name"]] = item["path"]
     return out
+
+
+SUBTITLE_BASE_THEMES = ("Fluent2",)   # Microsoft's Fluent2-CY26SU08 base theme switches subTitle on for every visual
+
+
+def _subtitle_switch(theme):
+    """True or False when a theme sets subTitle show for every visual ('*'), None when it does not say."""
+    styles = theme.get("visualStyles") if isinstance(theme, dict) else None
+    every = styles.get("*", {}).get("*", {}) if isinstance(styles, dict) and isinstance(styles.get("*"), dict) else {}
+    entries = every.get("subTitle") if isinstance(every, dict) else None
+    for entry in entries if isinstance(entries, list) else []:
+        if isinstance(entry, dict) and isinstance(entry.get("show"), bool):
+            return entry["show"]
+    return None
+
+
+def _subtitles_on(cp, report_dir, report, registered):
+    """True when the report's themes show a subtitle on every visual unless the visual says otherwise: the custom
+    theme decides when it says; else the base theme file, when the project holds it; else the base theme's name."""
+    collection = report.get("themeCollection") if isinstance(report.get("themeCollection"), dict) else {}
+    custom = collection.get("customTheme") if isinstance(collection.get("customTheme"), dict) else {}
+    if isinstance(custom.get("name"), str) and custom["name"] in registered:
+        path = os.path.join(report_dir, "StaticResources", "RegisteredResources", *registered[custom["name"]].split("/"))
+        said = _subtitle_switch(cp.load_object(path) or {})
+        if said is not None:
+            return said
+    base = collection.get("baseTheme") if isinstance(collection.get("baseTheme"), dict) else {}
+    name = base.get("name") if isinstance(base.get("name"), str) else ""
+    if not name:
+        return False
+    path = os.path.join(report_dir, "StaticResources", "SharedResources", "BaseThemes", name + ".json")
+    if os.path.isfile(path):
+        said = _subtitle_switch(cp.load_object(path) or {})
+        if said is not None:
+            return said
+    return name.startswith(SUBTITLE_BASE_THEMES)
 
 
 def _reads_direct_query(cp, report_dir):

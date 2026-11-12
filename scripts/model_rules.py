@@ -631,7 +631,10 @@ def style_problems(parsed, temporary_columns):
                     if after is not None and after.line != token.line and not declares:
                         problems.add("start a continued line with the operator, do not end the line before with it")
         elif position in tables and after is not None and after.start != token.end:
-            problems.add("write a column directly after its table, with no space: Table[Column]")
+            problems.add("write a column directly after its table, with no space: 'Table'[Column]")
+        if position in tables and token.kind == "word":
+            problems.add("write a table name in single quotes: 'Table'[Column]. Without them a name that DAX "
+                         "reads as a keyword (for example Calculations) breaks the formula")
     for call in parsed["calls"]:
         if call.close >= len(stream):
             continue

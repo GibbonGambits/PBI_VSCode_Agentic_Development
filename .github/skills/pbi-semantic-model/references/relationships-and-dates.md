@@ -86,8 +86,8 @@ The next seven rules catch files that Power BI refuses to load, or that break a 
 
 ```dax
 IF (
-    NOT ISFILTERED ( Product[Subcategory] )
-        && NOT ISFILTERED ( Product[Product Name] ),
+    NOT ISFILTERED ( 'Product'[Subcategory] )
+        && NOT ISFILTERED ( 'Product'[Product Name] ),
     [Total Target]
 )
 ```

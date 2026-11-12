@@ -2,5 +2,5 @@
 role 'Own Store'
 	modelPermission: read
 
-	tablePermission Store = Store[Manager Email] = USERPRINCIPALNAME ()
+	tablePermission Store = 'Store'[Manager Email] = USERPRINCIPALNAME ()
 

@@ -4,6 +4,7 @@ Desktop Bridge. With it, Copilot reloads and looks at the pages itself instead o
 
 Usage (run from the repository root; <folder> is '.' when left out):
     python scripts/desktop_bridge.py status [<folder>]                is Desktop open on this project? unsaved changes?
+    python scripts/desktop_bridge.py open [<folder>]                  open the project's .pbip file in Power BI Desktop
     python scripts/desktop_bridge.py reload [<folder>] [--with-model] reload the report files (and the model definition)
     python scripts/desktop_bridge.py screenshots [<folder>] [--out <dir>]   one PNG for each page
     python scripts/desktop_bridge.py clean <dir>                      delete a folder of pictures this script made
@@ -11,9 +12,10 @@ Usage (run from the repository root; <folder> is '.' when left out):
 Everything in the template works without this script. It is a thin layer over two command-line tools that
 Microsoft publishes on npm and the developer installs: @microsoft/powerbi-desktop-bridge-cli (command
 'powerbi-desktop') and @microsoft/powerbi-report-authoring-cli (command 'powerbi-report-author'). This script
-never installs anything, never starts Power BI Desktop, never publishes or deploys, and never refreshes data.
-It calls only: 'powerbi-desktop status', 'reload' and 'screenshot-all', and, for --with-model,
-'powerbi-report-author preview --host desktop --reload-with-model'.
+never installs anything, never publishes or deploys, and never refreshes data. It calls only:
+'powerbi-desktop status', 'open', 'reload' and 'screenshot-all', and, for --with-model,
+'powerbi-report-author preview --host desktop --reload-with-model'. 'open' starts Power BI Desktop on this
+project's own .pbip file, and only when no Desktop window has the project open already.
 
 Status of the feature (Microsoft Learn, "Power BI Desktop Bridge overview" and "Edit PBIP files outside Power
 BI Desktop"): the Desktop Bridge needs Power BI Desktop of June 2026 (2.155.756.0) or later on Windows, with
@@ -23,14 +25,15 @@ this script finds them, without asking and without a row in the brief.
 
 What the script guards:
     - Windows only; elsewhere, and when a tool is missing, it says "not available" and exits with code 3.
+      When a tool is missing it also prints the setup lines for the developer.
     - It acts only on the Desktop window that has THIS project open (matched by the report folder's path).
     - 'reload' first runs the project check and stops on errors, so Desktop is never handed broken files.
     - 'reload' stops when Desktop has unsaved changes: a reload would throw them away. The developer saves first.
     - A reload reloads definitions. It does not refresh data, so numbers on a page may be old.
     - Pictures can show data. They go to a temporary folder outside the project; delete them with 'clean'.
 
-Written, not run: Power BI Desktop could not be run where this template was built. The calls follow the
-tools' own documentation; the tests replace the tools with stand-ins.
+'status' and 'screenshots' ran on a developer's computer in November 2026. 'open' and 'reload --with-model'
+follow the tools' own code and documentation and have not been run yet. The tests replace the tools with stand-ins.
 Needs Python 3.8 or later. Uses the standard library only.
 Exit code: 0 = done, 1 = stopped or a problem, 2 = wrong usage, 3 = not available here (carry on without it).
 """
@@ -38,6 +41,7 @@ import json
 import os
 import shutil
 import subprocess
+import time
 import sys
 import tempfile
 
@@ -54,6 +58,11 @@ NOT_AVAILABLE = 3
 IS_WINDOWS = os.name == "nt"
 WITHOUT = ("Carry on without it: ask the developer to reload the project in Power BI Desktop and to look at the "
            "pages that changed.")
+SETUP = ("To set it up once, the developer runs two lines in a terminal: winget install OpenJS.NodeJS.LTS (then "
+         "closes and reopens VS Code), and npm.cmd install -g @microsoft/powerbi-desktop-bridge-cli "
+         "@microsoft/powerbi-report-authoring-cli. In PowerShell write npm.cmd, not npm: Windows often blocks npm's "
+         "PowerShell script. In Power BI Desktop the option File > Options and settings > Options > Security > "
+         "'Enable external tool access to Power BI Desktop through secure local APIs' must be on; it is on by default.")
 
 
 class Unavailable(Exception):
@@ -121,10 +130,41 @@ def find_report(folder):
 def need_instance(report):
     instance = our_instance(report)
     if instance is None:
-        print("Power BI Desktop does not have this project open (no Desktop window reports the folder %s). Ask the "
-              "developer to open the project's .pbip file in Power BI Desktop, then run this again. %s"
-              % (os.path.basename(report), WITHOUT))
+        print("Power BI Desktop does not have this project open (no Desktop window reports the folder %s). Open it: "
+              "python scripts/desktop_bridge.py open ." % os.path.basename(report))
     return instance
+
+
+def open_project(folder):
+    """Open this project's .pbip file in Power BI Desktop, unless a Desktop window has it open already."""
+    report = find_report(folder)
+    if report is None:
+        return 1
+    instance = our_instance(report)
+    if instance is not None:
+        print("Power BI Desktop has this project open already (process %s). Nothing was started." % instance.get("pid"))
+        return 0
+    projects = sorted(name for name in os.listdir(folder) if name.lower().endswith(".pbip"))
+    if len(projects) != 1:
+        print("Expected one .pbip file directly under %s, found %d." % (folder, len(projects)))
+        return 1
+    code, data, text = run_tool(BRIDGE, ["open", os.path.join(folder, projects[0]), "--timeout", WAIT_SECONDS])
+    if code != 0 or not isinstance(data, dict) or data.get("status") != "launched":
+        print("Power BI Desktop did not open the project: %s. %s" % (error_text(data, text), WITHOUT))
+        return 1
+    # 'open' waits for any Desktop window; wait until the one that has this project answers.
+    deadline = time.time() + int(WAIT_SECONDS)
+    instance = our_instance(report)
+    while instance is None and time.time() < deadline:
+        time.sleep(5)
+        instance = our_instance(report)
+    if instance is None:
+        print("Power BI Desktop started, but no window reported this project within %s seconds. Run "
+              "python scripts/desktop_bridge.py status . again in a minute. %s" % (WAIT_SECONDS, WITHOUT))
+        return 1
+    print("Opened %s in Power BI Desktop (process %s). It shows the data it last saved: refresh in Desktop when "
+          "queries changed." % (projects[0], instance.get("pid")))
+    return 0
 
 
 def status(folder):
@@ -240,7 +280,7 @@ def main(argv):
             return 2
         out = args[position + 1]
         del args[position:position + 2]
-    if not args or args[0] not in ("status", "reload", "screenshots", "clean") or len(args) > 2 \
+    if not args or args[0] not in ("status", "open", "reload", "screenshots", "clean") or len(args) > 2 \
             or any(a.startswith("-") for a in args):
         print(__doc__)
         return 2
@@ -253,11 +293,14 @@ def main(argv):
     try:
         if args[0] == "status":
             return status(folder)
+        if args[0] == "open":
+            return open_project(folder)
         if args[0] == "reload":
             return reload(folder, with_model)
         return screenshots(folder, out)
     except Unavailable as exc:
         print("Not available here: %s %s" % (exc, WITHOUT))
+        print(SETUP)
         return NOT_AVAILABLE
 
 

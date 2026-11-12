@@ -39,7 +39,7 @@ A measure goes in the table `_Measures` (model standard, rule 1), in that table'
 
 ```
 	/// Weight of all shipments, in kilograms.
-	measure 'Shipped Weight' = SUM ( Shipments[WeightKg] )
+	measure 'Shipped Weight' = SUM ( 'Shipments'[WeightKg] )
 		formatString: #,0
 		displayFolder: Work Management\Base
 ```

@@ -8,7 +8,7 @@ table _Measures
 		displayFolder: Finance\Counts
 
 	/// Units sold.
-	measure Quantity = SUM(Orders[Quantity])
+	measure Quantity = SUM('Orders'[Quantity])
 		formatString: #,0
 		displayFolder: Finance\Base
 

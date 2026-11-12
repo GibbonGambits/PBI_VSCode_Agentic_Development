@@ -208,6 +208,9 @@ Finding codes (errors unless marked warn or note; only errors change the exit co
           format string on a visual)
     V023  (warn) cross-report drillthrough page in a report that does not switch the feature on
     V024  data bars without a bar colour: Power BI Desktop fails to load the report
+    V025  (warn) visuals that may show a second heading: the report's theme switches subtitles on and the
+          visual neither switches its subtitle off nor writes one (one finding for each page)
+    V026  (warn) a colour scale from the theme's red (minimum) to its green (maximum)
     A001  (warn) visuals without alt text (one finding for each page)
     A002  (warn) visuals that share a tab order number
     A003  (warn) visuals that show a title made up from field names (one finding for each page)
@@ -1433,7 +1436,8 @@ def check_standards(model_dir, objects, usage, brief, findings):
         if loose or tied:
             parts = []
             if loose:
-                parts.append("write the column with its table: %s" % ", ".join(sorted(loose)))
+                parts.append("write the column with its table, the table in single quotes ('Table'[Column]): %s"
+                             % ", ".join(sorted(loose)))
             if tied:
                 parts.append("write the measure without its table: %s" % ", ".join(sorted(tied)))
             label = model_rules._label(owner)

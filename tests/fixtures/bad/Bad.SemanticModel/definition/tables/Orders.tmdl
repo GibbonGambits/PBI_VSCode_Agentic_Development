@@ -1,7 +1,7 @@
 /// One row per order line. Made-up rows for the template's tests. This description is longer than two hundred characters on purpose, so that the optional check for Copilot in Power BI has something to report when the brief turns it on.
 table Orders
 
-	measure total_sales = SUM(Orders[Amount])
+	measure total_sales = SUM('Orders'[Amount])
 
 	/// Total order amount.
 	measure 'Total Sales' = SUM([Amount])
@@ -14,12 +14,12 @@ table Orders
 		displayFolder: Finance\Counts
 
 	/// Sales from the start of the year.
-	measure 'ytd Sales' = TOTALYTD(Orders[Total Sales], Orders[Order Date])
+	measure 'ytd Sales' = TOTALYTD('Orders'[Total Sales], 'Orders'[Order Date])
 		formatString: #,0
 		displayFolder: Finance\Time Intelligence\Year
 
 	/// Margin as a share of sales.
-	measure 'Margin %' = DIVIDE([Total Sales] - SUM(Orders[Cost]), [Total Sales])
+	measure 'Margin %' = DIVIDE([Total Sales] - SUM('Orders'[Cost]), [Total Sales])
 		formatString: 0.0%
 		displayFolder: Finance\Extras
 
@@ -103,35 +103,35 @@ table Orders
 		sourceColumn: ProductCode
 
 	/// Amount with a flat ten percent tax.
-	column 'Amount With Tax' = Orders[Amount] * 1.1
+	column 'Amount With Tax' = 'Orders'[Amount] * 1.1
 		dataType: decimal
 		formatString: #,0.00
 		summarizeBy: none
 
 	/// Name of the customer, copied from the Customer table.
-	column 'Customer Name' = RELATED(Customer[Name])
+	column 'Customer Name' = RELATED('Customer'[Name])
 		dataType: string
 		summarizeBy: none
 
 	/// Year of the order.
-	column 'Order Year' = YEAR(Orders[Order Date])
+	column 'Order Year' = YEAR('Orders'[Order Date])
 		dataType: int64
 		formatString: 0
 		summarizeBy: none
 
 	/// True when the amount is over 100.
-	column 'Large Order' = Orders[Amount] > 100
+	column 'Large Order' = 'Orders'[Amount] > 100
 		dataType: boolean
 		summarizeBy: none
 
 	/// Amount minus cost.
-	column 'Line Margin' = Orders[Amount] - Orders[Cost]
+	column 'Line Margin' = 'Orders'[Amount] - 'Orders'[Cost]
 		dataType: decimal
 		formatString: #,0.00
 		summarizeBy: none
 
 	/// Days between order and shipping.
-	column 'Days To Ship' = DATEDIFF(Orders[Order Date], Orders[Ship Date], DAY)
+	column 'Days To Ship' = DATEDIFF('Orders'[Order Date], 'Orders'[Ship Date], DAY)
 		dataType: int64
 		formatString: 0
 		summarizeBy: none

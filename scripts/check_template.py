@@ -55,6 +55,7 @@ TOOL_CALLS = re.compile(r"(?<![.\w/-])pbir\s+[a-z]|AskUserQuestion|CLAUDE_PLUGIN
                         r"|powerbi-report-author\s+(?:pack|unpack|scaffold)\b|--host\s+service\b|DeployToFabric\s*\(")
 CREATED_LATER = {"docs/checklist-review.md",        # written by a review, not part of the template
                  "docs/checklist-review-before.md", "docs/fix-plan.md",      # written by the evaluate-and-improve flow
+                 "docs/change-log.md",
                  "docs/model-fields.md"}                                      # the saved field list of a published model
 TEXT_ENDINGS = (".md", ".py", ".json", ".tmdl", ".pbir", ".pbism", ".pbip", ".txt", ".yml", ".yaml")
 OWN_FILE = "scripts/check_template.py"             # holds the list of words itself

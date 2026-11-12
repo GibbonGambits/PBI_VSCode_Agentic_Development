@@ -2,7 +2,7 @@
 table _Measures
 
 	/// Example of a base measure: sum of the order line amounts.
-	measure 'Total Sales' = SUM ( Sales[Amount] )
+	measure 'Total Sales' = SUM ( 'Sales'[Amount] )
 		formatString: #,0.00
 		displayFolder: Finance\Base
 
@@ -14,9 +14,9 @@ table _Measures
 		detailRowsDefinition =
 				SELECTCOLUMNS (
 				    Sales,
-				    Sales[Order Date],
-				    Sales[Quantity],
-				    Sales[Amount]
+				    'Sales'[Order Date],
+				    'Sales'[Quantity],
+				    'Sales'[Amount]
 				)
 
 	/// Example of a ratio with DIVIDE: average amount of one order line.
@@ -63,7 +63,7 @@ table _Measures
 			CALCULATE (
 			    [Total Sales],
 			    USERELATIONSHIP (
-			        Sales[Ship Date Key],
+			        'Sales'[Ship Date Key],
 			        'Date'[Date Key]
 			    )
 			)
@@ -125,13 +125,13 @@ table _Measures
 	measure 'Store Share of Sales (%)' =
 			ShareOfAll (
 			    [Total Sales],
-			    Store[Store Name]
+			    'Store'[Store Name]
 			)
 		formatString: 0.0%
 		displayFolder: Finance\Ratios
 
 	/// Example of the data category WebUrl on a measure: web address of the store page when one store is shown.
-	measure 'Store Page Link' = SELECTEDVALUE ( Store[Store Page] )
+	measure 'Store Page Link' = SELECTEDVALUE ( 'Store'[Store Page] )
 		displayFolder: Customer\Base
 		dataCategory: WebUrl
 
@@ -146,7 +146,7 @@ table _Measures
 		displayFolder: Customer\Base
 
 	/// Example of the data category ImageUrl on a measure: the picture address of the product when one product is shown. An image visual can show it.
-	measure 'Selected Product Image' = SELECTEDVALUE ( Product[Product Image] )
+	measure 'Selected Product Image' = SELECTEDVALUE ( 'Product'[Product Image] )
 		displayFolder: Customer\Base
 		dataCategory: ImageUrl
 

@@ -2,7 +2,7 @@
 table _Measures
 
 	/// Sum of the order line amounts; summary queries are answered by the aggregation table.
-	measure 'Total Sales' = SUM ( Sales[Amount] )
+	measure 'Total Sales' = SUM ( 'Sales'[Amount] )
 		formatString: #,0.00
 		displayFolder: Finance\Base
 

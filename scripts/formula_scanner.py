@@ -285,7 +285,8 @@ def text_of(stream, first=0, last=None, source=None):
         if token.kind == TEXT:
             parts.append('"%s"' % token.value.replace('"', '""'))
         elif token.kind == QUOTED_NAME:
-            parts.append("'%s'" % token.value.lower())
+            plain = re.match(r"[A-Za-z_][A-Za-z0-9_]*\Z", token.value)
+            parts.append(token.value.upper() if plain else "'%s'" % token.value.lower())   # 'Sales' = Sales
         elif token.kind == BRACKET_NAME:
             parts.append("[%s]" % token.value.lower())
         elif token.kind == "word":

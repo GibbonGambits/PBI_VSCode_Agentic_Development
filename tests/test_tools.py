@@ -304,6 +304,9 @@ class DesktopBridge(TempCase):
             return 0, {"status": "ready", "instances": instances}, ""
         if args[0] == "reload":
             return 0, {"status": "ok", "result": {"success": True}}, ""
+        if args[0] == "open":
+            self.open_here = True
+            return 0, {"status": "launched", "bridgeStatus": "connected", "pid": 33}, ""
         if args[0] == "preview":
             return 0, {"data": {"result": "LIVE_WINDOW_RELOADED"}}, ""
         if args[0] == "screenshot-all":
@@ -355,7 +358,25 @@ class DesktopBridge(TempCase):
         code, out = self.run_main("reload", self.root)
         self.assertEqual(code, 1)
         self.assertIn("does not have this project open", out)
+        self.assertIn("desktop_bridge.py open", out)
         self.assertEqual([call[1][0] for call in self.calls], ["status"])
+
+    def test_open_starts_desktop_on_this_projects_file_only_when_it_is_not_open(self):
+        code, out = self.run_main("open", self.root)
+        self.assertEqual(code, 0, out)
+        self.assertIn("open already", out)
+        self.assertNotIn("open", [call[1][0] for call in self.calls])
+        self.open_here = False
+        code, out = self.run_main("open", self.root)
+        self.assertEqual(code, 1)
+        self.assertIn("Expected one .pbip file", out)                  # nothing is guessed
+        with open(os.path.join(self.root, "Sample.pbip"), "w", encoding="utf-8") as fh:
+            fh.write("{}")
+        code, out = self.run_main("open", self.root)
+        self.assertEqual(code, 0, out)
+        self.assertIn(("powerbi-desktop", ["open", os.path.join(self.root, "Sample.pbip"), "--timeout", "90"]),
+                      self.calls)
+        self.assertIn("process 22", out)
 
     def test_screenshots_go_outside_the_project_and_partial_results_are_kept(self):
         code, out = self.run_main("screenshots", self.root)
@@ -390,11 +411,12 @@ class DesktopBridge(TempCase):
         code, out = self.run_main("status", self.root)
         self.assertEqual(code, 3)
         self.assertIn("not installed", out)
+        self.assertIn("npm.cmd install -g @microsoft/powerbi-desktop-bridge-cli", out)     # the setup lines
 
-    def test_the_script_never_calls_a_command_that_opens_publishes_or_packs(self):
+    def test_the_script_never_calls_a_command_that_publishes_or_packs(self):
         with open(os.path.join(REPO, "scripts", "desktop_bridge.py"), encoding="utf-8") as fh:
             code = fh.read().split('"""', 2)[2]
-        for word in ('"open"', '"pack"', '"unpack"', '"scaffold"', '"service"', '"publish"', '"deploy"'):
+        for word in ('"pack"', '"unpack"', '"scaffold"', '"service"', '"publish"', '"deploy"'):
             self.assertNotIn(word, code)
 
 

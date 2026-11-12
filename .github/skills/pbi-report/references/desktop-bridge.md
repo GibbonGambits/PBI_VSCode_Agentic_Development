@@ -9,12 +9,21 @@ Everything in the template works without it. It is an optional step.
 - It is treated as a preview feature. Microsoft's release notes of September 2026 list it without a preview label; Microsoft's page on editing project files still calls it a preview. The developer installs its tools, and that is the yes: use it whenever the script finds them, without asking and without a row in the brief.
 - It needs Windows and the Desktop option "Enable external tool access to Power BI Desktop through secure local APIs" (File > Options and settings > Options > Security). Microsoft says that option is on by default, and that an administrator can switch it off. Microsoft names no minimum version of Power BI Desktop; its release notes first list the Desktop Bridge in June 2026 (version 2.155.756.0), so expect it from that version on.
 - It needs two command-line tools that Microsoft publishes on npm: `@microsoft/powerbi-desktop-bridge-cli` and `@microsoft/powerbi-report-authoring-cli` (the second is a public preview). The developer installs them. Never install them yourself.
-- The developer opens the project in Power BI Desktop. The script never starts Desktop.
+- Check at the start of every task: run `status`. When it says a tool is not installed, it prints the setup lines; show them to the developer at the start of your answer, then carry on without the Bridge. The lines, for a terminal on Windows:
 
-## The four commands
+```
+winget install OpenJS.NodeJS.LTS
+npm.cmd install -g @microsoft/powerbi-desktop-bridge-cli @microsoft/powerbi-report-authoring-cli
+```
+
+  After the first line the developer closes and reopens VS Code. In PowerShell the second line says `npm.cmd`, not `npm`: Windows often blocks npm's PowerShell script.
+- When Desktop does not have the project open, open it yourself with `open`, without asking. It starts Power BI Desktop on the project's own `.pbip` file, and only when no Desktop window has the project open already.
+
+## The commands
 
 ```
 python scripts/desktop_bridge.py status .
+python scripts/desktop_bridge.py open .
 python scripts/desktop_bridge.py reload .
 python scripts/desktop_bridge.py reload . --with-model
 python scripts/desktop_bridge.py screenshots .
@@ -22,10 +31,11 @@ python scripts/desktop_bridge.py clean "<folder of pictures>"
 ```
 
 1. `status` says whether Desktop has this project open, and whether Desktop holds unsaved changes.
-2. `reload` first runs the project check and stops on errors. It stops when Desktop has unsaved changes, because a reload throws them away: ask the developer to save, then run it again. Use `--with-model` when model files (`.tmdl`) changed.
-3. `screenshots` writes one picture for each page into a temporary folder outside the project, and prints the page name beside each file.
-4. Look at every picture of a page you changed. Look for: text that is cut off, visuals that overlap or leave the page, a visual that shows an error icon or is empty, a title or a number format that is wrong, a slicer that is too small for its text.
-5. `clean` deletes the pictures. Always run it when you have looked: a picture can show data.
+2. `open` opens the project in Desktop when no window has it. Desktop then shows the files as they are, so no reload is needed straight after it.
+3. `reload` first runs the project check and stops on errors. It stops when Desktop has unsaved changes, because a reload throws them away: ask the developer to save, then run it again. Use `--with-model` when model files (`.tmdl`) changed: without it a changed measure is not reloaded.
+4. `screenshots` writes one picture for each page into a temporary folder outside the project, and prints the page name beside each file.
+5. Look at every picture of a page you changed. Look for: text that is cut off, visuals that overlap or leave the page, a visual that shows an error icon or is empty, a title or a number format that is wrong, a slicer that is too small for its text. A visual with an error icon after a measure changed means the DAX is wrong: fix it before you go on.
+6. `clean` deletes the pictures. Always run it when you have looked: a picture can show data.
 
 Exit code 3 means "not available here": no Windows, or the tools are not installed. Then carry on the old way: ask the developer to reload and to look at the pages you name.
 
@@ -40,7 +50,7 @@ Exit code 3 means "not available here": no Windows, or the tools are not install
 
 ## What the script never does
 
-It never publishes, deploys, packs, opens a workspace, starts Desktop or installs a tool. It calls Microsoft's tools for exactly three things: status, reload, and pictures of pages.
+It never publishes, deploys, packs, opens a workspace or installs a tool. It calls Microsoft's tools for exactly four things: status, opening this project's own `.pbip` file, reload, and pictures of pages.
 
 ## Without the Bridge, with Desktop's own reload
 
@@ -48,7 +58,7 @@ Power BI Desktop from August 2026 has the preview feature "Detect and reload ext
 
 ## Status of this guidance
 
-Written, not run. Power BI Desktop could not be run where this template was built. The calls follow Microsoft's documentation of the two tools; the tests replace the tools with stand-ins.
+`status` and `screenshots` ran on a developer's computer in November 2026. `open` and `reload --with-model` follow the tools' own code and documentation and have not been run yet. The tests replace the tools with stand-ins.
 
 ## Sources
 
