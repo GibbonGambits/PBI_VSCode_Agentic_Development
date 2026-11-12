@@ -97,7 +97,7 @@ A move or a rename can break other reports that read a published copy of this mo
 - **no**: do the move or the rename at once, yourself, as set out below. In the evaluate-and-improve flow every measure moves to `_Measures` in one commit, and names the naming standard rejects are corrected in another.
 - **yes, or no answer**: tell the developer what can break, then wait for a clear yes. In a fix plan such a row is `held`.
 
-A new `_Measures` table is empty until Power BI Desktop loads it. Its query names no source, so refreshing that one table (right-click the table, Refresh data) loads it without reading any data source; the other tables keep their data. Say so whenever you make the table in an existing model.
+A new `_Measures` table is empty until Power BI Desktop refreshes the model. Say so whenever you make the table in an existing model.
 
 What can break:
 

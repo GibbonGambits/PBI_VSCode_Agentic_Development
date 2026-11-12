@@ -327,15 +327,16 @@ class BadProject(Case):
             self.assertEqual(statuses[code], {"question"}, code)
         for code in ("H001", "M003", "G002"):
             self.assertEqual(statuses[code], {"to do"}, code)             # nothing waits for an approval
-        for code in ("M001", "M007", "M108"):
-            self.assertEqual(statuses[code], {"held"}, code)              # no brief: both gates are shut
+        for code in ("M001", "M007"):
+            self.assertEqual(statuses[code], {"held"}, code)              # no brief: the other-reports gate is shut
+        self.assertEqual(statuses["M108"], {"to do"})                     # a change that needs a refresh is never held
         self.assertEqual(kinds["Item 39"], {"Needs a person"})
         self.assertEqual(kinds["Item 1"], {"?"})                          # for Copilot to sort; check-plan refuses a '?'
         self.assertTrue(any("Item 1" in p or "Kind" in p for p in problems))
         text = self.read(os.path.join("docs", "fix-plan.md"))
         self.assertIn("## For information", text)
         self.assertIn("M201", text)
-        self.assertIn("Gates today.", text)
+        self.assertIn("Gate today.", text)
         self.assertEqual(quiet(improve.check_plan, self.root)[0], 1)
         self.assertEqual(quiet(improve.plan, self.root)[0], 1)            # an existing plan is never overwritten
 
@@ -1112,40 +1113,22 @@ class Flow(FlowCase):
         self.assertEqual(self.statuses("M001"), ["to do"])
         self.assertIn("Apply the 1 Measures row(s) marked 'to do'", self.step())
 
-    def test_a_change_that_needs_a_refresh_is_held_when_the_data_cannot_be_refreshed(self):
-        self.plan_with((SALES, "\tpartition Sales = m", "\tpartition Rows = m"))
-        self.assertEqual(len(self.statuses("M117")), 1)                       # a renamed partition is a new, empty one
-        self.assertIn("held: the brief does not say that the data can be refreshed", self.statuses("M117")[0])
-        self.assertIn("python scripts/improve.py compare", self.step())      # a held row is not asked for
-        self.write(BRIEF, "- Data can be refreshed on this computer (yes or no): no\n")
-        quiet(improve.release, self.root)
-        self.assertIn("held: the data cannot be refreshed on this computer", self.statuses("M117")[0])
-        self.write(BRIEF, "- Data can be refreshed on this computer (yes or no): yes\n")
-        quiet(improve.release, self.root)
+    def test_a_change_that_needs_a_refresh_is_never_held(self):
+        self.plan_with((SALES, '{{1, 120.5, "Web", false}', '{{1, 120.5, "C:\\made-up\\Data.xlsx", false}'),   # a source that is not there
+                       (SALES, "\tpartition Sales = m", "\tpartition Rows = m"))
         self.assertEqual(self.statuses("M117"), ["to do"])
         self.assertIn("Apply the 1 Data row(s) marked 'to do'", self.step())
+        self.assertEqual(set(improve.gate_state(self.root)), {"other"})
 
-    def test_the_refresh_gate_looks_for_the_local_source_files(self):
-        self.assertIn("the sources are not local files", improve.gate_state(self.root)["refresh"])
-        self.replace(SALES, '{{1, 120.5, "Web", false}', '{{1, 120.5, "C:\\made-up\\Data.xlsx", false}')
-        self.assertIn("source file not found (C:\\made-up\\Data.xlsx)", improve.gate_state(self.root)["refresh"])
-        saved = improve.os.path.exists
-        improve.os.path.exists = lambda path: path == "C:\\made-up\\Data.xlsx" or saved(path)
-        try:
-            self.assertEqual(improve.gate_state(self.root)["refresh"], "")    # every source file is there
-        finally:
-            improve.os.path.exists = saved
-
-    def test_a_missing_measures_table_does_not_hold_the_move(self):
+    def test_only_moves_and_renames_pass_a_gate(self):
         self.assertTrue(improve.has_measures_table(self.root))
-        open_gates = {"other": "", "refresh": ""}
-        shut = {"other": "", "refresh": "no source"}
-        self.assertEqual(improve.first_status("Measures", shut), "to do")       # the new table names no source
-        self.assertEqual(improve.first_status("Data", shut), "held: no source")
-        self.assertEqual(improve.first_status("Measures", {"other": "used", "refresh": ""}), "held: used")
-        self.assertEqual(improve.first_status("Mechanical", {"other": "x", "refresh": "y"}), "to do")
-        self.assertEqual(improve.first_status("Theme", {"other": "x", "refresh": "y"}), "to do")
-        self.assertEqual(improve.first_status("Needs a person", open_gates), "question")
+        shut = {"other": "used"}
+        for kind in ("Measures", "Renames"):
+            self.assertEqual(improve.first_status(kind, shut), "held: used")
+            self.assertEqual(improve.first_status(kind, {"other": ""}), "to do")
+        for kind in ("Theme", "Mechanical", "Layout", "Data"):
+            self.assertEqual(improve.first_status(kind, shut), "to do")
+        self.assertEqual(improve.first_status("Needs a person", {"other": ""}), "question")
         os.remove(self.path(MEASURES))
         self.assertFalse(improve.has_measures_table(self.root))
 
@@ -1160,12 +1143,13 @@ class Flow(FlowCase):
         self.commit("Improve: measures moved")
         self.assertTrue(improve.made_measures_table(self.root))
 
-    def test_the_brief_holds_the_two_lines_the_gates_read(self):
+    def test_the_brief_holds_the_line_the_gate_reads(self):
         with open(os.path.join(REPO, "docs", "report-brief.md"), encoding="utf-8") as fh:
             lines = fh.read().splitlines()
-        for label in (improve.BRIEF_OTHER_REPORTS, improve.BRIEF_CAN_REFRESH):
-            self.assertEqual(len([line for line in lines if line.startswith("- " + label)]), 1, label)
-            self.assertEqual(improve.cp._brief_value(lines, label).strip(), "", label)      # shipped without an answer
+        label = improve.BRIEF_OTHER_REPORTS
+        self.assertEqual(len([line for line in lines if line.startswith("- " + label)]), 1)
+        self.assertEqual(improve.cp._brief_value(lines, label).strip(), "")        # shipped without an answer
+        self.assertNotIn("can be refreshed on this computer", "\n".join(lines))   # no run stops for a data source
 
     def test_a_status_is_one_of_the_fixed_words(self):
         plan = self.plan_with((CARD, '"width": 608', '"width": 610'))
@@ -1174,7 +1158,7 @@ class Flow(FlowCase):
         for status in ("yes", "approved", "maybe", "held", "skipped", "question", "answered"):
             self.write(plan, text.replace(row, row.replace("| to do |", "| %s |" % status)))
             self.assertEqual(quiet(improve.check_plan, self.root)[0], 1, status)
-        for status in ("to do", "done", "Done", "held: waiting for the source file", "skipped: the brief gives no format"):
+        for status in ("to do", "done", "Done", "held: other reports use this model", "skipped: the brief gives no format"):
             self.write(plan, text.replace(row, row.replace("| to do |", "| %s |" % status)))
             self.assertEqual(quiet(improve.check_plan, self.root)[0], 0, status)
 
@@ -1722,7 +1706,7 @@ class TemplateFiles(unittest.TestCase):
             self.assertNotIn(never, improve.MECHANICAL)       # renames, moves, types, summarisation, numbers, queries
         for code in ("M107", "M109", "M110", "M502", "B001"):
             self.assertIn(code, improve.PERSON)               # these need a fact or a decision: never done unasked
-        self.assertEqual(set(improve.GATES), {"Measures", "Renames", "Data"})
+        self.assertEqual(set(improve.GATES), {"Measures", "Renames"})
         self.assertEqual(set(improve.COMMITS), set(improve.AUTO_KINDS))
 
     def test_every_code_is_named_in_the_checklist_review_skill(self):

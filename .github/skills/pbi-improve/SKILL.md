@@ -16,10 +16,9 @@ It reads the files and Git, and prints the step you are on and what to run. If i
 
 - **No approvals.** Nothing waits for a yes. The branch, the copy in `_before/` and one commit for each kind of fix are the safeguard: each kind can be undone alone.
 - **One moment at the start, one answer at the end.** At the start the developer saves and closes the project, and answers one question if the brief does not. After that, ask nothing until your final answer. A fact you cannot find becomes a question in that answer.
-- **Two gates hold a row back**, and the plan says which rows and why:
-  - *Other reports.* A report that reads a published copy of this model names a measure with its table, so a move or a rename breaks it, and no file here can show that. The kinds Measures and Renames run only when section 3 of the brief answers "Other reports use this model" with no.
-  - *Refresh.* A change to a query's text, a partition's name or a data type makes Power BI Desktop load the table again, and until then the table is empty. The kind Data runs only when the data can be refreshed on this computer: section 3 of the brief says so, or every source is a local file that exists. A new `_Measures` table is not held: its query names no source, so Desktop loads that one table alone.
-- **A run never ends with an empty report.** If a gate is shut, the row is held and listed; you do not work around it.
+- **One gate holds a row back**, and the plan says which rows. *Other reports.* A report that reads a published copy of this model names a measure with its table, so a move or a rename breaks it, and no file here can show that. The kinds Measures and Renames run only when section 3 of the brief answers "Other reports use this model" with no.
+- **A missing data source never stops a fix.** The kind Data is applied like every other kind. A table whose query, partition or data type changed, and a new table, are empty until Power BI Desktop refreshes the model: say so in your final answer, and nothing more.
+- If the gate is shut, the row is held and listed; you do not work around it.
 
 ## Steps
 
@@ -40,11 +39,11 @@ It reads the files and Git, and prints the step you are on and what to run. If i
    - **Mechanical**: the skills `pbi-semantic-model` and `pbi-report`, with `python scripts/set_visual_defaults.py .` for header icons, tooltips and labels and `python scripts/set_model_properties.py . --set "<object>.<property>=<value>"` for folders, formats and hiding. Before header icons and tooltips are switched off, keep what the report uses: see "Features a visual uses" in `.github/skills/pbi-report/references/theme.md`. Alt text, titles, labels and the DAX style are written by you, as the report standard and the DAX standard set out. A reformatted formula keeps every token: only spaces and line breaks change. The two rewrites change tokens and never a result: DIVIDE by a fixed number becomes `/` (M518), and ALL as a filter argument of CALCULATE becomes REMOVEFILTERS (M519).
    - **Layout**: the layout standard, with `python scripts/set_positions.py`.
    - **Measures** and **Renames**: the model standard ("Existing models: moving and renaming"). Every measure moves in one commit. A new name follows the naming standard and keeps the meaning of the old one; when the standard does not settle the name, the row is `skipped: no name follows from the standard` and becomes a question.
-   - **Data**: last, so that it can be undone alone. Say in your final answer that Power BI Desktop must refresh the model once.
-   When this flow made the `_Measures` table, `compare` prints one line about it. Put that line first in your final answer: the developer refreshes that one table in Power BI Desktop (right-click the table, Refresh data), never the whole model for it.
+   - **Data**: last, so that it can be undone alone.
+   When a Data row was done or this flow made the `_Measures` table, `compare` prints one line: Power BI Desktop must refresh the model once. Put that line first in your final answer.
 5. **Evaluate again** with the skill `pbi-checklist-review`: go through all 79 items in order, not only the rows you expect to change. `docs/checklist-review.md` is replaced without asking; the first review is kept.
 6. **One final answer.** Run `python scripts/improve.py compare` and give the developer, in this order: the counts before and after; what changed, by kind; the pages to look at in Power BI Desktop (look yourself where the Desktop Bridge is agreed: `.github/skills/pbi-report/references/desktop-bridge.md`); what was held and the one thing that frees each group; what was skipped; the questions, grouped, with the open `TODO(owner)` lines (`python scripts/list_todos.py .`); and any tool that was not set up or failed. Ask nothing else.
-7. **Afterwards.** When the developer answers a question, do the work yourself and write `answered` in that row. When a gate opens (the brief now says no other report uses the model, or the source file is there), run `python scripts/improve.py release` and carry on from step 4.
+7. **Afterwards.** When the developer answers a question, do the work yourself and write `answered` in that row. When the gate opens (the brief now says no other report uses the model), run `python scripts/improve.py release` and carry on from step 4.
 
 ## Never in this flow
 

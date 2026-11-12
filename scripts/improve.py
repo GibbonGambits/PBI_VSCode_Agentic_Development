@@ -31,14 +31,12 @@ _Measures), Renames (names the naming standard rejects), Data (changes that make
 again: a query's text, a partition's name, a data type). Needs a person is everything else: a fact or a
 decision that no file holds. Those rows are questions, listed once at the end; they are never asked mid-run.
 
-Nothing waits for an approval. Two gates hold a row back instead, and the plan says which:
+Nothing waits for an approval. One gate holds a row back instead, and the plan says which rows:
   * other reports. Measures and Renames run only when section 3 of the brief answers 'Other reports use this
     model' with no: a report on a published copy of the model names a measure with its table, so a move or a
     rename breaks it, and no file here can show that.
-  * refresh. Data rows run only when the data can be refreshed on this computer: the brief says so, or every
-    source is a local file that exists. Otherwise the tables they touch would be left empty, with no way to
-    load them again. A new _Measures table is not held: its query names no source, so Power BI Desktop can
-    load that one table alone, and 'compare' says so when this flow made the table.
+Data rows are never held. They are applied last, and 'compare' says that Power BI Desktop must refresh the
+model once: a changed query, a renamed partition, a new data type or a new table is empty until then.
 The branch, the copy in _before/ and one commit for each kind are the safeguard: each kind can be undone alone.
 
 Needs Python 3.8 or later and Git. Uses the standard library only.
@@ -67,10 +65,8 @@ PERSON_KIND = "Needs a person"
 KINDS = AUTO_KINDS + (PERSON_KIND,)
 STATUS = re.compile(r"(?i)(to do|done|question|answered|held: \S.*|skipped: \S.*)\Z")
 PLAN_HEADER = ["Id", "Kind", "Item or code", "Object", "What will change", "Files", "What could break", "Status"]
-GATES = {"Measures": ("other",), "Renames": ("other",), "Data": ("refresh",)}       # kind -> the gates it must pass
+GATES = {"Measures": ("other",), "Renames": ("other",)}                              # kind -> the gate it must pass
 BRIEF_OTHER_REPORTS = "Other reports use this model"
-BRIEF_CAN_REFRESH = "Data can be refreshed on this computer"
-LOCAL_FILE = re.compile(r'"((?:[A-Za-z]:\\|\\\\)[^"\r\n]+)"')                 # "C:\..." or "\\server\..." in a query
 
 # code -> (what will change, what could break), one table for each kind. A code that is in none needs a person.
 THEME = {
@@ -138,8 +134,7 @@ MEASURES = {
              "A report on a published copy of this model names the measure with its old table and breaks"),
     "M002": ("Make or repair the _Measures table: visible, exactly one column, that column hidden "
              "(python scripts/scaffold.py measures-table makes the table when it is missing)",
-             "A new table is empty until Power BI Desktop loads it: refresh that one table once. Its query names "
-             "no source, so no other table is loaded again"),
+             "A new table is empty until Power BI Desktop refreshes the model"),
 }
 RENAMES = {
     "M005": ("Rename one of the two measures as the naming standard asks, and repair every reference",
@@ -386,7 +381,7 @@ def with_status(rows, kind, *wanted):
     return [r for r in rows if r["Kind"] == kind and status_of(r) in wanted]
 
 
-# ---------------------------------------------------------------- the two gates
+# ---------------------------------------------------------------- the gate
 
 def _brief_lines(root):
     try:
@@ -441,9 +436,8 @@ def made_measures_table(root):
 
 
 def gate_state(root):
-    """{'other': why the other-reports gate is shut, 'refresh': why the refresh gate is shut}; '' = open."""
-    lines = _brief_lines(root)
-    other = _yes_no(cp._brief_value(lines, BRIEF_OTHER_REPORTS))
+    """{'other': why the other-reports gate is shut}; '' = open."""
+    other = _yes_no(cp._brief_value(_brief_lines(root), BRIEF_OTHER_REPORTS))
     if not cp.find_models(root):
         why_other = "this report reads a published model, which other reports may use too"
     elif other == "no":
@@ -452,22 +446,7 @@ def gate_state(root):
         why_other = "other reports use this model (section 3 of the brief)"
     else:
         why_other = "the brief does not say whether other reports use this model (section 3: write yes or no)"
-    refresh = _yes_no(cp._brief_value(lines, BRIEF_CAN_REFRESH))
-    if refresh == "yes":
-        why_refresh = ""
-    elif refresh == "no":
-        why_refresh = "the data cannot be refreshed on this computer (section 3 of the brief)"
-    else:
-        paths = sorted({m.group(1) for _, text in _model_text(root) for m in LOCAL_FILE.finditer(text)})
-        missing = [path for path in paths if not os.path.exists(path)]
-        if missing:
-            why_refresh = "the data cannot be refreshed on this computer: source file not found (%s)" % missing[0][:80]
-        elif paths:
-            why_refresh = ""
-        else:
-            why_refresh = ("the brief does not say that the data can be refreshed on this computer, and the sources "
-                           "are not local files (section 3: write yes or no)")
-    return {"other": why_other, "refresh": why_refresh}
+    return {"other": why_other}
 
 
 def first_status(kind, state):
@@ -636,7 +615,7 @@ def plan(root):
              "`answered`. No row waits for an approval: a `to do` row is done, a `held` row waits until its reason "
              "is gone (`python scripts/improve.py release`), and the questions are listed once, at the end."
              % ", ".join(KINDS), "",
-             "Gates today. Other reports: %s. Refresh: %s." % (state["other"] or "open", state["refresh"] or "open"), "",
+             "Gate today. Other reports: %s." % (state["other"] or "open"), "",
              "| %s |" % " | ".join(PLAN_HEADER), "|%s|" % "|".join("---" for _ in PLAN_HEADER)]
     for number, (kind, source, what, change, files, risk, status) in enumerate(rows, 1):
         lines.append("| F%d | %s | %s | %s | %s | %s | %s | %s |"
@@ -648,9 +627,8 @@ def plan(root):
         fh.write("\n".join(lines) + "\n")
     print("Wrote %s with %d row(s). Give every '?' row a kind, fill in the '<...>' cells, then run: "
           "python scripts/improve.py release" % (PLAN.replace(os.sep, "/"), len(rows)))
-    for gate in ("other", "refresh"):
-        if state[gate]:
-            print("Held by the %s gate: %s." % ("other-reports" if gate == "other" else "refresh", state[gate]))
+    if state["other"]:
+        print("Held by the other-reports gate: %s." % state["other"])
     return 0
 
 
@@ -678,9 +656,8 @@ def release(root):
     freed = sum(1 for new in changes.values() if new == "to do")
     held = sum(1 for row in rows if (changes.get(row["Id"]) or row["Status"]).lower().startswith("held"))
     print("Statuses written: %d. Rows to do now: %d of them. Rows still held: %d." % (len(changes), freed, held))
-    for gate in ("other", "refresh"):
-        if state[gate]:
-            print("The %s gate is shut: %s." % ("other-reports" if gate == "other" else "refresh", state[gate]))
+    if state["other"]:
+        print("The other-reports gate is shut: %s." % state["other"])
     return 0
 
 
@@ -743,10 +720,6 @@ def compare(root):
         print("Pages to look at in Power BI Desktop: every page a fix touched (the start of this flow was not recorded).")
     else:
         print("Pages to look at in Power BI Desktop: %s" % (", ".join(pages) if pages else "none changed"))
-    if made_measures_table(root):
-        print("First in Power BI Desktop: refresh the table %s once (right-click the table, Refresh data). This flow "
-              "made it, so it is empty until loaded. Its query names no source: do not refresh the whole model for it."
-              % cp.MEASURE_TABLE)
     fails = [item for item in sorted(after) if after[item][0] == "Fail"]
     person = [item for item in fails if item in PERSON_ITEMS]
     other = [item for item in fails if item not in PERSON_ITEMS]
@@ -760,6 +733,9 @@ def compare(root):
             print("%s: %d done, %d held, %d skipped, %d to do."
                   % (kind, len(with_status(rows, kind, "done")), len(with_status(rows, kind, "held")),
                      len(with_status(rows, kind, "skipped")), len(with_status(rows, kind, "to do"))))
+    if with_status(rows, "Data", "done") or made_measures_table(root):
+        print("Refresh the model once in Power BI Desktop: this run changed a query, a partition, a data type or "
+              "added a table, and such a table is empty until it is loaded again.")
     held = [r for r in rows if status_of(r) == "held"]
     print("Held: %d row(s)%s" % (len(held), ":" if held else "."))
     for reason, group in _grouped(held, lambda r: r["Status"].split(":", 1)[1].strip()):

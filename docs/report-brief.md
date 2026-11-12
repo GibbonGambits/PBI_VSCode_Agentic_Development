@@ -25,12 +25,11 @@ An empty field means the layout standard: 1280 x 720, margin 24, gap 16, grid 8.
 
 - Semantic model: new in this project / already in this project / a published model (give its name):
 - Other reports use this model (yes or no):
-- Data can be refreshed on this computer (yes or no):
 - Sources, and the environments they exist in, such as development, test, production (1, 2):
 - Import, DirectQuery or both, and why (16):
 - How often the data must refresh (45):
 
-The two yes-or-no fields are the gates of the evaluate-and-improve flow. "Other reports use this model": with no, measures are moved and names corrected without a question; with yes or no answer, those rows are held, because a report on a published copy of the model would break. "Data can be refreshed on this computer": left empty, the flow looks for the local source files itself; with no, or when a source file is missing, changes that make Power BI Desktop load a table again are held.
+"Other reports use this model" is the one gate of the evaluate-and-improve flow: with no, measures are moved and names corrected without a question; with yes or no answer, those rows are held, because a report on a published copy of the model would break.
 
 ## 4. Standards to follow
 
