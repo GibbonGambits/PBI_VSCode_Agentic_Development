@@ -74,7 +74,8 @@ More rules:
 | V008, U102 | Item 51 |
 | G007 | Item 52 |
 | V010 | Item 53 |
-| A003 | Item 55 |
+| A003, V025 | Item 55 |
+| V026 | Items 57 and 58 |
 | U007 | Item 59 |
 | U101 | Item 61 |
 | V001, V013, V014, V023 | Item 63 (V001 is Fail: the item asks for back navigation on every drillthrough page; V013 on a tooltip page goes to item 65) |

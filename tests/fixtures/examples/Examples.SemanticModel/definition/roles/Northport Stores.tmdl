@@ -2,5 +2,5 @@
 role 'Northport Stores'
 	modelPermission: read
 
-	tablePermission Store = Store[City] = "Northport"
+	tablePermission Store = 'Store'[City] = "Northport"
 

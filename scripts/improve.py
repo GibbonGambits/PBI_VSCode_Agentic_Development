@@ -3,16 +3,19 @@
 
 Usage (run from the repository root; <folder> is '.' when left out):
     python scripts/improve.py next [<folder>]        say which step the flow is at, and what to run
-    python scripts/improve.py start [<folder>]       stop unless everything is committed, a branch is checked
+    python scripts/improve.py start [<folder>] [--scope design|practices|both]
+                                                     stop unless everything is committed, a branch is checked
                                                      out and no earlier flow left its files; make a new branch;
-                                                     copy the project, unchanged, to _before/
+                                                     copy the project, unchanged, to _before/; record the scope
     python scripts/improve.py snapshot [<folder>]    keep the first review as docs/checklist-review-before.md
     python scripts/improve.py plan [<folder>]        write docs/fix-plan.md from the review and the project check
     python scripts/improve.py check-plan [<folder>]  check the plan: every row has a kind, a change, files, a risk
     python scripts/improve.py release [<folder>]     give every row without a status its status
+    python scripts/improve.py changelog [<folder>]   write docs/change-log.md: every change, before and after,
+                                                     and a count by change type (checklist item 47)
     python scripts/improve.py compare [<folder>]     Pass, Fail and Not applicable before and after; the items
-                                                     that changed; the pages to look at; what was skipped; the
-                                                     questions left for a person
+                                                     that changed; a count table by change type; the pages to
+                                                     look at; what was skipped; the questions left for a person
 
 The steps, and who does what, are in the skill 'pbi-improve'. This script changes no report or model file.
 'start' makes a Git branch and the copy; 'snapshot' and 'plan' write the two files named above.
@@ -23,8 +26,16 @@ nothing inside them is edited. Each .platform file holds a logicalId that must s
 (Microsoft Learn, "Git integration source code format"), so the copy must never be committed: 'start' makes
 it only when Git ignores _before/, and skips it, saying so, when a path would pass 260 characters.
 
-Kinds of fix, in the order they are applied, one commit each: Theme (the owner's theme is registered),
-Mechanical (descriptions, format strings, folders, hiding, header icons and tooltips, alt text, titles, the
+The scope is the developer's answer to one question at the start: improve the design, apply best practices,
+or both (the default). Kinds outside the scope start as 'skipped: outside the scope asked for'.
+    design      Theme, Design, Layout
+    practices   Theme, Mechanical, Layout, Measures, Renames, Data
+    both        every kind
+
+Kinds of fix, in the order they are applied, one commit each: Theme (the owner's theme is registered, and the
+automatic subtitle a base theme puts under every title is switched off),
+Design (the pages whose design fails the checklist's design items are designed again: skill pbi-report,
+references/design.md), Mechanical (descriptions, format strings, folders, hiding, header icons and tooltips, alt text, titles, the
 DAX style), Layout (positions and sizes, a back button, tab order), Measures (every measure moves to
 _Measures), Renames (names the naming standard rejects), Data (changes that make Power BI Desktop load a table
 again: a query's text, a partition's name, a data type). Needs a person is everything else: a fact or a
@@ -40,6 +51,8 @@ Needs Python 3.8 or later and Git. Uses the standard library only.
 Exit code: 0 = done, 1 = stopped or a problem found, 2 = wrong usage.
 """
 import datetime
+import difflib
+import json
 import os
 import re
 import shutil
@@ -54,20 +67,37 @@ REVIEW_BEFORE = os.path.join("docs", "checklist-review-before.md")
 PLAN = os.path.join("docs", "fix-plan.md")
 BRANCH_PREFIX = "improve/"
 PATH_LIMIT = 260                                     # Microsoft Learn, "Power BI Desktop projects", limitations
-COMMITS = {"Theme": "Improve: theme", "Mechanical": "Improve: mechanical fixes", "Layout": "Improve: layout fixes",
+COMMITS = {"Theme": "Improve: theme", "Design": "Improve: design", "Mechanical": "Improve: mechanical fixes",
+           "Layout": "Improve: layout fixes",
            "Measures": "Improve: measures moved", "Renames": "Improve: renames",
            "Data": "Improve: changes that need a refresh"}
-AUTO_KINDS = ("Theme", "Mechanical", "Layout", "Measures", "Renames", "Data")       # applied in this order
+AUTO_KINDS = ("Theme", "Design", "Mechanical", "Layout", "Measures", "Renames", "Data")    # applied in this order
 PERSON_KIND = "Needs a person"
 KINDS = AUTO_KINDS + (PERSON_KIND,)
 STATUS = re.compile(r"(?i)(to do|done|question|answered|skipped: \S.*)\Z")
 PLAN_HEADER = ["Id", "Kind", "Item or code", "Object", "What will change", "Files", "What could break", "Status"]
+CHANGE_LOG = os.path.join("docs", "change-log.md")
+LOOK = ("Look before you commit: python scripts/desktop_bridge.py open . (it does nothing when Desktop has the project "
+        "open), then python scripts/desktop_bridge.py reload . --with-model, then python scripts/desktop_bridge.py "
+        "screenshots . Look at every page this kind changed and fix what looks wrong: an error icon on a visual means "
+        "a broken measure or file. Then run python scripts/desktop_bridge.py clean <folder of pictures>. When the "
+        "Bridge is not available, carry on and name the pages in your final answer.")
+SCOPES = {"design": ("Theme", "Design", "Layout"),
+          "practices": ("Theme", "Mechanical", "Layout", "Measures", "Renames", "Data"),
+          "both": AUTO_KINDS}
+DESIGN_ITEMS = frozenset((54, 55, 56, 57, 58, 66, 70))    # checklist items a design pass answers
 
 # code -> (what will change, what could break), one table for each kind. A code that is in none needs a person.
 THEME = {
     "T001": ("Register theme/theme.json in the report files (python scripts/scaffold.py theme .)",
              "Every visual takes the theme's colours and fonts. Microsoft Learn describes importing the theme in "
              "Power BI Desktop as the supported route: look at the colours when the report is first opened"),
+    "V025": ("Switch off the automatic subtitle the base theme shows (subTitle show false), or write a subtitle that adds "
+             "something, such as the period or the unit", "The line under the title disappears or changes"),
+}
+DESIGN = {
+    "V026": ("Colour the amount from light to dark in one hue (design.md, section 3). Red to green stays only where the "
+             "brief says which way is good, with an icon, a sign or a word beside it", "The colours of the scale change"),
 }
 MECHANICAL = {
     "D001": ("Add a '///' description from the brief, or a TODO(owner) question when the brief does not say",
@@ -109,7 +139,8 @@ MECHANICAL = {
     "V002": ("Hide the tooltip page (visibility HiddenInViewMode)", "The page no longer shows as a tab; the tooltip still works"),
     "V009": ("Remove the colour, font, size, border, shadow or background set on the visual, so that it follows the theme. "
              "Remove a whole setting, never one part of a setting made of parts (data bars, a colour scale, icons). A colour "
-             "scale keeps its shape and takes the theme file's minimum and maximum colours",
+             "scale keeps its shape and takes theme colours chosen by meaning: for an amount a light and a dark data colour "
+             "of one hue; red to green only where the brief says which way is good (theme.md, 'Colour scales')",
              "The visual looks different: it takes the theme's style"),
     "V024": ("Put the missing bar colour of the data bars back with a theme colour, or remove the data bars as a whole",
              "Nothing: without the part Power BI Desktop does not load the report at all"),
@@ -130,7 +161,7 @@ LAYOUT = {
     "G007": ("Write the page size in the brief; or resize the page in Power BI Desktop", "A resized page changes every position"),
     "V001": ("Add a back button to the drillthrough page (copy the shipped example) at the top-left of the page",
              "The page gains a visual; other visuals may have to move"),
-    "A002": ("Give each visual its own tab order number, in reading order: left to right, top to bottom",
+    "A002": ("Give each visual its own tab order number, in reading order: python scripts/set_tab_order.py .",
              "Keyboard users reach the visuals in a new order"),
 }
 MEASURES = {
@@ -426,9 +457,20 @@ def made_measures_table(root):
     return False
 
 
-def first_status(kind):
-    """The status a row starts with: 'question' for a row that needs a person, 'to do' for every other row."""
-    return "question" if kind == PERSON_KIND else "to do"
+def scope_of(root):
+    """The scope recorded by 'start': design, practices or both (both when none was recorded)."""
+    code, value = git(root, "config", "--get", "improve.scope")
+    return value if code == 0 and value in SCOPES else "both"
+
+
+def first_status(kind, scope="both"):
+    """The status a row starts with: 'question' for a row that needs a person, 'skipped' for a kind outside the
+    scope the developer asked for, 'to do' for every other row."""
+    if kind == PERSON_KIND:
+        return "question"
+    if kind not in SCOPES.get(scope, AUTO_KINDS):
+        return "skipped: outside the scope asked for (%s)" % scope
+    return "to do"
 
 
 def _write_statuses(path, statuses):
@@ -452,7 +494,10 @@ def review_problems(path):
 
 # ---------------------------------------------------------------- commands
 
-def start(root):
+def start(root, scope="both"):
+    if scope not in SCOPES:
+        print("Stopped: the scope is one of %s." % ", ".join(sorted(SCOPES)))
+        return 2
     code, out = git(root, "rev-parse", "--is-inside-work-tree")
     if code != 0:
         print("Stopped: %s is not a Git repository, so the original cannot be kept on a branch." % root)
@@ -492,7 +537,9 @@ def start(root):
         print("Stopped: could not make the branch %s: %s" % (name, out))
         return 1
     git(root, "config", "improve.base", commit)
-    print("New branch: %s. The original stays untouched on %s (commit %s)." % (name, old_branch, commit[:7]))
+    git(root, "config", "improve.scope", scope)
+    print("New branch: %s. The original stays untouched on %s (commit %s). Scope: %s (%s)."
+          % (name, old_branch, commit[:7], scope, ", ".join(SCOPES[scope])))
 
     target = os.path.join(root, cp.BEFORE_COPY)
     longest = max((len(os.path.join(target, os.path.relpath(os.path.join(folder, f), root)))
@@ -552,8 +599,9 @@ def plan(root):
         print("Stopped: the review is not finished. Run: python scripts/check_project.py --review docs/checklist-review.md")
         return 1
     findings, _, _ = cp.run(root)
-    tables = (("Theme", THEME), ("Mechanical", MECHANICAL), ("Layout", LAYOUT), ("Measures", MEASURES),
-              ("Renames", RENAMES), ("Data", DATA))
+    scope = scope_of(root)
+    tables = (("Theme", THEME), ("Design", DESIGN), ("Mechanical", MECHANICAL), ("Layout", LAYOUT),
+              ("Measures", MEASURES), ("Renames", RENAMES), ("Data", DATA))
     rows, notes = [], []
     for code, path, line, message, level in findings.items:
         rel = os.path.relpath(path, root).replace(os.sep, "/") if path else "-"
@@ -563,7 +611,7 @@ def plan(root):
         for kind, table in tables:
             if code in table:
                 rows.append((kind, code, message, table[code][0], rel, table[code][1],
-                             first_status(kind)))
+                             first_status(kind, scope)))
                 break
         else:
             rows.append((PERSON_KIND, code, message, PERSON.get(code, "Say what should happen here"), rel,
@@ -574,6 +622,9 @@ def plan(root):
             if item in PERSON_ITEMS:
                 rows.append((PERSON_KIND, "Item %d" % item, evidence, "<what will change>", "<files>",
                              "<what could break>", "question"))
+            elif item in DESIGN_ITEMS:
+                rows.append(("Design", "Item %d" % item, evidence, "<what will change>", "<files>",
+                             "<what could break>", first_status("Design", scope)))
             else:
                 rows.append(("?", "Item %d" % item, evidence, "<what will change>", "<files>", "<what could break>", ""))
     order = {kind: index for index, kind in enumerate(KINDS + ("?",))}
@@ -585,6 +636,7 @@ def plan(root):
              "Status: `to do`, `done`, `skipped: <why>`; for a row that needs a person `question` or `answered`. "
              "No row waits for an approval: every `to do` row is done, and the questions are listed once, at the end."
              % ", ".join(KINDS), "",
+             "Scope: %s. Kinds applied: %s. Rows of the other kinds start as skipped." % (scope, ", ".join(SCOPES[scope])), "",
              "| %s |" % " | ".join(PLAN_HEADER), "|%s|" % "|".join("---" for _ in PLAN_HEADER)]
     for number, (kind, source, what, change, files, risk, status) in enumerate(rows, 1):
         lines.append("| F%d | %s | %s | %s | %s | %s | %s | %s |"
@@ -610,10 +662,11 @@ def release(root):
     if unsorted:
         print("Stopped: give these rows one of the kinds first (%s): %s" % (", ".join(KINDS), ", ".join(unsorted)))
         return 1
+    scope = scope_of(root)
     changes = {}
     for row in rows:
         if not row["Status"]:
-            changes[row["Id"]] = first_status(row["Kind"])
+            changes[row["Id"]] = first_status(row["Kind"], scope)
     if changes:
         _write_statuses(path, changes)
     freed = sum(1 for new in changes.values() if new == "to do")
@@ -687,12 +740,11 @@ def compare(root):
     print("  %d can pass only on a fact from a person%s" % (len(person), _items(person)))
     print("  %d wait on a skipped fix or on an answer about the files%s" % (len(other), _items(other)))
     rows, _ = read_plan(os.path.join(root, PLAN))
-    for kind in AUTO_KINDS:
-        of_kind = [r for r in rows if r["Kind"] == kind]
-        if of_kind:
-            print("%s: %d done, %d skipped, %d to do."
-                  % (kind, len(with_status(rows, kind, "done")), len(with_status(rows, kind, "skipped")),
-                     len(with_status(rows, kind, "to do"))))
+    print("Scope: %s." % scope_of(root))
+    print("Changes by type:")
+    for line in count_table(rows):
+        print(line)
+    print("Every change, with before and after: %s (python scripts/improve.py changelog)." % CHANGE_LOG.replace(os.sep, "/"))
     if with_status(rows, "Data", "done") or made_measures_table(root):
         print("Refresh the model once in Power BI Desktop: this run changed a query, a partition, a data type or "
               "added a table, and such a table is empty until it is loaded again.")
@@ -707,6 +759,127 @@ def compare(root):
     print("Questions for a person: %d row(s)%s" % (len(people), ":" if people else "."))
     for (source, change), group in _grouped(people, lambda r: (r["Item or code"], r["What will change"])):
         print("  %s  %s%s (%s)" % (source, change, "" if len(group) == 1 else "  [%d rows]" % len(group), _ids(group)))
+    return 0
+
+
+def count_table(rows):
+    """A Markdown table: for each kind of fix, how many rows were done, skipped, left to do, or are questions."""
+    lines = ["| Change type | Done | Skipped | To do | Questions |", "|---|---:|---:|---:|---:|"]
+    totals = [0, 0, 0, 0]
+    for kind in KINDS:
+        if not any(r["Kind"] == kind for r in rows):
+            continue
+        numbers = [len(with_status(rows, kind, "done")), len(with_status(rows, kind, "skipped")),
+                   len(with_status(rows, kind, "to do")), len(with_status(rows, kind, "question"))]
+        totals = [a + b for a, b in zip(totals, numbers)]
+        lines.append("| %s | %d | %d | %d | %d |" % ((kind,) + tuple(numbers)))
+    lines.append("| Total | %d | %d | %d | %d |" % tuple(totals))
+    return lines
+
+
+def _flat(node, path="", out=None):
+    """{json path: value as text} of every leaf of a JSON document."""
+    out = {} if out is None else out
+    if isinstance(node, dict):
+        for key, value in node.items():
+            _flat(value, "%s.%s" % (path, key) if path else key, out)
+    elif isinstance(node, list):
+        for index, value in enumerate(node):
+            _flat(value, "%s[%d]" % (path, index), out)
+    else:
+        out[path] = json.dumps(node, ensure_ascii=False)
+    return out
+
+
+def _before_after(old, new, name, limit=40):
+    """Lines that say what changed in one file, before and after."""
+    lines = []
+    if name.lower().endswith(".json"):
+        try:
+            a = _flat(json.loads(old)) if old else {}
+            b = _flat(json.loads(new)) if new else {}
+        except ValueError:
+            a = b = None
+        if a is not None:
+            for key in sorted(set(a) | set(b)):
+                if a.get(key) != b.get(key):
+                    lines.append("- `%s`: %s -> %s" % (key, _short(a.get(key, "(none)")), _short(b.get(key, "(none)"))))
+            return lines[:limit] + (["- ... %d more" % (len(lines) - limit)] if len(lines) > limit else [])
+    header = ""
+    for line in difflib.unified_diff((old or "").splitlines(), (new or "").splitlines(), lineterm="", n=0):
+        if line.startswith(("---", "+++", "@@")):
+            continue
+        stripped = line[1:].strip()
+        if re.match(r"(table|measure|column|partition|relationship|role|expression|function)\b", stripped):
+            header = stripped[:80]
+        if stripped:
+            lines.append("- %s `%s`%s" % ("before" if line[0] == "-" else "after ", _short(stripped, 160),
+                                           " (in %s)" % header if header and not stripped.startswith(header) else ""))
+    return lines[:limit] + (["- ... %d more" % (len(lines) - limit)] if len(lines) > limit else [])
+
+
+def _short(text, size=100):
+    text = str(text).replace("`", "'").replace("|", "/")
+    return text if len(text) <= size else text[:size - 3] + "..."
+
+
+def changelog(root):
+    """Add a section for this flow at the top of docs/change-log.md: counts, every change, before and after."""
+    code, base = git(root, "config", "--get", "improve.base")
+    if code != 0 or not base:
+        print("Stopped: the start of this flow was not recorded (run python scripts/improve.py start first).")
+        return 1
+    rows, _ = read_plan(os.path.join(root, PLAN))
+    _, branch = git(root, "rev-parse", "--abbrev-ref", "HEAD")
+    _, subjects = git(root, "log", "--format=%h %s", "%s..HEAD" % base)
+    code, names = git(root, "diff", "--name-only", "--relative", base, "HEAD")
+    changed = [n.strip().strip('"') for n in names.splitlines()
+               if n.strip() and not n.strip().strip('"').startswith(("docs/", cp.BEFORE_COPY + "/"))]
+    section = ["## %s, branch %s, scope %s" % (datetime.date.today().isoformat(), branch, scope_of(root)), "",
+               "Made by `python scripts/improve.py changelog` from the fix plan and Git (start: commit %s)." % base[:7], "",
+               "### Changes by type", ""] + count_table(rows)
+    by_code = {}
+    for row in rows:
+        if status_of(row) == "done":
+            by_code.setdefault((row["Kind"], row["Item or code"]), 0)
+            by_code[(row["Kind"], row["Item or code"])] += 1
+    section += ["", "### Changes by finding", "", "| Change type | Item or code | Rows done |", "|---|---|---:|"]
+    section += ["| %s | %s | %d |" % (kind, source, count) for (kind, source), count in sorted(by_code.items())] or ["| - | - | 0 |"]
+    section += ["", "### Every change", "", "| Id | Change type | Item or code | Object | What changed | Status |",
+                "|---|---|---|---|---|---|"]
+    for row in rows:
+        if status_of(row) in ("done", "skipped", "answered"):
+            section.append("| %s | %s | %s | %s | %s | %s |" % (row["Id"], row["Kind"], row["Item or code"],
+                                                                 _short(row["Object"], 120), _short(row["What will change"], 160),
+                                                                 _short(row["Status"], 80)))
+    section += ["", "### Before and after, file by file", ""]
+    for name in changed:
+        old = git(root, "show", "%s:./%s" % (base, name))
+        new_path = os.path.join(root, name)
+        try:
+            with open(new_path, encoding="utf-8-sig") as fh:
+                new = fh.read()
+        except (OSError, UnicodeDecodeError):
+            new = ""
+        lines = _before_after(old[1] if old[0] == 0 else "", new, name)
+        section += ["**%s**%s" % (name, "" if os.path.exists(new_path) else " (removed)"), ""] + (lines or ["- (no text change)"]) + [""]
+    section += ["### Commits", ""] + ["- %s" % line for line in subjects.splitlines()] + [""]
+    target = os.path.join(root, CHANGE_LOG)
+    head = ["# Change log", "",
+            "One section for each evaluate-and-improve run, newest first. The exact change of every file is in its "
+            "commit (`git show <commit>`).", ""]
+    old_text = ""
+    if os.path.isfile(target):
+        with open(target, encoding="utf-8-sig") as fh:
+            old_text = fh.read()
+        first = old_text.find("\n## ")
+        old_text = old_text[first + 1:] if first >= 0 else ""
+    os.makedirs(os.path.dirname(target), exist_ok=True)
+    with open(target, "w", encoding="utf-8", newline="\n") as fh:
+        fh.write("\n".join(head + section) + ("\n" + old_text if old_text else "\n"))
+    done = sum(1 for r in rows if status_of(r) == "done")
+    print("Wrote %s: %d change(s) done, %d file(s) changed, %d commit(s). Commit it with the message "
+          "'Improve: change log'." % (CHANGE_LOG.replace(os.sep, "/"), done, len(changed), len(subjects.splitlines())))
     return 0
 
 
@@ -743,9 +916,14 @@ def next_step(root):
     if code != 0:
         return say(23, "This folder is not a Git repository. The flow needs one: the original stays on a branch.")
     if not branch.startswith(BRANCH_PREFIX):
-        return say(23, "Safety first. The project must be saved and closed in Power BI Desktop. If anything is not committed, commit "
-                       "it yourself, without asking: git add -A, then git commit -m \"Before improve: the report as found\". "
-                       "Then run: python scripts/improve.py start")
+        return say(23, "Safety first. Run python scripts/desktop_bridge.py status: if it says the Desktop Bridge is not "
+                       "available, show the developer the setup lines it prints and carry on without it. If the request "
+                       "does not say what to improve, ask once: improve the design, apply best practices, or both. The "
+                       "project must be saved and closed in Power BI Desktop: when status shows it open, ask the "
+                       "developer to save and close it, in the same message. You open it yourself later, to look at "
+                       "the pages. If anything is not committed, commit it "
+                       "yourself, without asking: git add -A, then git commit -m \"Before improve: the report as found\". "
+                       "Then run: python scripts/improve.py start --scope design|practices|both")
     exists = {name: os.path.isfile(os.path.join(root, name)) for name in (REVIEW, REVIEW_BEFORE, PLAN)}
     if not exists[REVIEW_BEFORE]:
         if not exists[REVIEW]:
@@ -763,8 +941,8 @@ def next_step(root):
         if todo:
             return say(27, "Apply the %d %s row(s) marked 'to do': no approval is needed. As each row is finished write "
                            "'done' in its Status, or 'skipped: <why>' when it cannot be done. Run python scripts/"
-                           "check_project.py . and fix what it reports. Then commit with the message '%s'."
-                           % (len(todo), kind, COMMITS[kind]))
+                           "check_project.py . and fix what it reports. %s Then commit with the message '%s'."
+                           % (len(todo), kind, LOOK, COMMITS[kind]))
         if with_status(rows, kind, "done") and not _has_commit(root, COMMITS[kind]):
             return say(27, "Commit the %s fixes with the message '%s'." % (kind, COMMITS[kind]))
     before = read_review(os.path.join(root, REVIEW_BEFORE))
@@ -778,16 +956,28 @@ def next_step(root):
         return say(28, "Evaluate again with the skill pbi-checklist-review: go through all 79 items in order, not only "
                        "the rows you expect to change. docs/checklist-review.md is replaced without asking; the first "
                        "review is kept as docs/checklist-review-before.md.")
-    return say("28 and 29", "Show the result: python scripts/improve.py compare. Then give the developer one final "
-                            "answer: what changed, the pages to look at in Power BI Desktop, what was skipped, and the "
-                            "questions. Do not merge, publish or deploy.")
+    if not _has_commit(root, "Improve: change log"):
+        return say(29, "Write the change log: python scripts/improve.py changelog, then commit it with the message "
+                       "'Improve: change log'.")
+    return say(30, "Show the result: python scripts/improve.py compare. Then give the developer one final answer: the "
+                   "counts before and after, the table of changes by type, the key changes, the pages you looked at "
+                   "(or the pages to look at), what was skipped, the assumptions, and the questions. Do not merge, "
+                   "publish or deploy.")
 
 
 def main(argv):
     cp.safe_output()
     commands = {"next": next_step, "start": start, "snapshot": snapshot, "plan": plan, "check-plan": check_plan,
-                "release": release, "compare": compare}
+                "release": release, "changelog": changelog, "compare": compare}
     args = argv[1:]
+    scope = None
+    if "--scope" in args:
+        at = args.index("--scope")
+        if at + 1 >= len(args) or args[0] != "start":
+            print(__doc__)
+            return 2
+        scope = args[at + 1]
+        args = args[:at] + args[at + 2:]
     if not args or args[0] not in commands or len(args) > 2:
         print(__doc__)
         return 2
@@ -795,6 +985,8 @@ def main(argv):
     if not os.path.isdir(root):
         print("Not a folder: %s" % args[1])
         return 2
+    if scope is not None:
+        return start(root, scope)
     return commands[args[0]](root)
 
 

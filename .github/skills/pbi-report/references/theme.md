@@ -7,7 +7,7 @@ Sources: Microsoft's report theme schema (version 2.159); Microsoft Learn pages 
 `theme/theme.json` is the owner's theme. It must stay exactly as it is. Every report gets it (owner's rule). There are two routes:
 
 - The developer imports it once in Power BI Desktop (Design ribbon > Import theme). This is the route Microsoft Learn describes: it supports changing a file under `RegisteredResources` only for a resource that Desktop itself registered.
-- A script registers it in the files, the way Microsoft's own report skill does: `python scripts/scaffold.py theme .` for a report that exists, `python scripts/scaffold.py project <Name> --register-theme` for a new one. The evaluate-and-improve flow uses this route without a question. The project must be closed in Power BI Desktop: Microsoft Learn says `report.json` is not reloaded into an open session. Tell the developer the theme was registered by script, and ask them to look at the colours when the report is first opened.
+- A script registers it in the files, the way Microsoft's own report skill does: `python scripts/scaffold.py theme .` for a report that exists, `python scripts/scaffold.py project <Name> --register-theme` for a new one. The evaluate-and-improve flow uses this route without a question. The project must be closed in Power BI Desktop: Microsoft Learn lists `report.json` among the files that cannot be edited while Desktop has the project open. Open it afterwards yourself to look at it (`desktop-bridge.md`, beside this file). Tell the developer the theme was registered by script. Look at the colours yourself in screenshots; when the Bridge is not available, ask the developer to look when the report is first opened.
 
 The report's base theme stays as it is; the custom theme sits on top of it.
 
@@ -27,7 +27,17 @@ Not confirmed from Microsoft: whether Power BI Desktop keeps and applies the two
 
 ## Removing styling from a visual
 
-When a visual sets its own styling (V009), remove the whole setting so the theme takes over. Never remove one part of a setting that is made of parts: data bars (`dataBars` with `positiveColor`, `negativeColor`, `axisColor`), a colour scale (`FillRule`), icons. A half-removed setting passes Microsoft's schema, and Power BI Desktop then fails to load the whole report (V024). If such a setting holds a colour code, replace that colour with a theme colour; in a colour scale, with the theme file's `minimum`, `center` or `maximum` colour. A colour named by a theme keyword (`'maxColor'`, `'minColor'`, `'foreground'`) is already a theme colour: leave it.
+When a visual sets its own styling (V009), remove the whole setting so the theme takes over. Never remove one part of a setting that is made of parts: data bars (`dataBars` with `positiveColor`, `negativeColor`, `axisColor`), a colour scale (`FillRule`), icons. A half-removed setting passes Microsoft's schema, and Power BI Desktop then fails to load the whole report (V024). If such a setting holds a colour code, replace that colour with a theme colour; in a colour scale, with the theme file's colours chosen by what the colour says (next section). A colour named by a theme keyword (`'maxColor'`, `'minColor'`, `'foreground'`) is already a theme colour: leave it.
+
+## Colour scales: colour by meaning
+
+A colour scale says something: which way is good, or only how much. Pick its colours from that, as section 3 of `design.md` (beside this file) sets out. In short, for this theme:
+
+- An amount (more is only more): `#A4DDEE` (light blue) for the lowest value to `#1B4D5C` (dark blue) for the highest. Both are data colours of this theme, of the same hue.
+- Good or bad, when the brief or the developer says which way is good: `minimum` `#D2222D` (red) for bad, `maximum` `#008001` (green) for good, `background` `#ffffff` in the middle; always with an icon, a sign or a word. The theme has no `center` colour.
+- Missing values: `null` `#94A3B8`.
+
+Never give an amount red to green: that says low is bad. V026 warns on it.
 
 ## Features a visual uses
 

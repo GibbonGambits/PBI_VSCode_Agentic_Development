@@ -9,7 +9,7 @@ A starting point for building, evaluating and changing Power BI reports with Git
 | Running the checks and tests | **Python 3.8 or later.** Nothing else: the scripts use only Python's standard library. No `pip install`. |
 | Working with Copilot | VS Code with GitHub Copilot set up and signed in, used in agent mode. |
 | Opening and looking at reports | Power BI Desktop, saving in Power BI project format (PBIP), with the model as TMDL and the report as PBIR. |
-| Optional: Copilot reloads and looks at pages itself | Microsoft's Desktop Bridge tools (Windows, Power BI Desktop of June 2026 or later). See "Optional tools from Microsoft". |
+| Optional: Copilot opens, reloads and looks at pages itself | Microsoft's Desktop Bridge tools (Windows, Power BI Desktop of June 2026 or later). Copilot shows you the two setup lines when they are missing. See "Optional tools from Microsoft". |
 | Optional: Copilot reads facts about the data itself | Microsoft's Power BI Authoring MCP Server, the local one. See "Optional tools from Microsoft". |
 | Version control | Git. |
 
@@ -28,7 +28,7 @@ the root instruction file           for an agent that reads a root instruction f
                                      Power Query, storage modes and security, model objects, the DAX function index
 .github/skills/pbi-report/           report work, and the report standards: layout, report features, theme rules
 .github/skills/pbi-checklist-review/ evaluation against the 79-item checklist; the list of native features to suggest
-.github/skills/pbi-improve/          evaluate an existing report, then fix it without waiting for approvals
+.github/skills/pbi-improve/          evaluate an existing report, then improve its design, its practices or both
 .github/skills/pbi-lookup/           looking things up on Microsoft Learn, DAX Guide and SQLBI, and nowhere else
 .github/skills/business-definitions/ starter definitions for eight business areas, read one at a time
 .github/skills/pbi-lessons/          the improvement loop: what Copilot does when it gets something wrong
@@ -219,26 +219,32 @@ It fails when a lesson is badly formed, when a fix points at the checklist or th
 
 ## 5. Evaluate and improve an existing report
 
-One request, such as "Evaluate and improve this report", runs these steps in order (skill `pbi-improve`). Copilot does not have to remember them: `python scripts/improve.py next` reads the files and Git and says which step comes next.
+One request, such as "Improve this report", "Improve the design" or "Apply best practices", runs these steps in order (skill `pbi-improve`). Copilot does not have to remember them: `python scripts/improve.py next` reads the files and Git and says which step comes next.
 
-**Nothing waits for an approval.** The safeguard is the branch, the untouched copy and one commit for each kind of fix: each kind can be undone alone with `git revert`. No row is held back, and Copilot asks nothing at the start.
+**One question at the start, nothing after it.** When the request does not say what to improve, Copilot asks once: improve the design, apply best practices, or both. The answer is the scope: `design` applies the kinds Theme, Design and Layout; `practices` every kind but Design; `both` all of them. Rows of the other kinds are skipped, saying why. In the same message Copilot shows the setup lines of the Desktop Bridge when it is not installed.
+
+**Nothing waits for an approval.** The safeguard is the branch, the untouched copy and one commit for each kind of fix: each kind can be undone alone with `git revert`. No row is held back.
+
+**Each report gets what it needs.** The review decides the work. A page whose design passes the checklist's design items is left alone; a model that passes gets no model changes.
 
 - **Other reports can break.** A report that reads a published copy of the model names a measure with its table, so a move or a rename breaks it, and no file here can show such a report. The flow moves and renames all the same and says so in its final answer: run it on a model that is yours to change.
 - **A missing data source never stops a fix.** A change to a query's text, a partition's name or a data type, and a new table, are applied like every other fix. Such a table is empty until Power BI Desktop refreshes the model, so refresh once after the run. Work on a report whose data sources you can reach.
 
-1. **Safety first.** Save and close the project in Power BI Desktop. Copilot commits what is not committed yet, as the report as found. `python scripts/improve.py start` stops unless everything is committed and no earlier flow left its files behind. It makes a new branch, and copies the project unchanged into the folder `_before/`, so you can open before and after side by side. Git ignores that folder and the checks skip it.
+1. **Safety first.** Copilot checks the Desktop Bridge (`python scripts/desktop_bridge.py status .`). Save and close the project in Power BI Desktop: Copilot opens it again itself to look at the pages. Copilot commits what is not committed yet, as the report as found. `python scripts/improve.py start` stops unless everything is committed and no earlier flow left its files behind. It makes a new branch, and copies the project unchanged into the folder `_before/`, so you can open before and after side by side. Git ignores that folder and the checks skip it.
 2. **Evaluate.** The checklist review writes `docs/checklist-review.md`. Copilot asks nothing: a fact no file holds is a Fail with "Evidence missing", and its question goes into the final answer.
 3. **Fix plan.** `docs/fix-plan.md` lists every finding and every failed item with a kind and a status (`to do`, `done`, `skipped: <why>`, and `question` or `answered` for a row that needs a person). The kinds, in the order they are applied:
-   - **Theme**: the owner's theme is registered in the report (`python scripts/scaffold.py theme .`).
+   - **Theme**: the owner's theme is registered in the report (`python scripts/scaffold.py theme .`), and the automatic subtitle a base theme puts under every title is switched off (V025).
+   - **Design**: the pages whose design fails the checklist's design items (54 to 58, 66, 70), and red to green on an amount (V026). Copilot judges each page first and leaves the pages that work. On a page that fails it may change the visual type, add, replace, resize or remove visuals without losing information, rewrite titles, and colour by meaning: light to dark for an amount, red to green only for good or bad with a known direction. Guidance: `.github/skills/pbi-report/references/design.md`.
    - **Mechanical**: descriptions, format strings, folders, hiding, header icons and tooltips, alt text and titles, the DAX style, two rewrites that cannot change a result, styling the theme should do. A visual that uses drill-down, a help tooltip, a tooltip page or tooltip fields keeps that setting, with a row in section 7 of the brief.
-   - **Layout**: positions and sizes by the numbers of the layout standard, a back button, tab order.
+   - **Layout**: positions and sizes by the numbers of the layout standard, a back button, tab order (`python scripts/set_tab_order.py .`).
    - **Measures**: every measure moves to `_Measures`, with every reference repaired.
    - **Renames**: names the naming standard rejects.
    - **Data**: a comment line in a query, a partition's name, a floating-point column, an unused column removed. Applied last; refresh the model afterwards.
    - **Needs a person**: a fact or a decision no file holds: summarisation, formulas whose result would change, relationships, security roles, access, user testing, export tests, performance runs. These are questions, not approvals.
-4. **Apply.** Each kind in turn, then the checks, then one commit for that kind.
-5. **Evaluate again**, all 79 items. `python scripts/improve.py compare` prints Pass, Fail and Not applicable before and after; how many of the items that still fail can pass only on a fact from a person; the pages to look at; what was skipped; and the questions, with rows that ask the same thing shown once.
-6. **One final answer** with all of that. When you answer a question, Copilot does the work.
+4. **Apply.** Each kind in turn, then the checks, then a look at the changed pages through the Desktop Bridge (open or reload, then screenshots), then one commit for that kind. A visual with an error icon after a measure changed is fixed before the commit; a changed measure that no picture shows is listed as not tested.
+5. **Evaluate again**, all 79 items.
+6. **Change log.** `python scripts/improve.py changelog` writes `docs/change-log.md`: the count by change type, every change with its before and after, file by file, and the commits (checklist item 47).
+7. **One final answer.** `python scripts/improve.py compare` prints Pass, Fail and Not applicable before and after; a table of changes by type (done, skipped, to do, questions); how many of the items that still fail can pass only on a fact from a person; the pages to look at; what was skipped; and the questions, with rows that ask the same thing shown once. Copilot adds the key changes and points to the change log for the full list. When you answer a question, Copilot does the work.
 
 Never in this flow: a change to the checklist, the theme file or a template file, a made-up business meaning, publishing, deploying or merging.
 
@@ -308,6 +314,12 @@ python scripts/set_positions.py . --dry-run --move "Overview/Overview_Card_Total
 Writes a position and size worked out from the layout standard. It refuses groups, visuals inside a group, rotated visuals and anything that would leave the page, and it names the pages to look at afterwards.
 
 ```bash
+python scripts/set_tab_order.py . --dry-run
+```
+
+Sets the keyboard tab order of each page to the reading order: rows from top to bottom, left to right inside a row. It changes `tabOrder` only. Leave out `--dry-run` to apply.
+
+```bash
 python scripts/scaffold.py project Sales
 ```
 
@@ -341,13 +353,13 @@ Searches Microsoft Learn, DAX Guide and SQLBI, and `python scripts/lookup.py rea
 python scripts/desktop_bridge.py status .
 ```
 
-Optional (see "Optional tools from Microsoft"): `status`, `reload`, `screenshots` and `clean`.
+Optional (see "Optional tools from Microsoft"): `status`, `open`, `reload`, `screenshots` and `clean`. When a tool is missing it prints the setup lines.
 
 ```bash
 python scripts/improve.py next
 ```
 
-Says which step of the evaluate-and-improve flow comes next (section 5). `python scripts/improve.py release` gives new plan rows their status; `python scripts/improve.py compare` prints the result.
+Says which step of the evaluate-and-improve flow comes next (section 5). `python scripts/improve.py start --scope design|practices|both` starts it; `release` gives new plan rows their status; `changelog` writes `docs/change-log.md`; `compare` prints the result.
 
 ```bash
 python scripts/check_project.py --review docs/checklist-review.md
@@ -389,7 +401,7 @@ Everything in the template works without these. Each one is your decision: you i
 
 | Tool | What Copilot does with it | What you set up |
 |---|---|---|
-| Desktop Bridge | Reloads the project in Power BI Desktop and takes a picture of every page, then looks at the pictures: `python scripts/desktop_bridge.py`. Guidance: `.github/skills/pbi-report/references/desktop-bridge.md` | Windows; Power BI Desktop of June 2026 (2.155.756.0) or later with the Desktop Bridge option on (Options > Security; on by default); Node.js 20 or later; the two npm packages `@microsoft/powerbi-desktop-bridge-cli` and `@microsoft/powerbi-report-authoring-cli`. You open the project in Desktop |
+| Desktop Bridge | Opens the project in Power BI Desktop when it is not open, reloads it, and takes a picture of every page, then looks at the pictures: `python scripts/desktop_bridge.py`. Guidance: `.github/skills/pbi-report/references/desktop-bridge.md` | Windows; Power BI Desktop of June 2026 (2.155.756.0) or later with the Desktop Bridge option on (Options > Security; on by default); Node.js 20 or later; the two npm packages. Two lines in a terminal, once: `winget install OpenJS.NodeJS.LTS`, then (after reopening VS Code) `npm.cmd install -g @microsoft/powerbi-desktop-bridge-cli @microsoft/powerbi-report-authoring-cli`. In PowerShell write `npm.cmd`, not `npm`: Windows often blocks npm's PowerShell script |
 | Power BI Authoring MCP Server, the local one (`microsoft/powerbi-modeling-mcp`) | Reads facts about the data with DAX queries: row counts, distinct values, whether a key is unique. Read only. Guidance: `.github/skills/pbi-semantic-model/references/data-facts.md` | The VS Code extension "Power BI Authoring MCP"; you accept Microsoft's licence terms for it; run it with `--readonly`; you open the connection |
 | Microsoft Learn MCP server | A second way to read Microsoft Learn pages. The look-up script needs no setup | Add the server in VS Code if you want it |
 
@@ -410,7 +422,9 @@ What the theme means for drill, tooltips, export, contrast and text size is set 
 - Copilot prompt tests have not been run. Steps are in `evals/prompts.md`.
 - The practice library is information drawn from articles, the oldest from 2011. No note was tried in Power BI Desktop. Notes whose advice may have aged carry the mark Check; a note without the mark showed no sign of change when it was written, which is not proof that it still holds.
 - Nothing here has been opened in Power BI Desktop by the template's builder. That includes every shipped example and the starter project. They parse (the model files load in Microsoft's own Tabular Object Model library and pass its validation), pass Microsoft's schemas, and pass the project check. Microsoft's library does not parse DAX or Power Query, and Microsoft's own skill warns that a wrong field or role can pass validation and still show an error icon. Look at the first use of each kind in Desktop.
-- Written, not run: `scripts/desktop_bridge.py` and the guidance for Microsoft's modeling server. Neither Power BI Desktop nor the server could be run where the template was built. The tests replace Microsoft's tools with stand-ins.
+- `scripts/desktop_bridge.py`: `status` and `screenshots` ran on a developer's computer in November 2026. `open` and `reload --with-model` follow the tools' own code and have not been run yet. The guidance for Microsoft's modeling server is written, not run. The tests replace Microsoft's tools with stand-ins.
+- Tab order: Microsoft's schema says only that `tabOrder` is the keyboard order, not whether the low or the high number comes first. `scripts/set_tab_order.py` follows a page's own numbers, and otherwise gives the top of the page the high numbers, as most of Microsoft's sample reports do. Check once in View > Selection > Tab order.
+- Automatic subtitles (V025): seen on screen in a report on Microsoft's Fluent2 base theme. That every Fluent2 base theme switches subtitles on is read from the theme file, not from a Microsoft page.
 - The starter project's report holds an empty theme collection until you import the theme. Whether Power BI Desktop opens it without a remark is not confirmed.
 - `scripts/scaffold.py project <Name> --register-theme` registers the theme in the files the way Microsoft's own report skill does. Microsoft Learn supports edits under `RegisteredResources` only for a resource Desktop registered itself, and Microsoft's command-line validator expects a theme's inner name to equal its file name, which the owner's theme does not do. The evaluate-and-improve flow uses this route for an existing report (`python scripts/scaffold.py theme .`) by the owner's rule that every report gets the theme; for a new project it stays off unless you pass the flag. Whether Power BI Desktop accepts a theme registered this way without a remark is not confirmed: look at the colours when the report is first opened.
 - After the evaluate-and-improve flow, a table whose query, partition name or data type changed shows no data until the model is refreshed. This rests on one observation and on reasoning, not on a Microsoft page: in the first trial a run left a report without data, on a computer where the source file was missing. Microsoft Learn says only that a project's local data cache holds the model and data "when it was last edited". Which of those changes empties a table is not confirmed one by one.

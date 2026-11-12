@@ -44,7 +44,7 @@ Work in this order.
 6. Names: items 7 and 28. Measure names follow the model standard. Tables and columns follow the brief; if it says nothing, the default in `references/relationships-and-dates.md`.
 7. Descriptions: items 8, 23, 37, 46, 48.
 8. Formats: items 36, 71, 72.
-9. Run `python scripts/check_project.py .` and fix every error. Then `python scripts/list_todos.py .`, and ask the developer about the open questions in one message.
+9. Run `python scripts/check_project.py .` and fix every error. Then test the DAX (next section). Then `python scripts/list_todos.py .`, and ask the developer about the open questions in one message.
 
 ## Existing model
 
@@ -63,7 +63,7 @@ The check prints notes with codes that start with U when a native feature may do
 
 - Auto date/time (item 18) is an option of Power BI Desktop: File > Options and settings > Options, the Current File page, Time intelligence. The check reports it when it is on (M401). Tell the developer once, and note it in section 6 of the brief. Do not set it in files.
 - Facts about the data: whether keys are unique (items 11, 14), row counts (item 17), distinct values, gaps in the date table (item 31). Read them yourself when the developer has set up Microsoft's modeling server (`references/data-facts.md`). Otherwise ask the developer once, in one message, and record the answers in section 4 of the brief. Whether a step folds (item 3) is always in that one message: the server is not known to tell.
-- Whether the model loads and the numbers are right. Reload through `python scripts/desktop_bridge.py reload . --with-model` where the Desktop Bridge is installed; otherwise ask the developer to reload and look.
+- Whether the model loads and the numbers are right. Test every measure you write or change, without asking: `python scripts/desktop_bridge.py open .` when Desktop does not have the project, else `reload . --with-model`; then `screenshots .` and look at a visual that uses the measure. An error icon means the DAX is wrong: fix it and look again. With Microsoft's modeling server set up, you may also run a query that returns the measure (`references/data-facts.md`). When neither is possible, list in your final answer each measure that is not tested. A formula that passes the checks can still fail in Power BI: Desktop rejected `Calculations[Amount]` until the table name was quoted, `'Calculations'[Amount]`.
 
 ## When you are stuck
 

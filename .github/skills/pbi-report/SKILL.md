@@ -28,6 +28,7 @@ Checklist items are in `checklist/checklist.md`. Read only the items a step name
 | Field parameters, bookmarks and buttons, tooltip and drillthrough pages, sync slicers, conditional formatting, phone layout, chart choice, titles, filters, accessibility, page density | `references/report-standard.md` | V0xx, A00x, U1xx |
 | Features inside a visual and on a page: filter kinds, drilling, small multiples, totals, sparklines, analytics lines, more slicers and buttons, cross-report drillthrough; what has no file form | `references/visual-features.md` | V022 |
 | Colour, text sizes, header icons and tooltips | `references/theme.md` | H00x, V009, T001 |
+| Improving the design of existing pages: judging each page, chart fit, colour by meaning, tab order | `references/design.md` | V025, V026, A002 |
 | Reloading and looking at pages yourself (optional) | `references/desktop-bridge.md` | - |
 
 ## New page or new visual
@@ -47,7 +48,7 @@ Checklist items are in `checklist/checklist.md`. Read only the items a step name
 - Give each existing visual a label. Write the labels from the `list_visuals.py` output, as the naming rule sets out, list them in your final answer, and run `python scripts/set_visual_defaults.py . --label <page folder>/<visual folder>=<Page_Type_Subject>`, with one `--label` for each visual.
 - The theme: the developer imports `theme/theme.json` once in Power BI Desktop (Design ribbon > Import theme). `python scripts/check_template.py` then confirms the copy.
 - Document non-obvious interactions, bookmarks or filter logic where they live (item 8): in the brief, or in an annotation on the page or visual.
-- To report gaps without changing anything, use the skill `pbi-checklist-review`. To evaluate and then fix in one request, use the skill `pbi-improve`.
+- To improve the design of a page: `references/design.md`. To report gaps without changing anything, use the skill `pbi-checklist-review`. To evaluate and then fix in one request, use the skill `pbi-improve`.
 
 ## A report on a published model
 
@@ -71,7 +72,7 @@ Never set up a connection to a workspace yourself. The check compares every fiel
 
 Files that pass the checks can still look wrong: text that is cut off, real colours, a visual with an error icon.
 
-- Where the Desktop Bridge is installed (the script says "not available" when it is not): reload and take a picture of each page yourself, look at the pictures, and delete them (`references/desktop-bridge.md`).
+- Where the Desktop Bridge is installed (the script says "not available" when it is not): open the project when Desktop does not have it, or reload it, take a picture of each page yourself, look at the pictures, and delete them (`references/desktop-bridge.md`). Do it without asking.
 - Otherwise name the pages that changed and ask the developer to reload the project in Power BI Desktop and to look at them.
 - Never say a page looks right from the files alone. Slow visuals and export results (items 68, 77) need a person.
 

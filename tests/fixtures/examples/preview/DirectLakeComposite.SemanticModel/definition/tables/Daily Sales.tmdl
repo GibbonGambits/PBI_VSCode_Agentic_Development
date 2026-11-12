@@ -18,8 +18,8 @@ table 'Daily Sales'
 		mode: import
 		source =
 				SUMMARIZECOLUMNS (
-				    Sales[Date Key],
-				    "Daily Amount", SUM ( Sales[Amount] )
+				    'Sales'[Date Key],
+				    "Daily Amount", SUM ( 'Sales'[Amount] )
 				)
 
 	annotation CalculatedReason = Shipped example of a calculated table over Direct Lake data (preview); in a real model this summary is made in the lakehouse.

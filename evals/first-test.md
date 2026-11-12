@@ -10,14 +10,15 @@ The report is not kept in this repository. Do not commit someone else's report t
 2. Open it in Power BI Desktop. File > Save as, file type Power BI project (`.pbip`), into the root of your scratch clone. Close Desktop.
 3. Do not import the theme and do not fix anything by hand: the test is what the flow finds and does.
 4. Commit nothing and fill in nothing by hand: the agent makes the first commit, and the brief stays empty.
+5. Optional, once per computer: the Desktop Bridge, so that the agent opens the report and looks at the pages itself. In a terminal: `winget install OpenJS.NodeJS.LTS`; close and reopen VS Code; then `npm.cmd install -g @microsoft/powerbi-desktop-bridge-cli @microsoft/powerbi-report-authoring-cli`. Without it the agent shows you these lines at the start and carries on.
 
 ## Run
 
 In VS Code, in the chat of your AI agent in agent mode, with the model you want to test, ask exactly:
 
-> Evaluate and improve this report.
+> Improve this report: both the design and best practices.
 
-The flow has no approvals and asks nothing. Answer nothing until the final answer.
+Naming both answers the one question the flow would ask. "Improve the design" or "Apply best practices" test one scope at a time. The flow has no approvals and asks nothing more. Answer nothing until the final answer.
 
 At any time you can ask the script where the flow stands:
 
@@ -35,6 +36,8 @@ python scripts/improve.py next
 | Rows in the plan by kind and by status | `python scripts/improve.py check-plan` |
 | The commits, one for each kind | `git log --oneline` |
 | Every question the agent asked between its first step and its final answer (there should be none) | your notes |
+| The pages it looked at itself, and what it fixed after looking | the chat; the screenshot lines of `desktop_bridge.py` |
+| The count of changes by type, and the full list | the final answer; `docs/change-log.md` |
 | Every place where it guessed, skipped a step, needed a reminder, or handed work back to you that it could have done | your notes |
 | What it looked up, and where | its answers: every address should be on Microsoft Learn, dax.guide or sqlbi.com |
 | What looked different in Desktop, page by page | open `_before/` and the working project side by side |
@@ -45,14 +48,17 @@ In Power BI Desktop also check these, because no document settles them: the repo
 ## What a good result looks like
 
 - A new branch `improve/<date>`; the branch you started on did not move; `_before/` opens in Desktop and is not in Git.
-- The agent asked nothing and waited for no approval.
+- The agent asked nothing and waited for no approval. With the Desktop Bridge installed it opened the report itself, looked at the pages before each commit, and you gave it no screenshots.
 - The review has all 79 rows and passes `python scripts/check_project.py --review docs/checklist-review.md`. Every "Not applicable" row quotes the checklist's own line for that item.
 - The plan sorts every finding into a kind, and every row has a status. Notes whose codes start with U are listed as suggestions, not as fix rows.
 - The theme is registered: `python scripts/check_project.py .` reports no T001, and the report's `StaticResources/RegisteredResources/` folder holds the theme file.
 - Every measure is in `_Measures`, not one or two: no M001, no M002, and no M908 or B001 for a moved measure. The model has one measures table, and the agent did not ask you to do a move in Desktop.
 - Every row of the kind Data is done, in the last commit. The final answer starts by saying that the model must be refreshed once; after that refresh every page shows the same data as in `_before/`.
 - A visual that uses drill-down, a help tooltip, a tooltip page or tooltip fields kept its header icons or its tooltip, with a row in section 7 of the brief.
-- One commit for each kind that had rows, in this order: `Improve: theme`, `Improve: mechanical fixes`, `Improve: layout fixes`, `Improve: measures moved`, `Improve: renames`, `Improve: changes that need a refresh`. Undoing one with `git revert` leaves the others in place.
+- One commit for each kind that had rows, in this order: `Improve: theme`, `Improve: design`, `Improve: mechanical fixes`, `Improve: layout fixes`, `Improve: measures moved`, `Improve: renames`, `Improve: changes that need a refresh`, then `Improve: change log`. Undoing one with `git revert` leaves the others in place.
+- Design: each page was judged first; a page that worked was left alone, with "the page works" in its row. No visual shows an automatic subtitle made of field names. No amount is coloured red to green (no V026). Nothing the page showed before is missing.
+- Every measure the agent wrote or changed shows a value in a picture, or is listed in the final answer as not tested. No visual shows an error icon. Every table name in DAX is in single quotes.
+- The final answer has a table of changes by type and a few key changes; `docs/change-log.md` lists every change with its before and after.
 - Fewer Fail items after than before, and no item that went from Pass to Fail. `compare` says how many of the remaining Fail items wait for a fact from a person.
 - `python scripts/check_project.py .` reports no G001 and no G002, and fewer errors than at the start.
 - Every description the agent wrote comes from the brief or is a `TODO(owner)` question. All questions come once, in the final answer, with rows that ask the same thing shown once.

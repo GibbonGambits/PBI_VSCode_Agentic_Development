@@ -160,7 +160,8 @@ def main(argv):
     print("%d visual(s) %s." % (len(planned), "would change" if dry_run else "changed"))
     if changed_pages:
         print("Reload the project in Power BI Desktop and look at these pages: %s." % ", ".join(changed_pages))
-        print("Also check there: the phone layout if the report has one, and the tab order (View > Selection > Tab order).")
+        print("Then set the tab order to the new reading order: python scripts/set_tab_order.py . "
+              "Also check the phone layout if the report has one.")
     return 0
 
 

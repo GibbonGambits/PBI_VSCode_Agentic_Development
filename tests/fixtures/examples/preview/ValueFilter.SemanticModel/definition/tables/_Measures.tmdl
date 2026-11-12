@@ -10,7 +10,7 @@ table _Measures
 	measure '# Catalog Rows All Years' =
 			CALCULATE (
 			    [# Catalog Rows],
-			    REMOVEFILTERS ( Catalog[Year] )
+			    REMOVEFILTERS ( 'Catalog'[Year] )
 			)
 		formatString: #,0
 		displayFolder: Finance\Counts

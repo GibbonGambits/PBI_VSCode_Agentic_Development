@@ -411,11 +411,11 @@ class Dax(StarCase):
 
 class Security(StarCase):
     def test_M601_text_functions_in_a_rule(self):
-        self.role("Store", 'LEFT ( Store[City], 1 ) = "U"')
+        self.role("Store", 'LEFT ( \'Store\'[City], 1 ) = "U"')
         self.assertFinds("M601", "warn")
 
     def test_plain_rule_on_a_dimension_passes(self):
-        self.role("Store", 'Store[City] = "Utrecht"')
+        self.role("Store", '\'Store\'[City] = "Utrecht"')
         self.assertEqual(self.codes(), [])
 
     def test_M602_rule_on_a_fact_table(self):

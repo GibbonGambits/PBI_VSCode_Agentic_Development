@@ -24,8 +24,8 @@ table Store
 	column 'Store Name Local' =
 			IF (
 			    USERCULTURE () = "nl-NL",
-			    Store[Store Name Dutch],
-			    Store[Store Name]
+			    'Store'[Store Name Dutch],
+			    'Store'[Store Name]
 			)
 		dataType: string
 		summarizeBy: none

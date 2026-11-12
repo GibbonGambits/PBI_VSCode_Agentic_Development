@@ -25,6 +25,7 @@ import check_template as ct           # noqa: E402
 import improve                        # noqa: E402
 import set_model_properties as smp    # noqa: E402
 import set_positions as sp            # noqa: E402
+import set_tab_order as sto           # noqa: E402
 import set_visual_defaults as svd     # noqa: E402
 
 TABLES = os.path.join("Sample.SemanticModel", "definition", "tables")
@@ -182,7 +183,7 @@ class BadProject(Case):
                        "M006 measure [Quantity] has the same name as column Orders[Quantity]",
                        "M007 measure name [total_sales]",
                        "M009 visible measure [total_sales] has no format string",
-                       "M010 DAX of [Total Sales]: write the column with its table: [Amount]",
+                       "M010 DAX of [Total Sales]: write the column with its table, the table in single quotes ('Table'[Column]): [Amount]",
                        "M010 DAX of [ytd Sales]: write the measure without its table: Orders[Total Sales]",
                        "M101 table 'Product' shows 21 fields",
                        "M102 column Orders[CustomerKey] is the many side of a relationship",
@@ -502,7 +503,7 @@ class MeasureNames(Case):
 
 class DaxReferences(Case):
     def test_unqualified_column_warns(self):
-        self.replace(MEASURES, "SUM ( Sales[Amount] )", "SUM ( [Amount] )")
+        self.replace(MEASURES, "SUM ( 'Sales'[Amount] )", "SUM ( [Amount] )")
         self.assertWarns("M010")
         self.assertIn("[Amount]", self.messages("M010")[0])
 
@@ -642,7 +643,7 @@ class ColumnsAndTables(Case):
         self.assertNot("M101")
 
     def test_hidden_column_nothing_uses_is_a_note(self):
-        self.replace(MEASURES, "DISTINCTCOUNT ( Sales[OrderId] )", "COUNTROWS ( Sales )")
+        self.replace(MEASURES, "DISTINCTCOUNT ( 'Sales'[OrderId] )", "COUNTROWS ( 'Sales' )")
         self.assertEqual(sorted(self.codes("note")), ["I001", "M201"])
         self.assertEqual(self.codes(False), [])
 
@@ -801,7 +802,7 @@ class SetModelProperties(Case):
 
     def test_existing_value_is_replaced_in_place(self):
         self.assertEqual(self.run_set("[Total Sales].formatString=#,0.00")[0], 0)
-        self.assertIn("SUM ( Sales[Amount] ) // one-line DAX comment is allowed here\n\t\tformatString: #,0.00\n"
+        self.assertIn("SUM ( 'Sales'[Amount] ) // one-line DAX comment is allowed here\n\t\tformatString: #,0.00\n"
                       "\t\tdisplayFolder: Finance\\Base\n", self.read(MEASURES))
 
     def test_property_goes_after_a_multi_line_expression(self):
@@ -961,6 +962,58 @@ class SetPositions(Case):
             self.assertEqual(quiet(sp.main, ["set_positions.py", self.root] + args)[0], 2, args)
 
 
+class SetTabOrder(Case):
+    def orders(self):
+        return [json.loads(self.read(p))["position"].get("tabOrder") for p in (GROUP, CARD, BAR)]
+
+    def test_numbers_follow_the_reading_order_and_nothing_else_changes(self):
+        for path, number in ((GROUP, 0), (CARD, 1), (BAR, 2)):          # low numbers already go first
+            self.edit_json(path, lambda d, n=number: d["position"].update({"tabOrder": n}))
+        self.edit_json(BAR, lambda d: d["position"].update({"y": 10}))   # the bar now sits above the card
+        before = json.loads(self.read(BAR))
+        code, out = quiet(sto.main, ["set_tab_order.py", self.root])
+        self.assertEqual(code, 0, out)
+        self.assertIn("low numbers first (the page's own numbers)", out)
+        self.assertEqual(self.orders(), [0, 2, 1])
+        after = json.loads(self.read(BAR))
+        self.assertEqual(after["position"], dict(before["position"], tabOrder=1))
+        before.pop("position")
+        after.pop("position")
+        self.assertEqual(after, before)
+        self.assertIn("View > Selection > Tab order on: Overview.", out)
+
+    def test_high_numbers_go_first_when_the_numbers_do_not_say(self):
+        for path in (GROUP, CARD, BAR):
+            self.edit_json(path, lambda d: d["position"].pop("tabOrder", None))
+        code, out = quiet(sto.main, ["set_tab_order.py", self.root])
+        self.assertEqual(code, 0, out)
+        self.assertIn("high numbers first (no clear pattern in the numbers, so the default)", out)
+        self.assertEqual(self.orders(), [2, 1, 0])
+
+    def test_visuals_in_a_group_and_tooltip_pages_are_left_alone(self):
+        self.edit_json(BAR, lambda d: d.update({"parentGroupName": "Overview_Group_Header"}))
+        self.edit_json(BAR, lambda d: d["position"].update({"tabOrder": 77}))
+        quiet(sto.main, ["set_tab_order.py", self.root])
+        self.assertEqual(self.orders()[2], 77)
+        self.edit_json(os.path.join(PAGE, "page.json"), lambda d: d.update({"type": "Tooltip"}))
+        self.edit_json(CARD, lambda d: d["position"].update({"y": 600}))
+        before = self.read(CARD)
+        code, out = quiet(sto.main, ["set_tab_order.py", self.root])
+        self.assertIn("left alone  Overview: a tooltip page", out)
+        self.assertEqual(self.read(CARD), before)
+
+    def test_dry_run_changes_nothing_and_wrong_usage(self):
+        self.edit_json(BAR, lambda d: d["position"].update({"y": 10}))
+        before = self.read(CARD)
+        code, out = quiet(sto.main, ["set_tab_order.py", self.root, "--dry-run"])
+        self.assertEqual(code, 0)
+        self.assertIn("would change", out)
+        self.assertEqual(self.read(CARD), before)
+        for args in ([], ["--page"], ["--page", "Nowhere"]):
+            self.assertEqual(quiet(sto.main, ["set_tab_order.py", self.root] + args)[0] if args else
+                             quiet(sto.main, ["set_tab_order.py"])[0], 2, args)
+
+
 # ---------------------------------------------------------------- the flow
 
 REVIEW_HEAD = "# Checklist review\n\n| Item | Status | Evidence |\n|---|---|---|\n"
@@ -1085,6 +1138,35 @@ class Flow(FlowCase):
         rows, _ = improve.read_plan(self.path(os.path.join("docs", "fix-plan.md")))
         return [row["Status"] for row in rows if row["Item or code"] == code]
 
+    def test_the_scope_asked_for_skips_the_other_kinds(self):
+        self.assertEqual(quiet(improve.main, ["improve.py", "start", self.root, "--scope", "colour"])[0], 2)
+        self.assertEqual(quiet(improve.main, ["improve.py", "next", self.root, "--scope", "design"])[0], 2)
+        code, out = quiet(improve.main, ["improve.py", "start", self.root, "--scope", "design"])
+        self.assertEqual(code, 0, out)
+        self.assertIn("Scope: design (Theme, Design, Layout)", out)
+        self.assertEqual(improve.scope_of(self.root), "design")
+        self.replace(CARD, '"width": 608', '"width": 610')
+        self.replace(SALES, "\t/// Sales channel of the order line: Web or Store.\n", "")
+        self.commit("As found")
+        self.write(os.path.join("docs", "checklist-review.md"), review_text(fails=(54, 76)))
+        quiet(improve.snapshot, self.root)
+        self.assertEqual(quiet(improve.plan, self.root)[0], 0)
+        text = self.read(os.path.join("docs", "fix-plan.md"))
+        self.assertIn("| Design | Item 54 |", text)                     # a failed design item is a Design row
+        self.assertIn("Scope: design.", text)
+        self.assertEqual(self.statuses("G003"), ["to do"])                # Layout is in the scope
+        self.assertEqual(self.statuses("D001"), ["skipped: outside the scope asked for (design)"])
+        self.assertEqual(self.statuses("Item 54"), ["to do"])
+        self.assertEqual(self.statuses("Item 76"), ["question"])          # a question stays a question
+
+    def test_the_count_table_counts_each_kind(self):
+        rows = [{"Kind": "Design", "Status": "done"}, {"Kind": "Design", "Status": "skipped: the page works"},
+                {"Kind": "Layout", "Status": "to do"}, {"Kind": "Needs a person", "Status": "question"}]
+        table = "\n".join(improve.count_table(rows))
+        self.assertIn("| Change type | Done | Skipped | To do | Questions |", table)
+        self.assertIn("| Design | 1 | 1 | 0 | 0 |", table)
+        self.assertIn("| Total | 1 | 1 | 1 | 1 |", table)
+
     def test_nothing_waits_for_an_approval(self):
         self.plan_with((CARD, '"width": 608', '"width": 610'),
                        (SALES, "\t/// Sales channel of the order line: Web or Store.\n", ""))
@@ -1097,7 +1179,7 @@ class Flow(FlowCase):
         self.assertNotIn("Stop.", step)
 
     def test_a_move_is_never_held_back(self):
-        moved = "\tmeasure 'Sales Check' = SUM ( Sales[Amount] )\n\t\tformatString: #,0\n\t\tdisplayFolder: Finance\\Base\n"
+        moved = "\tmeasure 'Sales Check' = SUM ( 'Sales'[Amount] )\n\t\tformatString: #,0\n\t\tdisplayFolder: Finance\\Base\n"
         plan = self.plan_with((SALES, "\tannotation SampleSource", "\t/// Made-up measure outside the measures table.\n"
                                + moved + "\n\tannotation SampleSource"))
         self.assertEqual(self.statuses("M001"), ["to do"])                    # no brief answer is needed
@@ -1230,6 +1312,16 @@ class Flow(FlowCase):
         self.assertIn("all 79 items", step)
 
         self.write(os.path.join("docs", "checklist-review.md"), review_text(fails=(76,), not_applicable=(79,)))
+        self.assertIn("python scripts/improve.py changelog", self.step())
+        code, out = quiet(improve.changelog, self.root)
+        self.assertEqual(code, 0, out)
+        log = self.read(improve.CHANGE_LOG)
+        self.assertIn("| Mechanical | 1 | 1 | 0 | 0 |", log)                          # the count by change type
+        self.assertIn("| Layout | 2 | 0 | 0 | 0 |", log)
+        self.assertIn("### Before and after, file by file", log)
+        self.assertIn("`position.width`: 610 -> 608", log)                          # the card's width, before -> after
+        self.assertIn("Improve: layout fixes", log)
+        self.commit("Improve: change log")
         self.assertIn("python scripts/improve.py compare", self.step())
         code, out = quiet(improve.compare, self.root)
         self.assertEqual(code, 0)
@@ -1242,11 +1334,12 @@ class Flow(FlowCase):
         self.assertIn("Still Fail: 1 item(s).", lines)
         self.assertIn("1 can pass only on a fact from a person (items 76).", lines)
         self.assertIn("0 wait on a skipped fix or on an answer about the files.", lines)
-        self.assertIn("Mechanical: 1 done, 1 skipped, 0 to do.", lines)
+        self.assertIn("| Mechanical | 1 | 1 | 0 | 0 |", lines)
+        self.assertIn("| Total | 3 | 1 | 0 | 1 |", lines)
         self.assertTrue(any(line.startswith("Skipped: 1 row(s)") for line in lines))
         self.assertTrue(any(line.startswith("Questions for a person: 1 row(s)") for line in lines))
         subjects = self.git("log", "--format=%s", "work..HEAD").splitlines()
-        self.assertEqual(subjects[:2], [improve.COMMITS["Layout"], improve.COMMITS["Mechanical"]])   # one commit per kind
+        self.assertEqual(subjects[:3], ["Improve: change log", improve.COMMITS["Layout"], improve.COMMITS["Mechanical"]])
 
     def test_an_answered_question_and_like_rows_are_shown_once(self):
         self.plan_with((CARD, '"width": 608', '"width": 610'))
@@ -1680,8 +1773,8 @@ class TemplateFiles(unittest.TestCase):
                     self.assertEqual(listed[code], "", code)
 
     def test_every_error_and_warning_is_sorted_by_the_improve_flow(self):
-        tables = (improve.THEME, improve.MECHANICAL, improve.LAYOUT, improve.MEASURES, improve.RENAMES, improve.DATA,
-                  improve.PERSON)
+        tables = (improve.THEME, improve.DESIGN, improve.MECHANICAL, improve.LAYOUT, improve.MEASURES, improve.RENAMES,
+                  improve.DATA, improve.PERSON)
         sorted_codes = set().union(*tables)
         self.assertEqual(sum(len(table) for table in tables), len(sorted_codes))     # a code has one kind only
         errors_and_warnings = {c for c, levels in self.all_codes().items()

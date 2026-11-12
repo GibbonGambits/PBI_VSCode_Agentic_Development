@@ -22,24 +22,24 @@ DIVIDE (
 - Leave out DIVIDE's third argument (rule 7).
 - Source: https://learn.microsoft.com/en-us/dax/best-practices/dax-divide-function-operator ; https://learn.microsoft.com/en-us/dax/divide-function-dax ; rule USE_THE_DIVIDE_FUNCTION_FOR_DIVISION in the best practice rules above; https://www.sqlbi.com/articles/divide-performance/
 
-**3. Counting rows.** Count rows with `COUNTROWS ( Sales )`, not `COUNT ( Sales[Order Key] )`. Why: it says what you mean, is faster, and does not skip rows where one column is blank. Check: M503 (warn; a measure that is one COUNT or COUNTA over a column). If the measure really counts the non-blank values of one column, list it in section 9. Source: https://learn.microsoft.com/en-us/dax/best-practices/dax-countrows
+**3. Counting rows.** Count rows with `COUNTROWS ( 'Sales' )`, not `COUNT ( 'Sales'[Order Key] )`. Why: it says what you mean, is faster, and does not skip rows where one column is blank. Check: M503 (warn; a measure that is one COUNT or COUNTA over a column). If the measure really counts the non-blank values of one column, list it in section 9. Source: https://learn.microsoft.com/en-us/dax/best-practices/dax-countrows
 
-**4. One selected value.** Read a single selected value with `SELECTEDVALUE ( Store[City] )`, not IF with HASONEVALUE and VALUES. Give a second argument when "none or several" needs its own result. Why: one function does both steps. Check: M504 (warn). Source: https://learn.microsoft.com/en-us/dax/best-practices/dax-selectedvalue
+**4. One selected value.** Read a single selected value with `SELECTEDVALUE ( 'Store'[City] )`, not IF with HASONEVALUE and VALUES. Give a second argument when "none or several" needs its own result. Why: one function does both steps. Check: M504 (warn). Source: https://learn.microsoft.com/en-us/dax/best-practices/dax-selectedvalue
 
-**5. VALUES compared with one value.** Never compare VALUES of a column with one value, as in `VALUES ( Store[City] ) = "Utrecht"`. Why: it returns an error as soon as two or more values are in the filter. Use SELECTEDVALUE. Check: M517 (warn). Source: https://learn.microsoft.com/en-us/dax/best-practices/dax-selectedvalue
+**5. VALUES compared with one value.** Never compare VALUES of a column with one value, as in `VALUES ( 'Store'[City] ) = "Utrecht"`. Why: it returns an error as soon as two or more values are in the filter. Use SELECTEDVALUE. Check: M517 (warn). Source: https://learn.microsoft.com/en-us/dax/best-practices/dax-selectedvalue
 
 **6. FILTER as a filter argument.** In CALCULATE and CALCULATETABLE, filter the column, not FILTER over a whole table. Why: a column filter is faster and clearer. Checklist item 32 allows 0 avoidable cases. Check: M505 (warn).
 
 ```dax
 CALCULATE (
     [Total Sales],
-    KEEPFILTERS ( Store[City] = "Utrecht" )
+    KEEPFILTERS ( 'Store'[City] = "Utrecht" )
 )
 ```
 
-- Not `CALCULATE ( [Total Sales], FILTER ( Store, Store[City] = "Utrecht" ) )`.
+- Not `CALCULATE ( [Total Sales], FILTER ( 'Store', 'Store'[City] = "Utrecht" ) )`.
 - KEEPFILTERS: a plain column test replaces any filter already on that column; FILTER over the table kept it. Wrap the test in KEEPFILTERS to keep the old result. SQLBI adds: a test on one value of one column needs no KEEPFILTERS; several values, or several columns, do (no check).
-- When the test needs a measure, FILTER stays, but over `VALUES ( Store[City] )`, not over the table `Store`.
+- When the test needs a measure, FILTER stays, but over `VALUES ( 'Store'[City] )`, not over the table `'Store'`.
 - Source: https://learn.microsoft.com/en-us/dax/best-practices/dax-avoid-avoid-filter-as-filter-argument ; rule FILTER_COLUMN_VALUES in the best practice rules; https://www.sqlbi.com/articles/best-practices-for-using-keepfilters-in-dax/
 
 **7. Blanks stay blank.** A measure with nothing to show returns blank. Do not write `IF ( ISBLANK ( x ), 0, x )`, `COALESCE ( x, 0 )`, `DIVIDE ( a, b, 0 )` or `+ 0`. Why: a zero makes every item appear in a visual, which is slower and uses more memory. If all items must show, the developer turns on "Show items with no data" on the visual. A zero the brief asks for goes in section 9. Check: M506 (warn; measures only). Source: https://learn.microsoft.com/en-us/dax/best-practices/dax-avoid-converting-blank
@@ -52,7 +52,7 @@ Where a fallback that is not a zero is allowed (a second measure, or a value the
 VAR UtrechtSales =
     CALCULATE (
         [Total Sales],
-        Store[City] = "Utrecht"
+        'Store'[City] = "Utrecht"
     )
 RETURN
     UtrechtSales - UtrechtSales * 0.1
@@ -62,14 +62,14 @@ Source: https://learn.microsoft.com/en-us/dax/best-practices/dax-variables ; htt
 
 **9. EARLIER and EARLIEST.** Do not use them. Store the outer value in a variable before the inner row context starts. Why: a variable is clearer and does the same. Check: M514 (warn). Source: https://learn.microsoft.com/en-us/dax/best-practices/dax-variables
 
-**10. Column and measure references.** Write a column with its table, `Sales[Amount]`, and a measure without one, `[Total Sales]`. Why: a measure written with its table breaks when the measure moves to another table, and a bare name then always means a measure. M010 reads measures, calculated columns, calculation items, role filters and user-defined functions. It reports a bare name that is a column, and a measure written with a table. Microsoft Learn also asks for table names on columns inside functions (rule 39). This is rule 5 of the model standard. Check: M010 (warn). Source: https://learn.microsoft.com/en-us/dax/best-practices/dax-column-measure-references ; https://learn.microsoft.com/en-us/dax/best-practices/dax-user-defined-functions ; rules DAX_COLUMNS_FULLY_QUALIFIED and DAX_MEASURES_UNQUALIFIED in the best practice rules
+**10. Column and measure references.** Write a column with its table, `'Sales'[Amount]`, and a measure without one, `[Total Sales]`. Why: a measure written with its table breaks when the measure moves to another table, and a bare name then always means a measure. M010 reads measures, calculated columns, calculation items, role filters and user-defined functions. It reports a bare name that is a column, and a measure written with a table. Microsoft Learn also asks for table names on columns inside functions (rule 39). This is rule 5 of the model standard. Check: M010 (warn). Source: https://learn.microsoft.com/en-us/dax/best-practices/dax-column-measure-references ; https://learn.microsoft.com/en-us/dax/best-practices/dax-user-defined-functions ; rules DAX_COLUMNS_FULLY_QUALIFIED and DAX_MEASURES_UNQUALIFIED in the best practice rules
 
 **11. Window functions.** OFFSET, WINDOW, INDEX, RANK and ROWNUMBER always get ORDERBY, and PARTITIONBY when the order restarts per group. Why: columns that are added by default come in no fixed order, so results can surprise. When the ORDERBY and PARTITIONBY columns do not identify every row, add MATCHBY with columns that do (no check). Check: M516 (warn).
 
 ```dax
 RANK (
     DENSE,
-    ALLSELECTED ( Store[City] ),
+    ALLSELECTED ( 'Store'[City] ),
     ORDERBY (
         [Total Sales],
         DESC
@@ -102,7 +102,7 @@ Source: rule AVOID_USING_'1-(X/Y)'_SYNTAX in the best practice rules; Microsoft'
 
 **17. Time intelligence in a DirectQuery model.** When any table is DirectQuery, time intelligence functions can be slow. If visuals are slow, use columns in the date table or prior-period values prepared at the source, with plain filters. Check: M513 (warn; a measure or calculation item calls a function from the time intelligence group of the function index). Source: rule MEASURES_USING_TIME_INTELLIGENCE_AND_MODEL_IS_USING_DIRECT_QUERY in the best practice rules
 
-**18. Names the model does not have.** Every `Table[Name]` must be a column of that table or a measure. Why: Microsoft says that a formula naming a column or table that cannot be found returns an error. Read the table's file before you write a name. The check only sees names written with a table that exists; check bare `[Name]` references yourself. Check: M908 (fail). Source: https://learn.microsoft.com/dax/dax-overview (Context; Troubleshooting) ; https://learn.microsoft.com/en-us/dax/dax-syntax-reference
+**18. Names the model does not have.** Every `'Table'[Name]` must be a column of that table or a measure. Why: Microsoft says that a formula naming a column or table that cannot be found returns an error. Read the table's file before you write a name. The check only sees names written with a table that exists; check bare `[Name]` references yourself. Check: M908 (fail). Source: https://learn.microsoft.com/dax/dax-overview (Context; Troubleshooting) ; https://learn.microsoft.com/en-us/dax/dax-syntax-reference
 
 **19. Functions that do not exist.** Call only functions in the file `dax-functions.md` beside this one, or a user-defined function of this model. Look up a function before you use it for the first time (skill `pbi-lookup`); never invent one. Check: M909 (warn). Source: https://learn.microsoft.com/en-us/dax/dax-function-reference ; the index is built from https://learn.microsoft.com/en-us/dax/toc.json and, for the function pages it leaves out, from https://learn.microsoft.com/_sitemaps/sitemapindex.xml
 
@@ -113,19 +113,19 @@ Source: rule AVOID_USING_'1-(X/Y)'_SYNTAX in the best practice rules; Microsoft'
 - Use ALLEXCEPT only when the kept column is filtered directly; otherwise REMOVEFILTERS plus VALUES (Microsoft's skill, pattern DAX012, and SQLBI).
 - Source: checklist item 32; Microsoft's skill (address in rule 8; pattern DAX012: https://github.com/microsoft/skills-for-fabric/blob/main/plugins/powerbi-authoring/skills/semantic-model-authoring/references/dax-perf-patterns.md); https://www.sqlbi.com/articles/all-vs-allselected-vs-allexcept-vs-removefilters/
 
-**21. Base and presentation measures.** A base measure holds the core logic once (`Total Sales`). Ratios, KPIs and time variants call it (`Total Sales YTD` uses `[Total Sales]`) and never repeat `SUM ( Sales[Amount] )`. Two or more variants of one metric is a review point. Judged in the review. Source: checklist item 35, which points to https://learn.microsoft.com/en-us/power-bi/guidance/power-bi-optimization
+**21. Base and presentation measures.** A base measure holds the core logic once (`Total Sales`). Ratios, KPIs and time variants call it (`Total Sales YTD` uses `[Total Sales]`) and never repeat `SUM ( 'Sales'[Amount] )`. Two or more variants of one metric is a review point. Judged in the review. Source: checklist item 35, which points to https://learn.microsoft.com/en-us/power-bi/guidance/power-bi-optimization
 
 ## B. DAX style
 
 The style is SQLBI's formatting rules, restated in new words; no SQLBI text, code or image is copied. M520 (warn) reads measures, calculated columns, calculation items, functions and role filters. It gives one warning per table file, names the formulas, and quotes each rule broken; its text starts with the words given below. An exception is listed per object, with M520.
 
-22. Write CALCULATE in full, never `[Total Sales] ( Store[City] = "Utrecht" )`. M520: "write CALCULATE in full".
-23. Put one space between a function name and `(`, and one before `)`: `SUM ( Sales[Amount] )`. An empty pair stays together, `SELECTEDMEASURE ()` (this template's own addition; SQLBI's article does not cover it). M520: "put a space between a function name and '('", "put a space before ')'".
+22. Write CALCULATE in full, never `[Total Sales] ( 'Store'[City] = "Utrecht" )`. M520: "write CALCULATE in full".
+23. Put one space between a function name and `(`, and one before `)`: `SUM ( 'Sales'[Amount] )`. An empty pair stays together, `SELECTEDMEASURE ()` (this template's own addition; SQLBI's article does not cover it). M520: "put a space between a function name and '('", "put a space before ')'".
 24. Keep `(` on the line of its function name. M520: "keep '(' on the line of its function name".
 25. Put each comma directly after its argument, and a space after it when the next argument is on the same line. M520: "put each comma directly after its argument", "put a space after a comma".
 26. Put a space on both sides of an operator: `+ - * / & = < > <= >= <> && ||`. M520: "put a space on both sides of an operator".
 27. When an expression goes on to the next line, start that line with the operator. The only operator that may end a line is the `=` of `VAR Name =` (this template's own addition; SQLBI's article is older than variables). M520: "start a continued line with the operator".
-28. Write a column right after its table, with no space: `Sales[Amount]`. M520: "write a column directly after its table".
+28. Write a column right after its table, with no space: `'Sales'[Amount]`. M520: "write a column directly after its table".
 29. A call with two or more arguments, or with another call inside it, puts each argument on its own line. A call with one plain argument stays on one line. M520: "put each argument on its own line".
 30. A column that a formula makes with ADDCOLUMNS or SELECTCOLUMNS gets a name that starts with `@`: `"@Store Sales"`. Why: it cannot be mistaken for a measure. M520 checks this in measures, calculation items and functions: "start the name of a column the formula makes with @".
 31. Give a variable a plain name that says what it holds, such as `PriorSales`. No check. (A `_` prefix, which Microsoft's skill uses, is not adopted: see "Where sources disagree".)
@@ -135,7 +135,7 @@ SQLBI rules the template does not check:
 - Indent arguments four spaces and line the closing bracket up with its call: TMDL adds its own tab indentation, so the check cannot judge it. Follow it anyway, as the shipped examples do.
 - `:=` for measures: TMDL always writes `measure 'Name' =`. Does not apply.
 - Name on its own line, formula below: TMDL does this for a formula of more than one line.
-- Quotes round a table name only when needed: not adopted. Microsoft's skill writes quotes round every table name, and a higher source wins. Both forms pass. A name with a space or a reserved word always needs quotes: `'Date'[Date]`.
+- Quotes round a table name only when needed: not adopted. Write every table name in single quotes, also before a column: `'Sales'[Amount]`, `COUNTROWS ( 'Sales' )`. Why: Microsoft's skill always quotes, and a higher source wins; and a name that DAX reads as a keyword breaks the formula without quotes. Microsoft gives no full list of such words: Power BI Desktop rejected `Calculations[Amount]` with "The syntax for 'Calculations' is incorrect". M520 warns on a table name without quotes before a column: "write a table name in single quotes".
 
 A complete measure in the style (made up):
 
@@ -145,7 +145,7 @@ A complete measure in the style (made up):
 			VAR OnlineSales =
 			    CALCULATE (
 			        [Total Sales],
-			        Store[Store Type] = "Online"
+			        'Store'[Store Type] = "Online"
 			    )
 			VAR AllSales = [Total Sales]
 			RETURN
@@ -225,8 +225,8 @@ Time intelligence needs a marked date table: rule in the file `relationships-and
 ```dax
 ADDCOLUMNS (
     SUMMARIZE (
-        Sales,
-        Store[City]
+        'Sales',
+        'Store'[City]
     ),
     "@City Sales", [Total Sales]
 )
@@ -239,10 +239,10 @@ Source: https://www.sqlbi.com/articles/best-practices-using-summarize-and-addcol
 ```dax
 CALCULATETABLE (
     SUMMARIZECOLUMNS (
-        Store[City],
+        'Store'[City],
         "@City Sales", [Total Sales]
     ),
-    Product[Category] = "Garden"
+    'Product'[Category] = "Garden"
 )
 ```
 
@@ -250,9 +250,9 @@ The model setting for how SUMMARIZECOLUMNS treats filters on values is in the fi
 
 **34. ALLSELECTED stays out of iterations.** A measure that uses ALLSELECTED is never called inside an iterator (SUMX, AVERAGEX, FILTER and the like), directly or through another measure. Why: ALLSELECTED is meant to bring back the filters of the visual; inside an iteration it can bring back the filters of the iteration instead, and the result is hard to predict. Keep such measures few, and use them at the top of a chain, the measure the visual shows. No check: it needs the chain of measures. Source: https://www.sqlbi.com/articles/allselected-best-practices/
 
-**35. Context transition inside an iterator.** A measure reference or a CALCULATE inside SUMX or another iterator runs once for every row. Over a large table that is slow. In order of preference: write the row expression with columns only (`Sales[Quantity] * RELATED ( Product[Unit Cost] )`); walk only the distinct values that matter (`VALUES ( Store[Store Key] )`), not the whole table; or build the rows and their values once with SUMMARIZECOLUMNS and walk that. Each rewrite must return the same numbers. No check. Source: Microsoft's skill, patterns DAX006, DAX008 and DAX015 (address in rule 32)
+**35. Context transition inside an iterator.** A measure reference or a CALCULATE inside SUMX or another iterator runs once for every row. Over a large table that is slow. In order of preference: write the row expression with columns only (`'Sales'[Quantity] * RELATED ( 'Product'[Unit Cost] )`); walk only the distinct values that matter (`VALUES ( 'Store'[Store Key] )`), not the whole table; or build the rows and their values once with SUMMARIZECOLUMNS and walk that. Each rewrite must return the same numbers. No check. Source: Microsoft's skill, patterns DAX006, DAX008 and DAX015 (address in rule 32)
 
-**36. True or false as a number.** Inside an iterator, turn a test into 1 or 0 with `INT ( test )`, not with IF. To count the rows that pass a test, use `CALCULATE ( COUNTROWS ( Sales ), test )`, with no iterator. Microsoft's skill also multiplies a value by a test, so that sibling measures can share one scan of the fact table. That form returns 0 where rule 7 wants blank, and only suits sums: keep it only when a timing shows a gain. No check. Source: Microsoft's skill, patterns DAX007 and DAX017 (address in rule 32)
+**36. True or false as a number.** Inside an iterator, turn a test into 1 or 0 with `INT ( test )`, not with IF. To count the rows that pass a test, use `CALCULATE ( COUNTROWS ( 'Sales' ), test )`, with no iterator. Microsoft's skill also multiplies a value by a test, so that sibling measures can share one scan of the fact table. That form returns 0 where rule 7 wants blank, and only suits sums: keep it only when a timing shows a gain. No check. Source: Microsoft's skill, patterns DAX007 and DAX017 (address in rule 32)
 
 **37. More of Microsoft's speed patterns.** Microsoft's skill offers each as something to try and then measure, not as a rule to apply blindly: keep a rewrite only when it returns the same numbers and runs faster. No check.
 
@@ -299,7 +299,7 @@ Where sources disagree, and what was decided. Order of trust: the owner's checkl
 - `/` inside iterators: Microsoft's skill and SQLBI accept it once zero divisors are removed. Checklist item 33 asks for DIVIDE unless justified: M502 fails, and the reason goes in section 9.
 - DIVIDE by a constant: Microsoft's skill says DIVIDE by default; Microsoft Learn prefers `/` for a constant. Learn wins: `/ 1000` passes, and M518 warns on DIVIDE by a fixed number.
 - M010: Microsoft Learn says a measure written with its table breaks. The check only warns, because a text scanner cannot be certain (the level rule at the top of `scripts/model_rules.py`). Treat the rule as a must.
-- Table quotes: SQLBI quotes only when needed; Microsoft's skill always quotes. SQLBI's rule is not adopted; no check.
+- Table quotes: SQLBI quotes only when needed; Microsoft's skill always quotes. Microsoft's skill wins: every table name is quoted, and M520 warns on a table name without quotes before a column.
 - Variable names: Microsoft's skill starts them with `_`; Microsoft Learn's page on variables (https://learn.microsoft.com/dax/best-practices/dax-variables) and SQLBI write plain names. Microsoft Learn is the higher source, so the `_` prefix is not adopted (rule 31).
 - SUMMARIZECOLUMNS inside a measure: Microsoft's skill uses it by default; SQLBI keeps it for advanced cases. Microsoft's skill wins. Where its filters go: SQLBI and pattern DAX009 of Microsoft's skill put them in an outer CALCULATETABLE; the skill's general guidelines pass them as arguments. So M523 is a note (rule 33).
 - Grouping with values: Microsoft's skill prefers SUMMARIZECOLUMNS; SQLBI writes ADDCOLUMNS around SUMMARIZE. Both pass; M522 reports only a column computed inside SUMMARIZE (rule 32).

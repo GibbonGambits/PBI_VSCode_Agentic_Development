@@ -2,7 +2,7 @@
 table _Measures
 
 	/// Sum of the order line amounts of the picked region.
-	measure 'Total Sales' = SUM ( Sales[Amount] )
+	measure 'Total Sales' = SUM ( 'Sales'[Amount] )
 		formatString: #,0.00
 		displayFolder: Finance\Base
 
