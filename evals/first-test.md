@@ -6,8 +6,8 @@ The sample is Microsoft's and is not kept in this repository. Do not commit it t
 
 ## Set up
 
-1. Pick a sample whose data you can refresh on your computer. Both of these are in the folder `2026 Power BI Samples Revamp` of `microsoft/powerbi-desktop-samples` on GitHub; their queries were read; the first was refreshed once after the fix below, the second not yet:
-   - `Revenue Opportunities.pbix`: 3 pages, 12 visuals, 6 measures in a table named Calculations, its own theme. Seven tables hold their data inside the query and the eighth combines two of them, so it needs no outside source. As downloaded its refresh fails: in the query Calculations the column Create Date is a whole number, and the model says date. Before you save it as a project, choose Transform data, select Calculations, set Create Date to the type Date, then Close & Apply and refresh. Start with this one.
+1. Pick a sample whose data you can refresh on your computer. Both of these are in the folder `2026 Power BI Samples Revamp` of `microsoft/powerbi-desktop-samples` on GitHub; their queries were read, and neither has been refreshed here:
+   - `Revenue Opportunities.pbix`: 3 pages, 12 visuals, 6 measures in a table named Calculations, its own theme. Seven tables hold their data inside the query and the eighth combines two of them, so it needs no outside source. Start with this one.
    - `AdventureWorks Sales.pbix`: 1 page, 17 visuals, 20 measures in two tables. Seven tables read one Excel workbook, which is in the same repository: `AdventureWorks Sales Sample/AdventureWorks Sales.xlsx`. Download it too, then in Power BI Desktop choose Transform data > Data source settings > Change Source, point it at your copy, and refresh once.
    Do not use a sample whose source you cannot reach (`Corporate Spend.pbix` reads a workbook on its builder's computer): a table whose query or partition changes shows no data until it is refreshed.
 2. Open it in Power BI Desktop. File > Save as, file type Power BI project (`.pbip`), into the root of your scratch clone. Close Desktop.
