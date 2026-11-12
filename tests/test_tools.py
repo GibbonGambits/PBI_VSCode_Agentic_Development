@@ -95,6 +95,63 @@ class Scaffold(TempCase):
         self.assertEqual(findings.items, [])
         self.assertIn("Microsoft Learn", out)
 
+    def test_theme_is_registered_in_a_report_that_has_none(self):
+        quiet(scaffold.main, ["scaffold.py", "project", "Shop", self.tmp])           # a report with no custom theme
+        self.assertIn("T001", [f[0] for f in cp.run(self.tmp)[0].items])
+        path = os.path.join(self.tmp, "Shop.Report", "definition", "report.json")
+        with open(path, encoding="utf-8") as fh:
+            data = json.load(fh)
+        data["themeCollection"] = {"baseTheme": {"name": "Made-up base", "type": "SharedResources",
+                                                 "reportVersionAtImport": {"visual": "2.9.0", "report": "3.2.0", "page": "2.3.0"}}}
+        data["resourcePackages"] = [{"name": "SharedResources", "type": "SharedResources",
+                                     "items": [{"name": "Made-up base", "path": "BaseThemes/Made-up base.json", "type": "BaseTheme"}]}]
+        with open(path, "w", encoding="utf-8") as fh:
+            json.dump(data, fh)
+        code, out = quiet(scaffold.main, ["scaffold.py", "theme", self.tmp])
+        self.assertEqual(code, 0, out)
+        self.assertIn("Microsoft Learn", out)                                        # the caveat is always said
+        with open(path, encoding="utf-8") as fh:
+            data = json.load(fh)
+        self.assertEqual(data["themeCollection"]["baseTheme"]["name"], "Made-up base")       # the base theme stays
+        self.assertEqual(data["themeCollection"]["customTheme"],
+                         {"name": "theme.json", "type": "RegisteredResources",
+                          "reportVersionAtImport": {"visual": "2.9.0", "report": "3.2.0", "page": "2.3.0"}})
+        self.assertEqual([p["type"] for p in data["resourcePackages"]], ["SharedResources", "RegisteredResources"])
+        with open(os.path.join(self.tmp, "Shop.Report", "StaticResources", "RegisteredResources", "theme.json"), "rb") as fh:
+            copy = fh.read()
+        with open(os.path.join(REPO, "theme", "theme.json"), "rb") as fh:
+            self.assertEqual(copy, fh.read())                                        # the owner's theme, unchanged
+        self.assertEqual(cp.run(self.tmp)[0].items, [])                              # T001 is gone, and the schema holds
+
+    def test_theme_replaces_another_custom_theme_and_runs_twice_the_same(self):
+        quiet(scaffold.main, ["scaffold.py", "project", "Shop", self.tmp, "--register-theme"])
+        report = os.path.join(self.tmp, "Shop.Report")
+        path = os.path.join(report, "definition", "report.json")
+        resources = os.path.join(report, "StaticResources", "RegisteredResources")
+        os.rename(os.path.join(resources, "theme.json"), os.path.join(resources, "Old1234.json"))
+        with open(path, encoding="utf-8") as fh:
+            data = json.load(fh)
+        data["themeCollection"]["customTheme"]["name"] = "Old1234.json"
+        data["resourcePackages"][0]["items"] = [{"name": "Old1234.json", "path": "Old1234.json", "type": "CustomTheme"},
+                                                {"name": "logo.png", "path": "logo.png", "type": "Image"}]
+        with open(path, "w", encoding="utf-8") as fh:
+            json.dump(data, fh)
+        for _ in range(2):
+            self.assertEqual(quiet(scaffold.main, ["scaffold.py", "theme", self.tmp])[0], 0)
+            with open(path, encoding="utf-8") as fh:
+                data = json.load(fh)
+            self.assertEqual(data["themeCollection"]["customTheme"]["name"], "theme.json")
+            self.assertEqual(data["resourcePackages"][0]["items"],
+                             [{"name": "logo.png", "path": "logo.png", "type": "Image"},          # other resources stay
+                              {"name": "theme.json", "path": "theme.json", "type": "CustomTheme"}])
+            self.assertEqual(sorted(os.listdir(resources)), ["theme.json"])          # the replaced theme file is gone
+
+    def test_theme_needs_a_report(self):
+        code, out = quiet(scaffold.main, ["scaffold.py", "theme", self.tmp])
+        self.assertEqual(code, 1)
+        self.assertIn("No report", out)
+        self.assertEqual(quiet(scaffold.main, ["scaffold.py", "theme", self.tmp, "--register-theme"])[0], 2)
+
     def test_second_project_in_one_folder_is_refused(self):
         quiet(scaffold.main, ["scaffold.py", "project", "Shop", self.tmp])
         code, out = quiet(scaffold.main, ["scaffold.py", "project", "Other", self.tmp])

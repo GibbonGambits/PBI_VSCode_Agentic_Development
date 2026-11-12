@@ -1,0 +1,36 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python scripts/*)",
+      "Bash(python -m unittest *)",
+      "Bash(python3 scripts/*)",
+      "Bash(python3 -m unittest *)",
+      "Bash(py scripts/*)",
+      "Bash(py -m unittest *)",
+      "Bash(git status *)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git show *)",
+      "Bash(git branch --show-current)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "PowerShell(python scripts/*)",
+      "PowerShell(python -m unittest *)",
+      "PowerShell(python3 scripts/*)",
+      "PowerShell(python3 -m unittest *)",
+      "PowerShell(py scripts/*)",
+      "PowerShell(py -m unittest *)",
+      "PowerShell(git status *)",
+      "PowerShell(git diff *)",
+      "PowerShell(git log *)",
+      "PowerShell(git show *)",
+      "PowerShell(git branch --show-current)",
+      "PowerShell(git add *)",
+      "PowerShell(git commit *)"
+    ],
+    "deny": [
+      "Bash(git push *)",
+      "PowerShell(git push *)"
+    ]
+  }
+}

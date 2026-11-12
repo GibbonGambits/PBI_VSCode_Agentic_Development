@@ -19,12 +19,16 @@ If `python` is not found, use `py` (Windows) or `python3` (macOS, Linux) in the 
 
 ```
 .github/copilot-instructions.md      rules Copilot always loads (short)
+the root instruction file           for an agent that reads a root instruction file in place of .github/: it loads
+                                     those same rules. The settings file in the hidden folder beside it lists what
+                                     that agent may run without asking: the scripts, the tests, and Git status, diff,
+                                     log, add and commit. Pushing is refused
 .github/instructions/                rules loaded when Copilot works on model files (*.tmdl) or report files (*.Report)
 .github/skills/pbi-semantic-model/   model work, and the model standards: measures, relationships and dates, DAX,
                                      Power Query, storage modes and security, model objects, the DAX function index
 .github/skills/pbi-report/           report work, and the report standards: layout, report features, theme rules
 .github/skills/pbi-checklist-review/ evaluation against the 79-item checklist; the list of native features to suggest
-.github/skills/pbi-improve/          evaluate an existing report, then fix what was approved
+.github/skills/pbi-improve/          evaluate an existing report, then fix it without waiting for approvals
 .github/skills/pbi-lookup/           looking things up on Microsoft Learn, DAX Guide and SQLBI, and nowhere else
 .github/skills/business-definitions/ starter definitions for eight business areas, read one at a time
 .github/skills/pbi-lessons/          the improvement loop: what Copilot does when it gets something wrong
@@ -100,7 +104,7 @@ You should see a `definition` folder inside the `.SemanticModel` folder (TMDL fi
 For an evaluation only, steps 1 and 3 are enough: the later steps change the report.
 
 1. Get it into project format. A `.pbix` file: open it in Power BI Desktop and use File > Save as with the Power BI project file type, saving into the root of your clone. A project that already exists: copy its `.pbip` file and its `.Report` and `.SemanticModel` folders into the root. Commit.
-2. Apply the theme in Power BI Desktop: Design ribbon > Import theme, choose `theme/theme.json`, then save and close. Microsoft notes that importing a custom theme removes customizations already added to the report.
+2. Apply the theme in Power BI Desktop: Design ribbon > Import theme, choose `theme/theme.json`, then save and close. Microsoft notes that importing a custom theme removes customizations already added to the report. If you go on to "Evaluate and improve" (section 5), skip this step: that flow registers the theme by script.
 3. Confirm the theme and see where the project stands:
 
 ```bash
@@ -145,15 +149,16 @@ Fill in `docs/report-brief.md` first. Then ask Copilot in agent mode.
 |---|---|---|
 | Build new | "Add a page that shows sales by month" | Copilot follows the model and report skills, copies the shipped example of any object kind the project lacks, gives new visuals a `Page_Type_Subject` name, and runs the checks |
 | Evaluate | "Evaluate this report against the checklist" | Copilot runs every check and gives Pass, Fail or Not applicable for all 79 items in a new file, `docs/checklist-review.md`. It changes nothing else |
-| Evaluate and improve | "Evaluate and improve this report" | Copilot makes a branch and an untouched copy, evaluates, writes a fix plan, stops for your approval, applies what you approved in two commits, evaluates again and shows the counts before and after. See section 5 |
+| Evaluate and improve | "Evaluate and improve this report" | Copilot makes a branch and an untouched copy, evaluates, writes a fix plan and applies it without waiting for an approval: the theme, the mechanical fixes, the layout, all measures into `_Measures`, names, and changes that need a refresh, one commit for each kind. It holds back only what could break other reports or leave tables without data, evaluates again, and ends with one answer: the counts before and after, what was held, and the questions. See section 5 |
 | Change existing | "Add descriptions to the Sales table" or "Move the slicers to the top" | Copilot edits pages, visuals, measures and descriptions, and does not rename what already exists |
-| Rename or move | "Rename the measure Total Sales to Net Sales" | Copilot lists every reference and what may break, here and in other reports on the same model, and waits for your clear yes. After the yes it does the work itself and proves every reference with the checks |
+| Rename or move | "Rename the measure Total Sales to Net Sales" | The brief decides (section 3, "Other reports use this model"). With no, Copilot does the work at once and proves every reference with the checks. With yes or no answer, it lists every reference and what may break in other reports on the same model, and waits for your clear yes |
 
 What Copilot asks you, and when:
 
 - **Meaning.** What a column or measure means comes from the brief or from you. When neither says it, Copilot writes `/// TODO(owner): <question>` above the object and carries on. At the end of the task it asks about all of them in one message. `python scripts/list_todos.py .` prints the list.
-- **Facts about the data.** Row counts, unique keys, whether a step folds. Copilot asks once. When you have set up Microsoft's modeling server it reads the counts and the keys itself; whether a step folds stays a question for you.
-- **A yes.** For a rename, a move or a deletion; for a preview feature; for a suggested native feature; for a change to a template file.
+- **Facts about the data.** Row counts, unique keys, whether a step folds. When you have set up Microsoft's modeling server Copilot reads the counts and the keys itself; otherwise the question goes into its final answer, in one list. Whether a step folds stays a question for you.
+- **A yes.** For a preview feature; for a suggested native feature; for a change to a template file; and for a rename, a move or a deletion when other reports use the model or the brief does not say.
+- **Never in the middle.** Copilot asks at the start of a task or in its final answer. A fact it cannot find becomes a `TODO(owner)` line or a question at the end, and a tool that was not set up or failed is named there.
 - **A look.** Files that pass the checks can still look wrong on screen. Copilot asks you to reload and look, or does it itself through Microsoft's Desktop Bridge when you have agreed to that.
 
 It does not ask you to make a first table, visual or measures table in Desktop: it copies a shipped example.
@@ -216,15 +221,26 @@ It fails when a lesson is badly formed, when a fix points at the checklist or th
 
 One request, such as "Evaluate and improve this report", runs these steps in order (skill `pbi-improve`). Copilot does not have to remember them: `python scripts/improve.py next` reads the files and Git and says which step comes next.
 
-1. **Safety first.** Save in Power BI Desktop and commit. `python scripts/improve.py start` stops unless everything is committed and no earlier flow left its files behind. It makes a new branch, and copies the project unchanged into the folder `_before/`, so you can open before and after side by side. Git ignores that folder and the checks skip it.
-2. **Evaluate.** The checklist review writes `docs/checklist-review.md`.
-3. **Fix plan.** `docs/fix-plan.md` lists every finding and every failed item as Mechanical (descriptions, format strings, folders, hiding, header icons and tooltips, alt text and titles, the DAX style, two rewrites that cannot change a result, styling the theme should do), Layout (positions and sizes by the numbers of the layout standard, a back button, tab order) or Needs a person (a decision, a number to check or a yes: renames and moves, data types, summarisation, formulas whose result changes, relationships, security roles, access, user testing, export tests, performance runs, and anything a file cannot settle). Each row says what will change, which files, and what could break. Suggestions (notes whose codes start with U) are listed apart and are never fix rows.
-4. **Stop.** You approve all of it, one kind, or single rows. Nothing changes before that, and only a plain yes counts: Copilot writes yes or no in every row, and the script will not go on while a row has no answer or a doubtful one.
-5. **Mechanical fixes**, then the checks, then one commit. **Layout fixes**, then the checks, then a second commit. Each commit can be undone alone.
-6. **Evaluate again.** `python scripts/improve.py compare` prints Pass, Fail and Not applicable before and after, the pages to look at, and the rows that need a person.
-7. **Decided rows.** "Needs a person" is not work handed back. Copilot goes through those rows with you; for each one you decide with a clear yes, it does the work itself (a move or a rename included), one commit for each kind of decision.
+**Nothing waits for an approval.** The safeguard is the branch, the untouched copy and one commit for each kind of fix: each kind can be undone alone with `git revert`. One gate holds a row back instead, and the plan says which rows.
 
-Never in this flow: a rename or a move without your yes, a change to the checklist, the theme or a template file, publishing, deploying or merging.
+- **Other reports.** A report that reads a published copy of the model names a measure with its table, so a move or a rename would break it, and no file here can show that. Measures are moved and names corrected only when section 3 of the brief answers "Other reports use this model" with no. This is the one question Copilot asks, at the start, when the brief does not answer it.
+- **A missing data source never stops a fix.** A change to a query's text, a partition's name or a data type, and a new table, are applied like every other fix. Such a table is empty until Power BI Desktop refreshes the model, so refresh once after the run. Work on a report whose data sources you can reach.
+
+1. **Safety first.** Save and close the project in Power BI Desktop, and commit. `python scripts/improve.py start` stops unless everything is committed and no earlier flow left its files behind. It makes a new branch, and copies the project unchanged into the folder `_before/`, so you can open before and after side by side. Git ignores that folder and the checks skip it.
+2. **Evaluate.** The checklist review writes `docs/checklist-review.md`. Copilot asks nothing: a fact no file holds is a Fail with "Evidence missing", and its question goes into the final answer.
+3. **Fix plan.** `docs/fix-plan.md` lists every finding and every failed item with a kind and a status (`to do`, `done`, `held: <why>`, `skipped: <why>`, and `question` or `answered` for a row that needs a person). The kinds, in the order they are applied:
+   - **Theme**: the owner's theme is registered in the report (`python scripts/scaffold.py theme .`).
+   - **Mechanical**: descriptions, format strings, folders, hiding, header icons and tooltips, alt text and titles, the DAX style, two rewrites that cannot change a result, styling the theme should do. A visual that uses drill-down, a help tooltip, a tooltip page or tooltip fields keeps that setting, with a row in section 7 of the brief.
+   - **Layout**: positions and sizes by the numbers of the layout standard, a back button, tab order.
+   - **Measures**: every measure moves to `_Measures`, with every reference repaired. Other-reports gate.
+   - **Renames**: names the naming standard rejects. Other-reports gate.
+   - **Data**: a comment line in a query, a partition's name, a floating-point column, an unused column removed. Applied last; refresh the model afterwards.
+   - **Needs a person**: a fact or a decision no file holds: why something is calculated in the model, summarisation, formulas whose result would change, relationships, security roles, access, user testing, export tests, performance runs. These are questions, not approvals.
+4. **Apply.** Each kind in turn, then the checks, then one commit for that kind.
+5. **Evaluate again**, all 79 items. `python scripts/improve.py compare` prints Pass, Fail and Not applicable before and after; how many of the items that still fail can pass only on a fact from a person; the pages to look at; what was held and why; what was skipped; and the questions, with rows that ask the same thing shown once.
+6. **One final answer** with all of that. When you answer a question, Copilot does the work. When the gate opens (you write no in the brief), `python scripts/improve.py release` frees the held rows and Copilot carries on.
+
+Never in this flow: a change that would break another report, a change to the checklist, the theme file or a template file, a made-up business meaning, publishing, deploying or merging.
 
 Why the copy is safe: the `.pbip` file points to the report folder, and the report points to the model, both by relative path, so the three are copied together with their names unchanged and nothing inside is edited. Each `.platform` file holds an identifier that must stay unique within a Git branch, which is why the copy is never committed. If Git would not ignore `_before/`, or a path would pass 260 characters, the script makes no copy, says so, and the branch is the safeguard.
 
@@ -232,7 +248,7 @@ To try the flow end to end, see `evals/first-test.md`.
 
 ## The rules the checks enforce
 
-`scripts/check_project.py` enforces these. Errors change its exit code; warnings and notes do not. It cannot tell a new visual from an existing one, or check that a header or tooltip exception is listed in the brief; people and the review do that. The full list of codes is at the top of the script, and every code is named in the checklist-review skill. The fix plan sorts every error and warning of the standards; a file or syntax error (codes such as F001, J001, N001, S001, T001) is listed there to decide with you, and notes are listed for information.
+`scripts/check_project.py` enforces these. Errors change its exit code; warnings and notes do not. It cannot tell a new visual from an existing one, or check that a header or tooltip exception is listed in the brief; people and the review do that. The full list of codes is at the top of the script, and every code is named in the checklist-review skill. The fix plan sorts every error and warning of the standards; a file or syntax error (codes such as F001, J001, N001, S001) is listed there as a question for a person, and notes are listed for information.
 
 - Every visible table, column and measure has a `///` description directly above it; so does every shared query and parameter. Unknown meaning becomes `/// TODO(owner): question`, which the check lists.
 - `//` comments appear only inside Power Query (M) or DAX expressions.
@@ -289,13 +305,13 @@ Sets one property of one model object: display folder, format string, hidden, su
 python scripts/set_positions.py . --dry-run --move "Overview/Overview_Card_TotalSales=24,24,608,120"
 ```
 
-Writes an approved position and size. It refuses groups, visuals inside a group, rotated visuals and anything that would leave the page, and it names the pages to look at afterwards.
+Writes a position and size worked out from the layout standard. It refuses groups, visuals inside a group, rotated visuals and anything that would leave the page, and it names the pages to look at afterwards.
 
 ```bash
 python scripts/scaffold.py project Sales
 ```
 
-Makes a new project from the shipped starter (section 2, Route A). `python scripts/scaffold.py measures-table .` adds the table `_Measures` to a model that has none: an imported one-column table, or a calculated table when the model reads its data in Direct Lake or DirectQuery mode.
+Makes a new project from the shipped starter (section 2, Route A). `python scripts/scaffold.py measures-table .` adds the table `_Measures` to a model that has none: an imported one-column table, or a calculated table when the model reads its data in Direct Lake or DirectQuery mode. `python scripts/scaffold.py theme .` registers `theme/theme.json` as the custom theme of a report that already exists, in place of any custom theme it had; close the project in Power BI Desktop first.
 
 ```bash
 python scripts/list_todos.py .
@@ -331,7 +347,7 @@ Optional (see "Optional tools from Microsoft"): `status`, `reload`, `screenshots
 python scripts/improve.py next
 ```
 
-Says which step of the evaluate-and-improve flow comes next (section 5).
+Says which step of the evaluate-and-improve flow comes next (section 5). `python scripts/improve.py release` gives new plan rows their status and frees held rows whose reason is gone; `python scripts/improve.py compare` prints the result.
 
 ```bash
 python scripts/check_project.py --review docs/checklist-review.md
@@ -396,7 +412,8 @@ What the theme means for drill, tooltips, export, contrast and text size is set 
 - Nothing here has been opened in Power BI Desktop by the template's builder. That includes every shipped example and the starter project. They parse (the model files load in Microsoft's own Tabular Object Model library and pass its validation), pass Microsoft's schemas, and pass the project check. Microsoft's library does not parse DAX or Power Query, and Microsoft's own skill warns that a wrong field or role can pass validation and still show an error icon. Look at the first use of each kind in Desktop.
 - Written, not run: `scripts/desktop_bridge.py` and the guidance for Microsoft's modeling server. Neither Power BI Desktop nor the server could be run where the template was built. The tests replace Microsoft's tools with stand-ins.
 - The starter project's report holds an empty theme collection until you import the theme. Whether Power BI Desktop opens it without a remark is not confirmed.
-- `scripts/scaffold.py project <Name> --register-theme` registers the theme in the files the way Microsoft's own report skill does. Microsoft Learn supports edits under `RegisteredResources` only for a resource Desktop registered itself, and Microsoft's command-line validator expects a theme's inner name to equal its file name, which the owner's theme does not do. So this route is off unless you say yes.
+- `scripts/scaffold.py project <Name> --register-theme` registers the theme in the files the way Microsoft's own report skill does. Microsoft Learn supports edits under `RegisteredResources` only for a resource Desktop registered itself, and Microsoft's command-line validator expects a theme's inner name to equal its file name, which the owner's theme does not do. The evaluate-and-improve flow uses this route for an existing report (`python scripts/scaffold.py theme .`) by the owner's rule that every report gets the theme; for a new project it stays off unless you pass the flag. Whether Power BI Desktop accepts a theme registered this way without a remark is not confirmed: look at the colours when the report is first opened.
+- After the evaluate-and-improve flow, a table whose query, partition name or data type changed shows no data until the model is refreshed. This rests on one observation and on reasoning, not on a Microsoft page: in the first trial a run left a report without data, on a computer where the source file was missing. Microsoft Learn says only that a project's local data cache holds the model and data "when it was last edited". Which of those changes empties a table is not confirmed one by one.
 - Release notes: the monthly feature summary posts on Microsoft's blog could not be opened. The feature inventory was built from Microsoft Learn's update pages, which are short for November 2024 to June 2025.
 - Not confirmed from Microsoft's documentation: how Desktop stores Power Query query and step descriptions; whether Desktop keeps annotations when it saves; what "Tooltips off" does to report-page tooltips; whether right-click drill and "Export data" still work in reading view when header icons are off; where the Selection pane name of a single visual is stored; how "hidden from the tab order" is stored; the value `ParameterMetadata` carries on a field parameter (it comes from Microsoft's skill, not from Microsoft Learn); the annotation that records Auto date/time (seen in projects Desktop saved).
 - The visual-level "Header icons off, Tooltips off" entries: Microsoft's schema defines where they go and what they are called, for every visual type, but not how the value is written; the written form follows Microsoft's own examples. Not confirmed: whether Desktop keeps and applies them on text boxes, shapes, images and buttons, and whether adding them changes a visual's padding (Microsoft's report skill warns that it can).

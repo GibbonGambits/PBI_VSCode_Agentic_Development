@@ -4,7 +4,7 @@ One fixed standard for every model built from this template, so that models look
 
 - New model, or new objects: follow every rule.
 - Evaluating an existing model: report every breach. Change nothing.
-- Changing an existing model: see "Existing models" at the end. Never rename or move without a clear yes.
+- Changing an existing model: see "Existing models" at the end. A rename or a move follows the rule there.
 
 This file covers measures, folders, hiding, calculated objects, summarising, data types and formats. The rest of the standard is in the files beside it: `relationships-and-dates.md` (star schema, relationships, dates, names of tables and columns), `dax-standard.md` (DAX), `storage-and-security.md` (Power Query, storage modes, security) and `model-objects.md` (functions, calculation groups, field parameters and the other object kinds).
 
@@ -92,7 +92,12 @@ A check passes only for an object that section 9 of the brief lists with the sam
 
 ## Existing models: moving and renaming
 
-Before a measure moves to `_Measures`, or anything is renamed, tell the developer what can break, then wait for a clear yes (rename rule in the project instructions). In a fix plan such a row stays under "Needs a person" until that yes.
+A move or a rename can break other reports that read a published copy of this model, and no file here shows them. So the brief decides (section 3, "Other reports use this model"; rule in the project instructions):
+
+- **no**: do the move or the rename at once, yourself, as set out below. In the evaluate-and-improve flow every measure moves to `_Measures` in one commit, and names the naming standard rejects are corrected in another.
+- **yes, or no answer**: tell the developer what can break, then wait for a clear yes. In a fix plan such a row is `held`.
+
+A new `_Measures` table is empty until Power BI Desktop refreshes the model. Say so whenever you make the table in an existing model.
 
 What can break:
 

@@ -24,9 +24,12 @@ An empty field means the layout standard: 1280 x 720, margin 24, gap 16, grid 8.
 ## 3. Data
 
 - Semantic model: new in this project / already in this project / a published model (give its name):
+- Other reports use this model (yes or no):
 - Sources, and the environments they exist in, such as development, test, production (1, 2):
 - Import, DirectQuery or both, and why (16):
 - How often the data must refresh (45):
+
+"Other reports use this model" is the one gate of the evaluate-and-improve flow: with no, measures are moved and names corrected without a question; with yes or no answer, those rows are held, because a report on a published copy of the model would break.
 
 ## 4. Standards to follow
 
@@ -61,7 +64,7 @@ Record anything a checklist item asks to be justified or done by hand. Examples:
 
 ## 7. Exceptions to "Header icons off, Tooltips off"
 
-Every visual has both off. List each visual that must keep one on, and why. Copilot adds the exception annotation to a visual only when it is listed here, and turns on only what the row names.
+Every visual has both off. List each visual that must keep one on, and why. Copilot adds the exception annotation to a visual only when it is listed here, and turns on only what the row names. On an existing report Copilot adds a row itself for a visual that uses drill-down, a help tooltip, a tooltip page or tooltip fields, with the reason "the report uses it"; remove the row to have it switched off.
 
 | Page | Visual | What stays on (header, tooltip or both) | Reason |
 |---|---|---|---|

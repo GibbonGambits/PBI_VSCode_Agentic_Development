@@ -4,6 +4,7 @@
 Usage (run from the repository root; <folder> is '.' when left out):
     python scripts/scaffold.py project <Name> [<folder>] [--register-theme]
     python scripts/scaffold.py measures-table [<folder>] [--form import|calculated]
+    python scripts/scaffold.py theme [<folder>]
 
 'project' copies tests/fixtures/examples/starter to <folder> under the new name: <Name>.pbip, <Name>.Report
 (PBIR, one empty page named Overview) and <Name>.SemanticModel (TMDL, with the table _Measures). It refuses
@@ -16,7 +17,12 @@ report has NO custom theme, and the developer imports theme/theme.json once in P
 With --register-theme the script registers the theme in the files instead, the way Microsoft's own report
 skill does (a customTheme entry and a resource package entry in report.json, and the theme file under
 StaticResources/RegisteredResources). That route is outside what Microsoft Learn describes as supported:
-use it only when the developer has said yes.
+say so to the developer, and ask them to look at the colours when the report is first opened.
+
+'theme' does the same for a report that already exists: every report under <folder> gets theme/theme.json as
+its custom theme, in place of any custom theme it had. The base theme of the report stays. The evaluate-and-
+improve flow runs it by the owner's rule: the theme is applied to every report, without a question. Close the
+project in Power BI Desktop first: Microsoft Learn says report.json is not reloaded into an open session.
 
 'measures-table' adds the table _Measures to a model that has none, in the form the model standard gives
 (rule 1): an imported one-column table for an import model, a calculated table for a model with Direct Lake
@@ -103,6 +109,70 @@ def project(name, folder, register_theme):
     return 0
 
 
+def register_theme(report):
+    """Make theme/theme.json the custom theme of one report folder. Returns a problem text, or '' when done."""
+    path = os.path.join(report, "definition", "report.json")
+    data = cp.load_object(path)
+    if data is None:
+        return "%s is not a JSON object" % path
+    collection = data.get("themeCollection")
+    if not isinstance(collection, dict):
+        collection = data["themeCollection"] = {}
+    old = collection.get("customTheme") if isinstance(collection.get("customTheme"), dict) else {}
+    base = collection.get("baseTheme") if isinstance(collection.get("baseTheme"), dict) else {}
+    with open(os.path.join(STARTER, "%s.Report" % STARTER_NAME, "definition", "report.json"), encoding="utf-8") as handle:
+        versions = json.load(handle)["themeCollection"]["customTheme"]["reportVersionAtImport"]
+    for source in (old, base):                            # keep the versions the report itself states
+        if isinstance(source.get("reportVersionAtImport"), dict):
+            versions = source["reportVersionAtImport"]
+            break
+    collection["customTheme"] = {"name": THEME_FILE, "reportVersionAtImport": versions, "type": "RegisteredResources"}
+    packages = data.get("resourcePackages")
+    if not isinstance(packages, list):
+        packages = data["resourcePackages"] = []
+    package = next((p for p in packages if isinstance(p, dict) and p.get("type") == "RegisteredResources"), None)
+    if package is None:
+        package = {"name": "RegisteredResources", "type": "RegisteredResources", "items": []}
+        packages.append(package)
+    if not isinstance(package.get("items"), list):
+        package["items"] = []
+    package["items"] = [i for i in package["items"]
+                        if not (isinstance(i, dict) and (i.get("type") == "CustomTheme" or i.get("name") == THEME_FILE))]
+    package["items"].append({"name": THEME_FILE, "path": THEME_FILE, "type": "CustomTheme"})
+    target = os.path.join(report, "StaticResources", "RegisteredResources")
+    os.makedirs(target, exist_ok=True)
+    shutil.copyfile(THEME, os.path.join(target, THEME_FILE))
+    old_name = old.get("name")
+    if isinstance(old_name, str) and old_name and old_name != THEME_FILE and os.path.basename(old_name) == old_name:
+        stale = os.path.join(target, old_name)
+        if os.path.isfile(stale):
+            os.remove(stale)                              # the theme it replaces is no longer registered
+    with open(path, "w", encoding="utf-8", newline="\n") as handle:
+        json.dump(data, handle, indent=2)
+        handle.write("\n")
+    return ""
+
+
+def theme(folder):
+    reports = cp.find_reports(folder)
+    if not reports:
+        print("No report in PBIR format under %s; nothing was written." % folder)
+        return 1
+    problems = 0
+    for report in reports:
+        problem = register_theme(report)
+        name = os.path.relpath(report, folder).replace(os.sep, "/")
+        if problem:
+            problems += 1
+            print("X  %s: %s" % (name, problem))
+        else:
+            print("Registered theme/theme.json as the custom theme of %s." % name)
+    print("Microsoft Learn describes importing a theme in Power BI Desktop as the supported route: tell the developer "
+          "the theme was registered by script, and ask them to look at the colours when the report is first opened.")
+    print("Next: python scripts/check_project.py %s" % folder)
+    return 1 if problems else 0
+
+
 def _replace_json(path, change):
     with open(path, encoding="utf-8") as handle:
         data = json.load(handle)
@@ -182,6 +252,8 @@ def main(argv):
         return project(args[1], os.path.abspath(args[2] if len(args) == 3 else "."), register)
     if len(args) in (1, 2) and args[0] == "measures-table" and not register:
         return measures_table(os.path.abspath(args[1] if len(args) == 2 else "."), form)
+    if len(args) in (1, 2) and args[0] == "theme" and not register and form is None:
+        return theme(os.path.abspath(args[1] if len(args) == 2 else "."))
     print(__doc__)
     return 2
 

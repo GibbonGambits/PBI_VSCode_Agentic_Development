@@ -4,7 +4,12 @@ Sources: Microsoft's report theme schema (version 2.159); Microsoft Learn pages 
 
 ## The theme
 
-`theme/theme.json` is the owner's theme. It must stay exactly as it is. The developer applies it once in Power BI Desktop (Design ribbon > Import theme). Microsoft Learn supports changing a file under `RegisteredResources` only for a resource that Desktop itself registered, so Copilot does not register the theme by writing files; `python scripts/scaffold.py project <Name> --register-theme` does it the way Microsoft's own report skill does, and only after the developer's yes.
+`theme/theme.json` is the owner's theme. It must stay exactly as it is. Every report gets it (owner's rule). There are two routes:
+
+- The developer imports it once in Power BI Desktop (Design ribbon > Import theme). This is the route Microsoft Learn describes: it supports changing a file under `RegisteredResources` only for a resource that Desktop itself registered.
+- A script registers it in the files, the way Microsoft's own report skill does: `python scripts/scaffold.py theme .` for a report that exists, `python scripts/scaffold.py project <Name> --register-theme` for a new one. The evaluate-and-improve flow uses this route without a question. The project must be closed in Power BI Desktop: Microsoft Learn says `report.json` is not reloaded into an open session. Tell the developer the theme was registered by script, and ask them to look at the colours when the report is first opened.
+
+The report's base theme stays as it is; the custom theme sits on top of it.
 
 It sets: 32 data colours; background, foreground and table accent colours; the three colours for colour-scale conditional formatting (maximum green, minimum red, null grey); four text classes (label 10 pt, title 11 pt, callout 28 pt, header); filter pane text sizes; and, for every visual type, Header icons off and Tooltips off.
 
@@ -19,6 +24,18 @@ This template sets both off twice: in the theme, and on every visual (rule in th
 - Microsoft states that turning Tooltips off hides the tooltip for that visual. A visual pinned to a dashboard still shows a basic tooltip.
 
 Not confirmed from Microsoft: whether Power BI Desktop keeps and applies the two visual-level settings on text boxes, shapes, images and buttons; whether adding them changes a visual's padding (Microsoft's report skill says a visual-level container setting can stop theme padding from applying); whether a report-page tooltip can still appear on a visual whose Tooltips are off; whether right-click drill, keyboard shortcuts and "Export data" still work in reading view when the header is hidden. Ask the developer to test these in a published report when they matter.
+
+## Features a visual uses
+
+Before header icons and tooltips are switched off on an existing report, keep what the report uses. Do this yourself, without a question:
+
+1. Run `python scripts/list_visuals.py .` and read each visual's file.
+2. A visual keeps **header icons** when it uses something only the header gives: a hierarchy or more than one field on an axis, so that the reader drills with the header's drill icons; or a help tooltip written for the visual (`visualHelpTooltip`).
+3. A visual keeps **tooltips** when it has a report page tooltip (its tooltip names a page), fields in its Tooltips well, or a tooltip text written for it.
+4. For each such visual add a row to section 7 of `docs/report-brief.md` with the reason "the report uses it: <feature>", add the annotation `HeaderTooltipException` (rule 5 of the PBIR instructions), and turn off only the other setting. Then run `python scripts/set_visual_defaults.py .`: it leaves the excepted setting alone.
+5. List these visuals in your final answer. The developer can remove a row afterwards; you then switch that setting off.
+
+A feature that only might be used (focus mode, export data on a visual with no drill) is not a reason: the owner's rule is off.
 
 ## When a visual needs them back
 

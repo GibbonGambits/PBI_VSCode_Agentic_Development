@@ -2,8 +2,10 @@
 
 The project files hold no data. Row counts, distinct values, whether a key is unique, gaps in a date table: no file shows them. Two ways to get such a fact:
 
-1. Ask the developer once, in one message, and record the answers in section 4 of `docs/report-brief.md`. This always works.
-2. Read it yourself through Microsoft's own server, when the developer has already set it up. This file says how.
+1. Read it yourself through Microsoft's own server, when the developer has already set it up. This file says how. Try this first.
+2. Ask the developer once, in one list at the end of the task, and record the answers in section 4 of `docs/report-brief.md`. This always works. Never ask in the middle of a task.
+
+If the server is not set up, is not connected, or does not answer, say so in your final answer, with what you tried: a tool that failed is never passed over in silence.
 
 Everything in the template works without the server. The template never installs it and never sets up a connection: that is the developer's decision.
 
@@ -27,7 +29,7 @@ Only operations that read. The server names every tool `<thing>_operations` with
 
 Never call: any `Create`, `Update`, `Delete`, `Rename` or `Move` operation; any `Refresh...` operation; `DeployToFabric`; `transaction_operations` `Commit`; `ClearCache`; `accept_eula`. The model is changed in its files, where the checks and Git see the change.
 
-Opening a connection is the developer's step. If no connection to this project's model is open, say so and use route 1. The one case where you read from a workspace is the field list of a published model, and only over a connection the developer has already made (skill `pbi-report`).
+Opening a connection is the developer's step. If no connection to this project's model is open, say so and use route 2. The one case where you read from a workspace is the field list of a published model, and only over a connection the developer has already made (skill `pbi-report`).
 
 ## The queries
 

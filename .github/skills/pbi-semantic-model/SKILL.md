@@ -49,7 +49,7 @@ Work in this order.
 ## Existing model
 
 - New objects follow the standards. Existing objects keep their names and their home table. A breach in what already exists is reported, not changed: it is changed only when the developer asks, or through the skill `pbi-improve`.
-- A rename or a move needs the developer's yes. First run `python scripts/find_references.py . "<object>"` and tell the developer what it lists, and that other reports on a published model can break. After the yes, do the work yourself as set out in the model standard ("Existing models: moving and renaming"). Places the script cannot classify go to the developer.
+- A rename or a move: the brief decides (section 3, "Other reports use this model"). With no, do it at once; with yes or no answer, say that other reports on a published model can break and wait for the developer's yes. Either way run `python scripts/find_references.py . "<object>"` first, do the work yourself as set out in the model standard ("Existing models: moving and renaming"), and list the places the script cannot classify in your final answer.
 - To set a display folder, a format string, hidden, or the reason line of a calculated object on something that exists, use `python scripts/set_model_properties.py` with `--dry-run` first. It changes that one line and nothing else. The value comes from the brief or the developer.
 - When you add a description, change nothing else on that object.
 - A measure's DAX shows how it is calculated, not what it means to the business. If the brief and the developer do not state the meaning, write the placeholder and carry on.
