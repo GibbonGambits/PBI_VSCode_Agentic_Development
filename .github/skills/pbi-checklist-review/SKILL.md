@@ -70,7 +70,7 @@ More rules:
 | M603, M605 | Item 41 |
 | G001, G002 | Item 49 (Fail: the item asks for 0 overlapping visuals) |
 | G003, G004, G005, G006 | Item 49 (Fail when they name 3 or more visuals on one page, unless the brief justifies it) |
-| V009 | Items 50, 70 and 74 |
+| V009, V024 | Items 50, 70 and 74 (V024 is Fail: the report does not load) |
 | V008, U102 | Item 51 |
 | G007 | Item 52 |
 | V010 | Item 53 |

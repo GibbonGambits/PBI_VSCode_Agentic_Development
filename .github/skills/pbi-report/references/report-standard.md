@@ -16,7 +16,7 @@ An exception counts only when section 10 of `docs/report-brief.md` lists the cod
 | V006 | A page that is not a tooltip page has more than 16 visuals that show data and are not hidden. A table or matrix that covers a third of the page or more counts as 2 | fail |
 | V007 | Such a page has 13 to 16 of them | warn |
 | V008 | A button's action goes to a bookmark or a page that the report does not have | warn |
-| V009 | A visual sets its own font, size, colour, bold, italic or underline, writes a colour code, or switches on its own border, shadow or background. A theme colour passes | warn |
+| V009 | A visual sets its own font, size, colour, bold, italic or underline, writes a colour code, or switches on its own border, shadow or background. A theme colour passes, as a `ThemeDataColor` or as a theme keyword such as `'maxColor'` | warn |
 | V010 | A bookmark holds a page or a visual that the report no longer has | warn |
 | V011 | `pages.json` and the page folders disagree: a page listed twice, listed but missing, or not listed; an opening or landing page that does not exist | warn |
 | V012 | A report-level measure's name does not start with the prefix: an underscore, or the prefix the brief gives | warn |
@@ -31,6 +31,7 @@ An exception counts only when section 10 of `docs/report-brief.md` lists the cod
 | V021 | A report on a model with translations shows more than one page tab | warn |
 | V022 | The report uses a preview feature that section 11 of the brief does not list: the Gantt visual, a format string on one visual (`visual-features.md`, beside this file) | warn |
 | V023 | A cross-report drillthrough page in a report whose `report.json` does not have `settings.useCrossReportDrillthrough` on | warn |
+| V024 | Data bars (`dataBars`) without `positiveColor` or `negativeColor`. Seen once, with all colour parts removed: Power BI Desktop then fails to load the whole report | fail |
 | A001 | A visual that shows data, or an image, has no alt text (hidden visuals are not checked; an image that is only decoration is listed in the brief) | warn |
 | A004 | Alt text is longer than 250 characters | warn |
 | A002 | Two visuals on one page share a tab order number (members of a group are not compared) | warn |

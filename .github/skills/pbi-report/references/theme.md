@@ -25,6 +25,10 @@ This template sets both off twice: in the theme, and on every visual (rule in th
 
 Not confirmed from Microsoft: whether Power BI Desktop keeps and applies the two visual-level settings on text boxes, shapes, images and buttons; whether adding them changes a visual's padding (Microsoft's report skill says a visual-level container setting can stop theme padding from applying); whether a report-page tooltip can still appear on a visual whose Tooltips are off; whether right-click drill, keyboard shortcuts and "Export data" still work in reading view when the header is hidden. Ask the developer to test these in a published report when they matter.
 
+## Removing styling from a visual
+
+When a visual sets its own styling (V009), remove the whole setting so the theme takes over. Never remove one part of a setting that is made of parts: data bars (`dataBars` with `positiveColor`, `negativeColor`, `axisColor`), a colour scale (`FillRule`), icons. A half-removed setting passes Microsoft's schema, and Power BI Desktop then fails to load the whole report (V024). If such a setting holds a colour code, replace that colour with a theme colour, or keep the setting and say so in your final answer. A colour named by a theme keyword (`'maxColor'`, `'minColor'`, `'foreground'`) is already a theme colour: leave it.
+
 ## Features a visual uses
 
 Before header icons and tooltips are switched off on an existing report, keep what the report uses. Do this yourself, without a question:

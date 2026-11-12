@@ -101,8 +101,11 @@ MECHANICAL = {
     "M812": ("Add a '///' description above each calculation item, from the brief, or a TODO(owner) question", "Nothing in the report"),
     "M907": ("Set isAvailableInMdx back to true on the column", "Nothing: the column is used for sorting or in a hierarchy"),
     "V002": ("Hide the tooltip page (visibility HiddenInViewMode)", "The page no longer shows as a tab; the tooltip still works"),
-    "V009": ("Remove the colour, font, size, border, shadow or background set on the visual, so that it follows the theme",
+    "V009": ("Remove the colour, font, size, border, shadow or background set on the visual, so that it follows the theme. "
+             "Remove a whole setting, never one part of a setting made of parts (data bars, a colour scale, icons)",
              "The visual looks different: it takes the theme's style"),
+    "V024": ("Put the missing bar colour of the data bars back with a theme colour, or remove the data bars as a whole",
+             "Nothing: without the part Power BI Desktop does not load the report at all"),
     "V011": ("List every page folder once in pages.json, in the present order, new ones last", "The tab order of pages may change"),
     "A001": ("Write alt text that says what the visual shows, from its fields and the page's question in the brief",
              "Nothing on screen; screen readers read the new text"),

@@ -93,6 +93,24 @@ def fields(node, found):
             fields(value, found)
 
 
+DATA_BAR_PARTS = ("positiveColor", "negativeColor")      # the two bar colours; the axis colour is optional
+
+
+def _half_data_bars(node, missing=None):
+    """Names of the bar colours that a 'dataBars' setting anywhere in a visual lacks."""
+    missing = [] if missing is None else missing
+    if isinstance(node, dict):
+        for key, value in node.items():
+            if key == "dataBars" and isinstance(value, dict):
+                missing.extend(part for part in DATA_BAR_PARTS if part not in value and part not in missing)
+            else:
+                _half_data_bars(value, missing)
+    elif isinstance(node, list):
+        for value in node:
+            _half_data_bars(value, missing)
+    return missing
+
+
 def styling(node, path, found):
     """Add the names of colour, font and size settings written on a visual itself."""
     if isinstance(node, dict):
@@ -104,6 +122,8 @@ def styling(node, path, found):
                     text = literal(solid.get("color"))
                     if text is None and isinstance(solid.get("color"), dict) and "ThemeDataColor" in solid["color"].get("expr", {}):
                         continue                         # a colour taken from the theme
+                if text is not None and key.lower().endswith("color") and not HEX_COLOUR.search(text):
+                    continue                             # a theme colour named by keyword, such as 'maxColor'
                 if text is not None or solid is not None:
                     found.add("%s.%s" % (path, key) if path else key)
             elif isinstance(value, str) and HEX_COLOUR.search(value) and key == "Value":
@@ -241,6 +261,11 @@ def check(cp, report_dir, brief, findings):
                     "list the reason in section 10 of the brief" % (shown(visual), RETIRING_TYPES[kind]))
             elif kind in OLD_CARD_TYPES and not excused("U105", page, visual):
                 old_cards.append(shown(visual))
+            half = _half_data_bars(visual["visual"])
+            if half:
+                add("V024", page, visual, "the data bars of '%s' lack %s. Data bars are one setting made of parts; "
+                    "without their bar colours Power BI Desktop fails to load the whole report. Put the part back with a "
+                    "theme colour, or remove the data bars as a whole" % (shown(visual), ", ".join(half)), level="error")
             used_items = set()
             _resources(visual["data"], used_items)
             lost = sorted(item for item in used_items if item not in registered
