@@ -8,11 +8,12 @@ Usage:
                "Sales[Amount]"          a column
                "Sales"                  a table
 
-Use it before a rename or a move. A rename or a move always needs the developer's yes. After the yes,
+Use it before a rename or a move. Whether one needs the developer's yes is the brief's answer to 'Other
+reports use this model' (project instructions): with no, none is needed. Either way
 Copilot does the work itself when this script can confirm every reference: it changes each place in the
 first list, and then runs the project check, which fails on any reference that was missed (M901 to M903 and
-M908 in the model, B001 in the report). When the second list is not empty, Copilot shows it to the developer:
-those places need a person's eye.
+M908 in the model, B001 in the report). When the second list is not empty, Copilot lists it in its final
+answer: those places need a person's eye.
 
 Three lists are printed:
     1. References it recognises: the definition; DAX that names the object (read with the formula scanner);

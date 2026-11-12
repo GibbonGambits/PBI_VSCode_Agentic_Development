@@ -462,10 +462,32 @@ class ReviewTable(unittest.TestCase):
     def test_complete_review_passes(self):
         rows = self.good_rows()
         rows[1] = (2, "Fail", "local file path in the Sales query")
-        rows[38] = (39, "Not applicable", "Mark N/A when: no row filtering is required (brief, section 3)")
+        rows[38] = (39, "Not applicable", "Mark N/A when: the dataset is intentionally open to all intended consumers "
+                    "and row filtering is not required. Brief, section 3: everyone may see every row")
         self.write(rows)
         self.assertEqual(self.codes(), [])
         self.assertEqual(quiet(cp.main, ["check_project.py", "--review", self.file])[0], 0)
+
+    def test_not_applicable_needs_the_items_own_line(self):
+        for evidence in ("This is only a test report", "Mark N/A when: no row filtering is required (brief, section 3)",
+                         "Not published, so it does not apply"):
+            rows = self.good_rows()
+            rows[38] = (39, "Not applicable", evidence)
+            self.write(rows)
+            self.assertEqual(self.codes(), ["R007"], evidence)
+        for evidence in ("Mark N/A when: the dataset is intentionally open to all intended consumers and row filtering "
+                         "is not required. Brief, section 3",
+                         "\"When applicable: different audiences should see different data rows from the same model\" "
+                         "is not the case: one audience (brief, section 1)",
+                         "the DATASET is  intentionally open to all intended consumers, and row filtering is not required"):
+            rows = self.good_rows()
+            rows[38] = (39, "Not applicable", evidence)
+            self.write(rows)
+            self.assertEqual(self.codes(), [], evidence)
+        rows = self.good_rows()
+        rows[38] = (39, "Fail", "Evidence missing: nobody said who may see which rows")     # unknown is Fail
+        self.write(rows)
+        self.assertEqual(self.codes(), [])
 
     def test_missing_item_fails(self):
         rows = self.good_rows()

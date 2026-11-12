@@ -1357,8 +1357,8 @@ def check_standards(model_dir, objects, usage, brief, findings):
         key = "[%s]" % name
         if table["name"] not in measure_tables:
             add("M001", measure, "measure %s lives in table '%s'; every measure lives in '%s' (or in a measure table "
-                "the brief lists). A new measure is written there. Moving an existing one needs the developer's yes; after it, "
-                "Copilot moves it and proves every reference (model standard, 'Existing models')"
+                "the brief lists). A new measure is written there. An existing one is moved by Copilot, with every reference "
+                "repaired, when the brief says no other report uses the model (model standard, 'Existing models')"
                 % (key, table["name"], MEASURE_TABLE), keys=(key, table["name"]))
         folder = measure["props"].get("displayfolder", "")
         levels = folder.split("\\")
@@ -1386,7 +1386,7 @@ def check_standards(model_dir, objects, usage, brief, findings):
                 % (key, column_names[name.lower()]), keys=(key,))
         errors, warnings = _name_problems(name, brief)
         if errors:
-            add("M007", measure, "measure name %s is not a business name: %s. Renaming needs the developer's yes"
+            add("M007", measure, "measure name %s is not a business name: %s. Renaming follows the brief (model standard, 'Existing models')"
                 % (key, "; ".join(errors)), keys=(key,))
         expected = _expected_type(name)
         if expected and len(levels) == 2 and levels[1] in FOLDER_TYPES and levels[1] != expected:
@@ -1991,6 +1991,37 @@ def _no_evidence(text):
     return words.strip(" .:!?") in EMPTY_EVIDENCE or re.match(r"(todo|tbd)\b", words) is not None
 
 
+CHECKLIST = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "checklist", "checklist.md")
+
+
+def _applicability():
+    """{item: [its 'Mark N/A when' line, its 'When applicable' line]} from the checklist; {} when it cannot be read."""
+    try:
+        with open(CHECKLIST, encoding="utf-8-sig") as fh:
+            lines = fh.read().splitlines()
+    except (OSError, UnicodeDecodeError):
+        return {}
+    found, item = {}, None
+    for line in lines:
+        heading = re.match(r"## Item (\d+)\s*$", line)
+        if heading:
+            item = int(heading.group(1))
+        clause = re.match(r"\W*(Mark N/A when|When applicable)\s*:\s*(\S.*)$", line)
+        if clause and item is not None:
+            found.setdefault(item, []).append("%s: %s" % (clause.group(1), clause.group(2).strip()))
+    return found
+
+
+def _words(text):
+    return " ".join(re.sub(r"[^a-z0-9]+", " ", text.lower()).split())
+
+
+def _quotes(evidence, clauses):
+    """True when the evidence holds the text of one of the item's own lines (the part after the colon)."""
+    said = _words(evidence)
+    return any(_words(clause.split(":", 1)[1]) in said for clause in clauses)
+
+
 def check_review(path, findings):
     try:
         with open(path, encoding="utf-8-sig") as fh:
@@ -2022,6 +2053,7 @@ def check_review(path, findings):
     if not found_table:
         findings.add("R001", path, 0, "no table with the header | Item | Status | Evidence | was found")
         return
+    applies = _applicability()
     for item in range(1, ITEM_COUNT + 1):
         if item not in rows:
             findings.add("R003", path, 0, "item %d has no row" % item)
@@ -2032,6 +2064,11 @@ def check_review(path, findings):
                          "item %d: status must be exactly one of: %s" % (item, ", ".join(REVIEW_STATUSES)))
         if _no_evidence(evidence):
             findings.add("R005", path, number, "item %d: the evidence cell is empty or a placeholder" % item)
+        elif status == "Not applicable" and item in applies and not _quotes(evidence, applies[item]):
+            findings.add("R007", path, number,
+                         "item %d: Not applicable needs the item's own line in the evidence cell, word for word (%s), and "
+                         "why it holds for this report. A fact nobody gave is 'Fail' with 'Evidence missing:', never "
+                         "Not applicable" % (item, " or ".join("'%s'" % clause for clause in applies[item])))
     for item in sorted(rows):
         if item < 1 or item > ITEM_COUNT:
             findings.add("R006", path, rows[item][0], "item %d is not a checklist item (1 to %d)" % (item, ITEM_COUNT))

@@ -9,19 +9,19 @@ A review reports. It never fixes. Change files only after the developer has read
 ## Steps
 
 1. Run `python scripts/check_project.py .` and keep the full output. If it reports F001, stop: the project must first be saved from Power BI Desktop with the model as TMDL and the report as PBIR. Run `python scripts/check_template.py` to confirm the report's registered theme has the same content as `theme/theme.json`. Run `python scripts/list_visuals.py .` for the page inventory.
-2. Read `docs/report-brief.md`, the model files and the report files. If the brief is empty or missing, carry on; ask for the facts in step 5 and mark what stays unknown as Fail with "Evidence missing".
-3. Copy `references/review-template.md` to `docs/checklist-review.md`. If that file already exists, ask the developer to commit it or to confirm it can be replaced.
-4. Go through `checklist/checklist.md` from item 1 to item 79, in order, reading each item in full. Fill one row per item.
-5. Before finishing, get the facts the files cannot show (see "Evidence only people can give"). Facts about the data: read them yourself where the developer has set up Microsoft's modeling server (the file data-facts.md of the skill `pbi-semantic-model`); for the rest, ask the developer in one message. Use the answers as evidence, with the date. Where the Desktop Bridge is agreed, look at the pages yourself for what only the screen shows (the file desktop-bridge.md of the skill `pbi-report`).
+2. Read `docs/report-brief.md`, the model files and the report files. If the brief is empty or missing, carry on, and mark what stays unknown as Fail with "Evidence missing".
+3. Copy `references/review-template.md` to `docs/checklist-review.md`. If that file already exists: inside the skill `pbi-improve` replace it without asking (that flow keeps the first review); otherwise say at the start that you will replace it, and go on when the developer does not object.
+4. Go through `checklist/checklist.md` from item 1 to item 79, in order, reading each item in full. Fill one row per item. A second review of the same project does the same: all 79 items again, never only the rows you expect to have changed.
+5. Get the facts the files cannot show (see "Evidence only people can give") without asking during the review. Facts about the data: read them yourself where the developer has set up Microsoft's modeling server (the file data-facts.md of the skill `pbi-semantic-model`), and check whether a local source file is there before you say a fact cannot be had. A fact that the brief or an earlier answer gives is evidence, with its date. Everything else is Fail with "Evidence missing:", and its question goes into your report (step 7). If the server is not set up, or does not answer, say so in the report. Where the Desktop Bridge is agreed, look at the pages yourself for what only the screen shows (the file desktop-bridge.md of the skill `pbi-report`).
 6. Run `python scripts/check_project.py --review docs/checklist-review.md` and fix the table until it passes.
-7. Report: the script findings, the 79 rows, a short list of the Fail items with what would close each gap, the open `TODO(owner)` questions (`python scripts/list_todos.py .`), and the suggestions.
+7. Report: the script findings, the 79 rows, a short list of the Fail items with what would close each gap, the questions for the facts only a person can give (one list, like questions together), the open `TODO(owner)` questions (`python scripts/list_todos.py .`), the suggestions, and any tool that was not set up or failed. When the developer answers, update those rows.
 
 ## The three statuses
 
 Use exactly these words. Nothing else is allowed.
 
 - **Pass**: the evidence shows the item is met, including its quantitative thresholds. Where the item says "review" or "unless justified", Pass needs a recorded justification from the brief or the developer.
-- **Not applicable**: the item's own "Mark N/A when" line is true for this report, or its "When applicable" line is not. Quote the line you relied on in the evidence cell. An item with neither line that fits is never Not applicable.
+- **Not applicable**: the item's own "Mark N/A when" line is true for this report, or its "When applicable" line is not. Write the line you relied on in the evidence cell, word for word, and why it holds for this report: the review check refuses the row otherwise (R007). An item with neither line that fits is never Not applicable. Nor is an item whose fact nobody gave, or one that "does not matter for a test": that is Fail with "Evidence missing:".
 - **Fail**: everything else. That includes "no evidence": write `Fail` and start the evidence cell with `Evidence missing:` and what is needed.
 
 More rules:
@@ -92,7 +92,7 @@ Some rules have no script. Judge them from the files and the brief: hierarchies 
 
 ## Evidence only people can give
 
-These items cannot be judged from project files alone. Ask; do not guess.
+These items cannot be judged from project files alone. Do not guess: read the fact yourself where a tool is set up, otherwise mark the item Fail and put the question in your report.
 
 - In Power BI Desktop: query folding (3), key uniqueness and nulls (11, 14), row counts (17), Auto date/time setting (18), slicer value counts (21), date table gaps (31), on-screen text sizes (67), Performance Analyzer (68).
 - In the Power BI service or from the team: security roles tested (39-41), sensitivity labels and endorsement (42), permissions (43), lineage (44), refresh and alerting (45), user testing (76), export tests (77), audience access (78), decommission plan (79).

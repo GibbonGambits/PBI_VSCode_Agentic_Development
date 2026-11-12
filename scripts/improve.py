@@ -9,8 +9,11 @@ Usage (run from the repository root; <folder> is '.' when left out):
     python scripts/improve.py snapshot [<folder>]    keep the first review as docs/checklist-review-before.md
     python scripts/improve.py plan [<folder>]        write docs/fix-plan.md from the review and the project check
     python scripts/improve.py check-plan [<folder>]  check the plan: every row has a kind, a change, files, a risk
+    python scripts/improve.py release [<folder>]     give every row without a status its status, and free a held
+                                                     row whose reason no longer applies
     python scripts/improve.py compare [<folder>]     Pass, Fail and Not applicable before and after; the items
-                                                     that changed; the pages to look at; what needs a person
+                                                     that changed; the pages to look at; what was held; the
+                                                     questions left for a person
 
 The steps, and who does what, are in the skill 'pbi-improve'. This script changes no report or model file.
 'start' makes a Git branch and the copy; 'snapshot' and 'plan' write the two files named above.
@@ -21,10 +24,22 @@ nothing inside them is edited. Each .platform file holds a logicalId that must s
 (Microsoft Learn, "Git integration source code format"), so the copy must never be committed: 'start' makes
 it only when Git ignores _before/, and skips it, saying so, when a path would pass 260 characters.
 
-Kinds of fix: Mechanical (descriptions, format strings, folders, hiding, header icons and tooltips, alt text,
-titles, the DAX style), Layout (positions and sizes, a back button, tab order), Needs a person (everything
-else: a decision, a number to check, a rename or a move, and anything a file cannot settle). A row under
-"Needs a person" is not work handed back: once the developer has answered it, Copilot does the work.
+Kinds of fix, in the order they are applied, one commit each: Theme (the owner's theme is registered),
+Mechanical (descriptions, format strings, folders, hiding, header icons and tooltips, alt text, titles, the
+DAX style), Layout (positions and sizes, a back button, tab order), Measures (every measure moves to
+_Measures), Renames (names the naming standard rejects), Data (changes that make Power BI Desktop load a table
+again: a query's text, a partition's name, a data type). Needs a person is everything else: a fact or a
+decision that no file holds. Those rows are questions, listed once at the end; they are never asked mid-run.
+
+Nothing waits for an approval. Two gates hold a row back instead, and the plan says which:
+  * other reports. Measures and Renames run only when section 3 of the brief answers 'Other reports use this
+    model' with no: a report on a published copy of the model names a measure with its table, so a move or a
+    rename breaks it, and no file here can show that.
+  * refresh. Data rows run only when the data can be refreshed on this computer: the brief says so, or every
+    source is a local file that exists. Otherwise the tables they touch would be left empty, with no way to
+    load them again. A new _Measures table is not held: its query names no source, so Power BI Desktop can
+    load that one table alone, and 'compare' says so when this flow made the table.
+The branch, the copy in _before/ and one commit for each kind are the safeguard: each kind can be undone alone.
 
 Needs Python 3.8 or later and Git. Uses the standard library only.
 Exit code: 0 = done, 1 = stopped or a problem found, 2 = wrong usage.
@@ -44,19 +59,31 @@ REVIEW_BEFORE = os.path.join("docs", "checklist-review-before.md")
 PLAN = os.path.join("docs", "fix-plan.md")
 BRANCH_PREFIX = "improve/"
 PATH_LIMIT = 260                                     # Microsoft Learn, "Power BI Desktop projects", limitations
-COMMITS = {"Mechanical": "Improve: mechanical fixes", "Layout": "Improve: layout fixes"}
-KINDS = ("Mechanical", "Layout", "Needs a person")
-ANSWER = re.compile(r"(?i)(yes|no)(,?\s+[0-9]{4}-[0-9]{2}-[0-9]{2})?\Z")      # 'yes', 'no', 'yes, 2026-11-11'
-PLAN_HEADER = ["Id", "Kind", "Item or code", "Object", "What will change", "Files", "What could break", "Approved"]
+COMMITS = {"Theme": "Improve: theme", "Mechanical": "Improve: mechanical fixes", "Layout": "Improve: layout fixes",
+           "Measures": "Improve: measures moved", "Renames": "Improve: renames",
+           "Data": "Improve: changes that need a refresh"}
+AUTO_KINDS = ("Theme", "Mechanical", "Layout", "Measures", "Renames", "Data")       # applied in this order
+PERSON_KIND = "Needs a person"
+KINDS = AUTO_KINDS + (PERSON_KIND,)
+STATUS = re.compile(r"(?i)(to do|done|question|answered|held: \S.*|skipped: \S.*)\Z")
+PLAN_HEADER = ["Id", "Kind", "Item or code", "Object", "What will change", "Files", "What could break", "Status"]
+GATES = {"Measures": ("other",), "Renames": ("other",), "Data": ("refresh",)}       # kind -> the gates it must pass
+BRIEF_OTHER_REPORTS = "Other reports use this model"
+BRIEF_CAN_REFRESH = "Data can be refreshed on this computer"
+LOCAL_FILE = re.compile(r'"((?:[A-Za-z]:\\|\\\\)[^"\r\n]+)"')                 # "C:\..." or "\\server\..." in a query
 
-# code -> (kind, what will change, what could break). A code that is not here needs a person.
+# code -> (what will change, what could break), one table for each kind. A code that is in none needs a person.
+THEME = {
+    "T001": ("Register theme/theme.json in the report files (python scripts/scaffold.py theme .)",
+             "Every visual takes the theme's colours and fonts. Microsoft Learn describes importing the theme in "
+             "Power BI Desktop as the supported route: look at the colours when the report is first opened"),
+}
 MECHANICAL = {
     "D001": ("Add a '///' description from the brief, or a TODO(owner) question when the brief does not say",
              "Nothing in the report. A placeholder still leaves checklist item 23 open"),
     "D002": ("Add a '///' description above the shared query or parameter", "Nothing in the report"),
     "D003": ("Move the '///' description directly above its object", "Nothing in the report"),
     "C001": ("Turn the '//' comment into a '///' description, or move it inside the expression", "Nothing in the report"),
-    "P001": ("Add a '//' line above the Power Query step that says what it does", "Nothing in the report"),
     "H001": ("Set Header icons off on the visual (scripts/set_visual_defaults.py)",
              "Drill, focus and export icons no longer show in reading view"),
     "H002": ("Set Tooltips off on the visual (scripts/set_visual_defaults.py)", "Hover tooltips no longer show"),
@@ -75,7 +102,6 @@ MECHANICAL = {
     "M112": ("Set the column's format string to the brief's format", "Values show differently wherever the column is used"),
     "M114": ("Set the data category the column's name states (City, Country, Latitude and so on)",
              "A map may place the values differently"),
-    "M117": ("Give the table's one partition the table's name", "A refresh script that names the partition must be updated"),
     "M518": ("Replace DIVIDE by the '/' operator where the divisor is a fixed number",
              "Nothing: a fixed number is never zero or blank"),
     "M519": ("Replace ALL by REMOVEFILTERS in the filter argument", "Nothing: as a filter argument the two do the same"),
@@ -106,22 +132,51 @@ LAYOUT = {
     "A002": ("Give each visual its own tab order number, in reading order: left to right, top to bottom",
              "Keyboard users reach the visuals in a new order"),
 }
+MEASURES = {
+    "M001": ("Move the measure to _Measures and repair every reference to it (python scripts/find_references.py, "
+             "then the checks). All measures move in one commit",
+             "A report on a published copy of this model names the measure with its old table and breaks"),
+    "M002": ("Make or repair the _Measures table: visible, exactly one column, that column hidden "
+             "(python scripts/scaffold.py measures-table makes the table when it is missing)",
+             "A new table is empty until Power BI Desktop loads it: refresh that one table once. Its query names "
+             "no source, so no other table is loaded again"),
+}
+RENAMES = {
+    "M005": ("Rename one of the two measures as the naming standard asks, and repair every reference",
+             "A report on a published copy of this model names the old name and breaks"),
+    "M006": ("Rename the measure or the column as the naming standard asks, and repair every reference",
+             "A report on a published copy of this model names the old name and breaks"),
+    "M007": ("Rename the measure to a business name, and repair every reference",
+             "A report on a published copy of this model names the old name and breaks"),
+    "M008": ("Rename the measure as the naming standard asks, and repair every reference",
+             "A report on a published copy of this model names the old name and breaks"),
+    "M118": ("Rename the table, column or hierarchy as the naming standard asks, and repair every reference",
+             "A report on a published copy of this model names the old name and breaks"),
+    "M119": ("Rename the column or the hierarchy as the naming standard asks, and repair every reference",
+             "A report on a published copy of this model names the old name and breaks"),
+    "M802": ("Rename the function, and change every formula that calls it",
+             "A report on a published copy of this model that calls the function breaks"),
+    "M807": ("Rename the function or its parameters, and change every formula that calls it",
+             "A report on a published copy of this model that calls the function breaks"),
+    "V012": ("Rename the report-level measure with the prefix, and update the visuals that use it",
+             "Nothing outside this report: a report-level measure lives in the report"),
+}
+DATA = {
+    "P001": ("Add a '//' line above the Power Query step that says what it does",
+             "The query's text changes, so Power BI Desktop may load the table again: it is empty until a refresh"),
+    "M108": ("Change the column from the floating-point type to fixed decimal, or to whole number when the brief "
+             "says its values are whole", "The column is stored again: the table is empty until a refresh, and "
+             "values keep four decimals at most"),
+    "M117": ("Give the table's one partition the table's name",
+             "A renamed partition is a new partition: the table is empty until a refresh. A refresh script that "
+             "names the partition must be updated"),
+}
 PERSON = {
-    "M001": "A move needs the developer's yes for this measure. After it, Copilot moves the measure to _Measures itself and proves "
-            "every reference (scripts/find_references.py, then the checks). DAX that names it with its table, visuals, and other "
-            "reports on a published model can break",
-    "M002": "After the developer's yes, Copilot repairs the _Measures table: the table visible, exactly one column, that column "
-            "hidden (scripts/scaffold.py measures-table makes the table when it is missing)",
-    "M005": "Rename one of the two measures: renaming may break visuals and other reports",
-    "M006": "Rename the measure or the column: renaming may break visuals and other reports",
-    "M007": "Rename the measure: renaming may break visuals and other reports",
-    "M008": "Rename the measure, or accept the name: renaming may break visuals and other reports",
     "M010": "Edit the DAX reference; the developer checks the result",
     "M104": "Decide whether the hidden column should be shown again",
     "M105": "The developer states why it is calculated in the model; then the reason is written as an annotation",
     "M106": "Decide whether the calculated columns can come from the source",
     "M107": "Decide on 'do not summarise': Microsoft does not document its effect on visuals that already total the column",
-    "M108": "Decide on the data type: a change alters stored precision",
     "M109": "Give both relationship columns the same type, at the source or in Power Query",
     "M110": "Decide whether the relationship can use whole-number keys",
     "M111": "Look at the data: split date and time, or keep the date only",
@@ -129,8 +184,6 @@ PERSON = {
     "M113": "Say which column holds the order of the month names; then sortByColumn is set",
     "M115": "Decide which table keeps the column; removing it from the other needs a yes",
     "M116": "Decide whether the flag is shown as Yes and No text",
-    "M118": "Rename the table, column or hierarchy: renaming may break visuals and other reports",
-    "M119": "Rename the column or the hierarchy: renaming may break visuals and other reports",
     "M401": "The developer turns Auto date/time off in Power BI Desktop (Options, Current File, Time intelligence)",
     "M402": "Name the date table; then it is marked (dataCategory Time, isKey on its date column) or built from the shipped example",
     "M403": "Decide whether the model gets a date table",
@@ -169,12 +222,10 @@ PERSON = {
     "M609": "Decide whether the security filter must travel both ways; the roles must be tested again",
     "M711": "Replace the Power Query partition by an entity partition, from the shipped Direct Lake example; the developer confirms the source",
     "M806": "Decide: keep the hidden object out of the function, or change the role; the function is tested for that role",
-    "M807": "After the developer's yes, rename the function or its parameters: every formula that calls it must change",
     "M832": "Confirm nothing else uses the data source; then it is removed",
     "M833": "Convert the partition to a Power Query (m) partition; the model must be refreshed and checked",
     "M910": "Say which name the calculated table's formula should return for the column",
     "P007": "Decide whether the table's load is turned off (Enable load in Power BI Desktop)",
-    "V012": "After the developer's yes, rename the report-level measure with the prefix and update the visuals that use it",
     "V013": "The developer clears the filter in Power BI Desktop and saves",
     "V014": "Decide: hide the drillthrough page, or add a reset button with a bookmark",
     "V015": "Say which table the filter is on; then the filter is repaired",
@@ -206,7 +257,6 @@ PERSON = {
     "M708": "Check that the date filter reaches the source; or filter on a table or view instead",
     "M709": "Include one end of the refresh window only; the next refresh then loads boundary rows once",
     "M801": "Raise the model's compatibility level to 1702; an older Power BI Desktop can then no longer open it",
-    "M802": "Rename the function: every formula that calls it must change",
     "M804": "Say the type of each parameter",
     "M805": "Rewrite the function without calling itself",
     "M811": "Add calculation items, or remove the empty calculation group",
@@ -312,17 +362,134 @@ def read_plan(path):
             for column in ("Item or code", "What will change", "Files", "What could break"):
                 if not re.search(r"[^\W_]", row[column]) or row[column].startswith("<"):
                     problems.append("%s: '%s' is empty" % (where, column))
-            if row["Approved"] and not ANSWER.match(row["Approved"]):
-                problems.append("%s: Approved must be empty, or exactly yes or no, with or without the date "
-                                "(for example 'yes, 2026-11-11'); a doubt is a no" % where)
+            if not row["Status"]:
+                problems.append("%s: Status is empty. Run: python scripts/improve.py release" % where)
+            elif not STATUS.match(row["Status"]):
+                problems.append("%s: Status must be one of: to do, done, question, answered, 'held: <why>', "
+                                "'skipped: <why>'" % where)
+            elif row["Kind"] in KINDS and (row["Kind"] == PERSON_KIND) != (status_of(row) in ("question", "answered")):
+                problems.append("%s: a '%s' row is a question or answered; every other row is to do, done, held or "
+                                "skipped" % (where, PERSON_KIND))
             rows.append(row)
     if not inside:
         problems.append("no table with the header | %s |" % " | ".join(PLAN_HEADER))
     return rows, problems
 
 
-def approved(rows, kind):
-    return [r for r in rows if r["Kind"] == kind and ANSWER.match(r["Approved"]) and r["Approved"].lower().startswith("yes")]
+def status_of(row):
+    """'to do', 'done', 'question', 'answered', 'held' or 'skipped'; '' when the cell holds anything else."""
+    m = STATUS.match(row["Status"])
+    return m.group(1).split(":")[0].lower() if m else ""
+
+
+def with_status(rows, kind, *wanted):
+    return [r for r in rows if r["Kind"] == kind and status_of(r) in wanted]
+
+
+# ---------------------------------------------------------------- the two gates
+
+def _brief_lines(root):
+    try:
+        with open(os.path.join(root, cp.BRIEF), encoding="utf-8-sig") as fh:
+            return fh.read().splitlines()
+    except (OSError, UnicodeDecodeError):
+        return []
+
+
+def _yes_no(text):
+    word = re.match(r"\s*`?(yes|no)\b", text, re.I)
+    return word.group(1).lower() if word else ""
+
+
+def _model_text(root):
+    """(file, text) of every TMDL file of the models under root."""
+    for model in cp.find_models(root):
+        for folder, _, files in os.walk(os.path.join(model, "definition")):
+            for name in sorted(files):
+                if name.lower().endswith(".tmdl"):
+                    try:
+                        with open(os.path.join(folder, name), encoding="utf-8-sig") as fh:
+                            yield os.path.join(folder, name), fh.read()
+                    except (OSError, UnicodeDecodeError):
+                        continue
+
+
+def has_measures_table(root):
+    name = re.compile(r"(?m)^table\s+'?%s'?\s*$" % re.escape(cp.MEASURE_TABLE))
+    return any(name.search(text) for _, text in _model_text(root))
+
+
+def made_measures_table(root):
+    """True when a file that defines the table _Measures was added since 'start'; None when that cannot be told."""
+    code, base = git(root, "config", "--get", "improve.base")
+    if code != 0 or not base:
+        return None
+    code, out = git(root, "diff", "--name-only", "--diff-filter=A", "--relative", base, "HEAD")
+    if code != 0:
+        return None
+    name = re.compile(r"(?m)^table\s+'?%s'?\s*$" % re.escape(cp.MEASURE_TABLE))
+    for line in out.splitlines():
+        path = os.path.join(root, line.strip().strip('"'))
+        if path.lower().endswith(".tmdl"):
+            try:
+                with open(path, encoding="utf-8-sig") as fh:
+                    if name.search(fh.read()):
+                        return True
+            except (OSError, UnicodeDecodeError):
+                continue
+    return False
+
+
+def gate_state(root):
+    """{'other': why the other-reports gate is shut, 'refresh': why the refresh gate is shut}; '' = open."""
+    lines = _brief_lines(root)
+    other = _yes_no(cp._brief_value(lines, BRIEF_OTHER_REPORTS))
+    if not cp.find_models(root):
+        why_other = "this report reads a published model, which other reports may use too"
+    elif other == "no":
+        why_other = ""
+    elif other == "yes":
+        why_other = "other reports use this model (section 3 of the brief)"
+    else:
+        why_other = "the brief does not say whether other reports use this model (section 3: write yes or no)"
+    refresh = _yes_no(cp._brief_value(lines, BRIEF_CAN_REFRESH))
+    if refresh == "yes":
+        why_refresh = ""
+    elif refresh == "no":
+        why_refresh = "the data cannot be refreshed on this computer (section 3 of the brief)"
+    else:
+        paths = sorted({m.group(1) for _, text in _model_text(root) for m in LOCAL_FILE.finditer(text)})
+        missing = [path for path in paths if not os.path.exists(path)]
+        if missing:
+            why_refresh = "the data cannot be refreshed on this computer: source file not found (%s)" % missing[0][:80]
+        elif paths:
+            why_refresh = ""
+        else:
+            why_refresh = ("the brief does not say that the data can be refreshed on this computer, and the sources "
+                           "are not local files (section 3: write yes or no)")
+    return {"other": why_other, "refresh": why_refresh}
+
+
+def first_status(kind, state):
+    """The status a row starts with: 'to do', 'question', or 'held: <why>'."""
+    if kind == PERSON_KIND:
+        return "question"
+    for gate in GATES.get(kind, ()):
+        if state[gate]:
+            return "held: " + state[gate]
+    return "to do"
+
+
+def _write_statuses(path, statuses):
+    """Write {row id: status} into the Status cell of those rows; every other character of the file stays."""
+    with open(path, encoding="utf-8-sig") as fh:
+        lines = fh.read().split("\n")
+    for index, line in enumerate(lines):
+        cells = re.split(r"(?<!\\)\|", line.strip().strip("|"))
+        if line.strip().startswith("|") and len(cells) == len(PLAN_HEADER) and cells[0].strip() in statuses:
+            lines[index] = re.sub(r"\|[^|]*\|\s*$", "| %s |" % statuses[cells[0].strip()], line.rstrip())
+    with open(path, "w", encoding="utf-8", newline="\n") as fh:
+        fh.write("\n".join(lines))
 
 
 def review_problems(path):
@@ -434,41 +601,86 @@ def plan(root):
         print("Stopped: the review is not finished. Run: python scripts/check_project.py --review docs/checklist-review.md")
         return 1
     findings, _, _ = cp.run(root)
+    state = gate_state(root)
+    tables = (("Theme", THEME), ("Mechanical", MECHANICAL), ("Layout", LAYOUT), ("Measures", MEASURES),
+              ("Renames", RENAMES), ("Data", DATA))
     rows, notes = [], []
     for code, path, line, message, level in findings.items:
         rel = os.path.relpath(path, root).replace(os.sep, "/") if path else "-"
         if level == "note":
             notes.append("- %s  %s  %s" % (code, rel, message))
-        elif code in MECHANICAL:
-            rows.append(("Mechanical", code, message, MECHANICAL[code][0], rel, MECHANICAL[code][1]))
-        elif code in LAYOUT:
-            rows.append(("Layout", code, message, LAYOUT[code][0], rel, LAYOUT[code][1]))
+            continue
+        for kind, table in tables:
+            if code in table:
+                rows.append((kind, code, message, table[code][0], rel, table[code][1],
+                             first_status(kind, state)))
+                break
         else:
-            rows.append(("Needs a person", code, message, PERSON.get(code, "Decide with the developer"), rel,
-                         "Depends on the decision"))
+            rows.append((PERSON_KIND, code, message, PERSON.get(code, "Say what should happen here"), rel,
+                         "Depends on the answer", "question"))
     for item in sorted(review):
         status, evidence = review[item]
         if status == "Fail":
-            kind = "Needs a person" if item in PERSON_ITEMS else "?"
-            rows.append((kind, "Item %d" % item, evidence, "<what will change>", "<files>", "<what could break>"))
+            if item in PERSON_ITEMS:
+                rows.append((PERSON_KIND, "Item %d" % item, evidence, "<what will change>", "<files>",
+                             "<what could break>", "question"))
+            else:
+                rows.append(("?", "Item %d" % item, evidence, "<what will change>", "<files>", "<what could break>", ""))
     order = {kind: index for index, kind in enumerate(KINDS + ("?",))}
     rows.sort(key=lambda row: order[row[0]])
     lines = ["# Fix plan", "",
              "Made on %s by `python scripts/improve.py plan` from the checklist review and the project check. "
              "Rules: skill `pbi-improve`." % datetime.date.today().isoformat(), "",
-             "Kinds: Mechanical, Layout, Needs a person. A `?` or a `<...>` cell is still to be filled in. "
-             "Approved: `yes` or `no` with the date, written when the developer answers. Nothing is changed before a yes.", "",
+             "Kinds, in the order they are applied: %s. A `?` or a `<...>` cell is still to be filled in. "
+             "Status: `to do`, `done`, `held: <why>`, `skipped: <why>`; for a row that needs a person `question` or "
+             "`answered`. No row waits for an approval: a `to do` row is done, a `held` row waits until its reason "
+             "is gone (`python scripts/improve.py release`), and the questions are listed once, at the end."
+             % ", ".join(KINDS), "",
+             "Gates today. Other reports: %s. Refresh: %s." % (state["other"] or "open", state["refresh"] or "open"), "",
              "| %s |" % " | ".join(PLAN_HEADER), "|%s|" % "|".join("---" for _ in PLAN_HEADER)]
-    for number, (kind, source, what, change, files, risk) in enumerate(rows, 1):
-        lines.append("| F%d | %s | %s | %s | %s | %s | %s |  |"
-                     % (number, kind, source, _cell(what)[:300], _cell(change), _cell(files), _cell(risk)))
+    for number, (kind, source, what, change, files, risk, status) in enumerate(rows, 1):
+        lines.append("| F%d | %s | %s | %s | %s | %s | %s | %s |"
+                     % (number, kind, source, _cell(what)[:300], _cell(change), _cell(files), _cell(risk), _cell(status)))
     lines += ["", "## For information", "",
-              "Notes from the project check. They are not errors and need no approval.", ""] + (notes or ["- none"])
+              "Notes from the project check. They are not errors and are never fix rows.", ""] + (notes or ["- none"])
     os.makedirs(os.path.dirname(target), exist_ok=True)
     with open(target, "w", encoding="utf-8", newline="\n") as fh:
         fh.write("\n".join(lines) + "\n")
-    print("Wrote %s with %d row(s). Sort every '?' row, fill in the '<...>' cells, then run: python scripts/improve.py check-plan"
-          % (PLAN.replace(os.sep, "/"), len(rows)))
+    print("Wrote %s with %d row(s). Give every '?' row a kind, fill in the '<...>' cells, then run: "
+          "python scripts/improve.py release" % (PLAN.replace(os.sep, "/"), len(rows)))
+    for gate in ("other", "refresh"):
+        if state[gate]:
+            print("Held by the %s gate: %s." % ("other-reports" if gate == "other" else "refresh", state[gate]))
+    return 0
+
+
+def release(root):
+    """Give every row that has no status its first status, and free a held row whose gate is open now."""
+    path = os.path.join(root, PLAN)
+    rows, problems = read_plan(path)
+    if not rows:
+        print("Stopped: %s has no rows. Write it first: python scripts/improve.py plan" % PLAN.replace(os.sep, "/"))
+        return 1
+    unsorted = [r["Id"] for r in rows if r["Kind"] not in KINDS]
+    if unsorted:
+        print("Stopped: give these rows one of the kinds first (%s): %s" % (", ".join(KINDS), ", ".join(unsorted)))
+        return 1
+    state = gate_state(root)
+    changes = {}
+    for row in rows:
+        now = status_of(row)
+        if now in ("", "held"):
+            new = first_status(row["Kind"], state)
+            if new != row["Status"]:
+                changes[row["Id"]] = new
+    if changes:
+        _write_statuses(path, changes)
+    freed = sum(1 for new in changes.values() if new == "to do")
+    held = sum(1 for row in rows if (changes.get(row["Id"]) or row["Status"]).lower().startswith("held"))
+    print("Statuses written: %d. Rows to do now: %d of them. Rows still held: %d." % (len(changes), freed, held))
+    for gate in ("other", "refresh"):
+        if state[gate]:
+            print("The %s gate is shut: %s." % ("other-reports" if gate == "other" else "refresh", state[gate]))
     return 0
 
 
@@ -478,7 +690,12 @@ def check_plan(root):
         print("X  %s" % line)
     for kind in KINDS:
         of_kind = [r for r in rows if r["Kind"] == kind]
-        print("%s: %d row(s), %d approved." % (kind, len(of_kind), len(approved(rows, kind))))
+        if kind == PERSON_KIND:
+            print("%s: %d row(s), %d still a question." % (kind, len(of_kind), len(with_status(rows, kind, "question"))))
+        else:
+            print("%s: %d row(s): %d to do, %d done, %d held, %d skipped."
+                  % (kind, len(of_kind), len(with_status(rows, kind, "to do")), len(with_status(rows, kind, "done")),
+                     len(with_status(rows, kind, "held")), len(with_status(rows, kind, "skipped"))))
     print("Fix plan: %d problem(s)." % len(problems))
     return 1 if problems else 0
 
@@ -526,12 +743,53 @@ def compare(root):
         print("Pages to look at in Power BI Desktop: every page a fix touched (the start of this flow was not recorded).")
     else:
         print("Pages to look at in Power BI Desktop: %s" % (", ".join(pages) if pages else "none changed"))
+    if made_measures_table(root):
+        print("First in Power BI Desktop: refresh the table %s once (right-click the table, Refresh data). This flow "
+              "made it, so it is empty until loaded. Its query names no source: do not refresh the whole model for it."
+              % cp.MEASURE_TABLE)
+    fails = [item for item in sorted(after) if after[item][0] == "Fail"]
+    person = [item for item in fails if item in PERSON_ITEMS]
+    other = [item for item in fails if item not in PERSON_ITEMS]
+    print("Still Fail: %d item(s)." % len(fails))
+    print("  %d can pass only on a fact from a person%s" % (len(person), _items(person)))
+    print("  %d wait on a held fix or on an answer about the files%s" % (len(other), _items(other)))
     rows, _ = read_plan(os.path.join(root, PLAN))
-    people = [r for r in rows if r["Kind"] == "Needs a person"]
-    print("Needs a person: %d row(s)%s" % (len(people), ":" if people else "."))
-    for row in people:
-        print("  %s  %s  %s" % (row["Id"], row["Item or code"], row["What will change"]))
+    for kind in AUTO_KINDS:
+        of_kind = [r for r in rows if r["Kind"] == kind]
+        if of_kind:
+            print("%s: %d done, %d held, %d skipped, %d to do."
+                  % (kind, len(with_status(rows, kind, "done")), len(with_status(rows, kind, "held")),
+                     len(with_status(rows, kind, "skipped")), len(with_status(rows, kind, "to do"))))
+    held = [r for r in rows if status_of(r) == "held"]
+    print("Held: %d row(s)%s" % (len(held), ":" if held else "."))
+    for reason, group in _grouped(held, lambda r: r["Status"].split(":", 1)[1].strip()):
+        print("  %d row(s): %s (%s)" % (len(group), reason, _ids(group)))
+    skipped = [r for r in rows if status_of(r) == "skipped"]
+    print("Skipped: %d row(s)%s" % (len(skipped), ":" if skipped else "."))
+    for row in skipped:
+        print("  %s  %s  %s" % (row["Id"], row["Item or code"], row["Status"].split(":", 1)[1].strip()))
+    people = with_status(rows, PERSON_KIND, "question")
+    print("Questions for a person: %d row(s)%s" % (len(people), ":" if people else "."))
+    for (source, change), group in _grouped(people, lambda r: (r["Item or code"], r["What will change"])):
+        print("  %s  %s%s (%s)" % (source, change, "" if len(group) == 1 else "  [%d rows]" % len(group), _ids(group)))
     return 0
+
+
+def _items(items):
+    return " (items %s)." % ", ".join(str(item) for item in items) if items else "."
+
+
+def _ids(rows):
+    ids = [r["Id"] for r in rows]
+    return ", ".join(ids) if len(ids) <= 6 else "%s ... %s" % (", ".join(ids[:3]), ids[-1])
+
+
+def _grouped(rows, key):
+    """[(key, rows)] in the order the keys first appear: twenty rows that ask the same thing print as one line."""
+    groups = {}
+    for row in rows:
+        groups.setdefault(key(row), []).append(row)
+    return list(groups.items())
 
 
 def _has_commit(root, subject):
@@ -550,27 +808,30 @@ def next_step(root):
     if code != 0:
         return say(23, "This folder is not a Git repository. The flow needs one: the original stays on a branch.")
     if not branch.startswith(BRANCH_PREFIX):
-        return say(23, "Safety first. Ask the developer to save in Power BI Desktop and commit. Then run: python scripts/improve.py start")
+        return say(23, "Safety first. The project must be saved and closed in Power BI Desktop, and everything committed. "
+                       "If section 3 of the brief does not answer 'Other reports use this model', ask the developer that "
+                       "one question now and write yes or no there. Then run: python scripts/improve.py start")
     exists = {name: os.path.isfile(os.path.join(root, name)) for name in (REVIEW, REVIEW_BEFORE, PLAN)}
     if not exists[REVIEW_BEFORE]:
         if not exists[REVIEW]:
             return say(24, "Evaluate with the skill pbi-checklist-review. It writes docs/checklist-review.md.")
         return say(24, "Keep the review as the 'before': python scripts/improve.py snapshot")
     if not exists[PLAN]:
-        return say(25, "Write the fix plan: python scripts/improve.py plan. Then sort the '?' rows and fill in the '<...>' cells.")
+        return say(25, "Write the fix plan: python scripts/improve.py plan. Then give the '?' rows a kind and fill in the '<...>' cells.")
     rows, problems = read_plan(os.path.join(root, PLAN))
+    if any(not r["Status"] for r in rows) and all(r["Kind"] in KINDS for r in rows):
+        return say(25, "Give the new rows their status: python scripts/improve.py release")
     if problems:
         return say(25, "Finish the fix plan (%d problem(s)): python scripts/improve.py check-plan" % len(problems))
-    waiting = [r for r in rows if r["Kind"] in COMMITS and not r["Approved"]]
-    if waiting:
-        return say(26, "Stop. Show the developer docs/fix-plan.md. They approve all of it, one kind, or single rows. "
-                       "Then write yes or no with the date in 'Approved' of every Mechanical and Layout row: a row "
-                       "they did not approve gets no. %d row(s) still have no answer. Change nothing before that."
-                       % len(waiting))
-    for kind in ("Mechanical", "Layout"):
-        if approved(rows, kind) and not _has_commit(root, COMMITS[kind]):
-            return say(27, "Apply the approved %s rows only. Run python scripts/check_project.py . and fix what it reports. "
-                           "Then commit with the message '%s'." % (kind, COMMITS[kind]))
+    for kind in AUTO_KINDS:
+        todo = with_status(rows, kind, "to do")
+        if todo:
+            return say(27, "Apply the %d %s row(s) marked 'to do': no approval is needed. As each row is finished write "
+                           "'done' in its Status, or 'skipped: <why>' when it cannot be done. Run python scripts/"
+                           "check_project.py . and fix what it reports. Then commit with the message '%s'."
+                           % (len(todo), kind, COMMITS[kind]))
+        if with_status(rows, kind, "done") and not _has_commit(root, COMMITS[kind]):
+            return say(27, "Commit the %s fixes with the message '%s'." % (kind, COMMITS[kind]))
     before = read_review(os.path.join(root, REVIEW_BEFORE))
     after = read_review(os.path.join(root, REVIEW)) if exists[REVIEW] else None
     with_fixes = any(_has_commit(root, subject) for subject in COMMITS.values())
@@ -579,16 +840,18 @@ def next_step(root):
         with open(os.path.join(root, REVIEW), "rb") as one, open(os.path.join(root, REVIEW_BEFORE), "rb") as two:
             same = one.read() == two.read()
     if after is None or (same and with_fixes) or review_problems(os.path.join(root, REVIEW)):
-        return say(28, "Evaluate again with the skill pbi-checklist-review (confirm that docs/checklist-review.md may be replaced; "
-                       "the first review is kept as docs/checklist-review-before.md).")
-    return say("28 and 29", "Show the result: python scripts/improve.py compare. Then tell the developer which pages to "
-                            "look at in Power BI Desktop and which rows need a person. Do not merge, publish or deploy.")
+        return say(28, "Evaluate again with the skill pbi-checklist-review: go through all 79 items in order, not only "
+                       "the rows you expect to change. docs/checklist-review.md is replaced without asking; the first "
+                       "review is kept as docs/checklist-review-before.md.")
+    return say("28 and 29", "Show the result: python scripts/improve.py compare. Then give the developer one final "
+                            "answer: what changed, the pages to look at in Power BI Desktop, what was held and what "
+                            "frees it, what was skipped, and the questions. Do not merge, publish or deploy.")
 
 
 def main(argv):
     cp.safe_output()
     commands = {"next": next_step, "start": start, "snapshot": snapshot, "plan": plan, "check-plan": check_plan,
-                "compare": compare}
+                "release": release, "compare": compare}
     args = argv[1:]
     if not args or args[0] not in commands or len(args) > 2:
         print(__doc__)

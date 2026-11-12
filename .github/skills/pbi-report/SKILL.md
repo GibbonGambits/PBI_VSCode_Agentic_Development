@@ -44,7 +44,7 @@ Checklist items are in `checklist/checklist.md`. Read only the items a step name
 
 - Existing pages and visuals keep their names (project instructions).
 - Set Header icons off and Tooltips off on all visuals in one step: run `python scripts/set_visual_defaults.py . --dry-run`, then the same without `--dry-run`.
-- Give each existing visual a label. Propose labels from the `list_visuals.py` output, agree them with the developer, then run `python scripts/set_visual_defaults.py . --label <page folder>/<visual folder>=<Page_Type_Subject>`, with one `--label` for each visual.
+- Give each existing visual a label. Write the labels from the `list_visuals.py` output, as the naming rule sets out, list them in your final answer, and run `python scripts/set_visual_defaults.py . --label <page folder>/<visual folder>=<Page_Type_Subject>`, with one `--label` for each visual.
 - The theme: the developer imports `theme/theme.json` once in Power BI Desktop (Design ribbon > Import theme). `python scripts/check_template.py` then confirms the copy.
 - Document non-obvious interactions, bookmarks or filter logic where they live (item 8): in the brief, or in an annotation on the page or visual.
 - To report gaps without changing anything, use the skill `pbi-checklist-review`. To evaluate and then fix in one request, use the skill `pbi-improve`.

@@ -417,7 +417,7 @@ def _columns(context, rels, column_at):
             problems = _table_column_name(obj["name"], context["brief"])
             if problems:
                 shown = obj["name"] if obj["kind"] == "table" else "%s[%s]" % (table["name"], obj["name"])
-                add("M118", obj, "%s name '%s': %s. Renaming needs the developer's yes"
+                add("M118", obj, "%s name '%s': %s. Renaming follows the brief (model standard, 'Existing models')"
                     % (obj["kind"], obj["name"], "; ".join(problems)), level="warn", keys=(shown,))
 
 
