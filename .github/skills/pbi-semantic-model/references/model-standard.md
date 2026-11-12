@@ -92,10 +92,7 @@ A check passes only for an object that section 9 of the brief lists with the sam
 
 ## Existing models: moving and renaming
 
-A move or a rename can break other reports that read a published copy of this model, and no file here shows them. So the brief decides (section 3, "Other reports use this model"; rule in the project instructions):
-
-- **no**: do the move or the rename at once, yourself, as set out below. In the evaluate-and-improve flow every measure moves to `_Measures` in one commit, and names the naming standard rejects are corrected in another.
-- **yes, or no answer**: tell the developer what can break, then wait for a clear yes. In a fix plan such a row is `held`.
+A move or a rename happens when the developer asks for it, or in the evaluate-and-improve flow, where every measure moves to `_Measures` in one commit and names the naming standard rejects are corrected in another. Do it at once, yourself, as set out below, without asking. It can break other reports that read a published copy of this model, and no file here shows them: say so in your final answer.
 
 A new `_Measures` table is empty until Power BI Desktop refreshes the model. Say so whenever you make the table in an existing model.
 
@@ -105,7 +102,7 @@ What can break:
 - Report visuals: a visual stores the measure's table beside its name, so a move or a rename can break visuals, filters and bookmarks in this report.
 - Other reports connected to a published model can break in the same way, and no file here can show it. Say so every time.
 
-After the yes, Copilot does the work itself:
+Copilot does the work itself:
 
 1. Run `python scripts/find_references.py . "<object>"`, written as `[Measure]`, `Table[Column]` or `Table`. It prints the references it recognises, and the text it cannot classify.
 2. If the second list is not empty, show it to the developer and change only what they confirm. If the script cannot confirm the references at all (the object is not in the model, or a file cannot be read), stop and say so.

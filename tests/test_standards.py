@@ -327,16 +327,15 @@ class BadProject(Case):
             self.assertEqual(statuses[code], {"question"}, code)
         for code in ("H001", "M003", "G002"):
             self.assertEqual(statuses[code], {"to do"}, code)             # nothing waits for an approval
-        for code in ("M001", "M007"):
-            self.assertEqual(statuses[code], {"held"}, code)              # no brief: the other-reports gate is shut
-        self.assertEqual(statuses["M108"], {"to do"})                     # a change that needs a refresh is never held
+        for code in ("M001", "M007", "M108"):
+            self.assertEqual(statuses[code], {"to do"}, code)             # an empty brief holds nothing back
         self.assertEqual(kinds["Item 39"], {"Needs a person"})
         self.assertEqual(kinds["Item 1"], {"?"})                          # for Copilot to sort; check-plan refuses a '?'
         self.assertTrue(any("Item 1" in p or "Kind" in p for p in problems))
         text = self.read(os.path.join("docs", "fix-plan.md"))
         self.assertIn("## For information", text)
         self.assertIn("M201", text)
-        self.assertIn("Gate today.", text)
+        self.assertNotIn("held", text)
         self.assertEqual(quiet(improve.check_plan, self.root)[0], 1)
         self.assertEqual(quiet(improve.plan, self.root)[0], 1)            # an existing plan is never overwritten
 
@@ -1096,39 +1095,29 @@ class Flow(FlowCase):
         self.assertIn("Apply the 1 Mechanical row(s) marked 'to do': no approval is needed", step)
         self.assertNotIn("Stop.", step)
 
-    def test_a_move_is_held_until_the_brief_says_no_other_report_uses_the_model(self):
+    def test_a_move_is_never_held_back(self):
         moved = "\tmeasure 'Sales Check' = SUM ( Sales[Amount] )\n\t\tformatString: #,0\n\t\tdisplayFolder: Finance\\Base\n"
-        self.plan_with((SALES, "\tannotation SampleSource", "\t/// Made-up measure outside the measures table.\n"
-                        + moved + "\n\tannotation SampleSource"))
-        self.assertEqual(len(self.statuses("M001")), 1)
-        self.assertIn("held: the brief does not say whether other reports use this model", self.statuses("M001")[0])
-        self.assertNotIn("Measures row(s) marked 'to do'", self.step())
-        self.write(BRIEF, "- Other reports use this model (yes or no): yes\n")
-        quiet(improve.release, self.root)
-        self.assertIn("held: other reports use this model", self.statuses("M001")[0])
-        self.write(BRIEF, "- Other reports use this model (yes or no): no\n")
-        code, out = quiet(improve.release, self.root)
-        self.assertEqual(code, 0, out)
-        self.assertIn("Rows to do now: 1", out)
-        self.assertEqual(self.statuses("M001"), ["to do"])
+        plan = self.plan_with((SALES, "\tannotation SampleSource", "\t/// Made-up measure outside the measures table.\n"
+                               + moved + "\n\tannotation SampleSource"))
+        self.assertEqual(self.statuses("M001"), ["to do"])                    # no brief answer is needed
         self.assertIn("Apply the 1 Measures row(s) marked 'to do'", self.step())
+        self.assertNotIn("ask the developer", self.step())
+        rows, _ = improve.read_plan(self.path(plan))
+        improve._write_statuses(self.path(plan), {r["Id"]: "done" for r in rows if r["Kind"] == "Measures"})
+        self.write(os.path.join("docs", "checklist-review.md"), review_text(fails=(76,), not_applicable=(79,)))
+        self.assertIn("a report that reads a published copy of this model", quiet(improve.compare, self.root)[1])
 
-    def test_a_change_that_needs_a_refresh_is_never_held(self):
+    def test_a_change_that_needs_a_refresh_is_never_held_back(self):
         self.plan_with((SALES, '{{1, 120.5, "Web", false}', '{{1, 120.5, "C:\\made-up\\Data.xlsx", false}'),   # a source that is not there
                        (SALES, "\tpartition Sales = m", "\tpartition Rows = m"))
         self.assertEqual(self.statuses("M117"), ["to do"])
         self.assertIn("Apply the 1 Data row(s) marked 'to do'", self.step())
-        self.assertEqual(set(improve.gate_state(self.root)), {"other"})
 
-    def test_only_moves_and_renames_pass_a_gate(self):
+    def test_the_first_status_depends_on_the_kind_only(self):
         self.assertTrue(improve.has_measures_table(self.root))
-        shut = {"other": "used"}
-        for kind in ("Measures", "Renames"):
-            self.assertEqual(improve.first_status(kind, shut), "held: used")
-            self.assertEqual(improve.first_status(kind, {"other": ""}), "to do")
-        for kind in ("Theme", "Mechanical", "Layout", "Data"):
-            self.assertEqual(improve.first_status(kind, shut), "to do")
-        self.assertEqual(improve.first_status("Needs a person", {"other": ""}), "question")
+        for kind in improve.AUTO_KINDS:
+            self.assertEqual(improve.first_status(kind), "to do")
+        self.assertEqual(improve.first_status("Needs a person"), "question")
         os.remove(self.path(MEASURES))
         self.assertFalse(improve.has_measures_table(self.root))
 
@@ -1143,22 +1132,20 @@ class Flow(FlowCase):
         self.commit("Improve: measures moved")
         self.assertTrue(improve.made_measures_table(self.root))
 
-    def test_the_brief_holds_the_line_the_gate_reads(self):
+    def test_the_brief_asks_nothing_that_holds_a_fix_back(self):
         with open(os.path.join(REPO, "docs", "report-brief.md"), encoding="utf-8") as fh:
-            lines = fh.read().splitlines()
-        label = improve.BRIEF_OTHER_REPORTS
-        self.assertEqual(len([line for line in lines if line.startswith("- " + label)]), 1)
-        self.assertEqual(improve.cp._brief_value(lines, label).strip(), "")        # shipped without an answer
-        self.assertNotIn("can be refreshed on this computer", "\n".join(lines))   # no run stops for a data source
+            text = fh.read()
+        self.assertNotIn("Other reports use this model", text)
+        self.assertNotIn("can be refreshed on this computer", text)
 
     def test_a_status_is_one_of_the_fixed_words(self):
         plan = self.plan_with((CARD, '"width": 608', '"width": 610'))
         text = self.read(plan)
         row = [line for line in text.splitlines() if line.startswith("| F") and "| Layout |" in line][0]
-        for status in ("yes", "approved", "maybe", "held", "skipped", "question", "answered"):
+        for status in ("yes", "approved", "maybe", "held", "held: other reports", "skipped", "question", "answered"):
             self.write(plan, text.replace(row, row.replace("| to do |", "| %s |" % status)))
             self.assertEqual(quiet(improve.check_plan, self.root)[0], 1, status)
-        for status in ("to do", "done", "Done", "held: other reports use this model", "skipped: the brief gives no format"):
+        for status in ("to do", "done", "Done", "skipped: the brief gives no format"):
             self.write(plan, text.replace(row, row.replace("| to do |", "| %s |" % status)))
             self.assertEqual(quiet(improve.check_plan, self.root)[0], 0, status)
 
@@ -1222,7 +1209,7 @@ class Flow(FlowCase):
         self.assertIn("Statuses written: 2", out)
         code, out = quiet(improve.check_plan, self.root)
         self.assertEqual(code, 0, out)
-        self.assertIn("Mechanical: 2 row(s): 2 to do, 0 done, 0 held, 0 skipped.", out)
+        self.assertIn("Mechanical: 2 row(s): 2 to do, 0 done, 0 skipped.", out)
 
         self.assertIn("Apply the 2 Mechanical row(s) marked 'to do'", self.step())
         self.replace(SALES, "\tcolumn Channel\n", "\t/// Sales channel of the order line: Web or Store.\n\tcolumn Channel\n")
@@ -1253,9 +1240,8 @@ class Flow(FlowCase):
         self.assertIn("Pages to look at in Power BI Desktop: Overview", lines)
         self.assertIn("Still Fail: 1 item(s).", lines)
         self.assertIn("1 can pass only on a fact from a person (items 76).", lines)
-        self.assertIn("0 wait on a held fix or on an answer about the files.", lines)
-        self.assertIn("Mechanical: 1 done, 0 held, 1 skipped, 0 to do.", lines)
-        self.assertIn("Held: 0 row(s).", lines)
+        self.assertIn("0 wait on a skipped fix or on an answer about the files.", lines)
+        self.assertIn("Mechanical: 1 done, 1 skipped, 0 to do.", lines)
         self.assertTrue(any(line.startswith("Skipped: 1 row(s)") for line in lines))
         self.assertTrue(any(line.startswith("Questions for a person: 1 row(s)") for line in lines))
         subjects = self.git("log", "--format=%s", "work..HEAD").splitlines()
@@ -1267,15 +1253,14 @@ class Flow(FlowCase):
         head = "| %s |\n|%s|\n" % (" | ".join(improve.PLAN_HEADER), "|".join("---" for _ in improve.PLAN_HEADER))
         why = "The developer states why it is calculated in the model"
         self.write(os.path.join("docs", "fix-plan.md"), head
-                   + "| F1 | Measures | M001 | [A] | Move it | a.tmdl | Other reports | held: other reports use this model |\n"
-                   + "| F2 | Measures | M001 | [B] | Move it | a.tmdl | Other reports | held: other reports use this model |\n"
+                   + "| F1 | Measures | M001 | [A] | Move it | a.tmdl | Other reports | done |\n"
+                   + "| F2 | Measures | M001 | [B] | Move it | a.tmdl | Other reports | done |\n"
                    + "| F3 | Needs a person | M105 | Sales[X] | %s | b.tmdl | Depends | question |\n" % why
                    + "| F4 | Needs a person | M105 | Sales[Y] | %s | b.tmdl | Depends | question |\n" % why
                    + "| F5 | Needs a person | Item 76 | - | Say who tested it | - | Nothing | question |\n")
         self.write(os.path.join("docs", "checklist-review.md"), review_text(fails=(76,), not_applicable=(79,)))
         out = quiet(improve.compare, self.root)[1]
-        self.assertIn("Held: 2 row(s):", out)
-        self.assertIn("  2 row(s): other reports use this model (F1, F2)", out)       # one line for one reason
+        self.assertNotIn("Held", out)
         self.assertIn("Questions for a person: 3 row(s):", out)
         self.assertIn("  M105  %s  [2 rows] (F3, F4)" % why, out)                    # rows that ask the same thing
         improve._write_statuses(plan, {"F3": "answered", "F4": "answered"})
@@ -1706,7 +1691,7 @@ class TemplateFiles(unittest.TestCase):
             self.assertNotIn(never, improve.MECHANICAL)       # renames, moves, types, summarisation, numbers, queries
         for code in ("M107", "M109", "M110", "M502", "B001"):
             self.assertIn(code, improve.PERSON)               # these need a fact or a decision: never done unasked
-        self.assertEqual(set(improve.GATES), {"Measures", "Renames"})
+        self.assertFalse(hasattr(improve, "GATES"))           # nothing holds a fix back
         self.assertEqual(set(improve.COMMITS), set(improve.AUTO_KINDS))
 
     def test_every_code_is_named_in_the_checklist_review_skill(self):

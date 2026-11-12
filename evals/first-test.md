@@ -17,7 +17,7 @@ In VS Code, in the chat of your AI agent in agent mode, with the model you want 
 
 > Evaluate and improve this report.
 
-The flow has no approvals. It asks one question at the start: whether other reports use this model. Answer truthfully; for a report that nothing else reads, "no". It writes that answer, and the page size, into the brief itself. Then answer nothing until the final answer.
+The flow has no approvals and asks nothing. Answer nothing until the final answer.
 
 At any time you can ask the script where the flow stands:
 
@@ -33,7 +33,6 @@ python scripts/improve.py next
 | Errors, warnings and notes at the start | the agent's report of its first check, in the chat |
 | Pass, Fail and Not applicable before and after; how many Fail items only a person's fact can close | `python scripts/improve.py compare` |
 | Rows in the plan by kind and by status | `python scripts/improve.py check-plan` |
-| What was held, and why (nothing should be, with "no" in the brief) | the "Held:" lines of `compare` |
 | The commits, one for each kind | `git log --oneline` |
 | Every question the agent asked between its first step and its final answer (there should be none) | your notes |
 | Every place where it guessed, skipped a step, needed a reminder, or handed work back to you that it could have done | your notes |
@@ -46,12 +45,12 @@ In Power BI Desktop also check these, because no document settles them: the repo
 ## What a good result looks like
 
 - A new branch `improve/<date>`; the branch you started on did not move; `_before/` opens in Desktop and is not in Git.
-- The agent asked nothing after its first step, and waited for no approval.
+- The agent asked nothing and waited for no approval.
 - The review has all 79 rows and passes `python scripts/check_project.py --review docs/checklist-review.md`. Every "Not applicable" row quotes the checklist's own line for that item.
 - The plan sorts every finding into a kind, and every row has a status. Notes whose codes start with U are listed as suggestions, not as fix rows.
 - The theme is registered: `python scripts/check_project.py .` reports no T001, and the report's `StaticResources/RegisteredResources/` folder holds the theme file.
 - Every measure is in `_Measures`, not one or two: no M001, no M002, and no M908 or B001 for a moved measure. The model has one measures table, and the agent did not ask you to do a move in Desktop.
-- No row is held, and every row of the kind Data is done, in the last commit. The final answer starts by saying that the model must be refreshed once; after that refresh every page shows the same data as in `_before/`.
+- Every row of the kind Data is done, in the last commit. The final answer starts by saying that the model must be refreshed once; after that refresh every page shows the same data as in `_before/`.
 - A visual that uses drill-down, a help tooltip, a tooltip page or tooltip fields kept its header icons or its tooltip, with a row in section 7 of the brief.
 - One commit for each kind that had rows, in this order: `Improve: theme`, `Improve: mechanical fixes`, `Improve: layout fixes`, `Improve: measures moved`, `Improve: renames`, `Improve: changes that need a refresh`. Undoing one with `git revert` leaves the others in place.
 - Fewer Fail items after than before, and no item that went from Pass to Fail. `compare` says how many of the remaining Fail items wait for a fact from a person.

@@ -1358,7 +1358,7 @@ def check_standards(model_dir, objects, usage, brief, findings):
         if table["name"] not in measure_tables:
             add("M001", measure, "measure %s lives in table '%s'; every measure lives in '%s' (or in a measure table "
                 "the brief lists). A new measure is written there. An existing one is moved by Copilot, with every reference "
-                "repaired, when the brief says no other report uses the model (model standard, 'Existing models')"
+                "repaired, when the developer asks or the improve flow runs (model standard, 'Existing models')"
                 % (key, table["name"], MEASURE_TABLE), keys=(key, table["name"]))
         folder = measure["props"].get("displayfolder", "")
         levels = folder.split("\\")
