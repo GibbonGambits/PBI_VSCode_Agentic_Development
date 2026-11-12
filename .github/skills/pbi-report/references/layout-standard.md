@@ -60,7 +60,7 @@ A value in the brief always wins. The theme sets no page size and no spacing.
 2. Work out each new x, y, width and height by arithmetic from the numbers above. Do not wait for a yes: apply them, and give the old and the new values of each visual in your final answer.
 3. Apply with `python scripts/set_positions.py . --dry-run --move "<page>/<visual>=<x>,<y>,<width>,<height>"`, then without `--dry-run`. `--snap` only moves each edge of a visual to the nearest grid line, so visuals that touch still touch. A target that fits more than one visual is refused: name the page and the visual by their folders. The script changes the four numbers and nothing else, and refuses groups, members, rotated visuals and anything that would leave the page.
 4. Run the check again.
-5. Look at the pages that changed. Where the developer has agreed to the Desktop Bridge, reload and take the pictures yourself (`desktop-bridge.md`, beside this file). Otherwise name the pages and ask the developer to reload the project in Power BI Desktop and to look at each one. The script prints the list. Never say a page looks right from the files alone.
+5. Look at the pages that changed. Where the Desktop Bridge is installed (the script says "not available" when it is not), reload and take the pictures yourself, without asking first (`desktop-bridge.md`, beside this file). Otherwise name the pages and ask the developer to reload the project in Power BI Desktop and to look at each one. The script prints the list. Never say a page looks right from the files alone.
 
 ## Sources
 

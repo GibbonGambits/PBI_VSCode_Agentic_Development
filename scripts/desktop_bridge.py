@@ -18,8 +18,8 @@ It calls only: 'powerbi-desktop status', 'reload' and 'screenshot-all', and, for
 Status of the feature (Microsoft Learn, "Power BI Desktop Bridge overview" and "Edit PBIP files outside Power
 BI Desktop"): the Desktop Bridge needs Power BI Desktop of June 2026 (2.155.756.0) or later on Windows, with
 the Desktop Bridge option on (Options > Security; on by default). Microsoft's pages disagree on whether it is
-still a preview, so this template treats it as a preview feature: Copilot uses it only after the developer
-has said yes, and section 11 of docs/report-brief.md records that yes.
+still a preview. The developer installs the two tools, and that is the yes: Copilot uses the Bridge whenever
+this script finds them, without asking and without a row in the brief.
 
 What the script guards:
     - Windows only; elsewhere, and when a tool is missing, it says "not available" and exits with code 3.

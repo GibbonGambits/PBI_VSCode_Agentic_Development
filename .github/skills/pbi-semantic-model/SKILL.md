@@ -63,7 +63,7 @@ The check prints notes with codes that start with U when a native feature may do
 
 - Auto date/time (item 18) is an option of Power BI Desktop: File > Options and settings > Options, the Current File page, Time intelligence. The check reports it when it is on (M401). Tell the developer once, and note it in section 6 of the brief. Do not set it in files.
 - Facts about the data: whether keys are unique (items 11, 14), row counts (item 17), distinct values, gaps in the date table (item 31). Read them yourself when the developer has set up Microsoft's modeling server (`references/data-facts.md`). Otherwise ask the developer once, in one message, and record the answers in section 4 of the brief. Whether a step folds (item 3) is always in that one message: the server is not known to tell.
-- Whether the model loads and the numbers are right. Reload through `python scripts/desktop_bridge.py reload . --with-model` where the developer has agreed to the Desktop Bridge; otherwise ask the developer to reload and look.
+- Whether the model loads and the numbers are right. Reload through `python scripts/desktop_bridge.py reload . --with-model` where the Desktop Bridge is installed; otherwise ask the developer to reload and look.
 
 ## When you are stuck
 

@@ -89,7 +89,7 @@ A visual listed in section 7 of the brief keeps what the brief names switched on
 - `python scripts/set_visual_defaults.py .` sets Header icons off and Tooltips off on every visual; `--label` adds labels.
 - `python scripts/set_positions.py .` writes approved positions; see `layout-standard.md`, beside this file.
 - `python scripts/check_project.py .` fails on a bad name, a missing label, a visual with header icons or tooltips on or not set, a visual outside its page, two data visuals that overlap, a field the model does not have, and a file that does not fit Microsoft's schema.
-- `python scripts/desktop_bridge.py` reloads the project and takes a picture of each page, where the developer has agreed to it: `desktop-bridge.md`, beside this file.
+- `python scripts/desktop_bridge.py` reloads the project and takes a picture of each page, wherever the tools are installed: `desktop-bridge.md`, beside this file.
 
 ## Read only
 
