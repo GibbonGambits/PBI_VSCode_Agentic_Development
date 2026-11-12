@@ -65,10 +65,12 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T04-A144-4.** To stop time intelligence measures showing values past the last data, add a Boolean calculated column to the Date table, true up to the final date reports should show (for example the latest fact date), and let every time intelligence function use only flagged dates.
 - Should. 2019. https://www.sqlbi.com/articles/hiding-future-dates-for-calculations-in-dax/
 - When: The model can be changed and the cut-off date does not vary, for example from measure to measure.
+- Version: Only when Power Query cannot supply the value, with its CalculatedReason (storage and security, rule 17; M105).
 
 **T04-A144-5.** When fact tables hold data for different date ranges, give the Date table one date-flag calculated column per fact table, and let each measure filter on the flag of its own fact table.
 - Should. 2019. https://www.sqlbi.com/articles/hiding-future-dates-for-calculations-in-dax/
 - When: Future dates are hidden with a Date table flag column and several fact tables differ in range.
+- Version: Only when Power Query cannot supply the values, with a CalculatedReason (storage and security, rule 17; M105).
 
 **T04-A144-7.** Avoid hiding future dates with an IF that returns blank when the filtered dates lie past the last data. It only hides rows: prior-year figures still cover whole periods, and an inner IF is lost once a time shift is applied.
 - Should. 2019. https://www.sqlbi.com/articles/hiding-future-dates-for-calculations-in-dax/
@@ -89,6 +91,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T04-A147-1.** Working days between two dates can be counted as COUNTROWS of the date table inside CALCULATE, filtered by DATESBETWEEN to the span and to rows whose working-day flag is true, for instance in a calculated column of the fact table.
 - Option. 2019. https://www.sqlbi.com/articles/counting-working-days-in-dax/
 - When: A day count must skip weekends and holidays, and the date table flags working days.
+- Version: Only when Power Query cannot supply the value, with its CalculatedReason (storage and security, rule 17; M105).
 
 **T04-A147-3.** A simple way to fill the working-day flag of a date table is to mark a date as non-working when WEEKDAY places it on a Saturday or a Sunday.
 - Option. 2019. https://www.sqlbi.com/articles/counting-working-days-in-dax/
@@ -241,24 +244,9 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 - Fact. Check. 2016. https://www.sqlbi.com/articles/time-intelligence-in-power-bi-desktop/
 - When: A date table related to other tables through a column of Date data type.
 
-**T04-A073-4.** Where the date table is joined on a non-Date key but also holds a date column, a workaround adds a Date column to the related tables, in the source query or by a Power Query merge, and relates on it. Time intelligence then works.
-- Option. Check. 2016. https://www.sqlbi.com/articles/time-intelligence-in-power-bi-desktop/
-- When: Source-query route: relational sources only, and joining a large fact table to the calendar there can be costly.
-- Version: Only matters for Power BI Desktop before February 2018, which lacked Mark as Date Table.
-
 **T04-A073-5.** A Date column added to relate a table to the date table must not be a calculated column in Power BI Desktop: the hidden date tables Desktop creates automatically interfere with it. Build it in the source or in Power Query.
 - Must. Check. 2016. https://www.sqlbi.com/articles/time-intelligence-in-power-bi-desktop/
 - When: A non-Date relationship key is replaced by a Date column so that time intelligence works.
-- Version: Only matters for Power BI Desktop before February 2018, which lacked Mark as Date Table.
-
-**T04-A073-6.** When time intelligence fails because the date table is related on a non-Date key and cannot be marked, a workaround is a hidden calculated table used as dummy fact table and related to the date table, so its Date column counts as a primary key.
-- Option. Check. 2016. https://www.sqlbi.com/articles/time-intelligence-in-power-bi-desktop/
-- When: The date table cannot be marked; the relationship to the dummy table needs a specific setup.
-- Version: Added in February 2017; only matters for Power BI Desktop before February 2018.
-
-**T04-A073-7.** Clearing the date table's filters in a CALCULATE filter argument does not reach scalar time intelligence functions. TOTALYTD and the like must be rewritten as CALCULATE with DATESYTD, or the matching table function, plus that clearing, or take it as their filter (third) argument.
-- Must. Check. 2016. https://www.sqlbi.com/articles/time-intelligence-in-power-bi-desktop/
-- When: A date table on a non-Date key, not marked, is fixed by clearing its filters in each measure.
 - Version: Only matters for Power BI Desktop before February 2018, which lacked Mark as Date Table.
 
 **T04-A073-8.** A model built in Power Pivot, with the date table marked there, keeps working with every time intelligence function, scalar ones included, after import into Power BI, even when the relationship does not use a Date column.
@@ -310,6 +298,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T04-A168-2.** A previous-year figure can be limited to dates matching the current data with a Boolean calculated column in the Date table, true up to the last fact date moved back twelve months with EDATE, and a previous-year measure that also filters that column to true.
 - Option. Check. 2019. https://www.sqlbi.com/articles/previous-year-up-to-a-certain-date/
 - When: The current year's fact data ends at some date, and later dates of earlier years should be ignored.
+- Version: Only when Power Query cannot supply the value, with its CalculatedReason (storage and security, rule 17; M105).
 
 **T04-A289-1.** Take care showing the latest period with a Relative Date slicer or a TODAY-based filter: 'This Day' or 'This Month' can be empty when data stops the day before, and 'This Month' ends at month end, which can break month-to-date comparisons with the previous month.
 - Consider. 2023. https://www.sqlbi.com/articles/computing-mtd-qtd-ytd-in-power-bi-for-the-current-period/
@@ -322,6 +311,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T04-A289-3.** One option: a calculated column in the Date table marks the last date with transactions with a fixed text, and a visual, page or report filter selects that text. Inside the column, find the last date in CALCULATE with REMOVEFILTERS, because of context transition.
 - Option. 2023. https://www.sqlbi.com/articles/computing-mtd-qtd-ytd-in-power-bi-for-the-current-period/
 - When: Reports showing the latest period in the data; needs a Date column flagging dates with transactions.
+- Version: Only when Power Query cannot supply the value, with its CalculatedReason (storage and security, rule 17; M105).
 
 **T04-A289-4.** Another option: a calculation group whose item finds the last date with transactions and evaluates SELECTEDMEASURE filtered to it. Used as a visual filter, it makes every measure, MTD, QTD and YTD too, use that date; further items can select its whole month or quarter.
 - Option. 2023. https://www.sqlbi.com/articles/computing-mtd-qtd-ytd-in-power-bi-for-the-current-period/

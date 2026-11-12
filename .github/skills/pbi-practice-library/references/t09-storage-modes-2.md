@@ -36,7 +36,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T09-W380-30.** When only recent data must be real time, build two models: a small DirectQuery model for the last few days with simple calculations, and an in-memory model for the full history with the complex calculations.
 - Should. Check. Paper. 2017. https://www.sqlbi.com/whitepapers/directquery-in-analysis-services-2016/
 - When: Real-time needs cover only recent days.
-- Version: Analysis Services 2016 Tabular; 2017 white paper.
+- Version: Analysis Services 2016 Tabular; 2017 white paper. DirectQuery needs its reason in section 3 of the brief; a hybrid table is the native route (storage and security, rules 22 and 26).
 
 **T09-W380-42.** Avoid enabling paging for an in-memory Tabular model.
 - Should. Paper. 2017. https://www.sqlbi.com/whitepapers/directquery-in-analysis-services-2016/
@@ -46,7 +46,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T09-W380-43.** When an in-memory model does not fit in memory, prefer adding RAM: reducing the memory the data model uses is the harder alternative, because optimising it is a complex task.
 - Should. Paper. 2017. https://www.sqlbi.com/whitepapers/directquery-in-analysis-services-2016/
 - When: An Analysis Services in-memory model outgrows the memory of its server.
-- Version: Analysis Services 2016 Tabular; 2017 white paper.
+- Version: Analysis Services 2016 Tabular; 2017 white paper. This template first applies the data-reduction rules (storage and security, part B; checklist item 5).
 
 **T09-W380-44.** Build solid DAX skills before adopting DirectQuery, so you can judge how each calculation behaves there: which functions a project needs, and how much data they materialise, is hard to foresee at the start.
 - Should. Paper. 2017. https://www.sqlbi.com/whitepapers/directquery-in-analysis-services-2016/
@@ -100,7 +100,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T09-A212-2.** A composite model on a published model suits a slightly different view of it (a custom grouping, an Excel budget, a link to another model) instead of an Excel export: it keeps the original measures and relationships, sees refreshed data and duplicates nothing.
 - Option. Check. 2020. https://www.sqlbi.com/articles/new-composite-models-in-power-bi-a-milestone-in-business-intelligence/
 - When: Users need local additions to a model already published on the service.
-- Version: Written in December 2020, when this composite model feature was still a preview in Power BI Desktop.
+- Version: Written in December 2020, when this composite model feature was still a preview in Power BI Desktop. A composite model needs its reason and trade-offs in section 3 of the brief (storage and security, rules 22 and 23).
 
 **T09-A227-2.** In a hybrid model that keeps most tables in Import mode and a few DirectQuery tables for current data, some calculations cannot be split across the imported and the DirectQuery tables; DISTINCTCOUNT is one such case.
 - Fact. 2021. https://www.sqlbi.com/articles/implementing-real-time-updates-in-power-bi-using-push-datasets-instead-of-directquery/
@@ -154,7 +154,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T09-A227-6.** A push dataset cannot contain a table called Date; one workaround is another name, such as Dates or Calendar, given inside Power BI Desktop so that every reference to the table follows the new name.
 - Option. Check. 2021. https://www.sqlbi.com/articles/implementing-real-time-updates-in-power-bi-using-push-datasets-instead-of-directquery/
 - When: The date table of the source model is named Date.
-- Version: Written in 2021; Microsoft now lists push semantic models as retiring: check before building one.
+- Version: Written in 2021; Microsoft now lists push semantic models as retiring: check before building one. Renaming an existing table needs the developer's yes, and every reference checked (project instructions).
 
 **T09-A227-7.** When loading a table would break the push dataset row limits (5 million rows per table, 1 million added per hour), shrink the table, for example to the coarser grain the real-time dashboard needs, such as one row per order date and store.
 - Must. Check. 2021. https://www.sqlbi.com/articles/implementing-real-time-updates-in-power-bi-using-push-datasets-instead-of-directquery/

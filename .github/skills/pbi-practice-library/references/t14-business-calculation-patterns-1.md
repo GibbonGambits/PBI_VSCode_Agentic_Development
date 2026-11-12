@@ -1,6 +1,6 @@
 # Business calculation patterns
 
-Part 1 of 5 of this topic. Covers: Totals and hierarchy levels; Budget, currency and financial calculations.
+Part 1 of 4 of this topic. Covers: Totals and hierarchy levels; Budget, currency and financial calculations.
 
 Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit or condition. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. **Paper** means the note comes from a white paper: its link opens only a summary, and the paper itself is on a download site that `pbi-lookup` does not open, so confirm the point on Microsoft Learn instead. The article holds the detail. A note may name another product in passing, such as Analysis Services or Excel: that is information for the developer. Nothing is installed, published or deployed from this template.
 
@@ -54,6 +54,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T14-A010-4.** When the query also filters another item column, such as model, the CALCULATE that returns a related-table group total must also clear the fact table with ALL. Otherwise items of the same group under other values of that column are left out.
 - Must. 2011. https://www.sqlbi.com/articles/ratio-over-subtotals-with-normalized-tables-in-dax/
 - When: A parent-group total on a related-table column, in a report that filters other columns of the item table.
+- Version: In this template, clear the filter with REMOVEFILTERS, not ALL (DAX standard, rule 20; M519).
 
 **T14-A010-5.** A group-total measure that finds the group with a CONTAINS test on the values of a related group column returns an error when the query does not group by that column: CONTAINS then receives several groups where it needs one value.
 - Fact. 2011. https://www.sqlbi.com/articles/ratio-over-subtotals-with-normalized-tables-in-dax/
@@ -86,7 +87,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T14-A019-6.** Prefer working out an item's share of its parent level inside a DAX measure over the reporting client's built-in ratio-to-parent display option: logic in the formula is far more flexible and needs no action from the user.
 - Should. Check. 2012. https://www.sqlbi.com/articles/clever-hierarchy-handling-in-dax/
 - When: Reports that show each item's share of its parent in a hierarchy.
-- Version: The comparison made in 2012 was with the ratio-over-parent option of Excel PivotTables.
+- Version: The comparison made in 2012 was with the ratio-over-parent option of Excel PivotTables. Within one visual, this template may suggest a visual calculation for a share of parent (native features).
 
 **T14-A150-3.** Adding a condition to a measure, such as returning blank when sales are zero, does not correct its total. The total evaluates the condition once in its own filter context, where it is met, so rows hidden at detail level are still counted.
 - Fact. 2019. https://www.sqlbi.com/articles/summing-values-for-the-total/
@@ -118,7 +119,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T14-A015-4.** A coarse-grain budget can be summed through a virtual relationship: CALCULATE takes one filter per linking column, keeping the budget values found among the visible values of the matching lookup column, tested with CONTAINS over VALUES or by counting a FILTER over VALUES.
 - Option. Check. 2012. https://www.sqlbi.com/articles/budget-and-other-data-at-different-granularities-in-powerpivot/
 - When: A budget-like table at a coarser grain than the lookup tables, with no physical relationship to them.
-- Version: Described in 2012; the shorter CONTAINS form needs the SQL Server 2012 version of PowerPivot or Tabular.
+- Version: Described in 2012; the shorter CONTAINS form needs the SQL Server 2012 version of PowerPivot or Tabular. The unrelated budget table needs its M411 row in the brief (relationships and dates, rule 4).
 
 **T14-A015-6.** One test of whether the selection matches a budget table's grain: compare the row count of the detailed fact table in the current filter context with its row count after clearing all fact filters and reapplying only the current values of each virtual-relationship column.
 - Option. Check. 2012. https://www.sqlbi.com/articles/budget-and-other-data-at-different-granularities-in-powerpivot/

@@ -183,6 +183,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T15-A166-1.** One slicer can list values from several columns of a table (state, country, continent) through a separate calculated table: stack the columns with UNION and SELECTCOLUMNS, apply DISTINCT, pair each shown item with every key it must filter, and relate it to the table's key.
 - Option. 2019. https://www.sqlbi.com/articles/creating-a-slicer-that-filters-multiple-columns-in-power-bi/
 - When: Readers must filter alternative values held in different columns of one table through a single slicer.
+- Version: Only when Power Query cannot build it, with a CalculatedReason in the developer's words (model standard, rule 8; M105).
 
 **T15-A166-3.** In the one-slicer-over-several-columns pattern, relate the slicer table to the source table on their shared key with a many-to-many cardinality relationship whose filter flows one way only, from the slicer table to the source table.
 - Must. 2019. https://www.sqlbi.com/articles/creating-a-slicer-that-filters-multiple-columns-in-power-bi/
@@ -251,6 +252,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T15-A072-9.** Visibility logic a visual cannot apply, such as the top three of one group plus the top one of another, can go into the measure: it returns blank for members to hide, and a parameter table sets how many to show.
 - Option. 2016. https://www.sqlbi.com/articles/the-space-report-under-the-hood/
 - When: The filter logic a visual needs cannot be configured on the visual itself.
+- Version: The parameter table needs its M411 row in the brief, unless it is a numeric range parameter (relationships and dates, rule 4).
 
 **T15-A163-1.** A measure that returns the name of the top item as text must return every tied item when there is a tie, for example by joining the rows TOPN returns into one string with CONCATENATEX. Showing one of them hides the tie.
 - Must. 2019. https://www.sqlbi.com/articles/using-concatenatex-in-measures/

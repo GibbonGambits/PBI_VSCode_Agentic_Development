@@ -19,6 +19,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T08-A030-5.** A column that can be derived from other columns should not be imported: load only the base columns, which have fewer distinct values, and compute the result in a measure, for example quantity times price summed with SUMX in place of a stored amount.
 - Should. 2013. https://www.sqlbi.com/articles/checklist-for-memory-optimizations-in-powerpivot-and-tabular-models/
 - When: A source table holds denormalised columns, such as an amount beside quantity and price.
+- Version: On an existing model, removing a column needs the developer's yes (storage and security, part B; project instructions).
 
 **T08-A030-6.** A derived value that was left out of the import to save memory should not return as a calculated column: it would still take the memory of a column with many distinct values. Compute it in a measure.
 - Should. 2013. https://www.sqlbi.com/articles/checklist-for-memory-optimizations-in-powerpivot-and-tabular-models/
@@ -27,6 +28,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T08-A030-9.** Round numbers to whole values where decimals do not matter to the analysis, and cut a time stored with milliseconds at least to the second. The data type alone changes nothing: the count of distinct values must fall.
 - Should. 2013. https://www.sqlbi.com/articles/checklist-for-memory-optimizations-in-powerpivot-and-tabular-models/
 - When: Extra precision in a numeric or time column is not needed for analysis.
+- Version: Only once the developer confirms the precision is not needed (storage and security, rule 20; TMDL instructions, rule 10).
 
 **T08-A030-10.** Take care when lowering precision: a change of data type alone frees no memory. The column shrinks only when it ends up holding fewer distinct values.
 - Consider. 2013. https://www.sqlbi.com/articles/checklist-for-memory-optimizations-in-powerpivot-and-tabular-models/
@@ -66,6 +68,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T08-A016-7.** For an integer column with very many distinct values, such as a transaction ID, one option is to import two or more integer columns made by integer division and remainder instead. One test: 100 million IDs fell from about 3 GB to under 200 MB.
 - Option. 2012. https://www.sqlbi.com/articles/optimizing-high-cardinality-columns-in-vertipaq/
 - When: The identifier is still needed, for example to find one transaction.
+- Version: On an existing model, replacing the column needs the developer's yes (storage and security, part B and rule 20).
 
 **T08-A016-8.** When an integer ID exists only as high and low part columns, a measure can return the original ID: the high part multiplied by the split factor, plus the low part, with blank returned where that expression cannot be worked out.
 - Option. 2012. https://www.sqlbi.com/articles/optimizing-high-cardinality-columns-in-vertipaq/
@@ -99,13 +102,10 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 
 ### Analysis Services processing
 
-**T08-A039-2.** A NOW () calculated column that records the last process time must sit in a table that every process operation includes. When other tables are processed without it, the time shown can be wrong; a Process Full of the whole database is always right.
-- Must. 2014. https://www.sqlbi.com/articles/last-process-date-in-ssas-tabular/
-- When: The last process time of an Analysis Services Tabular database is kept in a calculated column.
-
 **T08-A039-3.** Where single tables or partitions may be processed, read the last process time from the MDSCHEMA_CUBES DMV, taking the latest LAST_DATA_UPDATE, and not from the XMLA Discover result: that one moves only on a full process of the whole database.
 - Must. Check. 2014. https://www.sqlbi.com/articles/last-process-date-in-ssas-tabular/
 - When: Finding the last process time of an Analysis Services Tabular database with partial processing.
+- Version: A person's own step: Copilot connects to no server (project instructions).
 
 **T08-A039-4.** Convert the LAST_DATA_UPDATE value that Analysis Services returns to local time before showing it: the server gives the date and time in UTC.
 - Must. 2014. https://www.sqlbi.com/articles/last-process-date-in-ssas-tabular/
@@ -114,7 +114,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T08-A107-5.** On Analysis Services Tabular, these bring an oversized dictionary allocation down to the minimum: detaching and re-attaching the database; restoring it from a backup; restarting the instance or its machine, which hits every user; for an integrated workspace, closing and reopening the Visual Studio solution.
 - Option. 2017. https://www.sqlbi.com/articles/measuring-the-dictionary-size-of-a-column-correctly/
 - When: A new table's first processing likely left more dictionary memory allocated than needed.
-- Version: On Azure Analysis Services, pausing and starting the service counts as a restart.
+- Version: On Azure Analysis Services, pausing and starting the service counts as a restart. An administrator's step: Copilot connects to no server (project instructions).
 
 **T08-A107-6.** On Analysis Services the extra dictionary memory in the storage figures is truly allocated, not a reporting error; only a detach and attach, a restore or a restart frees it. It seldom matters for a large database; small ones with hundreds of columns may gain.
 - Fact. 2017. https://www.sqlbi.com/articles/measuring-the-dictionary-size-of-a-column-correctly/

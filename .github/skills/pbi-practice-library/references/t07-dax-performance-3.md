@@ -144,6 +144,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T07-A287-4.** One way to avoid computing a formula-engine-only function at query time is to store its result in a calculated column of the fact table. It is rarely the right choice: the fact table grows by a column that can be large.
 - Option. 2023. https://www.sqlbi.com/articles/optimizing-callbacks-in-a-sumx-iterator/
 - When: An iterator applies a function the storage engine cannot run to a fact table column.
+- Version: Only when Power Query cannot supply the value, with its CalculatedReason annotation (storage and security, rule 17; M105).
 
 **T07-A287-5.** When an iterator over a large table applies a formula-engine-only function to a column, iterate that column's distinct values, aggregate the other columns per value through context transition, and apply the function once per value. Callbacks disappear and the cache is used far better.
 - Should. 2023. https://www.sqlbi.com/articles/optimizing-callbacks-in-a-sumx-iterator/

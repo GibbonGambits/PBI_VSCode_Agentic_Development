@@ -52,6 +52,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T01-A361-8.** When several columns must be kept while the table's other filters are removed, use SUMMARIZE of the table by those columns in place of VALUES. ALLEXCEPT remains a choice for maximum performance and for advanced cases such as removing circular dependencies in calculated columns.
 - Should. 2016. https://www.sqlbi.com/articles/using-allexcept-vs-all-values/ ; https://www.sqlbi.com/articles/using-allexcept-versus-all-and-values/ ; https://www.sqlbi.com/articles/all-vs-allselected-vs-allexcept-vs-removefilters/
 - When: Measures keep one grouping grain and remove the rest, such as a share of the group total.
+- Version: This template allows ALLEXCEPT only when every kept column is filtered directly (DAX standard, rule 20).
 
 **T01-A361-9.** REMOVEFILTERS or ALL can take one column, a whole table to clear the filters on all its columns, or, less commonly, no argument, which clears every filter on every table of the model.
 - Option. 2026. https://www.sqlbi.com/articles/all-vs-allselected-vs-allexcept-vs-removefilters/
@@ -60,6 +61,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T01-A132-1.** When a measure removes the filter from a column sorted by another column, list both the displayed column and its sort-by column in the same ALL call: Power BI queries include both, and a share that clears only the displayed one always returns 100%.
 - Should. 2018. https://www.sqlbi.com/articles/side-effects-in-dax-of-the-sort-by-column-setting/
 - When: A measure removes or changes the filter on a column with Sort by Column set.
+- Version: As a CALCULATE filter, write REMOVEFILTERS with both columns in place of ALL (DAX standard, rule 20; M519).
 
 **T01-A324-3.** Do not replace every existing ALL with ALLCROSSFILTERED as a blanket change. In a model with no limited relationships ALL already works correctly; ALLCROSSFILTERED suits models where filters from cross-filtering tables must also be removed.
 - Should. 2025. https://www.sqlbi.com/articles/differences-between-all-and-allcrossfiltered/
@@ -107,6 +109,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T01-A228-4.** To stop a brand-level budget showing below its grain, compare COUNTROWS of Product in the current filter context with the count at brand granularity and return the budget only when they match. Build the brand-level count with ALL plus VALUES, not ALLEXCEPT on brand alone.
 - Should. 2016. https://www.sqlbi.com/articles/using-allexcept-vs-all-values/
 - When: A report slices a coarser-grain fact by finer dimension attributes, such as category.
+- Version: As a CALCULATE filter, write REMOVEFILTERS in place of ALL (DAX standard, rule 20; M519).
 
 **T01-A097-2.** Tables are expanded along many-to-one relationships, so a table used as a CALCULATE filter, such as FILTER over a fact table, also filters every column of the related lookup tables and replaces the filters already on those columns.
 - Fact. 2017. https://www.sqlbi.com/articles/context-transition-and-expanded-tables/
@@ -128,10 +131,6 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 - Fact. 2018. https://www.sqlbi.com/articles/expanded-tables-in-dax/
 - When: A calculated column needs a related value through an inactive relationship.
 - Version: Stated in 2018: DAX then had no syntax for passing USERELATIONSHIP to RELATED.
-
-**T01-A124-6.** In a calculated column, one way to read a dimension attribute through an inactive relationship is CALCULATE with TREATAS, which moves the current row's key as a filter onto the dimension key; ALL on the dimension is not needed, since the TREATAS filter overrides it.
-- Option. 2018. https://www.sqlbi.com/articles/expanded-tables-in-dax/
-- When: The relationship on that key is inactive; the approach does not rely on table expansion.
 
 **T01-A142-1.** A column in a table expression keeps its data lineage, and so can filter model tables, only as a plain column reference. Renaming keeps lineage; any expression around the column, even appending an empty string, gives a new lineage unrelated to the model.
 - Fact. 2019. https://www.sqlbi.com/articles/understanding-data-lineage-in-dax/
@@ -226,10 +225,6 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 - Option. 2021. https://www.sqlbi.com/articles/using-allexcept-versus-all-and-values/
 - When: REMOVEFILTERS on a table, with more than one column filter to retain.
 
-**T01-A228-7.** When ALLEXCEPT keeps a column's selection, an alternative fix for lost cross-filters is to also list every coarser column that groups its values. It needs fewer scans and is slightly faster, but the measure must be updated whenever such a column is added.
-- Option. 2016. https://www.sqlbi.com/articles/using-allexcept-vs-all-values/
-- When: Users may filter columns coarser than the kept one; the gain was hardly visible on a small table.
-
 **T01-A361-3.** When a legacy DAX pattern depends on ALL working both as a table function and as a filter remover, write it with ALL.
 - Should. 2026. https://www.sqlbi.com/articles/all-vs-allselected-vs-allexcept-vs-removefilters/
 - When: Older patterns that need ALL as both table function and CALCULATE modifier.
@@ -250,6 +245,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T01-A122-3.** Another way to make ALL pass its rows to a CALCULATE filter is to wrap it in FILTER with a condition that is always true; this is the less elegant form.
 - Option. 2018. https://www.sqlbi.com/articles/managing-all-functions-in-dax-all-allselected-allnoblankrow-allexcept/
 - When: A filter argument must filter by all rows of a table, not just remove filters.
+- Version: FILTER over a whole table needs its M505 row and reason in the brief (DAX standard, rule 6).
 
 **T01-A122-5.** ALL with a table, as a CALCULATE filter argument, clears the filters of the whole expanded table: ALL on a fact table also removes the filters placed on its related dimension tables.
 - Fact. 2018. https://www.sqlbi.com/articles/managing-all-functions-in-dax-all-allselected-allnoblankrow-allexcept/

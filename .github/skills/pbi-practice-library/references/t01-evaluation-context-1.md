@@ -288,7 +288,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T01-A058-1.** To give a measure parameter values, one option is a hidden table per parameter holding every value needed: call the measure in CALCULATE with a filter that sets the column to the wanted value, and let the measure read it with VALUES.
 - Option. Check. 2015. https://www.sqlbi.com/articles/parameters-in-dax-measures/
 - When: Complex expressions compute a measure with different argument values; simple cases can keep the condition in inner measures.
-- Version: Written in 2015, when DAX had no way to pass arguments to a measure. The DAX standard reads one value with SELECTEDVALUE (rule 4); user-defined functions now take parameters.
+- Version: Written in 2015, when DAX had no way to pass arguments to a measure. The DAX standard reads one value with SELECTEDVALUE (rule 4); user-defined functions now take parameters. Needs its M411 row in the brief (relationships and dates, rule 4).
 
 **T01-A058-2.** Hide measures that read their parameter values from hidden parameter tables, so users never call them directly: with several values selected in a parameter table such a measure fails with an error.
 - Should. 2015. https://www.sqlbi.com/articles/parameters-in-dax-measures/

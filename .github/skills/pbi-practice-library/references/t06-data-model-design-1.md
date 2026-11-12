@@ -12,10 +12,6 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 - Option. 2011. https://www.sqlbi.com/articles/separate-date-and-time-in-powerpivot-and-bism-tabular/
 - When: An imported column holds date and time, and the time of day matters to the business.
 
-**T06-A009-3.** The sort column of a combined label, such as month with year or quarter with year, must have exactly the label's granularity. When the Date table has none, add a calculated column that encodes year and month, or year and quarter, as one sortable number.
-- Must. 2011. https://www.sqlbi.com/articles/sorting-dates-columns-in-powerpivot-v2-and-bism-tabular/
-- When: A Date table column that joins year with month or quarter needs its own sort order.
-
 **T06-A009-4.** Consider a Date table column that shows the month name together with its year, for month-by-month charts and for a year, month, day hierarchy: the year a month belongs to is then plain to the reader.
 - Consider. 2011. https://www.sqlbi.com/articles/sorting-dates-columns-in-powerpivot-v2-and-bism-tabular/
 - When: Reports plot data month by month or use a year-month-day hierarchy.
@@ -62,6 +58,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T06-A172-2.** What remains for DAX calculated columns is logic that reads other rows or other tables: typically aggregations over other model tables, or lookups between tables from different data sources, where a Power Query merge would gain nothing from folding.
 - Should. 2019. https://www.sqlbi.com/articles/comparing-dax-calculated-columns-with-power-query-computed-columns/
 - When: Import models; deciding whether a derived column belongs in Power Query or in DAX.
+- Version: Only with a CalculatedReason from the developer on why Power Query cannot supply it (storage and security, rule 17; M106).
 
 **T06-A172-5.** When several derived columns are planned, prefer Power Query columns to DAX calculated columns, and accept that the overall effect varies: moving one column changes total model size almost unpredictably, because other columns may then compress worse.
 - Should. 2019. https://www.sqlbi.com/articles/comparing-dax-calculated-columns-with-power-query-computed-columns/
@@ -111,6 +108,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T06-A076-5.** Consider another data type for very large numbers stored as whole number or Fixed Decimal Number: their total keeps the same type and could exceed its range, and the engine does not detect that overflow.
 - Consider. 2016. https://www.sqlbi.com/articles/choosing-numeric-data-types-in-dax/
 - When: Columns of very large values whose sums could pass the range of their type.
+- Version: A type change is the developer's decision, and a floating-point type needs its M108 row (model standard, rule 10).
 
 **T06-A076-6.** Keep a column's data type apart from its format string and do not take one for the other: the name Currency has been used for both.
 - Should. 2016. https://www.sqlbi.com/articles/choosing-numeric-data-types-in-dax/
@@ -170,10 +168,6 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 - Should. 2020. https://www.sqlbi.com/articles/sorting-duplicated-names-in-a-level-of-a-hierarchy-with-dax/
 - When: The order must hold for one hierarchy level only, or in visuals without the measure.
 
-**T06-A192-3.** When a sort key follows a value that can tie, such as population, one way to keep it unique is a calculated column with RANKX over one expression: the value times a factor that leaves room for the largest unique key, plus that key.
-- Option. 2020. https://www.sqlbi.com/articles/sorting-duplicated-names-in-a-level-of-a-hierarchy-with-dax/
-- When: The ordering value can repeat across rows.
-
 **T06-A192-4.** When one name appears under different parents in a hierarchy level, such as a county name in several states, and needs a key-based order, first make each name unique without changing its look, for example with zero-width characters, then sort that column by the key.
 - Must. 2020. https://www.sqlbi.com/articles/sorting-duplicated-names-in-a-level-of-a-hierarchy-with-dax/
 - When: Names at one level repeat across parents and their order differs by parent.
@@ -181,6 +175,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T06-A192-5.** Categories, products, customers and similar entities can be given a custom order through ranking values computed in calculated columns, in place of the default alphabetical order, to bring the most relevant values to users first.
 - Option. 2020. https://www.sqlbi.com/articles/sorting-duplicated-names-in-a-level-of-a-hierarchy-with-dax/
 - When: A more specific order than alphabetical helps users; alphabetical order is not wrong.
+- Version: Only when the ranking needs a measure or aggregate; otherwise rank in Power Query (storage and security, rule 17; M105).
 
 **T06-A224-1.** As the key between a fact table and the Date dimension, a date-typed column and a whole-number column take the same storage and give the same query speed: VertiPaq hash-encodes every relationship column, storing dictionary indexes whatever the type.
 - Fact. 2021. https://www.sqlbi.com/articles/choosing-between-date-or-integer-to-represent-dates-in-power-bi-and-tabular/
@@ -195,6 +190,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T06-A062-10.** A DAX calculated column is a fitting choice when the value needs data from other tables of the model or rests on aggregated data, as in static segmentation or ABC classification.
 - Option. 2015. https://www.sqlbi.com/articles/calculated-columns-and-measures-in-dax/
 - When: A derived column depends on other tables or on aggregates, not only on its own row.
+- Version: Only when the value needs data from other tables or aggregates, with its CalculatedReason (storage and security, rule 17; M106).
 
 **T06-A172-3.** Denormalising by a merge in Power Query, instead of importing the tables apart and fetching values with RELATED in calculated columns, pays when the source is a relational database that joins the tables efficiently. It applies to Import models only.
 - Should. 2019. https://www.sqlbi.com/articles/comparing-dax-calculated-columns-with-power-query-computed-columns/
@@ -203,6 +199,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T06-A172-4.** Take care with a Power Query column that aggregates rows of other tables: the aggregation runs on the data source and can take long. If it runs too long there, consider a DAX calculated column instead.
 - Consider. 2019. https://www.sqlbi.com/articles/comparing-dax-calculated-columns-with-power-query-computed-columns/
 - When: Import models; a derived column aggregates rows from other tables.
+- Version: Only with the developer's CalculatedReason recorded on the column (model standard, rule 8; M105).
 
 **T06-A172-6.** The engine ignores DAX calculated columns when it picks the table's sort order for compression, so one may compress poorly, above all with few distinct values. A Power Query column is compressed like any other; better compression of one column can still worsen others.
 - Fact. 2019. https://www.sqlbi.com/articles/comparing-dax-calculated-columns-with-power-query-computed-columns/
@@ -233,6 +230,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T06-A075-12.** If the raw number columns are to stay visible, besides turning summarisation off give them names that follow the convention, and add an explicit measure for the row-by-row result, for example one that iterates the table with SUMX.
 - Option. 2016. https://www.sqlbi.com/articles/data-import-best-practices-in-power-bi/
 - When: The detail number columns must remain visible in the model.
+- Version: Visible raw number columns need their use listed in the brief (model standard, rule 7; M103).
 
 **T06-A076-3.** Read from SQL Server, NUMERIC and DECIMAL columns become floating point by default whatever their declared digits; only MONEY and SMALLMONEY map to Fixed Decimal Number.
 - Fact. Check. 2016. https://www.sqlbi.com/articles/choosing-numeric-data-types-in-dax/
@@ -290,3 +288,4 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T06-A233-4.** A separate header table can be kept to speed up specific calculations, such as a distinct count of customers sliced by dimensions linked to the header (about five times faster in one test). Slicing by detail-side dimensions needs a both-direction relationship, which removes the gain.
 - Option. 2021. https://www.sqlbi.com/articles/header-detail-vs-star-schema-models-in-tabular-and-power-bi/
 - When: A header and detail source; the header table also takes much memory.
+- Version: A both-direction relationship needs its reason and M405 row in the brief (relationships and dates, rule 2).

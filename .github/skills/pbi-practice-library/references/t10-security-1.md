@@ -61,6 +61,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T10-A282-1.** One option for security by hierarchy node: keep a small user-to-node table and derive a calculated table of every node below each assigned node, so the role filter needs no string search. Match full-path identifiers by their start with LEFT; PATHCONTAINS suits unique names.
 - Option. 2023. https://www.sqlbi.com/articles/managing-hierarchical-organizations-in-power-bi-security-roles/
 - When: Dynamic security on an organization hierarchy stored in level columns, with access kept in a configuration table.
+- Version: The calculated table needs its CalculatedReason (model standard, rule 8; M105); role filters compare values stored at the source (rule 30).
 
 **T10-A282-2.** Between an expanded permissions table and the organization table it secures, neither side is unique, and Power BI proposes a both-direction filter by default. Do not accept it: the filter must run one way only, from permissions to organization.
 - Must. 2023. https://www.sqlbi.com/articles/managing-hierarchical-organizations-in-power-bi-security-roles/
@@ -86,10 +87,12 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T10-A297-2.** When row-level security blocks USERELATIONSHIP, a measure can instead apply the dimension's current values to the fact column of the inactive relationship with TREATAS over VALUES of the dimension key, or move the filter between the tables some other way.
 - Option. 2024. https://www.sqlbi.com/articles/dax-limitations-with-inactive-relationships-and-row-level-security-rls/
 - When: The active relationship of a dimension transfers a security filter; the result needs checking against the security intent.
+- Version: Only where no active relationship to a role copy is chosen (relationships and dates, rules 24 and 25; M415).
 
 **T10-A297-3.** When TREATAS stands in for an inactive relationship while the active one still exists, also remove the filter on that dimension in the same CALCULATE, for example with ALL on the dimension table. Otherwise the active relationship keeps filtering the wrong fact column.
 - Must. 2024. https://www.sqlbi.com/articles/dax-limitations-with-inactive-relationships-and-row-level-security-rls/
 - When: A measure emulates an inactive relationship with TREATAS between tables that also share an active relationship.
+- Version: In this template, clear the filter with REMOVEFILTERS, not ALL (DAX standard, rule 20; M519).
 
 **T10-A297-4.** After TREATAS replaces a USERELATIONSHIP call that row-level security blocked, verify that results still respect the intended security semantics: the workaround can hide values that should be shown, and the original error can point to worse problems such as disclosure of secured data.
 - Must. 2024. https://www.sqlbi.com/articles/dax-limitations-with-inactive-relationships-and-row-level-security-rls/
@@ -100,7 +103,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T10-A069-4.** When a role applies a very complex filter to a large dimension table, one option is snowflaking: move the security filter to a smaller table. Above the bitmap index row limit no cached bitmap index is used, so the expression runs in every query.
 - Option. 2016. https://www.sqlbi.com/articles/security-cost-in-analysis-services-tabular/
 - When: A very complex role filter sits on a dimension with more rows than the bitmap index limit.
-- Version: Bitmap index row limit: 131,072 rows; 524,288 in the Power BI Service from June 2026.
+- Version: Bitmap index row limit: 131,072 rows; 524,288 in the Power BI Service from June 2026. A snowflake needs its M412 row and reason in the brief (relationships and dates, rule 3).
 
 **T10-A069-5.** On a dimension table above the bitmap index row limit, simplifying a very complex role filter is one possible fix: such a table never gets a cached bitmap index, so the expression is evaluated again in every query.
 - Option. 2016. https://www.sqlbi.com/articles/security-cost-in-analysis-services-tabular/
@@ -122,7 +125,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T10-A090-2.** The hidden pre-aggregated table that supplies non-visual totals can be a calculated table: it is built at refresh time, so it can read every row of the fact table.
 - Option. 2016. https://www.sqlbi.com/articles/implement-non-visual-totals-with-power-bi-security-roles/
 - When: Implementing non-visual totals in a model with security roles.
-- Version: Said to work in Power BI and in any version of Analysis Services Tabular.
+- Version: Said to work in Power BI and in any version of Analysis Services Tabular. The calculated table needs its CalculatedReason (model standard, rule 8; M105).
 
 **T10-A288-1.** ALL on a dimension secured by row-level security clears every filter on it except the security filter, which DAX cannot remove. A percentage whose denominator uses ALL on that dimension is therefore computed only over rows the user may see.
 - Fact. 2023. https://www.sqlbi.com/articles/computing-accurate-percentages-with-row-level-security-in-power-bi/
@@ -140,6 +143,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T10-A288-4.** Build the unsecured table as a calculated table that summarizes the fact table by the keys of the dimensions without security, omitting the secured dimension's key. Relate it to those dimensions only and use it as the denominator, which then still reacts to report filters.
 - Should. 2023. https://www.sqlbi.com/articles/computing-accurate-percentages-with-row-level-security-in-power-bi/
 - When: Percentages must compare visible values with totals that include rows hidden on one secured dimension.
+- Version: Build it upstream where it only reshapes data (checklist item 38; M105); hide it and record the decision (storage and security, rule 38).
 
 **T10-A288-7.** Reports that slice non-visual totals by attributes of a secured dimension must take those attributes from the separate attribute dimension, never from the secured one: only the attribute dimension filters the unsecured summary table.
 - Must. 2023. https://www.sqlbi.com/articles/computing-accurate-percentages-with-row-level-security-in-power-bi/
@@ -163,6 +167,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T10-A253-3.** The empty table that measures reference for object-level security can be a calculated table whose expression returns no rows, for example FILTER over a table with a condition that is always FALSE.
 - Option. Check. 2022. https://www.sqlbi.com/articles/hiding-measures-by-using-object-level-security-in-power-bi/
 - When: Creating the empty table used to hide measures through object-level security.
+- Version: As a calculated table it needs its CalculatedReason in the developer's words (TMDL instructions, rule 9; M105).
 
 **T10-A253-4.** When several sensitive measures all depend on one base measure, the reference to the secured empty table can go in the base measure only: measures that depend on a hidden measure are hidden too.
 - Option. Check. 2022. https://www.sqlbi.com/articles/hiding-measures-by-using-object-level-security-in-power-bi/

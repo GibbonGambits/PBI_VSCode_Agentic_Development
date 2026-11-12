@@ -89,11 +89,6 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 - Should. 2021. https://www.sqlbi.com/articles/development-tools-for-tabular-models-in-2021/
 - When: Assembling the toolset for model authors, report authors and business users.
 
-**T16-A221-19.** Starting a Tabular project in Visual Studio (Analysis Services Projects) can open more features shared with Analysis Services, such as custom partitions. In return, Power BI-specific features such as Incremental Refresh are out of reach, and Power BI Desktop cannot edit the deployed model.
-- Option. 2021. https://www.sqlbi.com/articles/development-tools-for-tabular-models-in-2021/
-- When: Choosing the authoring tool at the start of a Tabular project for Analysis Services or Power BI Premium.
-- Version: Describes the tools as of 2021.
-
 **T16-A331-3.** No tool is mandatory; pick one for a specific model task. Power BI's own include DAX query view, TMDL view, Performance Analyzer and Analyze in Excel; VS Code edits the project files.
 - Option. 2025. https://www.sqlbi.com/articles/tools-in-power-bi/
 - When: Choosing a tool for model design, DAX debugging, optimisation, testing or bulk changes.
@@ -127,7 +122,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T16-A050-3.** Translations can serve as a renaming layer: build the model in a language no user works in, or add a translation for the model's own locale, and set the user-facing names there. Clients show the translated names; DAX and MDX queries keep the originals.
 - Option. Check. 2014. https://www.sqlbi.com/articles/frictionless-renaming-in-tabular-models-with-analysis-services/
 - When: User-facing names must change without editing DAX; possibly unsupported by Microsoft, so test first and accept the risk.
-- Version: 2014 technique for Analysis Services Tabular, not Power Pivot. This template uses default-language translations sparingly (multiple languages, rule 3).
+- Version: 2014 technique for Analysis Services Tabular, not Power Pivot. This template uses default-language translations sparingly (multiple languages, rule 3). Object names stay business words (relationships and dates, rules 41 and 42; M118).
 
 **T16-A081-3.** Save a Tabular translation file as Unicode UTF-8, the encoding the export writes and the import expects. In Visual Studio set it explicitly with Save with Encoding (Advanced Save Options): a JSON file with no character above code 127 is otherwise saved as ANSI.
 - Must. Check. 2016. https://www.sqlbi.com/articles/translations-in-analysis-services-2016/
@@ -154,6 +149,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T16-A081-8.** Leave the translation of model metadata to the very end of the project. Objects created after an export are not translated by the import, a new export always holds every object, and partial translations cannot be merged.
 - Should. 2016. https://www.sqlbi.com/articles/translations-in-analysis-services-2016/
 - When: Projects that translate Analysis Services Tabular metadata through exported translation files.
+- Version: Plan a multi-language model from the start; only the translated text comes last (multiple languages, rule 7).
 
 **T16-A081-10.** A translation file is plain text, so no particular tool is needed: it can be edited in any text editor that handles UTF-8, or through a script of your own that turns the JSON into a simpler format.
 - Option. 2016. https://www.sqlbi.com/articles/translations-in-analysis-services-2016/
@@ -177,7 +173,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T16-A200-1.** A KPI defined on the measure is one option: Excel, through Analyze in Excel, and every Power BI visual reuse it with identical properties, whereas indicators built from extra measures and conditional formatting take much effort and must be redone for Excel.
 - Option. 2020. https://www.sqlbi.com/articles/creating-kpis-in-power-bi-desktop/
 - When: A measure needs a goal-based status and a trend indicator in both Power BI and Excel.
-- Version: Power BI Desktop models accept KPIs since July 2020; earlier only Analysis Services or Premium models.
+- Version: Power BI Desktop models accept KPIs since July 2020; earlier only Analysis Services or Premium models. This template builds a KPI only when the developer asks for one (native features).
 
 **T16-A200-2.** Turning a measure into a KPI replaces it in the Fields pane: Power BI lists the KPI, with Trend added when one is defined, instead of the measure. The original measure stays usable in DAX code and serves as the KPI Value.
 - Fact. 2020. https://www.sqlbi.com/articles/creating-kpis-in-power-bi-desktop/
@@ -207,7 +203,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T16-A232-1.** One way to give an ordinary numeric column the slicer Single Value option of New Parameter columns: add to the column an extended property named ParameterMetadata whose value is the JSON text `{"version":0}`, then save the model.
 - Option. Check. 2021. https://www.sqlbi.com/articles/how-to-enable-the-single-value-option-in-a-power-bi-slicer/
 - When: A slicer on your own numeric column should offer Single Value; unsupported by Microsoft, so back up first.
-- Version: Described in 2021. The project check reads a column with this property as a field parameter (M822): expect that finding.
+- Version: Described in 2021. The project check reads a column with this property as a field parameter (M822): expect that finding. Copilot never writes this property by itself: only if the developer supplies it, with an M822 row (TMDL instructions, rule 12).
 
 **T16-A232-2.** Always back up the Power BI file before adding the ParameterMetadata extended property to a column: the change is not supported by Microsoft and is made at your own risk.
 - Should. 2021. https://www.sqlbi.com/articles/how-to-enable-the-single-value-option-in-a-power-bi-slicer/

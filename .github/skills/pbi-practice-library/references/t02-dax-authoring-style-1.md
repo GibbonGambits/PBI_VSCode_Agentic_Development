@@ -189,6 +189,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T02-A178-8.** For numeric expressions that must never return blank, consider writing COALESCE logic as a sum of each expression multiplied by ISBLANK-based flags. To keep blank when all expressions are blank, wrap the sum in DIVIDE.
 - Consider. 2019. https://www.sqlbi.com/articles/from-sql-to-dax-implementing-nullif-and-coalesce-in-dax/
 - When: Numeric expressions only, where a blank result is not wanted.
+- Version: It returns zero, not blank: only when the brief asks for a zero (DAX standard, rule 7; M506).
 
 **T02-A178-9.** For a NULLIF equivalent, prefer the form without IF: DIVIDE the first expression by the negated equality test of the two expressions, so the result is blank when they are equal. A better plan is possible, not guaranteed.
 - Should. Check. 2019. https://www.sqlbi.com/articles/from-sql-to-dax-implementing-nullif-and-coalesce-in-dax/

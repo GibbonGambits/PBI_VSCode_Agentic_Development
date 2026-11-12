@@ -20,7 +20,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T13-A347-2.** Keep queries or scripts that confirm each model-dependent function still works in its model: a change to a model object can break the functions that refer to it.
 - Should. 2025. https://www.sqlbi.com/articles/model-dependent-and-model-independent-user-defined-functions-in-dax/
 - When: Functions that name specific tables, columns or measures of the model.
-- Version: User-defined functions came as a preview in September 2025.
+- Version: User-defined functions came as a preview in September 2025. Copilot writes query or script files only when the developer asks, never inside a model folder (more model features, rules 21 and 25).
 
 **T13-A347-3.** Write a function meant for a library, or for several models, as model-independent: it gets every table, column and measure it needs through parameters and names no model object. It then fits any model, and the caller answers for valid arguments.
 - Should. 2025. https://www.sqlbi.com/articles/model-dependent-and-model-independent-user-defined-functions-in-dax/
@@ -50,6 +50,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T13-A354-1.** One way to make measure or calculated-table logic reusable: put all the business logic in a model-independent function whose tables and columns are parameters, and add a small `Local.` function that only maps this model's objects onto them. Later optimisations are then made once.
 - Option. 2026. https://www.sqlbi.com/articles/creating-functions-for-the-like-for-like-dax-pattern/
 - When: Logic, such as a published pattern, that otherwise needs manual adapting to each model's names.
+- Version: This template suggests a function at the end of a task and builds it after the developer's yes (native features; U001).
 
 **T13-A354-2.** A model-independent function must not name a measure: measure names belong to one specific model. Pass the calculation to evaluate as an argument instead.
 - Must. 2026. https://www.sqlbi.com/articles/creating-functions-for-the-like-for-like-dax-pattern/
@@ -62,13 +63,14 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T13-A354-4.** Once a calculation developed in a measure gives the right result, ask whether its logic should be made more generic for reuse elsewhere, and whether it then belongs in a model-dependent or a model-independent function. Some code gains nothing from this.
 - Should. 2026. https://www.sqlbi.com/articles/creating-functions-for-the-like-for-like-dax-pattern/
 - When: A calculation was first built and debugged in a measure.
+- Version: This template suggests a function at the end of a task and builds it after the developer's yes (native features; U001).
 
 ### Functions, measures and calculation groups
 
 **T13-A344-10.** User-defined functions can break a model's DAX into small pieces that are tested and debugged on their own. Once checked and tuned, each piece serves as a building block, which makes the whole project sturdier.
 - Option. 2025. https://www.sqlbi.com/articles/introducing-user-defined-functions-in-dax/
 - When: Organising the DAX code of a semantic model.
-- Version: User-defined functions exist from the September 2025 version of DAX.
+- Version: User-defined functions exist from the September 2025 version of DAX. This template suggests a function at the end of a task and builds it after the developer's yes (native features; U001).
 
 **T13-A355-1.** Decide between a measure and a calculation group by what report users must see and interact with. How the underlying logic is shared is a separate, internal decision; user-defined functions are one tool for it, and they only help the developer organise code.
 - Should. 2026. https://www.sqlbi.com/articles/dax-user-defined-functions-udf-vs-calculation-groups/
@@ -81,11 +83,12 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T13-A355-3.** Do not use a calculation group as the way to share code between calculations: share it through user-defined functions with explicit parameters. A calculation group has no parameters, so shared code gets its input through a changed filter context, which can add query-time work.
 - Should. 2026. https://www.sqlbi.com/articles/dax-user-defined-functions-udf-vs-calculation-groups/
 - When: Sharing logic between calculations; the cost grows with complex logic and repeated calls in one query.
-- Version: Before user-defined functions, calculation groups were the only way to share logic; their arrival is a reason to revisit that.
+- Version: Before user-defined functions, calculation groups were the only way to share logic; their arrival is a reason to revisit that. This template suggests a function at the end of a task and builds it after the developer's yes (native features; U001).
 
 **T13-A355-4.** Besides a repeated formula, a function suits business logic that is complex enough to deserve one definition, or whose parameters may vary. Calculation items, like measures, call the function and pass the fitting parameters.
 - Should. 2026. https://www.sqlbi.com/articles/dax-user-defined-functions-udf-vs-calculation-groups/
 - When: Business logic that is complex, takes varying parameters, or is applied in several places.
+- Version: Without a repeated formula, this template builds a function only when the developer asks (native features; U001).
 
 **T13-A355-5.** Do not wrap a simple calculation, such as a plain SUM or a straightforward subtraction, in a user-defined function: write it in the measure. The function adds nothing there and hides the calculation, which makes it harder to read.
 - Should. 2026. https://www.sqlbi.com/articles/dax-user-defined-functions-udf-vs-calculation-groups/
@@ -212,7 +215,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T13-A363-2.** The filter-keep columns of a calendar whose filters must be cleared can be listed in one user-defined function that removes those filters with REMOVEFILTERS. The list, which may grow as the model develops, is then kept in a single place.
 - Option. 2026. https://www.sqlbi.com/articles/using-removefilters-in-dax-user-defined-functions/
 - When: A date table has extra columns, such as weekday names, that are neither calendar levels nor time-related columns.
-- Version: Calendar-based time intelligence is a preview feature here: it needs the developer's yes.
+- Version: Calendar-based time intelligence is a preview feature here: it needs the developer's yes. This template suggests a function at the end of a task and builds it after the developer's yes (native features; U001).
 
 **T13-A363-3.** In place of a function that yields only a REMOVEFILTERS modifier, a function can take the calculation as an EXPR parameter and evaluate it inside its own CALCULATE, together with the filter removal.
 - Option. 2026. https://www.sqlbi.com/articles/using-removefilters-in-dax-user-defined-functions/

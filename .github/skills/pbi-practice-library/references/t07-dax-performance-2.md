@@ -45,7 +45,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T07-A061-6.** Watch closely the performance of relationships whose lookup table has between 200,000 and 5,000,000 rows. If it degrades on the hardware in use, consider denormalizing, or moving low-cardinality columns into a smaller separate table.
 - Consider. Check. 2015. https://www.sqlbi.com/articles/costs-of-relationships-in-dax/
 - When: Relationships to lookup tables of 200,000 to 5,000,000 rows.
-- Version: Row figures date from 2015.
+- Version: Row figures date from 2015. Denormalizing needs a written reason in section 9 of the brief (relationships and dates, rules 1 and 5; M115).
 
 **T07-A061-8.** A star schema is also the design suggested for the VertiPaq engine: in one example, denormalizing a header and detail pair of tables into a star saved 61% of query time. Dimensions above about 1 to 2 million rows can still become a bottleneck.
 - Should. 2015. https://www.sqlbi.com/articles/costs-of-relationships-in-dax/
@@ -54,6 +54,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T07-A350-2.** Avoid many-to-many cardinality relationships on keys with millions of distinct values. On keys with few distinct values, ideally thousands or fewer, they can be acceptable: the cost of a relationship follows the number of unique values in the key column.
 - Should. 2026. https://www.sqlbi.com/articles/analyzing-the-performance-of-limited-and-regular-relationships/
 - When: Deciding whether a many-to-many cardinality relationship is acceptable for a given key column.
+- Version: This template allows many-to-many only for a fact at a higher grain, with its M406 row in the brief (relationships and dates, rule 19).
 
 **T07-A350-5.** Keep in mind that the cost of crossing a relationship depends strongly on how many rows the table on its one side holds. A slow relationship slows every measure that crosses it; grouping by a smaller one-side table ran faster in one test.
 - Consider. 2026. https://www.sqlbi.com/articles/analyzing-the-performance-of-limited-and-regular-relationships/
@@ -153,10 +154,12 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T07-W378-18.** Use partitions to make refresh predictable: when rows keep changing until their item is closed, keep open items in their own small partition and partition closed items by closing date, not start date. Each refresh then reprocesses only the current-day partition and the open-items partition.
 - Should. Paper. 2014. https://www.sqlbi.com/whitepapers/using-tabular-models-in-a-large-scale-commercial-solution/
 - When: Near real-time refresh of data whose rows stay incomplete until a closing event.
+- Version: This template does not suggest partitions: only when the developer asks, with the decision in section 4 of the brief (model standard, rule 14).
 
 **T07-W378-19.** One way to handle rows that arrive incomplete is daily partitions with a full reprocess of each one after its day is over, which picks up the final state. It fails when items stay open for weeks while data is reprocessed every few minutes.
 - Option. Paper. 2014. https://www.sqlbi.com/whitepapers/using-tabular-models-in-a-large-scale-commercial-solution/
 - When: Rows loaded during the day may belong to items that are not yet complete.
+- Version: This template does not suggest partitions: only when the developer asks, with the decision in section 4 of the brief (model standard, rule 14).
 
 **T07-W378-20.** Reprocessing even one partition clears the whole cache of an Analysis Services database, so queries run slower until the cache is rebuilt. The effect is described as small and short-lived.
 - Fact. Paper. 2014. https://www.sqlbi.com/whitepapers/using-tabular-models-in-a-large-scale-commercial-solution/

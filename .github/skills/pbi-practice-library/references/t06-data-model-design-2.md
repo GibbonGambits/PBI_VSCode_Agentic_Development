@@ -78,11 +78,6 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 
 ### User-context calculated columns
 
-**T06-A360-5.** A User Context column also suits a simple row-level expression the storage engine computes at query time at minimal cost, such as arithmetic between columns of one table: nothing is stored, the logic stays in one place, and filters, slicers and visuals can use it.
-- Should. 2026. https://www.sqlbi.com/articles/introducing-user-aware-calculated-columns-in-power-bi/
-- When: Table functions or elaborate IF logic need the formula engine; cost may show on very large or high-cardinality tables.
-- Version: User-context calculated columns are a preview feature (May 2026) that needs the developer's yes.
-
 **T06-A360-7.** Keep a calculated column Standard when its expression is not simple or query speed comes first: an expression the storage engine cannot compute triggers a formula-engine callback for each row at query time, and that cost can grow significantly.
 - Should. 2026. https://www.sqlbi.com/articles/introducing-user-aware-calculated-columns-in-power-bi/
 - When: Choosing between a Standard and a User Context calculated column.
@@ -91,7 +86,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T06-A360-14.** Keep a calculated column that exists only to feed a relationship, such as a key built with COMBINEVALUES or a price-range column for static segmentation, as a Standard column, and accept its storage cost.
 - Must. 2026. https://www.sqlbi.com/articles/introducing-user-aware-calculated-columns-in-power-bi/
 - When: A relationship is built on a calculated column.
-- Version: User-context calculated columns are a preview feature (May 2026) that needs the developer's yes.
+- Version: User-context calculated columns are a preview feature (May 2026) that needs the developer's yes. This template builds such keys at the source; COMBINEVALUES only on a DirectQuery table (storage and security, rule 23; M704).
 
 ## Special-case techniques and facts
 
@@ -111,13 +106,10 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 - Option. 2020. https://www.sqlbi.com/articles/handling-customers-with-the-same-name-in-power-bi/
 - When: Different entities share one display name.
 
-**T06-A191-3.** Duplicate names can be made unique without a visible change by a calculated column that ranks the entities sharing a name by their code and appends zero-width characters (Unicode 8204), one fewer than the rank: the engine then sees different values.
-- Option. 2020. https://www.sqlbi.com/articles/handling-customers-with-the-same-name-in-power-bi/
-- When: Different entities share a display name that must look unchanged; test the model's culture first.
-
 **T06-A191-4.** Consider showing the unique-name column under the plain name label and hiding the original name column, so same-name entities are kept apart by default. Keep the original in the model: it is still needed to test for an empty name.
 - Consider. 2020. https://www.sqlbi.com/articles/handling-customers-with-the-same-name-in-power-bi/
 - When: A unique-name column padded with zero-width characters has been created.
+- Version: Renaming or hiding an existing column needs the developer's yes (project instructions).
 
 **T06-A191-5.** Before relying on zero-width characters to make names unique, check that appending them leaves names displayed unchanged in the model's culture and language: the zero-width space has a meaning of its own in some languages.
 - Consider. 2020. https://www.sqlbi.com/articles/handling-customers-with-the-same-name-in-power-bi/
@@ -215,6 +207,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T06-A290-7.** Store each entity's first event type in a calculated column instead of hardcoding which event types count as start events.
 - Should. 2023. https://www.sqlbi.com/articles/preparing-a-data-model-for-sankey-charts-in-power-bi/
 - When: A funnel where users can hide events and a start event is treated differently from later ones.
+- Version: Only when the event table is itself calculated, or with a CalculatedReason (storage and security, rule 17; M105).
 
 **T06-A290-9.** If only a static funnel chart is needed, consider building the event table in Power Query or SQL and keeping DAX for the measures. A Power Query transformation can itself fail on memory during refresh when its steps do not fold into one request.
 - Consider. 2023. https://www.sqlbi.com/articles/preparing-a-data-model-for-sankey-charts-in-power-bi/

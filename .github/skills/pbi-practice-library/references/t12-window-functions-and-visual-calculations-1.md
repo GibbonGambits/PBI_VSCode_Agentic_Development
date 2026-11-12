@@ -24,6 +24,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T12-A357-2.** When a visual calculation would repeat the same column and measure names in several places, move the generic logic into a user-defined function that takes the matrix table, the needed columns and the expression as parameters, so the names appear only in the call.
 - Should. 2026. https://www.sqlbi.com/articles/using-visual-calculations-to-highlight-an-entire-row/
 - When: Visual calculations that must be adapted to visuals with different measures or column layouts.
+- Version: This template suggests a function at the end of a task and builds it after the developer's yes (native features; U001).
 
 ### Window functions and apply semantics
 
@@ -82,6 +83,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T12-A348-6.** When the ranking expression is a floating-point value, use RANK, not RANKX: RANKX can return a wrong ranking on such values, an issue RANK does not have. This also holds for existing RANKX measures that otherwise work.
 - Should. 2025. https://www.sqlbi.com/articles/using-rank-instead-of-rankx-in-dax/
 - When: Ranking over decimal (floating-point) expressions.
+- Version: Changing a measure that works needs the developer's yes (model skill, existing models; pbi-improve).
 
 **T12-A348-8.** Existing RANKX measures that return correct results can stay as they are; replacing them with RANK is not required. The exception is a RANKX measure that ranks floating-point values, where RANK works better.
 - Option. 2025. https://www.sqlbi.com/articles/using-rank-instead-of-rankx-in-dax/
@@ -173,10 +175,6 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 - When: Percent-of-parent measures written against specific model columns.
 - Version: Stated in 2020, when DAX offered no calculation that worked whatever the slicing column.
 
-**T12-A196-4.** A running total by date can be a model measure: read the latest visible date with MAX, then SUMX the amount over FILTER of ALL of the sales table, keeping rows dated on or before it. ALL lifts the visual's filter so earlier sales count.
-- Option. Check. 2020. https://www.sqlbi.com/articles/a-proposal-for-visual-calculations-in-dax/
-- When: Running totals in a model measure, when the visual slices by date.
-
 **T12-A196-5.** A share of the grand total shown can divide the sales total by the same total under CALCULATE with ALLSELECTED and no arguments. Adding VALUES of the category column gives the share of the category total, right only while the report slices by category.
 - Option. Check. 2020. https://www.sqlbi.com/articles/a-proposal-for-visual-calculations-in-dax/
 - When: Percentage-of-total measures in the model.
@@ -184,6 +182,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T12-A302-8.** When a visual calculation needs a few constant values per member, such as a rate for each year, define them in a visual calculation with SWITCH, not in a model table. Visual calculations exist so that calculations can be added without changing the model.
 - Should. 2024. https://www.sqlbi.com/articles/using-expand-and-collapse-in-visual-calculations/
 - When: Calculations built with visual calculations where the model is to stay unchanged.
+- Version: The values come from the brief or the developer, with a comment where they live (descriptions; checklist item 8).
 
 **T12-A302-10.** A visual calculation depends on the structure of its visual: changing that structure can quickly break it and force a major rewrite. One built on year and month stops working when the visual is sliced by brand instead.
 - Fact. 2024. https://www.sqlbi.com/articles/using-expand-and-collapse-in-visual-calculations/
@@ -192,6 +191,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T12-A302-12.** In a model measure, a few lookup values such as a yearly rate can live in a table held by a variable inside the measure, with the per-period structures derived from the model at evaluation time. No separate column is needed to store them.
 - Option. 2024. https://www.sqlbi.com/articles/using-expand-and-collapse-in-visual-calculations/
 - When: Model measures that need small constant inputs, such as yearly inflation rates.
+- Version: The values come from the brief or the developer, with a comment in the DAX (descriptions; checklist item 8).
 
 **T12-A327-2.** A visual calculation that returns text, such as a colour name, must have its data type set to Text in the visual's format options (Format, General, Data Format, Format Options) before it can be picked as a conditional-formatting source.
 - Must. Check. 2025. https://www.sqlbi.com/articles/using-visual-calculations-for-conditional-formatting/

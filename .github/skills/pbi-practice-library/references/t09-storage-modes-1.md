@@ -26,7 +26,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T09-A295-2.** When tuning time intelligence measures in VertiPaq, prefer DAX logic that does not rely on the built-in time intelligence functions: they mostly fetch data at day granularity and aggregate it in the formula engine, which materialises many day-level rows.
 - Should. Check. 2024. https://www.sqlbi.com/articles/optimizing-time-intelligence-in-directquery/
 - When: Optimising time intelligence on VertiPaq; DirectQuery over SQL needs the same patterns for other reasons.
-- Version: Tested in 2024; engine behaviour can change.
+- Version: Tested in 2024; engine behaviour can change. Keep such a rewrite only when a timing shows it faster with the same numbers (DAX standard, rule 37).
 
 **T09-A295-5.** Before relying on any DAX optimisation pattern, verify it on the specific Tabular engine version you use: the engine changes over time, so the effect of an optimisation cannot be assumed.
 - Must. 2024. https://www.sqlbi.com/articles/optimizing-time-intelligence-in-directquery/
@@ -180,7 +180,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T09-W380-27.** For row-level security on an older SQL Server source, one option: a schema per user group holding same-named filtered views, each user given that default schema and SELECT rights on it, and DirectQuery partitions bound to SQL statements without schema names.
 - Option. Paper. 2017. https://www.sqlbi.com/whitepapers/directquery-in-analysis-services-2016/
 - When: DirectQuery queries reach the source with the credentials of each user.
-- Version: For SQL Server before 2016, which has row-level security of its own; 2017 white paper.
+- Version: For SQL Server before 2016, which has row-level security of its own; 2017 white paper. In this template a partition's SQL is a Value.NativeQuery step in Power Query (storage and security, rule 39; M833).
 
 **T09-W380-39.** In one comparison, bidirectional filtering, whether set on a relationship or switched on in DAX, made DirectQuery queries 3 to 30 times slower, depending on query complexity. In many-to-many models the size of the bridge table can also become a problem.
 - Fact. Check. Paper. 2017. https://www.sqlbi.com/whitepapers/directquery-in-analysis-services-2016/
@@ -194,6 +194,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T09-A126-3.** Where two tables can only be related on several columns, a single combined key suits small tables or cases where heavier reshaping is impossible; it has more distinct values than the original columns, which costs performance.
 - Should. 2018. https://www.sqlbi.com/articles/using-combinevalues-to-optimize-directquery-performance/
 - When: No single native column can carry the relationship.
+- Version: Build the key at the source and justify it under checklist item 14 (relationships and dates, rule 9; M110).
 
 **T09-A126-4.** In an import model a relationship performs best on one column with few distinct values; a key that concatenates several key columns ends up with more distinct values than any of them, and that hurts performance.
 - Fact. 2018. https://www.sqlbi.com/articles/using-combinevalues-to-optimize-directquery-performance/
@@ -206,9 +207,9 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T09-A126-6.** COMBINEVALUES tells DirectQuery which columns lie beneath the key, so the generated SQL joins on the original columns, can partly use existing indexes and usually gets a much better plan than string concatenation.
 - Should. 2018. https://www.sqlbi.com/articles/using-combinevalues-to-optimize-directquery-performance/
 - When: DirectQuery tables need a relationship on several columns and no native single column exists.
-- Version: As of Power BI April 2018 the SQL still held NULL checks, even for NOT NULL columns.
+- Version: As of Power BI April 2018 the SQL still held NULL checks, even for NOT NULL columns. A COMBINEVALUES key column needs its CalculatedReason and an item 14 justification (model standard, rule 8; M105).
 
 **T09-A126-7.** Assume referential integrity can also be turned on for a DirectQuery relationship on COMBINEVALUES key columns, giving an inner join instead of a left outer join; it does not remove the extra NULL-checking conditions in the join.
 - Option. 2018. https://www.sqlbi.com/articles/using-combinevalues-to-optimize-directquery-performance/
 - When: A DirectQuery relationship built on COMBINEVALUES calculated columns.
-- Version: Observed with Power BI in 2018.
+- Version: Observed with Power BI in 2018. Only when the source guarantees that every fact key has a match (storage and security, rule 24; U008).

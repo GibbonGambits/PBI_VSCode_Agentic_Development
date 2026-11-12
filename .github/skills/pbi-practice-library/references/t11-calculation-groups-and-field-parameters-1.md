@@ -69,6 +69,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T11-A159-3.** To let report users choose which measure a visual shows, a calculation group can hold items that each return one named measure and never call SELECTEDMEASURE. Such an item replaces the measure in the visual; it does not vary it.
 - Option. 2019. https://www.sqlbi.com/articles/introducing-calculation-groups/
 - When: Users pick the metric in a slicer; with a second group for time variants, precedence sets the order.
+- Version: Where a field parameter can serve, this template uses one (report standard, rule 1; checklist item 64); this suits clients such as Excel.
 
 **T11-A201-5.** When a calculation item must change one measure wherever other measures reference it, hide the calculation group and never let report users select it directly. A group placed in a report is applied at the top level, to the queried measure, not the inner reference.
 - Must. 2020. https://www.sqlbi.com/articles/using-calculation-groups-to-selectively-replace-measures-in-dax-expressions/
@@ -77,6 +78,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T11-A201-6.** To let a slicer switch one measure's implementation while other measures build on it, move its code to a hidden measure. The public measure evaluates it in CALCULATE, filtering a hidden calculation group through TREATAS with values selected in a visible copy of its items.
 - Should. 2020. https://www.sqlbi.com/articles/using-calculation-groups-to-selectively-replace-measures-in-dax-expressions/
 - When: One measure's implementation must switch from a slicer while measures that reference it keep working.
+- Version: The visible copy needs its M411 row and a CalculatedReason (relationships and dates, rule 4; model standard, rule 8).
 
 **T11-A201-7.** A disconnected table that users slice in place of a hidden calculation group must hold exactly the same values as that group. A calculated table built from the columns of the calculation group is one way to make it.
 - Must. 2020. https://www.sqlbi.com/articles/using-calculation-groups-to-selectively-replace-measures-in-dax-expressions/
@@ -98,6 +100,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T11-A210-3.** To let report users choose which date drives the numbers, a calculation group can hold one item per relationship to the Date table. The item for the active relationship returns SELECTEDMEASURE unchanged; each other item evaluates it in CALCULATE with USERELATIONSHIP.
 - Option. Check. 2020. https://www.sqlbi.com/articles/using-calculation-groups-to-switch-between-dates/
 - When: Several relationships between a fact table and Date, one active; with no selection the active one applies.
+- Version: Not towards a table a role filters (relationships and dates, rules 24 and 25; M414, M415).
 
 **T11-A268-1.** To let users pick relative periods such as last month, previous month or last six months, a calculation group can hold one item per period. Each item evaluates SELECTEDMEASURE under a date filter whose bounds come from the latest date in the fact table.
 - Option. 2023. https://www.sqlbi.com/articles/using-calculation-groups-or-many-to-many-relationships-for-time-intelligence-selection/
@@ -116,6 +119,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T11-A286-5.** To tell a formatting measure which calculation item is selected, add a disconnected calculated table of item names. Each item, when ISSELECTEDMEASURE finds the formatting measure, evaluates it with a filter on its own name in that table; the measure reads the name with SELECTEDVALUE.
 - Option. 2023. https://www.sqlbi.com/articles/using-field-parameters-and-calculation-groups-for-conditional-formatting/
 - When: Conditional formatting or other logic must change with the calculation item selected.
+- Version: The disconnected table needs its M411 row and a CalculatedReason (relationships and dates, rule 4; model standard, rule 8).
 
 ### Calculation item application
 
@@ -126,6 +130,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T11-A159-6.** Consider SELECTEDMEASURENAME in a calculation item whose behaviour must follow settings kept outside the DAX code, such as a table that lists the measures a behaviour is switched on for. The settings can then change with no edit to the formula.
 - Consider. 2019. https://www.sqlbi.com/articles/introducing-calculation-groups/
 - When: An item must transform results according to configuration stored outside its formula.
+- Version: The unrelated settings table needs its M411 row and purpose in the brief (relationships and dates, rule 4).
 
 **T11-A161-2.** A calculation item filtered by an outer CALCULATE is not applied at that level to a measure inside a nested CALCULATE. Its filter stays active, and the item rewrites the inner measure reference in the inner filter context, where inner filters can override outer ones.
 - Fact. 2019. https://www.sqlbi.com/articles/understanding-the-application-of-calculation-items/

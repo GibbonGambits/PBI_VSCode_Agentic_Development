@@ -59,7 +59,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T03-A342-1.** Set the model's value filter behavior to Independent, and do not switch it back to Coalesced afterwards.
 - Should. Check. 2025. https://www.sqlbi.com/articles/summarizecolumns-best-practices/ ; https://www.sqlbi.com/articles/understanding-value-filter-behavior-in-summarizecolumns/
 - When: Any semantic model, and above all code that uses SUMMARIZECOLUMNS.
-- Version: Independent arrived in 2025; Coalesced was the default before. A preview feature here: needs the developer's yes.
+- Version: Independent arrived in 2025; Coalesced was the default before. A preview feature here: needs the developer's yes. This template does not suggest it by itself: only when the developer asks, with its section 11 row (native features; M841).
 
 **T03-A337-4.** A SUMMARIZECOLUMNS call written inside a measure should include an aggregation, not list group-by columns only. A call without one may return the correct number, yet falls outside the good practices for the function.
 - Should. 2025. https://www.sqlbi.com/articles/using-values-in-summarize/
@@ -78,6 +78,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T03-A055-2.** DAX join techniques that do not use relationships are an option for building calculated tables, or small tables inside complex expressions of measures and calculated columns. The price is slower and more complex code than relationships give.
 - Option. 2018. https://www.sqlbi.com/articles/from-sql-to-dax-joining-tables/
 - When: Calculated tables, or small tables within complex expressions in measures and calculated columns.
+- Version: A calculated table needs its CalculatedReason; checklist item 38 keeps source reshaping upstream (M105).
 
 **T03-A055-4.** To add lookup-table columns to each row of a table without aggregating, one way is ADDCOLUMNS with RELATED over the relationship to the one side.
 - Option. 2018. https://www.sqlbi.com/articles/from-sql-to-dax-joining-tables/
@@ -276,10 +277,12 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T03-A197-5.** LOOKUPVALUE is the better choice than a model relationship when the lookup matches on several columns, or on a more complex condition built from several columns: there it is more flexible.
 - Should. 2020. https://www.sqlbi.com/articles/introducing-lookupvalue/
 - When: The lookup is defined by several columns or a complex multi-column condition, not one key column.
+- Version: This template relates tables on one key built at the source where it can (relationships and dates, rules 4 and 9).
 
 **T03-A197-6.** A calculated column that must fetch a value from another row of its own table can use LOOKUPVALUE to search that same table, because a table cannot have a relationship with itself.
 - Option. Check. 2020. https://www.sqlbi.com/articles/introducing-lookupvalue/
 - When: A calculated column looks up its own table, such as the previous order's price for a product.
+- Version: Only when Power Query cannot supply the value, with its CalculatedReason (storage and security, rule 17; M105).
 
 **T03-A198-1.** LOOKUPVALUE disregards any filter that is currently active on the table it searches.
 - Fact. Check. 2020. https://www.sqlbi.com/articles/understanding-lookupvalue/

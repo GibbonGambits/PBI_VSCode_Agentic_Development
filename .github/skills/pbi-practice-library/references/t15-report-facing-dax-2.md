@@ -102,11 +102,6 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 - Should. 2021. https://www.sqlbi.com/articles/how-to-return-0-instead-of-blank-in-dax/
 - When: A model uses a physical table to drive where zero replaces blank.
 
-**T15-A222-7.** If the helper table listing where zero replaces blank grows too large, it can be stored by month and related to the Date table through a many-to-many cardinality relationship on a year-month column. The smaller table offsets the added complexity; speed is similar.
-- Option. 2021. https://www.sqlbi.com/articles/how-to-return-0-instead-of-blank-in-dax/
-- When: The day-level helper table is too big; a month grain rules out a regular relationship with Date.
-- Version: A many-to-many relationship is listed with its reason as an exception (M406).
-
 **T15-A296-14.** Report-specific formatted measures can live in a proxy composite model that the reports connect to, while other users keep using the original model. It adds management overhead and composite model limits, and its author can override the original measures' formats and definitions.
 - Option. 2024. https://www.sqlbi.com/articles/improving-data-labels-with-format-strings/
 - When: Report-specific format strings must stay out of the main model.
@@ -130,15 +125,17 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T15-A113-5.** For a measure built from two other measures, the detail rows expression can call DETAILROWS on each, join the two results with NATURALINNERJOIN, which drops the columns they share, and add derived columns with ADDCOLUMNS.
 - Option. Check. 2017. https://www.sqlbi.com/articles/controlling-drillthrough-using-detail-rows-expressions-in-dax/
 - When: A measure such as a margin combines the detail rows of sales and cost.
-- Version: Stated in 2017; check current behaviour.
+- Version: Stated in 2017; check current behaviour. Only in a model without a calculation group (more model features, rule 14; M815).
 
 **T15-A113-6.** When a measure evaluates a base measure under a changed filter context, write its detail rows expression as DETAILROWS of the base measure inside CALCULATETABLE, with the same filter modifiers the measure uses.
 - Should. 2017. https://www.sqlbi.com/articles/controlling-drillthrough-using-detail-rows-expressions-in-dax/
 - When: Year-to-date, prior-year and similar variants of a base measure.
+- Version: Only in a model without a calculation group (more model features, rule 14; M815).
 
 **T15-A113-8.** When one measure's drillthrough should equal another's, call DETAILROWS on that other measure; do not copy its detail rows expression.
 - Should. 2017. https://www.sqlbi.com/articles/controlling-drillthrough-using-detail-rows-expressions-in-dax/
 - When: For example a year-over-year percentage that reuses the detail rows of the year-over-year difference.
+- Version: Only in a model without a calculation group (more model features, rule 14; M815).
 
 **T15-A231-1.** Without a detail rows expression, drillthrough on a measure returns all columns of the measure's own table, hidden ones included and none from related tables, for the visible rows. It ignores filter changes inside the measure and returns nothing useful for a separate measures table.
 - Fact. 2017. https://www.sqlbi.com/articles/controlling-drillthrough-using-detail-rows-expressions-in-dax/ ; https://www.sqlbi.com/articles/controlling-drillthrough-in-excel-pivottables-connected-to-power-bi-or-analysis-services/
@@ -160,14 +157,17 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T15-A231-6.** When a measure should share another measure's drillthrough, set its detail rows expression to DETAILROWS of that measure. For measures in a separate measures table, do this per measure and not as a table default, which later measures would inherit, suitable or not.
 - Option. 2021. https://www.sqlbi.com/articles/controlling-drillthrough-in-excel-pivottables-connected-to-power-bi-or-analysis-services/
 - When: Measures hosted in a measures table need the drillthrough of measures defined elsewhere.
+- Version: Only in a model without a calculation group (more model features, rule 14; M815).
 
 **T15-A231-7.** For a measure that changes the filter context, such as a same-period-last-year measure, the detail rows expression can wrap DETAILROWS of the base measure in CALCULATETABLE with the same filter function. The default drillthrough ignores filter changes made inside the measure.
 - Option. 2021. https://www.sqlbi.com/articles/controlling-drillthrough-in-excel-pivottables-connected-to-power-bi-or-analysis-services/
 - When: Excel drillthrough on measures whose definition shifts or changes the filter context.
+- Version: Only in a model without a calculation group (more model features, rule 14; M815).
 
 **T15-A231-8.** When users want a summarised drillthrough, as for a year-over-year difference, the detail rows expression must change the granularity and aggregate, for instance one row per date with current and prior-year values. An older alternative appends the detail rows of both periods with UNION.
 - Must. 2021. https://www.sqlbi.com/articles/controlling-drillthrough-in-excel-pivottables-connected-to-power-bi-or-analysis-services/ ; https://www.sqlbi.com/articles/controlling-drillthrough-using-detail-rows-expressions-in-dax/
 - When: Business users expect an aggregated drillthrough view, not every transaction of both periods.
+- Version: Only in a model without a calculation group (more model features, rule 14; M815).
 
 **T15-A231-9.** Numeric columns returned by a detail rows expression have no format string that can be set, and rounding them in the expression removes the dropped digits for good. A measure format in a PivotTable only hides decimals and keeps the full number.
 - Fact. 2021. https://www.sqlbi.com/articles/controlling-drillthrough-in-excel-pivottables-connected-to-power-bi-or-analysis-services/
@@ -176,10 +176,12 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T15-A231-10.** A measure has one drillthrough behaviour, so several detail views for the same PivotTable filters need one dedicated measure per view: for example a measure that shows how many customers will be listed and whose drillthrough returns those distinct customers.
 - Option. 2021. https://www.sqlbi.com/articles/controlling-drillthrough-in-excel-pivottables-connected-to-power-bi-or-analysis-services/
 - When: Users need more than one kind of detail list, such as customers and products, for the same cell.
+- Version: Only in a model without a calculation group (more model features, rule 14; M815).
 
 **T15-A231-11.** Where detailed data tables are a key need, Excel drillthrough with custom detail rows expressions can serve them efficiently: it runs as one DAX query and can return tens of thousands of rows in seconds, while a PivotTable with many attributes on rows is slow.
 - Option. 2021. https://www.sqlbi.com/articles/controlling-drillthrough-in-excel-pivottables-connected-to-power-bi-or-analysis-services/
 - When: Users need detail-level extracts from a tabular model in Excel.
+- Version: Only in a model without a calculation group (more model features, rule 14; M815).
 
 **T15-A145-2.** To validate or debug a report, a measure that lists the active filters can go into the tooltip fields of a visual: it shows the filter context of each data point, including filters the standard filter display leaves out.
 - Option. 2019. https://www.sqlbi.com/articles/displaying-filter-context-in-power-bi-tooltips/
@@ -263,10 +265,6 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 - Option. 2018. https://www.sqlbi.com/articles/improving-temporal-line-charts-in-power-bi-with-dax/
 - When: A trend line at a grain coarser than day, where the period column would otherwise be text.
 
-**T15-A139-4.** For the end-of-period date on each Date row, EOMONTH serves months of a standard calendar. For any grain and for custom calendars, take MAX of the date in CALCULATE with ALLEXCEPT that keeps only the columns identifying the period.
-- Option. 2018. https://www.sqlbi.com/articles/improving-temporal-line-charts-in-power-bi-with-dax/
-- When: Building a date-typed period column, for example for a continuous line chart axis.
-
 **T15-A139-5.** When grouping Date rows by period, identify the period by one column that is unique across years; failing that, keep every column that together identifies it, such as year and quarter number.
 - Should. 2018. https://www.sqlbi.com/articles/improving-temporal-line-charts-in-power-bi-with-dax/
 - When: Computing a period-level value, such as the end-of-period date, with ALLEXCEPT over the period columns.
@@ -274,6 +272,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T15-A139-6.** End-of-month and end-of-quarter date columns used on a continuous axis can take the format string `MMMM yyyy`; by default the tooltip labels a point with the full end-of-period date.
 - Option. 2018. https://www.sqlbi.com/articles/improving-temporal-line-charts-in-power-bi-with-dax/
 - When: A continuous line chart whose axis column stores the last date of each month or quarter.
+- Version: Only when the brief's date format allows it (model standard, rule 12; M112).
 
 **T15-A139-7.** On a continuous line chart plotted on an end-of-period date column, switch on the X-axis title: the dates alone do not show whether a point stands for a month or a quarter.
 - Should. 2018. https://www.sqlbi.com/articles/improving-temporal-line-charts-in-power-bi-with-dax/

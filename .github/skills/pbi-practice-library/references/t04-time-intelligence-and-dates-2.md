@@ -139,6 +139,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T04-A114-1.** A report where users pick two independent periods with slicers and compare them needs a second date table in the model. It can be a calculated table that simply duplicates the existing Date table.
 - Must. Check. 2017. https://www.sqlbi.com/articles/filtering-and-comparing-different-time-periods-with-power-bi/
 - When: Two custom periods chosen by slicers, each with its own start and length.
+- Version: The copy needs its CalculatedReason (model standard, rule 8; M105); a table named with Date also needs the date table marks (M404).
 
 **T04-A114-2.** A second date table for a two-period comparison can be linked to the main Date table by one inactive one-to-one relationship, not by an inactive relationship to every fact table. It is less intuitive, and while inactive it leaves calculations sliced by Date untouched.
 - Option. Check. 2017. https://www.sqlbi.com/articles/filtering-and-comparing-different-time-periods-with-power-bi/
@@ -208,7 +209,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T04-A281-5.** A table of custom periods with start and end dates can be used in two ways: copy its columns into the Date table as calculated columns, or keep it visible and relate Date to it many-to-one on the sequential period number, hidden in Date.
 - Option. 2023. https://www.sqlbi.com/articles/comparing-different-school-terms-in-power-bi/
 - When: Custom periods such as terms, seasons or campaigns kept in their own table.
-- Version: Relating Date to another table makes a chain that needs its exception row in the brief (M412).
+- Version: Relating Date to another table makes a chain that needs its exception row in the brief (M412). Copied columns only when Power Query cannot supply them, with a CalculatedReason (storage and security, rule 17; M105).
 
 **T04-A281-6.** In a calculated column of the Date table that looks up the custom period holding each date, one option is to trap the lookup error with IFERROR and raise your own message with ERROR, pointing to overlapping periods, so the refresh log names the cause.
 - Option. 2023. https://www.sqlbi.com/articles/comparing-different-school-terms-in-power-bi/
@@ -256,6 +257,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T04-A153-4.** A simple DAX date table: take the dates of CALENDARAUTO and drop those whose year lies outside the range of interest, with the first and last year held in variables computed from MIN and MAX of the transaction date column.
 - Option. 2019. https://www.sqlbi.com/articles/creating-a-simple-date-table-in-dax/
 - When: Creating a simple calculated date table as a starting point; the variables keep the rest portable between models.
+- Version: Only when the source has no date table, with its CalculatedReason (relationships and dates, rule 32; M105).
 
 **T04-A319-1.** The hidden Auto Date/Time tables cannot be customized: they hold Year, Quarter, Month and Date, no attribute can be added, and they offer no grouping by week, so no week-based chart or matrix can be built on them.
 - Fact. Check. 2019. https://www.sqlbi.com/articles/automatic-time-intelligence-in-power-bi/ ; https://www.sqlbi.com/articles/using-weekly-calendars-in-power-bi/
@@ -314,6 +316,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T04-A371-5.** Setting dataCategory metadata on a Date hierarchy is an alternative to a Date table whose levels are DateTime columns shown through custom format strings. Choose it for more control over level names, or when other client tools do not fully support such columns as levels.
 - Option. 2026. https://www.sqlbi.com/articles/continuous-axis-for-any-date-table-in-power-bi/
 - When: A Date table for a continuous axis at month level or coarser.
+- Version: No shipped example carries these values: ask the developer first (project instructions).
 
 ### Blank and placeholder dates
 

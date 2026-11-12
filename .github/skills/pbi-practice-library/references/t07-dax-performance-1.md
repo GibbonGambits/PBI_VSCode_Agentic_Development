@@ -126,7 +126,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T07-A040-3.** When a distinct count runs under several CALCULATE filter arguments that each depend on the outer context, consider merging them into one FILTER condition. It costs more by itself, but separate filters can build a temporary Cartesian product that is slower than one table scan.
 - Consider. Check. 2014. https://www.sqlbi.com/articles/filter-vs-calculatetable-optimization-using-cardinality-estimation/
 - When: Only with several context-dependent filters plus a distinct count, worst with a many-to-many relationship; benchmark first.
-- Version: Reported in 2014; later engine releases were expected to make the merged filter unnecessary.
+- Version: Reported in 2014; later engine releases were expected to make the merged filter unnecessary. In this template a FILTER filter argument needs a benchmark and its M505 row in the brief (DAX standard, rule 6).
 
 **T07-A040-5.** For a distinct count limited by conditions on two columns of one fact table, a possibly better option than filtering the whole table is one FILTER over ALL of just those two columns, wrapped in KEEPFILTERS.
 - Option. Check. 2014. https://www.sqlbi.com/articles/filter-vs-calculatetable-optimization-using-cardinality-estimation/

@@ -1,6 +1,6 @@
 # Business calculation patterns
 
-Part 2 of 5 of this topic. Covers: Customer, product and campaign analysis.
+Part 2 of 4 of this topic. Covers: Customer, product and campaign analysis.
 
 Practice notes drawn from public SQLBI articles and white papers, each restated in new words. They are information, not rules to enforce: the checklist and this template's standards win. Each note gives its ID, then its strength (Must, Should, Consider, Option or Fact), the year of the article and the article's address, when it applies, and any version limit or condition. **Check** after the strength means the note may no longer hold in current Power BI: confirm it with the skill `pbi-lookup` before you rely on it. **Paper** means the note comes from a white paper: its link opens only a summary, and the paper itself is on a download site that `pbi-lookup` does not open, so confirm the point on Microsoft Learn instead. The article holds the detail. A note may name another product in passing, such as Analysis Services or Excel: that is information for the developer. Nothing is installed, published or deployed from this template.
 
@@ -38,7 +38,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T14-A031-3.** To group fact rows into bands that a separate table defines by minimum and maximum, do not relate the fact table to the band table. Copy the band into the fact table with a calculated column returning the one band that encloses the row's value.
 - Should. 2013. https://www.sqlbi.com/articles/grouping-transactions-by-age-of-customers-in-dax/
 - When: Bands such as age groups: the band table has no row for every single value.
-- Version: In 2013 the band table was a linked table in PowerPivot or a regular table in Tabular. A calculated column needs its reason line; the standard prefers the source or Power Query (M105, M106).
+- Version: In 2013 the band table was a linked table in PowerPivot or a regular table in Tabular. A calculated column needs its reason line; the standard prefers the source or Power Query (M105, M106). The unrelated band table needs its M411 row.
 
 **T14-A031-4.** When a band label is copied into the fact table, copy the band's position column there as well, hide it, and make it the Sort by Column of the band column.
 - Should. 2013. https://www.sqlbi.com/articles/grouping-transactions-by-age-of-customers-in-dax/
@@ -51,6 +51,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T14-A031-6.** Once the band and its position are columns of the fact table, the intermediate age column can go: compute both straight from the order date and the related birth date. The age column has far more distinct values; the longer formula runs only at refresh.
 - Option. 2013. https://www.sqlbi.com/articles/grouping-transactions-by-age-of-customers-in-dax/
 - When: Large fact tables, such as a sales table with millions of rows.
+- Version: Only when the source or Power Query cannot supply it, with its CalculatedReason (storage and security, rule 17; M105).
 
 **T14-A034-1.** When a calculation needs each customer's first order date, keep that date in a calculated column of the customer table and do not work it out inside the measure: the stored value performs better.
 - Should. 2013. https://www.sqlbi.com/articles/yearly-customer-historical-sales-in-dax/
@@ -64,7 +65,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T14-A066-1.** To analyse how a customer's yearly category moves over time, build a calculated table with one row per customer and year holding the category and level of that year and the year before. Measures with dummy category dimensions are complex, and slow on large data.
 - Should. Check. 2015. https://www.sqlbi.com/articles/transition-matrix-using-calculated-tables/
 - When: Category set by yearly sales, and customers moving between categories are counted; plain dynamic segmentation needs none of this.
-- Version: Needs calculated tables: in Power BI since September 2015, not in Excel 2016.
+- Version: Needs calculated tables: in Power BI since September 2015, not in Excel 2016. Only when upstream shaping cannot supply the table, with its CalculatedReason (model standard, rule 8; checklist item 38; M105).
 
 **T14-A066-2.** When a customer-by-year category table joins each customer-year to a category lookup with GENERATE, not GENERATEALL, customer-years lacking a category in the current or the previous year are dropped silently. New and lost customers are absent, so transition matrix totals can look wrong at first.
 - Fact. Check. 2015. https://www.sqlbi.com/articles/transition-matrix-using-calculated-tables/
@@ -132,6 +133,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T14-A330-1.** A Pareto line chart comparing several groups, such as countries, must be built with measures over a disconnected numeric table numbered 1 to the item count, used as a continuous axis. Item names on a categorical axis add a scrollbar and leave groups unconnected.
 - Must. 2025. https://www.sqlbi.com/articles/dynamic-pareto-analysis-in-power-bi/
 - When: Pareto or cumulative-distribution line charts that show several groups in one chart.
+- Version: The disconnected axis table needs its M411 row in the brief (relationships and dates, rule 4).
 
 **T14-A330-2.** The numeric position table used as the continuous axis of a dynamic Pareto chart must stay visible to report authors in the model, although it has no relationships.
 - Must. 2025. https://www.sqlbi.com/articles/dynamic-pareto-analysis-in-power-bi/
@@ -140,6 +142,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T14-A330-3.** To let users choose which measure an analysis works on, you can create a table that lists the measure names for a slicer, and a measure that switches with SWITCH to the measure the user picked.
 - Option. 2025. https://www.sqlbi.com/articles/dynamic-pareto-analysis-in-power-bi/
 - When: A calculation such as a Pareto analysis must run on a metric the user chooses.
+- Version: Where the choice only swaps a visual's field, this template suggests a field parameter instead (U003).
 
 **T14-A330-4.** In a measure that switches between measures by a slicer selection, the fallback branch can call ERROR, so evaluation stops in plain sight when there is no valid selection and nobody is confused by a missing or wrong choice.
 - Option. 2025. https://www.sqlbi.com/articles/dynamic-pareto-analysis-in-power-bi/

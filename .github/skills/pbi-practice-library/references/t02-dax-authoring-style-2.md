@@ -55,6 +55,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T02-A100-9.** Columns that hold the same content in different tables should have the same name; in particular, the two columns of a relationship should share one name.
 - Should. 2017. https://www.sqlbi.com/articles/duplicated-names-in-dax/
 - When: Naming columns that carry the same content across tables, including relationship keys.
+- Version: Not for role-playing copies, whose columns take role names (relationships and dates, rule 7).
 
 **T02-A100-10.** Do not rely on the editor's colour highlighting to tell a measure reference from a column reference: it is not always clear, and not every editor offers it.
 - Consider. Check. 2017. https://www.sqlbi.com/articles/duplicated-names-in-dax/
@@ -141,6 +142,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T02-A316-3.** As a general practice, avoid reducing the numeric precision of values at the level of single transactions: an error introduced that early is carried forward and grows through the later multiplications and sums.
 - Should. 2024. https://www.sqlbi.com/articles/impact-of-data-types-in-dax-arithmetical-calculations/
 - When: General guidance; the business decides whether a precision loss is acceptable.
+- Version: A floating-point column needs its M108 row in the brief (model standard, rule 10).
 
 **T02-A316-6.** A BI developer must understand that small rounding errors build up into larger differences in large models, in order to explain such differences to users and not waste time trying to fix a number that cannot be fixed.
 - Must. 2024. https://www.sqlbi.com/articles/impact-of-data-types-in-dax-arithmetical-calculations/
@@ -232,6 +234,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T02-A255-5.** A column created inside a measure, for example with ADDCOLUMNS, and held in a table variable may be referenced by its bare name, which reads better than the formally correct form with an empty table name.
 - Option. 2022. https://www.sqlbi.com/articles/variables-in-dax/
 - When: Only columns added inside the measure that belong to a table variable.
+- Version: This template starts such a column's name with @ (DAX standard, rule 30; M520).
 
 ### Data types and comparisons
 
@@ -282,11 +285,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T02-A316-2.** Changing a Decimal column, such as an exchange rate, to Fixed Decimal speeds up its multiplication by Fixed Decimal values, but weigh whether the lost precision is tolerable: Fixed Decimal keeps only four decimal digits.
 - Consider. 2024. https://www.sqlbi.com/articles/impact-of-data-types-in-dax-arithmetical-calculations/
 - When: Whether the error is acceptable depends on the business requirements.
-
-**T02-A316-4.** For a Decimal rate multiplied by Fixed Decimal amounts, iterate the distinct values of the rate column and multiply each by an aggregated measure, so far fewer multiplications run. Expect a larger datacache, and totals that differ from the row-by-row version through rounding.
-- Should. Check. 2024. https://www.sqlbi.com/articles/impact-of-data-types-in-dax-arithmetical-calculations/
-- When: The formula allows the amount to be aggregated per distinct rate value.
-- Version: Engine behaviour as tested in 2024.
+- Version: A type change is always the developer's decision (model standard, rule 10; M108).
 
 **T02-A316-5.** Two semantically equivalent formulas, even ones that differ only in the order of multiplications or the granularity of the iteration, can return noticeably different totals through rounding: every multiplication enlarges rounding errors already in the source values.
 - Fact. 2024. https://www.sqlbi.com/articles/impact-of-data-types-in-dax-arithmetical-calculations/

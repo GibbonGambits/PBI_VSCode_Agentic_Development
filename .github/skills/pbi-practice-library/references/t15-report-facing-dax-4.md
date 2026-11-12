@@ -40,6 +40,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T15-A317-15.** When core visuals cannot meet a requirement directly, one route is core visuals bent by unusual formatting; another is SVG images from DAX measures. Each suits a different situation.
 - Option. 2024. https://www.sqlbi.com/articles/creating-custom-visuals-in-power-bi-with-dax/
 - When: A reporting requirement that core Power BI visuals cannot meet directly.
+- Version: Formatting a single visual only when the developer asks; a colour code needs its row in section 10 of the brief (V009).
 
 ### Themes and report templates
 

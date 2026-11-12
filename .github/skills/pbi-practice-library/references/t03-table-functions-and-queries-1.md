@@ -68,7 +68,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T03-A012-7.** For performance, avoid CONTAINSSTRING and SEARCH unless a wildcard pattern is really needed. To test whether a text starts with a given value, use LEFT instead of SEARCH; that may be 5 to 10 times faster.
 - Should. Check. 2011. https://www.sqlbi.com/articles/from-sql-to-dax-string-comparison/
 - When: Filtering or comparing text in DAX.
-- Version: Speed figure reported in 2011.
+- Version: Speed figure reported in 2011. Not in a security role filter: there, store the value at the source (storage and security, rule 30; M601).
 
 **T03-A045-2.** Never treat CALCULATETABLE as automatically the better choice over FILTER. Internally it executes at least one FILTER itself, so what usually decides speed is how fine-grained those inner filters are, though the engine may optimise beyond that.
 - Must. 2014. https://www.sqlbi.com/articles/from-sql-to-dax-filtering-data/
@@ -131,6 +131,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T03-A048-10.** One way to make SUMMARIZE less complex is to shrink its clusters to the group-by columns only, for instance by giving the outer SUMMARIZE an inner SUMMARIZE of just those columns as its base table. Removing a group-by filter then behaves intuitively.
 - Option. 2021. https://www.sqlbi.com/articles/all-the-secrets-of-summarize/
 - When: Expressions are computed inside SUMMARIZE; a step towards replacing the outer SUMMARIZE with ADDCOLUMNS.
+- Version: This template computes columns with ADDCOLUMNS, not inside SUMMARIZE (DAX standard, rule 32; M522).
 
 **T03-A046-2.** Grouping a table by a related lookup column with SUMMARIZE differs from iterating that column's values with ADDCOLUMNS. SUMMARIZE keeps only the lookup values reached from the rows of its first argument; the ADDCOLUMNS form also returns lookup values with no matching rows.
 - Fact. 2014. https://www.sqlbi.com/articles/from-sql-to-dax-grouping-data/
@@ -169,7 +170,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T03-A071-9.** When a GROUPBY column takes MAXX over CURRENTGROUP of a value that can be blank, and every group must show a value, one way is to make the iterated expression return 0 instead of BLANK.
 - Option. Check. 2016. https://www.sqlbi.com/articles/nested-grouping-using-groupby-vs-summarize/
 - When: A GROUPBY aggregation returns BLANK for some groups that should still appear with a value.
-- Version: Written when GROUPBY dropped blank groups; since 2022 Power BI and Azure Analysis Services keep them as blank.
+- Version: Written when GROUPBY dropped blank groups; since 2022 Power BI and Azure Analysis Services keep them as blank. In a measure, a zero needs the brief's request (DAX standard, rule 7; M506).
 
 **T03-A283-2.** To group by a column computed in the query or expression, not stored in the model, avoid SUMMARIZE and use GROUPBY with CURRENTGROUP. SUMMARIZE groups such a column through clustering, which mostly gives unexpected results; GROUPBY groups without clustering.
 - Should. 2021. https://www.sqlbi.com/articles/all-the-secrets-of-summarize/ ; https://www.sqlbi.com/articles/differences-between-groupby-and-summarize/
@@ -256,7 +257,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T03-A115-4.** When sending SQL-syntax queries to a Tabular model, add SqlQueryMode=DataKeys; to the connection string.
 - Should. Check. 2017. https://www.sqlbi.com/articles/querying-raw-data-to-tabular/
 - When: Querying raw Tabular data with the SQL syntax used by SSDT and Power Pivot.
-- Version: Found by analysing tool queries; undocumented by Microsoft, may change and might be unsupported.
+- Version: Found by analysing tool queries; undocumented by Microsoft, may change and might be unsupported. Information for a person's own tooling: Copilot connects to no model or server (project instructions).
 
 **T03-A115-5.** In SQL-syntax queries against a Tabular model, start every reference with the [Model] identifier, put a $ before the table name, and enclose table and column names in square brackets every time, although brackets are strictly required only for names with spaces or special characters.
 - Should. Check. 2017. https://www.sqlbi.com/articles/querying-raw-data-to-tabular/
@@ -315,7 +316,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T03-A012-8.** Translate each SQL LIKE into the simplest DAX test: equality when there is no wildcard; LEFT for a fixed start; RIGHT for a fixed end; CONTAINSSTRING or SEARCH for a substring, with * between two ordered fragments; join two tests with AND for combined patterns.
 - Should. Check. 2011. https://www.sqlbi.com/articles/from-sql-to-dax-string-comparison/
 - When: Rewriting SQL LIKE filters as DAX conditions.
-- Version: Without CONTAINSSTRING (Analysis Services 2012 to 2017, Power Pivot v2): SEARCH with start 1 and not-found 0.
+- Version: Without CONTAINSSTRING (Analysis Services 2012 to 2017, Power Pivot v2): SEARCH with start 1 and not-found 0. Not in a security role filter: there, store the value at the source (storage and security, rule 30; M601).
 
 **T03-A045-1.** CALCULATETABLE combines its filter arguments with a logical AND and turns each one into an internal FILTER over a single column. That can be faster than FILTER over the table when each single-column condition returns relatively few values.
 - Fact. 2014. https://www.sqlbi.com/articles/from-sql-to-dax-filtering-data/
@@ -328,7 +329,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T03-A053-2.** Where the IN operator cannot be used, one way to filter a column on a list of values is to keep the values in a separate table and check the column against that table.
 - Option. Check. 2015. https://www.sqlbi.com/articles/from-sql-to-dax-in-and-exists/
 - When: Filtering a column on a list of values without the IN operator.
-- Version: The approach used before the IN operator existed (2016).
+- Version: The approach used before the IN operator existed (2016). The separate table needs its M411 row in the brief (relationships and dates, rule 4).
 
 **T03-A053-4.** In an existence test over the rows related to the current lookup value, RELATEDTABLE can replace CALCULATETABLE to get the related rows. Behaviour and performance are the same, and it is more descriptive and easier to read.
 - Option. 2015. https://www.sqlbi.com/articles/from-sql-to-dax-in-and-exists/
@@ -342,7 +343,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T03-A129-1.** To avoid repeating one complex table filter in many measures, the table expression can be kept in one measure's Detail Rows Expression property, and each measure can pass DETAILROWS of that measure to CALCULATE as its filter.
 - Option. Check. 2018. https://www.sqlbi.com/articles/creating-table-functions-in-dax-using-detailrows/
 - When: Complex filters shared by several measures; the feature was not designed for this, so check performance.
-- Version: Compatibility level 1400; in 2018 the only reusable table expression.
+- Version: Compatibility level 1400; in 2018 the only reusable table expression. Only without a calculation group (more model features, rule 14; M815); for repeated logic this template suggests user-defined functions.
 
 **T03-A129-3.** DETAILROWS used as a CALCULATE filter returns correct results, but its query plan can be worse than the same table expression written directly in CALCULATE, notably when the filter picks standard time intelligence functions from dynamic conditions.
 - Fact. Check. 2018. https://www.sqlbi.com/articles/creating-table-functions-in-dax-using-detailrows/

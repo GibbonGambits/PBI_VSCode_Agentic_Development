@@ -111,6 +111,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T11-A223-7.** For per-user defaults on any number of columns, work out in a variable, per column, the values to keep on the model column itself: all visible values when it is already filtered, otherwise the user's defaults. Apply all variables in one CALCULATE around SELECTEDMEASURE.
 - Must. 2021. https://www.sqlbi.com/articles/customizing-default-values-for-each-user-in-power-bi-reports/
 - When: Two or more default columns; relationships to defaults tables are no longer needed. Expect a heavy formula engine cost.
+- Version: Each unrelated defaults table needs its M411 row in the brief (relationships and dates, rule 4).
 
 **T11-A223-8.** The label that describes the values in view can be a measure which, for each column with a default, tests ISCROSSFILTERED and then either lists the visible values with CONCATENATEX or states that all values are shown.
 - Option. 2021. https://www.sqlbi.com/articles/customizing-default-values-for-each-user-in-power-bi-reports/

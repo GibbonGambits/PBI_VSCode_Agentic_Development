@@ -19,6 +19,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T16-A311-3.** Build recurring report elements, such as a title area, by copying them from a library of ready-made pieces instead of recreating them in every report.
 - Should. 2024. https://www.sqlbi.com/articles/using-atomic-design-in-report-and-model-development/
 - When: Most useful when fixed styles or functions, such as a help button to a central portal, apply to many reports.
+- Version: Only pieces from this report or the shipped examples, with no visual-level style (report standard, rule 36; V009).
 
 **T16-A311-6.** The built-in quick measures of Power BI Desktop can be a starting point for self-service authors or for the most common patterns, but they are limited: the set cannot be customised, and some quick measures place requirements on the model.
 - Option. 2024. https://www.sqlbi.com/articles/using-atomic-design-in-report-and-model-development/
@@ -36,6 +37,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T16-A366-4.** Move shared logic into a user-defined function also when just two measures repeat it and differ only in the last step: for example both build the same table variable, then one counts its rows and the other uses it as a CALCULATE filter.
 - Should. 2026. https://www.sqlbi.com/articles/creating-dax-functions-with-ai-to-remove-duplicated-code/
 - When: Measures compute the same intermediate result and use it differently at the end; AI-generated code sometimes needs this.
+- Version: This template suggests a function from three repeats, at the end of a task, and builds it after the developer's yes (U001).
 
 ### AI assistants and agents
 
@@ -47,7 +49,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T16-A339-2.** Before users query a semantic model through today's conversational BI tools, the model must be prepared for AI, with significant effort: very specific naming conventions, a linguistic schema, AI instructions, and limits on the fields the AI can see and use.
 - Must. 2025. https://www.sqlbi.com/articles/ai-in-power-bi-time-to-pay-attention/
 - When: Users will ask questions through existing conversational BI tools; access through an MCP server may need less preparation.
-- Version: State of 2025. AI instructions belong to Prep data for AI, a preview feature that needs the developer's yes.
+- Version: State of 2025. AI instructions belong to Prep data for AI, a preview feature that needs the developer's yes. The developer sets these in Power BI, not in the files (model standard, rule 17; native features).
 
 **T16-A339-3.** When users query a model through an AI tool and an MCP server, you can have the tool ask clarifying questions before it uses fields, correct it to improve answers, and optionally add a server that gives it persistent memory of what it learns.
 - Option. 2025. https://www.sqlbi.com/articles/ai-in-power-bi-time-to-pay-attention/
@@ -149,7 +151,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T16-A367-6.** An AI assistant connected to the semantic model can also automate test preparation: it inspects the model, searches for suitable test cases, and runs or validates the test queries, sparing repeated manual filtering and reading of each customer's transactions.
 - Option. Check. 2026. https://www.sqlbi.com/articles/testing-dax-measures-by-using-ai/
 - When: Building tests for the measures of a semantic model.
-- Version: Shown in 2026 with a model open in Power BI Desktop, reached through the local Power BI modeling MCP server.
+- Version: Shown in 2026 with a model open in Power BI Desktop, reached through the local Power BI modeling MCP server. Copilot only reads, over a read-only connection the developer has set up (data facts).
 
 **T16-A367-9.** A failing test can be written to return the expected and the actual value together with an explanation of the likely cause, which gives the first information needed to investigate a regression.
 - Option. 2026. https://www.sqlbi.com/articles/testing-dax-measures-by-using-ai/
@@ -162,6 +164,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T16-A367-12.** Once reviewed, generated test queries can be kept as ordinary DAX code with the project and run again later. With customers, dates, filters and expected values fixed, the queries are deterministic, even though the AI discovery that produced them was not.
 - Option. 2026. https://www.sqlbi.com/articles/testing-dax-measures-by-using-ai/
 - When: Maintaining measure tests first created with AI help; manual checks through report pages are hard to repeat.
+- Version: Copilot keeps such files only when the developer asks, outside model and report folders (more model features, rules 21 and 25).
 
 **T16-A367-13.** In measure testing, let AI explore the model, find candidate cases and write the repetitive test code, while a person keeps control of what counts as correct: the business requirement and the expected results, which still need human validation.
 - Should. 2026. https://www.sqlbi.com/articles/testing-dax-measures-by-using-ai/
@@ -240,6 +243,7 @@ Practice notes drawn from public SQLBI articles and white papers, each restated 
 **T16-A370-10.** A customer ranking measure that an AI assistant wrote from a contract can probably be made more efficient by rewriting it with the RANK function.
 - Option. 2026. https://www.sqlbi.com/articles/understanding-dax-contracts-when-using-ai/
 - When: Reviewing a customer ranking measure generated by an AI assistant.
+- Version: Window functions only when the developer asks; keep a rewrite only with equal results (native features; M516).
 
 ### Testing measures
 
