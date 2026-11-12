@@ -56,7 +56,7 @@ In Power BI Desktop also check these, because no document settles them: the repo
 - Every row of the kind Data is done, in the last commit. The final answer starts by saying that the model must be refreshed once; after that refresh every page shows the same data as in `_before/`.
 - A visual that uses drill-down, a help tooltip, a tooltip page or tooltip fields kept its header icons or its tooltip, with a row in section 7 of the brief.
 - One commit for each kind that had rows, in this order: `Improve: theme`, `Improve: design`, `Improve: mechanical fixes`, `Improve: layout fixes`, `Improve: measures moved`, `Improve: renames`, `Improve: changes that need a refresh`, then `Improve: change log`. Undoing one with `git revert` leaves the others in place.
-- Design: each page was judged first; a page that worked was left alone, with "the page works" in its row. No visual shows a second heading made of field names. No amount is coloured red to green (no V026). Nothing the page showed before is missing.
+- Design: each page was judged first; a page that worked was left alone, with "the page works" in its row. No visual shows an automatic subtitle made of field names. No amount is coloured red to green (no V026). Nothing the page showed before is missing.
 - Every measure the agent wrote or changed shows a value in a picture, or is listed in the final answer as not tested. No visual shows an error icon. Every table name in DAX is in single quotes.
 - The final answer has a table of changes by type and a few key changes; `docs/change-log.md` lists every change with its before and after.
 - Fewer Fail items after than before, and no item that went from Pass to Fail. `compare` says how many of the remaining Fail items wait for a fact from a person.

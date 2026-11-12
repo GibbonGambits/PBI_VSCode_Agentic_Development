@@ -13,7 +13,7 @@ Use this page when the developer asks to improve the design of an existing repor
 - **The visual type**, to fit the question it answers: the table in section H of `report-standard.md`, beside this file. A part-to-whole visual with more than 5 categories becomes a bar chart sorted by value; a trend gets an ordered date axis; a gauge used as a KPI becomes a card or a KPI visual.
 - **Add, replace, resize or remove visuals.** No information may be lost: every field and measure that the page showed is still shown on that page. Removing a visual is allowed only when another visual on the page shows the same fields and measures. A retired map type (`map`, `filledMap`) keeps its type: Azure Maps can be switched off by an administrator. Name it in your final answer as a note.
 - **Positions and sizes**: by the numbers in `layout-standard.md`, with `python scripts/set_positions.py`. A new visual is copied from a visual of the same type in the report, or from the shipped example of that type (`tests/fixtures/examples/INDEX.md`), as `pages-and-visuals.md` sets out.
-- **Titles and headings** (item 55): each title says what the visual shows. One heading per visual: a subtitle that repeats the title or the field names is switched off (`subTitle` `show` false). Code V025 lists visuals that may show a second heading.
+- **Titles and subtitles** (item 55): each title says what the visual shows. A subtitle that repeats the title or the field names is switched off (`subTitle` `show` false); keep one only when it adds something, such as the period or the unit. Code V025 lists visuals that may show an automatic subtitle.
 - **Text** (item 70): the theme's text classes only. Remove font, size and colour settings on single visuals (V009).
 - **Colour** (items 57, 58, 66): section 3.
 - **Tab order**: after any visual moves, is added or is removed, run `python scripts/set_tab_order.py .` (`--dry-run` first). It sets the keyboard order to the reading order, without a yes.
@@ -38,7 +38,7 @@ Decide first what the colour says. Then use the theme's colours for that meaning
 ## 4. Look at the result
 
 1. `python scripts/check_project.py .`, and fix every error.
-2. `python scripts/desktop_bridge.py reload .`, then `screenshots .`. On each page you changed, look for: an error icon or an empty visual, text that is cut off, overlaps, colours that do not match section 3, two headings on one visual. Fix what you find, then look again.
+2. `python scripts/desktop_bridge.py reload .`, then `screenshots .`. On each page you changed, look for: an error icon or an empty visual, text that is cut off, overlaps, colours that do not match section 3, an automatic subtitle that repeats the field names. Fix what you find, then look again.
 3. `python scripts/desktop_bridge.py clean <folder of pictures>`.
 4. When the Bridge is not available, say in your final answer that you could not see the pages, and name them.
 

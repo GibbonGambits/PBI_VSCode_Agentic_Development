@@ -435,7 +435,7 @@ def check(cp, report_dir, brief, findings):
                 "An image that is only decoration is listed in section 10 of the brief instead"
                 % (title, len(no_alt), ", ".join(no_alt[:10]) + (" ..." if len(no_alt) > 10 else "")))
         if second:
-            add("V025", page, None, "page '%s': %d visual(s) may show a second heading under the title: %s. Their files "
+            add("V025", page, None, "page '%s': %d visual(s) may show an automatic subtitle under the title: %s. Their files "
                 "neither switch the subtitle off nor write one, and the report's base theme switches it on (it then "
                 "repeats the field names). Set subTitle show to false, or write a subtitle that adds something"
                 % (title, len(second), ", ".join(second[:10]) + (" ..." if len(second) > 10 else "")))

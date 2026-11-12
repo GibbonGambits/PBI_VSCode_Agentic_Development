@@ -33,7 +33,7 @@ or both (the default). Kinds outside the scope start as 'skipped: outside the sc
     both        every kind
 
 Kinds of fix, in the order they are applied, one commit each: Theme (the owner's theme is registered, and the
-second heading a base theme puts under every title is switched off),
+automatic subtitle a base theme puts under every title is switched off),
 Design (the pages whose design fails the checklist's design items are designed again: skill pbi-report,
 references/design.md), Mechanical (descriptions, format strings, folders, hiding, header icons and tooltips, alt text, titles, the
 DAX style), Layout (positions and sizes, a back button, tab order), Measures (every measure moves to
@@ -92,7 +92,7 @@ THEME = {
     "T001": ("Register theme/theme.json in the report files (python scripts/scaffold.py theme .)",
              "Every visual takes the theme's colours and fonts. Microsoft Learn describes importing the theme in "
              "Power BI Desktop as the supported route: look at the colours when the report is first opened"),
-    "V025": ("Switch off the second heading the base theme shows (subTitle show false), or write a subtitle that adds "
+    "V025": ("Switch off the automatic subtitle the base theme shows (subTitle show false), or write a subtitle that adds "
              "something, such as the period or the unit", "The line under the title disappears or changes"),
 }
 DESIGN = {
