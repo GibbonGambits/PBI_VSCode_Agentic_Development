@@ -193,6 +193,30 @@ class Pages(ReportCase):
         self.write_json(path, data)
         self.assertNot("V009")
 
+    def test_V009_a_theme_colour_named_by_keyword_passes(self):
+        keyword = {"solid": {"color": lit("'maxColor'")}}
+        self.visual("Overview", "Overview_Card_Styled", fields=[SALES],
+                    objects={"labels": [{"properties": {"color": keyword}}]})
+        self.assertNot("V009")
+
+    def test_V024_data_bars_with_a_part_missing_fail(self):
+        def colour(word):
+            return {"solid": {"color": lit("'%s'" % word)}}
+        bars = {"positiveColor": colour("maxColor"), "negativeColor": colour("minColor"),
+                "axisColor": colour("foreground"), "hideText": lit("false")}
+        path = self.visual("Overview", "Overview_Card_Styled", fields=[SALES],
+                           objects={"columnFormatting": [{"properties": {"dataBars": bars}}]})
+        self.assertNot("V024")
+        self.assertNot("V009")                                   # theme keywords are not styling of the visual
+        data = self.read_json(path)
+        bars = data["visual"]["objects"]["columnFormatting"][0]["properties"]["dataBars"]
+        del bars["axisColor"]
+        self.write_json(path, data)
+        self.assertNot("V024")                                   # the axis colour is optional
+        del bars["positiveColor"]
+        self.write_json(path, data)
+        self.assertFinds("V024", False)
+
     def test_V010_bookmark_with_a_visual_that_is_gone_warns(self):
         self.write_json(os.path.join(DEFINITION, "bookmarks", "ShowTrend.bookmark.json"),
                         {"$schema": BOOKMARK_SCHEMA, "name": "ShowTrend", "displayName": "Show trend",

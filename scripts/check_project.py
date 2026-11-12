@@ -207,6 +207,7 @@ Finding codes (errors unless marked warn or note; only errors change the exit co
     V022  (warn) the report uses a preview feature that section 11 of the brief does not list (Gantt visual,
           format string on a visual)
     V023  (warn) cross-report drillthrough page in a report that does not switch the feature on
+    V024  data bars without a bar colour: Power BI Desktop fails to load the report
     A001  (warn) visuals without alt text (one finding for each page)
     A002  (warn) visuals that share a tab order number
     A003  (warn) visuals that show a title made up from field names (one finding for each page)
