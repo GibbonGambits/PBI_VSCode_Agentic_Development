@@ -450,7 +450,7 @@ def start(root):
         return 1
     code, out = git(root, "status", "--porcelain", "--untracked-files=all")
     if code != 0 or out:
-        print("Stopped: not everything is committed. Commit these first, then run this again:")
+        print("Stopped: not everything is committed. Commit these yourself (git add -A, then git commit -m \"Before improve: the report as found\"), then run this again:")
         print(out)
         return 1
     parts = project_parts(root)
@@ -734,7 +734,8 @@ def next_step(root):
     if code != 0:
         return say(23, "This folder is not a Git repository. The flow needs one: the original stays on a branch.")
     if not branch.startswith(BRANCH_PREFIX):
-        return say(23, "Safety first. The project must be saved and closed in Power BI Desktop, and everything committed. "
+        return say(23, "Safety first. The project must be saved and closed in Power BI Desktop. If anything is not committed, commit "
+                       "it yourself, without asking: git add -A, then git commit -m \"Before improve: the report as found\". "
                        "Then run: python scripts/improve.py start")
     exists = {name: os.path.isfile(os.path.join(root, name)) for name in (REVIEW, REVIEW_BEFORE, PLAN)}
     if not exists[REVIEW_BEFORE]:

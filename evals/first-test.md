@@ -9,7 +9,7 @@ The report is not kept in this repository. Do not commit someone else's report t
 1. Pick any report that nobody here built and whose data you can refresh on your computer. A table whose query or partition changes shows no data until it is refreshed.
 2. Open it in Power BI Desktop. File > Save as, file type Power BI project (`.pbip`), into the root of your scratch clone. Close Desktop.
 3. Do not import the theme and do not fix anything by hand: the test is what the flow finds and does.
-4. Commit everything. Fill in nothing by hand: the brief stays empty.
+4. Commit nothing and fill in nothing by hand: the agent makes the first commit, and the brief stays empty.
 
 ## Run
 
