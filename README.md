@@ -43,7 +43,7 @@ scripts/schemas/                     a copy of every version of Microsoft's sche
 tests/                               tests of the scripts, on made-up data
 tests/fixtures/examples/             one working example of every native object kind, with INDEX.md
 evals/prompts.md                     test prompts for the guidance (not yet run)
-evals/first-test.md                  how to try the whole flow on one of Microsoft's sample reports
+evals/first-test.md                  how to try the whole flow on a report nobody here built
 maintenance/                         the template's own working papers: coverage, feature inventory, decisions, sources,
                                      and the working paper and removal record of the practice library
 THIRD_PARTY_NOTICES.md               licence notices for what the template follows or ships
